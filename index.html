@@ -125,6 +125,7 @@ button{
   height:210px;
   object-fit:cover;
   background:#eee;
+  display:block;
 }
 .card-content{
   padding:16px;
@@ -270,6 +271,7 @@ textarea{
     <div class="logo">🇬🇳 Marché Guinée</div>
     <button class="account-btn" onclick="ouvrirCompte()">👤 Mon compte</button>
   </div>
+
   <input
     id="searchInput"
     class="search"
@@ -283,7 +285,10 @@ textarea{
 <section class="hero">
   <h1>Bienvenue sur Marché Guinée 🇬🇳</h1>
   <p>Achetez et vendez facilement en Guinée.</p>
-  <button class="primary" onclick="ouvrirVente()">➕ Publier une annonce</button>
+
+  <button class="primary" onclick="ouvrirVente()">
+    ➕ Publier une annonce
+  </button>
 </section>
 
 <div class="categories">
@@ -314,13 +319,16 @@ textarea{
 <!-- COMPTE -->
 <div id="compteModal" class="modal">
   <div class="modal-box">
+
     <button class="close" onclick="fermerModal('compteModal')">×</button>
 
     <div id="compteAccueil">
       <div class="form-title">👤 Mon compte</div>
+
       <p>Crée ton compte gratuitement ou connecte-toi.</p>
 
       <div class="form-actions">
+
         <button class="primary" onclick="afficherInscription()">
           Créer mon compte gratuitement
         </button>
@@ -328,62 +336,95 @@ textarea{
         <button class="secondary" onclick="afficherConnexion()">
           Se connecter
         </button>
+
       </div>
     </div>
 
+
     <div id="inscription" style="display:none">
+
       <div class="form-title">Créer mon compte</div>
 
       <div id="signupMessage" class="message"></div>
 
       <label>Nom complet</label>
-      <input id="signupName" type="text" placeholder="Ex : Saikou Diallo">
+      <input
+        id="signupName"
+        type="text"
+        placeholder="Ex : Saikou Diallo"
+      >
 
       <label>Numéro</label>
-      <input id="signupPhone" type="tel" placeholder="Ex : 620000000">
+      <input
+        id="signupPhone"
+        type="tel"
+        placeholder="Ex : 620000000"
+      >
 
       <label>Mot de passe</label>
-      <input id="signupPassword" type="password" placeholder="Mot de passe">
+      <input
+        id="signupPassword"
+        type="password"
+        placeholder="Mot de passe"
+      >
 
       <button class="primary" onclick="creerCompte()">
         Créer mon compte
       </button>
 
       <br><br>
+
       <button class="secondary" onclick="afficherConnexion()">
         J'ai déjà un compte
       </button>
+
     </div>
 
+
     <div id="connexion" style="display:none">
+
       <div class="form-title">Se connecter</div>
 
       <div id="loginMessage" class="message"></div>
 
       <label>Numéro</label>
-      <input id="loginPhone" type="tel" placeholder="Ex : 620000000">
+      <input
+        id="loginPhone"
+        type="tel"
+        placeholder="Ex : 620000000"
+      >
 
       <label>Mot de passe</label>
-      <input id="loginPassword" type="password" placeholder="Mot de passe">
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Mot de passe"
+      >
 
       <button class="primary" onclick="connecterCompte()">
         Se connecter
       </button>
 
       <br><br>
+
       <button class="secondary" onclick="afficherInscription()">
         Créer un compte
       </button>
+
     </div>
 
+
     <div id="compteConnecte" style="display:none">
+
       <div class="form-title">👤 Mon compte</div>
+
       <p id="nomUtilisateur"></p>
       <p id="numeroUtilisateur"></p>
 
       <button class="primary" onclick="fermerModal('compteModal')">
         Fermer
       </button>
+
     </div>
 
   </div>
@@ -392,7 +433,9 @@ textarea{
 
 <!-- VENTE -->
 <div id="venteModal" class="modal">
+
   <div class="modal-box">
+
     <button class="close" onclick="fermerModal('venteModal')">×</button>
 
     <div class="form-title">🛍️ Publier une annonce</div>
@@ -400,15 +443,29 @@ textarea{
     <div id="venteMessage" class="message"></div>
 
     <label>Titre de l'annonce</label>
-    <input id="titre" type="text" placeholder="Ex : iPhone 13">
+    <input
+      id="titre"
+      type="text"
+      placeholder="Ex : iPhone 13"
+    >
 
     <label>Description</label>
-    <textarea id="description" placeholder="Décris ton produit..."></textarea>
+
+    <textarea
+      id="description"
+      placeholder="Décris ton produit..."
+    ></textarea>
 
     <label>Prix en GNF</label>
-    <input id="prix" type="number" placeholder="Ex : 5000000">
+
+    <input
+      id="prix"
+      type="number"
+      placeholder="Ex : 5000000"
+    >
 
     <label>État</label>
+
     <select id="condition">
       <option value="Good">Bon état</option>
       <option value="New">Neuf</option>
@@ -416,6 +473,7 @@ textarea{
     </select>
 
     <label>Catégorie</label>
+
     <select id="categorie">
       <option value="Téléphones">Téléphones</option>
       <option value="Mode">Mode</option>
@@ -426,41 +484,67 @@ textarea{
     </select>
 
     <label>Ville</label>
-    <input id="ville" type="text" placeholder="Ex : Conakry">
+
+    <input
+      id="ville"
+      type="text"
+      placeholder="Ex : Conakry"
+    >
 
     <label>Quartier</label>
-    <input id="quartier" type="text" placeholder="Ex : Lambanyi">
+
+    <input
+      id="quartier"
+      type="text"
+      placeholder="Ex : Lambanyi"
+    >
 
     <label>Photo du produit</label>
-    <input id="photo" type="file" accept="image/*" onchange="previewPhoto()">
+
+    <input
+      id="photo"
+      type="file"
+      accept="image/*"
+      onchange="previewPhoto()"
+    >
 
     <img id="photoPreview" class="preview">
 
     <button class="primary" onclick="publierAnnonce()">
       Publier l'annonce
     </button>
+
   </div>
+
 </div>
 
 
 <!-- DETAIL -->
 <div id="detailModal" class="modal">
+
   <div class="modal-box">
 
-    <button class="close" onclick="fermerModal('detailModal')">×</button>
+    <button class="close" onclick="fermerModal('detailModal')">
+      ×
+    </button>
 
     <div id="detailContent">
       <p>Chargement...</p>
     </div>
 
   </div>
+
 </div>
 
 
 <!-- PAIEMENT -->
 <div id="paiementModal" class="modal">
+
   <div class="modal-box">
-    <button class="close" onclick="fermerModal('paiementModal')">×</button>
+
+    <button class="close" onclick="fermerModal('paiementModal')">
+      ×
+    </button>
 
     <div class="form-title">💳 Paiement</div>
 
@@ -473,442 +557,936 @@ textarea{
       Les échanges entre acheteurs et vendeurs restent gratuits.
     </p>
 
-    <button class="primary" onclick="fermerModal('paiementModal')">
+    <button
+      class="primary"
+      onclick="fermerModal('paiementModal')"
+    >
       Compris
     </button>
+
   </div>
+
 </div>
 
 
 <script>
-const SUPABASE_URL = "https://meernnpwtcgqjppyccqk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
+
+const SUPABASE_URL =
+  "https://meernnpwtcgqjppyccqk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
+
 
 let toutesLesAnnonces = [];
+
 let categorieActuelle = "Toutes";
+
 let utilisateurConnecte = null;
 
 
 function headers(extra={}){
+
   return {
+
     "apikey": SUPABASE_KEY,
-    "Authorization": "Bearer " + SUPABASE_KEY,
-    "Content-Type": "application/json",
+
+    "Authorization":
+      "Bearer " + SUPABASE_KEY,
+
+    "Content-Type":
+      "application/json",
+
     ...extra
   };
+
 }
 
 
 function escapeHTML(value){
-  if(value === null || value === undefined) return "";
+
+  if(value === null || value === undefined){
+    return "";
+  }
+
   return String(value)
+
     .replace(/&/g,"&amp;")
+
     .replace(/</g,"&lt;")
+
     .replace(/>/g,"&gt;")
+
     .replace(/"/g,"&quot;")
+
     .replace(/'/g,"&#039;");
 }
 
 
 function formatPrix(prix){
-  if(prix === null || prix === undefined) return "";
+
+  if(prix === null || prix === undefined){
+    return "";
+  }
+
   return Number(prix).toLocaleString("fr-FR") + " GNF";
 }
 
 
 function formatDate(date){
-  if(!date) return "";
-  try{
-    return new Date(date).toLocaleDateString("fr-FR");
-  }catch(e){
+
+  if(!date){
     return "";
+  }
+
+  try{
+
+    return new Date(date)
+      .toLocaleDateString("fr-FR");
+
+  }catch(e){
+
+    return "";
+
   }
 }
 
 
 function ouvrirModal(id){
+
   document.getElementById(id).style.display="block";
+
   document.body.style.overflow="hidden";
 }
 
 
 function fermerModal(id){
+
   document.getElementById(id).style.display="none";
+
   document.body.style.overflow="";
 }
 
 
 window.addEventListener("click",function(e){
-  document.querySelectorAll(".modal").forEach(function(modal){
-    if(e.target === modal){
-      modal.style.display="none";
-      document.body.style.overflow="";
-    }
-  });
+
+  document.querySelectorAll(".modal")
+    .forEach(function(modal){
+
+      if(e.target === modal){
+
+        modal.style.display="none";
+
+        document.body.style.overflow="";
+
+      }
+
+    });
+
 });
 
 
 function ouvrirCompte(){
+
   if(utilisateurConnecte){
+
     afficherCompteConnecte();
+
   }else{
-    document.getElementById("compteAccueil").style.display="block";
-    document.getElementById("inscription").style.display="none";
-    document.getElementById("connexion").style.display="none";
-    document.getElementById("compteConnecte").style.display="none";
+
+    document.getElementById("compteAccueil")
+      .style.display="block";
+
+    document.getElementById("inscription")
+      .style.display="none";
+
+    document.getElementById("connexion")
+      .style.display="none";
+
+    document.getElementById("compteConnecte")
+      .style.display="none";
+
     ouvrirModal("compteModal");
+
   }
+
 }
 
 
 function afficherInscription(){
-  document.getElementById("compteAccueil").style.display="none";
-  document.getElementById("inscription").style.display="block";
-  document.getElementById("connexion").style.display="none";
-  document.getElementById("compteConnecte").style.display="none";
+
+  document.getElementById("compteAccueil")
+    .style.display="none";
+
+  document.getElementById("inscription")
+    .style.display="block";
+
+  document.getElementById("connexion")
+    .style.display="none";
+
+  document.getElementById("compteConnecte")
+    .style.display="none";
+
 }
 
 
 function afficherConnexion(){
-  document.getElementById("compteAccueil").style.display="none";
-  document.getElementById("inscription").style.display="none";
-  document.getElementById("connexion").style.display="block";
-  document.getElementById("compteConnecte").style.display="none";
+
+  document.getElementById("compteAccueil")
+    .style.display="none";
+
+  document.getElementById("inscription")
+    .style.display="none";
+
+  document.getElementById("connexion")
+    .style.display="block";
+
+  document.getElementById("compteConnecte")
+    .style.display="none";
+
 }
 
 
 function afficherCompteConnecte(){
-  document.getElementById("compteAccueil").style.display="none";
-  document.getElementById("inscription").style.display="none";
-  document.getElementById("connexion").style.display="none";
-  document.getElementById("compteConnecte").style.display="block";
 
-  document.getElementById("nomUtilisateur").textContent =
-    "Nom : " + (utilisateurConnecte.fullName || "");
+  document.getElementById("compteAccueil")
+    .style.display="none";
 
-  document.getElementById("numeroUtilisateur").textContent =
-    "Numéro : " + (utilisateurConnecte.phone || "");
+  document.getElementById("inscription")
+    .style.display="none";
+
+  document.getElementById("connexion")
+    .style.display="none";
+
+  document.getElementById("compteConnecte")
+    .style.display="block";
+
+
+  document.getElementById("nomUtilisateur")
+    .textContent =
+    "Nom : " +
+    (utilisateurConnecte.fullName || "");
+
+
+  document.getElementById("numeroUtilisateur")
+    .textContent =
+    "Numéro : " +
+    (utilisateurConnecte.phone || "");
+
 
   ouvrirModal("compteModal");
+
 }
 
 
 function numeroNormalise(numero){
+
   return String(numero || "")
+
     .replace(/\s/g,"")
+
     .replace(/^\+/,"")
+
     .replace(/^00/,"");
+
 }
 
 
 function emailTechnique(numero){
-  return numeroNormalise(numero) + "@marche-guinee.netlify.app";
+
+  return numeroNormalise(numero) +
+    "@marche-guinee.netlify.app";
+
 }
 
 
 async function creerCompte(){
 
-  const nom = document.getElementById("signupName").value.trim();
-  const phone = numeroNormalise(document.getElementById("signupPhone").value);
-  const password = document.getElementById("signupPassword").value;
+  const nom =
+    document.getElementById("signupName")
+      .value
+      .trim();
 
-  const msg = document.getElementById("signupMessage");
+  const phone =
+    numeroNormalise(
+      document.getElementById("signupPhone").value
+    );
+
+  const password =
+    document.getElementById("signupPassword")
+      .value;
+
+
+  const msg =
+    document.getElementById("signupMessage");
+
 
   msg.style.display="block";
 
+
   if(!nom || !phone || !password){
-    msg.textContent="Veuillez remplir tous les champs.";
+
+    msg.textContent =
+      "Veuillez remplir tous les champs.";
+
     return;
+
   }
+
 
   if(password.length < 6){
-    msg.textContent="Le mot de passe doit contenir au moins 6 caractères.";
+
+    msg.textContent =
+      "Le mot de passe doit contenir au moins 6 caractères.";
+
     return;
+
   }
 
-  msg.textContent="Création du compte...";
+
+  msg.textContent =
+    "Création du compte...";
+
 
   try{
 
-    const signup = await fetch(
-      SUPABASE_URL + "/auth/v1/signup",
-      {
-        method:"POST",
-        headers:headers(),
-        body:JSON.stringify({
-          email:emailTechnique(phone),
-          password:password,
-          data:{
-            full_name:nom,
-            phone:phone
-          }
-        })
-      }
-    );
+    const signup =
+      await fetch(
 
-    const result = await signup.json();
+        SUPABASE_URL +
+        "/auth/v1/signup",
+
+        {
+
+          method:"POST",
+
+          headers:headers(),
+
+          body:JSON.stringify({
+
+            email:
+              emailTechnique(phone),
+
+            password:
+              password,
+
+            data:{
+
+              full_name:
+                nom,
+
+              phone:
+                phone
+
+            }
+
+          })
+
+        }
+
+      );
+
+
+    const result =
+      await signup.json();
+
 
     if(!signup.ok){
+
       msg.textContent =
         result.msg ||
         result.message ||
         result.error_description ||
         "Impossible de créer le compte.";
+
       return;
+
     }
+
 
     if(result.user){
 
       await fetch(
-        SUPABASE_URL + "/rest/v1/Users?on_conflict=id",
+
+        SUPABASE_URL +
+        "/rest/v1/Users?on_conflict=id",
+
         {
+
           method:"POST",
+
           headers:headers({
-            "Prefer":"resolution=merge-duplicates,return=minimal"
+
+            "Prefer":
+              "resolution=merge-duplicates,return=minimal"
+
           }),
+
           body:JSON.stringify({
-            id:result.user.id,
-            "Full name":nom,
-            "Phone":phone
+
+            id:
+              result.user.id,
+
+            "Full name":
+              nom,
+
+            "Phone":
+              phone
+
           })
+
         }
+
       );
 
+
       utilisateurConnecte={
-        id:result.user.id,
-        fullName:nom,
-        phone:phone,
-        accessToken:result.access_token || null
+
+        id:
+          result.user.id,
+
+        fullName:
+          nom,
+
+        phone:
+          phone,
+
+        accessToken:
+          result.access_token || null
+
       };
 
-      msg.textContent="Compte créé avec succès. 🇬🇳";
+
+      msg.textContent =
+        "Compte créé avec succès. 🇬🇳";
+
 
       setTimeout(function(){
+
         fermerModal("compteModal");
+
         afficherCompteConnecte();
+
       },700);
+
     }
 
+
   }catch(error){
-    msg.textContent="Erreur de connexion à Supabase.";
+
+    msg.textContent =
+      "Erreur de connexion à Supabase.";
+
     console.error(error);
+
   }
+
 }
 
 
 async function connecterCompte(){
 
-  const phone = numeroNormalise(document.getElementById("loginPhone").value);
-  const password = document.getElementById("loginPassword").value;
+  const phone =
+    numeroNormalise(
+      document.getElementById("loginPhone").value
+    );
 
-  const msg=document.getElementById("loginMessage");
+  const password =
+    document.getElementById("loginPassword").value;
+
+
+  const msg =
+    document.getElementById("loginMessage");
+
+
   msg.style.display="block";
 
+
   if(!phone || !password){
-    msg.textContent="Veuillez remplir tous les champs.";
+
+    msg.textContent =
+      "Veuillez remplir tous les champs.";
+
     return;
+
   }
 
-  msg.textContent="Connexion...";
+
+  msg.textContent =
+    "Connexion...";
+
 
   try{
 
-    const response=await fetch(
-      SUPABASE_URL + "/auth/v1/token?grant_type=password",
-      {
-        method:"POST",
-        headers:headers(),
-        body:JSON.stringify({
-          email:emailTechnique(phone),
-          password:password
-        })
-      }
-    );
+    const response =
+      await fetch(
 
-    const result=await response.json();
+        SUPABASE_URL +
+        "/auth/v1/token?grant_type=password",
+
+        {
+
+          method:"POST",
+
+          headers:headers(),
+
+          body:JSON.stringify({
+
+            email:
+              emailTechnique(phone),
+
+            password:
+              password
+
+          })
+
+        }
+
+      );
+
+
+    const result =
+      await response.json();
+
 
     if(!response.ok){
+
       msg.textContent =
         result.error_description ||
         result.msg ||
         "Numéro ou mot de passe incorrect.";
+
       return;
+
     }
+
 
     let nom="Utilisateur";
 
-    if(result.user && result.user.user_metadata){
-      nom=result.user.user_metadata.full_name || nom;
+
+    if(
+      result.user &&
+      result.user.user_metadata
+    ){
+
+      nom =
+        result.user.user_metadata.full_name ||
+        nom;
+
     }
 
+
     utilisateurConnecte={
-      id:result.user.id,
-      fullName:nom,
-      phone:phone,
-      accessToken:result.access_token
+
+      id:
+        result.user.id,
+
+      fullName:
+        nom,
+
+      phone:
+        phone,
+
+      accessToken:
+        result.access_token
+
     };
 
-    msg.textContent="Connexion réussie.";
+
+    msg.textContent =
+      "Connexion réussie.";
+
 
     setTimeout(function(){
+
       fermerModal("compteModal");
+
     },600);
 
+
   }catch(error){
-    msg.textContent="Erreur de connexion.";
+
+    msg.textContent =
+      "Erreur de connexion.";
+
     console.error(error);
+
   }
+
 }
 
 
 function ouvrirVente(){
 
   if(!utilisateurConnecte){
+
     ouvrirCompte();
 
     setTimeout(function(){
+
       afficherConnexion();
+
     },100);
 
     return;
+
   }
 
   ouvrirModal("venteModal");
+
 }
 
 
 function previewPhoto(){
 
-  const input=document.getElementById("photo");
-  const preview=document.getElementById("photoPreview");
+  const input =
+    document.getElementById("photo");
 
-  if(!input.files || !input.files[0]){
+  const preview =
+    document.getElementById("photoPreview");
+
+
+  if(
+    !input.files ||
+    !input.files[0]
+  ){
+
     preview.style.display="none";
+
     return;
+
   }
 
-  const reader=new FileReader();
+
+  const reader =
+    new FileReader();
+
 
   reader.onload=function(e){
-    preview.src=e.target.result;
-    preview.style.display="block";
+
+    preview.src =
+      e.target.result;
+
+    preview.style.display =
+      "block";
+
   };
 
-  reader.readAsDataURL(input.files[0]);
+
+  reader.readAsDataURL(
+    input.files[0]
+  );
+
+}
+
+
+/* CONSTRUIT L'URL D'UNE IMAGE SUPABASE */
+function construireImageUrl(imageUrl){
+
+  if(!imageUrl){
+    return "";
+  }
+
+
+  let valeur =
+    String(imageUrl).trim();
+
+
+  /*
+    Si image_url contient déjà une URL,
+    on récupère uniquement le nom du fichier.
+  */
+  if(
+    valeur.startsWith("http://") ||
+    valeur.startsWith("https://")
+  ){
+
+    try{
+
+      const url =
+        new URL(valeur);
+
+      const morceaux =
+        url.pathname.split("/");
+
+      const dernier =
+        morceaux[morceaux.length - 1];
+
+      if(dernier){
+
+        valeur =
+          decodeURIComponent(dernier);
+
+      }
+
+    }catch(e){
+
+      valeur =
+        valeur.split("?")[0]
+          .split("/")
+          .pop();
+
+    }
+
+  }
+
+
+  /*
+    Si le chemin contient encore des dossiers,
+    on garde le chemin complet.
+  */
+  valeur =
+    valeur.replace(/^\/+/,"");
+
+
+  return (
+    SUPABASE_URL +
+    "/storage/v1/object/public/Listing-image/" +
+    valeur
+  );
+
 }
 
 
 async function publierAnnonce(){
 
-  const message=document.getElementById("venteMessage");
+  const message =
+    document.getElementById("venteMessage");
+
+
   message.style.display="block";
 
+
   if(!utilisateurConnecte){
-    message.textContent="Connecte-toi d'abord.";
+
+    message.textContent =
+      "Connecte-toi d'abord.";
+
     return;
+
   }
 
-  const titre=document.getElementById("titre").value.trim();
-  const description=document.getElementById("description").value.trim();
-  const prix=document.getElementById("prix").value;
-  const condition=document.getElementById("condition").value;
-  const categorie=document.getElementById("categorie").value;
-  const ville=document.getElementById("ville").value.trim();
-  const quartier=document.getElementById("quartier").value.trim();
-  const photoInput=document.getElementById("photo");
+
+  const titre =
+    document.getElementById("titre")
+      .value
+      .trim();
+
+
+  const description =
+    document.getElementById("description")
+      .value
+      .trim();
+
+
+  const prix =
+    document.getElementById("prix").value;
+
+
+  const condition =
+    document.getElementById("condition").value;
+
+
+  const categorie =
+    document.getElementById("categorie").value;
+
+
+  const ville =
+    document.getElementById("ville")
+      .value
+      .trim();
+
+
+  const quartier =
+    document.getElementById("quartier")
+      .value
+      .trim();
+
+
+  const photoInput =
+    document.getElementById("photo");
+
 
   if(!titre || !prix || !ville){
-    message.textContent="Titre, prix et ville sont obligatoires.";
+
+    message.textContent =
+      "Titre, prix et ville sont obligatoires.";
+
     return;
+
   }
 
-  message.textContent="Publication en cours...";
+
+  message.textContent =
+    "Publication en cours...";
+
 
   try{
 
     let categoryId=null;
 
-    const catResponse=await fetch(
-      SUPABASE_URL + "/rest/v1/Catégorie?select=*",
-      {
-        headers:headers()
-      }
-    );
+
+    const catResponse =
+      await fetch(
+
+        SUPABASE_URL +
+        "/rest/v1/Catégorie?select=*",
+
+        {
+          headers:headers()
+        }
+
+      );
+
 
     if(catResponse.ok){
 
-      const categories=await catResponse.json();
+      const categories =
+        await catResponse.json();
+
 
       if(Array.isArray(categories)){
 
-        const trouve=categories.find(function(cat){
+        const trouve =
+          categories.find(function(cat){
 
-          const texte=JSON.stringify(cat).toLowerCase();
+            const texte =
+              JSON.stringify(cat)
+                .toLowerCase();
 
-          return texte.includes(categorie.toLowerCase());
 
-        });
+            return texte.includes(
+              categorie.toLowerCase()
+            );
+
+          });
+
 
         if(trouve){
-          categoryId=trouve.id;
+
+          categoryId =
+            trouve.id;
+
         }
+
       }
+
     }
+
 
     const annonce={
-      seller_id:utilisateurConnecte.id,
-      title:titre,
-      description:description,
-      price_gnf:Number(prix),
-      condition:condition,
-      city:ville,
-      neighborhood:quartier,
-      status:"active",
-      views:0
+
+      seller_id:
+        utilisateurConnecte.id,
+
+      title:
+        titre,
+
+      description:
+        description,
+
+      price_gnf:
+        Number(prix),
+
+      condition:
+        condition,
+
+      city:
+        ville,
+
+      neighborhood:
+        quartier,
+
+      status:
+        "active",
+
+      views:
+        0
+
     };
 
+
     if(categoryId){
-      annonce.category_id=categoryId;
+
+      annonce.category_id =
+        categoryId;
+
     }
 
-    const listingResponse=await fetch(
-      SUPABASE_URL + "/rest/v1/listings",
-      {
-        method:"POST",
-        headers:headers({
-          "Prefer":"return=representation"
-        }),
-        body:JSON.stringify(annonce)
-      }
-    );
 
-    const listingResult=await listingResponse.json();
+    const listingResponse =
+      await fetch(
+
+        SUPABASE_URL +
+        "/rest/v1/listings",
+
+        {
+
+          method:"POST",
+
+          headers:headers({
+
+            "Prefer":
+              "return=representation"
+
+          }),
+
+          body:
+            JSON.stringify(annonce)
+
+        }
+
+      );
+
+
+    const listingResult =
+      await listingResponse.json();
+
 
     if(!listingResponse.ok){
 
-      message.textContent=
+      message.textContent =
         listingResult.message ||
         listingResult.hint ||
         "Impossible de publier l'annonce.";
 
       console.error(listingResult);
+
       return;
+
     }
 
-    const listing=Array.isArray(listingResult)
+
+    const listing =
+      Array.isArray(listingResult)
       ? listingResult[0]
       : listingResult;
 
-    const listingId=listing.id;
 
-    if(photoInput.files && photoInput.files[0]){
+    const listingId =
+      listing.id;
 
-      const fichier=photoInput.files[0];
 
-      const extension=(fichier.name.split(".").pop() || "jpg")
-        .toLowerCase();
+    /*
+      ENVOI DE LA PHOTO
+    */
+    if(
+      photoInput.files &&
+      photoInput.files[0]
+    ){
 
-      const chemin=
+      const fichier =
+        photoInput.files[0];
+
+
+      const extension =
+        (
+          fichier.name.split(".").pop() ||
+          "jpg"
+        ).toLowerCase();
+
+
+      const chemin =
         utilisateurConnecte.id +
         "/" +
         listingId +
@@ -917,274 +1495,548 @@ async function publierAnnonce(){
         "." +
         extension;
 
-      const uploadResponse=await fetch(
-        SUPABASE_URL +
-        "/storage/v1/object/Listing-image/" +
-        chemin,
-        {
-          method:"POST",
-          headers:{
-            "apikey":SUPABASE_KEY,
-            "Authorization":"Bearer " +
-              (utilisateurConnecte.accessToken || SUPABASE_KEY),
-            "Content-Type":fichier.type || "image/jpeg"
-          },
-          body:fichier
-        }
-      );
+
+      const uploadResponse =
+        await fetch(
+
+          SUPABASE_URL +
+          "/storage/v1/object/Listing-image/" +
+          chemin,
+
+          {
+
+            method:"POST",
+
+            headers:{
+
+              "apikey":
+                SUPABASE_KEY,
+
+              "Authorization":
+                "Bearer " +
+                (
+                  utilisateurConnecte.accessToken ||
+                  SUPABASE_KEY
+                ),
+
+              "Content-Type":
+                fichier.type ||
+                "image/jpeg"
+
+            },
+
+            body:
+              fichier
+
+          }
+
+        );
+
 
       if(uploadResponse.ok){
 
-        const signedResponse=await fetch(
-          SUPABASE_URL +
-          "/storage/v1/object/sign/Listing-image/" +
-          chemin,
-          {
-            method:"POST",
-            headers:headers(),
-            body:JSON.stringify({
-              expiresIn:31536000
-            })
-          }
-        );
+        /*
+          On enregistre maintenant le CHEMIN
+          du fichier et non un lien signé temporaire.
+        */
 
-        if(signedResponse.ok){
-
-          const signedData=await signedResponse.json();
-
-          const imageUrl=
-            SUPABASE_URL +
-            "/storage/v1/object/sign/Listing-image/" +
-            chemin +
-            "?token=" +
-            encodeURIComponent(signedData.signedURL || signedData.token || "");
-
+        const imageResponse =
           await fetch(
-            SUPABASE_URL + "/rest/v1/Listing%20images",
+
+            SUPABASE_URL +
+            "/rest/v1/Listing%20images",
+
             {
+
               method:"POST",
+
               headers:headers({
-                "Prefer":"return=minimal"
+
+                "Prefer":
+                  "return=minimal"
+
               }),
-              body:JSON.stringify({
-                listing_id:listingId,
-                image_url:imageUrl
-              })
+
+              body:
+                JSON.stringify({
+
+                  listing_id:
+                    listingId,
+
+                  image_url:
+                    chemin
+
+                })
+
             }
+
+          );
+
+
+        if(!imageResponse.ok){
+
+          console.error(
+            await imageResponse.text()
           );
 
         }
+
+      }else{
+
+        console.error(
+          "Erreur upload image:",
+          await uploadResponse.text()
+        );
+
       }
+
     }
 
-    message.textContent="Annonce publiée avec succès ! 🇬🇳";
+
+    message.textContent =
+      "Annonce publiée avec succès ! 🇬🇳";
+
 
     document.getElementById("titre").value="";
+
     document.getElementById("description").value="";
+
     document.getElementById("prix").value="";
+
     document.getElementById("ville").value="";
+
     document.getElementById("quartier").value="";
+
     document.getElementById("photo").value="";
-    document.getElementById("photoPreview").style.display="none";
+
+    document.getElementById("photoPreview")
+      .style.display="none";
+
 
     setTimeout(function(){
+
       fermerModal("venteModal");
+
       chargerAnnonces();
+
     },900);
+
 
   }catch(error){
 
     console.error(error);
-    message.textContent="Une erreur est survenue pendant la publication.";
+
+    message.textContent =
+      "Une erreur est survenue pendant la publication.";
+
   }
+
 }
 
 
 async function chargerImages(listingId){
 
   const noms=[
+
     "Listing%20images",
+
     "listing_images"
+
   ];
+
 
   for(const nom of noms){
 
     try{
 
-      const response=await fetch(
-        SUPABASE_URL +
-        "/rest/v1/" +
-        nom +
-        "?select=listing_id,image_url&listing_id=eq." +
-        encodeURIComponent(listingId),
-        {
-          headers:headers()
-        }
-      );
+      const response =
+        await fetch(
+
+          SUPABASE_URL +
+          "/rest/v1/" +
+          nom +
+          "?select=listing_id,image_url&listing_id=eq." +
+          encodeURIComponent(listingId),
+
+          {
+            headers:headers()
+          }
+
+        );
+
 
       if(response.ok){
 
-        const data=await response.json();
+        const data =
+          await response.json();
 
-        if(Array.isArray(data) && data.length){
+
+        if(
+          Array.isArray(data) &&
+          data.length
+        ){
+
           return data;
+
         }
+
       }
 
-    }catch(e){}
+    }catch(e){
+
+      console.error(e);
+
+    }
+
   }
 
+
   return [];
+
 }
 
 
 async function chargerAnnonces(){
 
-  const conteneur=document.getElementById("annonces");
-  const empty=document.getElementById("empty");
+  const conteneur =
+    document.getElementById("annonces");
+
+
+  const empty =
+    document.getElementById("empty");
+
 
   conteneur.innerHTML="";
+
   empty.style.display="block";
-  empty.textContent="Chargement des annonces...";
+
+  empty.textContent =
+    "Chargement des annonces...";
+
 
   try{
 
-    const response=await fetch(
-      SUPABASE_URL +
-      "/rest/v1/listings?select=*&order=created_at.desc",
-      {
-        headers:headers()
-      }
-    );
+    const response =
+      await fetch(
+
+        SUPABASE_URL +
+        "/rest/v1/listings?select=*&order=created_at.desc",
+
+        {
+          headers:headers()
+        }
+
+      );
+
 
     if(!response.ok){
-      const err=await response.text();
+
+      const err =
+        await response.text();
+
       console.error(err);
-      empty.textContent="Impossible de charger les annonces.";
+
+      empty.textContent =
+        "Impossible de charger les annonces.";
+
       return;
+
     }
 
-    const data=await response.json();
 
-    toutesLesAnnonces=Array.isArray(data) ? data : [];
+    const data =
+      await response.json();
 
-    await afficherAnnonces(toutesLesAnnonces);
+
+    toutesLesAnnonces =
+      Array.isArray(data)
+      ? data
+      : [];
+
+
+    await afficherAnnonces(
+      toutesLesAnnonces
+    );
+
 
   }catch(error){
 
     console.error(error);
-    empty.textContent="Erreur de connexion.";
+
+    empty.textContent =
+      "Erreur de connexion.";
+
   }
+
 }
 
 
+/*
+  AFFICHAGE COMPLET DES ANNONCES
+  AVEC CORRECTION DES IMAGES
+*/
 async function afficherAnnonces(liste){
 
-  const conteneur=document.getElementById("annonces");
-  const empty=document.getElementById("empty");
+  const conteneur =
+    document.getElementById("annonces");
+
+
+  const empty =
+    document.getElementById("empty");
+
 
   conteneur.innerHTML="";
+
 
   if(!liste.length){
 
     empty.style.display="block";
-    empty.textContent="Aucune annonce trouvée.";
+
+    empty.textContent =
+      "Aucune annonce trouvée.";
+
     return;
+
   }
+
 
   empty.style.display="none";
 
+
   for(const annonce of liste){
 
-    const images=await chargerImages(annonce.id);
+    const images =
+      await chargerImages(
+        annonce.id
+      );
+
 
     let image="";
 
+
     if(images.length){
-      image=images[0].image_url || "";
+
+      image =
+        construireImageUrl(
+          images[0].image_url
+        );
+
     }
 
-    const article=document.createElement("article");
+
+    const article =
+      document.createElement("article");
+
+
     article.className="card";
 
-    article.setAttribute("data-annonce-id",annonce.id);
+
+    article.setAttribute(
+      "data-annonce-id",
+      annonce.id
+    );
+
 
     article.innerHTML=`
+
       ${
         image
-        ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(annonce.title)}">`
-        : `<div style="height:210px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:50px">📦</div>`
+
+        ? `
+
+          <img
+            src="${escapeHTML(image)}"
+            alt="${escapeHTML(
+              annonce.title || "Annonce"
+            )}"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+          >
+
+          <div
+            style="
+              height:210px;
+              background:#eee;
+              display:none;
+              align-items:center;
+              justify-content:center;
+              font-size:50px;
+            "
+          >📦</div>
+
+        `
+
+        : `
+
+          <div
+            style="
+              height:210px;
+              background:#eee;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:50px
+            "
+          >📦</div>
+
+        `
       }
 
+
       <div class="card-content">
-        <h3>${escapeHTML(annonce.title || "Sans titre")}</h3>
+
+        <h3>
+          ${escapeHTML(
+            annonce.title || "Sans titre"
+          )}
+        </h3>
+
 
         <div class="price">
-          ${formatPrix(annonce.price_gnf)}
+
+          ${formatPrix(
+            annonce.price_gnf
+          )}
+
         </div>
+
 
         <div class="location">
-          📍 ${escapeHTML(annonce.city || "")}
-          ${annonce.neighborhood ? " • " + escapeHTML(annonce.neighborhood) : ""}
+
+          📍
+          ${escapeHTML(
+            annonce.city || ""
+          )}
+
+          ${
+            annonce.neighborhood
+            ? " • " +
+              escapeHTML(
+                annonce.neighborhood
+              )
+            : ""
+          }
+
         </div>
+
 
         <div class="small">
-          👁️ ${Number(annonce.views || 0)} vue(s)
+
+          👁️
+          ${Number(
+            annonce.views || 0
+          )}
+          vue(s)
+
         </div>
+
       </div>
+
     `;
 
-    article.addEventListener("click",function(){
 
-      const id=this.getAttribute("data-annonce-id");
+    article.addEventListener(
+      "click",
+      function(){
 
-      ouvrirDetailAnnonce(id);
+        const id =
+          this.getAttribute(
+            "data-annonce-id"
+          );
 
-    });
 
-    conteneur.appendChild(article);
+        ouvrirDetailAnnonce(id);
+
+      }
+    );
+
+
+    conteneur.appendChild(
+      article
+    );
+
   }
+
 }
 
 
 async function ouvrirDetailAnnonce(id){
 
-  const annonce=toutesLesAnnonces.find(function(a){
-    return String(a.id)===String(id);
-  });
+  const annonce =
+    toutesLesAnnonces.find(
+      function(a){
+
+        return String(a.id) ===
+          String(id);
+
+      }
+    );
+
 
   if(!annonce){
-    alert("Annonce introuvable.");
+
+    alert(
+      "Annonce introuvable."
+    );
+
     return;
+
   }
 
-  const content=document.getElementById("detailContent");
 
-  content.innerHTML="<p>Chargement...</p>";
+  const content =
+    document.getElementById(
+      "detailContent"
+    );
 
-  ouvrirModal("detailModal");
 
-  const images=await chargerImages(id);
+  content.innerHTML =
+    "<p>Chargement...</p>";
+
+
+  ouvrirModal(
+    "detailModal"
+  );
+
+
+  const images =
+    await chargerImages(id);
+
 
   let imageHTML="";
 
+
   if(images.length){
 
-    imageHTML=images.map(function(img){
+    imageHTML =
+      images.map(
+        function(img){
 
-      return `
-        <img
-          class="detail-img"
-          src="${escapeHTML(img.image_url)}"
-          alt="${escapeHTML(annonce.title)}"
-        >
-      `;
+          const image =
+            construireImageUrl(
+              img.image_url
+            );
 
-    }).join("");
+
+          return `
+
+            <img
+              class="detail-img"
+              src="${escapeHTML(image)}"
+              alt="${escapeHTML(
+                annonce.title || "Annonce"
+              )}"
+            >
+
+          `;
+
+        }
+      ).join("");
+
 
   }else{
 
     imageHTML=`
+
       <div
         style="
           height:250px;
@@ -1197,100 +2049,208 @@ async function ouvrirDetailAnnonce(id){
           margin-bottom:18px;
         "
       >📦</div>
+
     `;
+
   }
+
 
   content.innerHTML=`
 
     ${imageHTML}
 
-    <h2>${escapeHTML(annonce.title || "Annonce")}</h2>
+
+    <h2>
+      ${escapeHTML(
+        annonce.title || "Annonce"
+      )}
+    </h2>
+
 
     <div class="detail-price">
-      ${formatPrix(annonce.price_gnf)}
+
+      ${formatPrix(
+        annonce.price_gnf
+      )}
+
     </div>
+
 
     <div class="detail-info">
 
-      📍 <strong>Lieu :</strong>
-      ${escapeHTML(annonce.city || "")}
-      ${annonce.neighborhood
-        ? " • " + escapeHTML(annonce.neighborhood)
+      📍
+      <strong>Lieu :</strong>
+
+      ${escapeHTML(
+        annonce.city || ""
+      )}
+
+      ${
+        annonce.neighborhood
+        ? " • " +
+          escapeHTML(
+            annonce.neighborhood
+          )
         : ""
       }
 
-      <br>
-
-      🏷️ <strong>État :</strong>
-      ${escapeHTML(annonce.condition || "")}
 
       <br>
 
-      👁️ <strong>Vues :</strong>
-      ${Number(annonce.views || 0)}
+
+      🏷️
+      <strong>État :</strong>
+
+      ${escapeHTML(
+        annonce.condition || ""
+      )}
+
 
       <br>
 
-      📅 <strong>Publié le :</strong>
-      ${formatDate(annonce.created_at)}
+
+      👁️
+      <strong>Vues :</strong>
+
+      ${Number(
+        annonce.views || 0
+      )}
+
+
+      <br>
+
+
+      📅
+      <strong>Publié le :</strong>
+
+      ${formatDate(
+        annonce.created_at
+      )}
 
     </div>
 
-    <hr style="border:0;border-top:1px solid #eee;margin:20px 0">
 
-    <h3>Description</h3>
+    <hr
+      style="
+        border:0;
+        border-top:1px solid #eee;
+        margin:20px 0
+      "
+    >
 
-    <p style="line-height:1.6">
-      ${escapeHTML(annonce.description || "Aucune description.")}
+
+    <h3>
+      Description
+    </h3>
+
+
+    <p
+      style="
+        line-height:1.6
+      "
+    >
+
+      ${escapeHTML(
+        annonce.description ||
+        "Aucune description."
+      )}
+
     </p>
+
 
     <div class="actions">
 
-      <button class="primary" onclick="ouvrirMessageVendeur()">
+      <button
+        class="primary"
+        onclick="ouvrirMessageVendeur()"
+      >
         💬 Contacter le vendeur
       </button>
 
-      <button class="secondary" onclick="ouvrirPaiement()">
+
+      <button
+        class="secondary"
+        onclick="ouvrirPaiement()"
+      >
         💳 Acheter
       </button>
 
     </div>
+
   `;
 
-  enregistrerVue(id,Number(annonce.views || 0));
+
+  enregistrerVue(
+    id,
+    Number(
+      annonce.views || 0
+    )
+  );
+
 }
 
 
-async function enregistrerVue(id,vues){
+async function enregistrerVue(
+  id,
+  vues
+){
 
   try{
 
     await fetch(
+
       SUPABASE_URL +
       "/rest/v1/listings?id=eq." +
       encodeURIComponent(id),
+
       {
+
         method:"PATCH",
+
         headers:headers({
-          "Prefer":"return=minimal"
+
+          "Prefer":
+            "return=minimal"
+
         }),
-        body:JSON.stringify({
-          views:vues+1
-        })
+
+        body:
+          JSON.stringify({
+
+            views:
+              vues + 1
+
+          })
+
       }
+
     );
 
-    const annonce=toutesLesAnnonces.find(function(a){
-      return String(a.id)===String(id);
-    });
+
+    const annonce =
+      toutesLesAnnonces.find(
+        function(a){
+
+          return String(a.id) ===
+            String(id);
+
+        }
+      );
+
 
     if(annonce){
-      annonce.views=vues+1;
+
+      annonce.views =
+        vues + 1;
+
     }
 
   }catch(e){
+
     console.error(e);
+
   }
+
 }
 
 
@@ -1298,28 +2258,50 @@ function ouvrirMessageVendeur(){
 
   if(!utilisateurConnecte){
 
-    alert("Connecte-toi pour contacter le vendeur.");
+    alert(
+      "Connecte-toi pour contacter le vendeur."
+    );
 
-    fermerModal("detailModal");
+
+    fermerModal(
+      "detailModal"
+    );
+
+
     ouvrirCompte();
 
+
     return;
+
   }
 
-  alert("La messagerie sera reliée aux conversations Marché Guinée.");
+
+  alert(
+    "La messagerie sera reliée aux conversations Marché Guinée."
+  );
+
 }
 
 
 function ouvrirPaiement(){
 
-  fermerModal("detailModal");
-  ouvrirModal("paiementModal");
+  fermerModal(
+    "detailModal"
+  );
+
+  ouvrirModal(
+    "paiementModal"
+  );
+
 }
 
 
-function filtrerCategorie(categorie){
+function filtrerCategorie(
+  categorie
+){
 
-  categorieActuelle=categorie;
+  categorieActuelle =
+    categorie;
 
   appliquerFiltres();
 
@@ -1328,37 +2310,68 @@ function filtrerCategorie(categorie){
 
 function appliquerFiltres(){
 
-  const recherche=
-    document.getElementById("searchInput")
-      .value
-      .trim()
-      .toLowerCase();
+  const recherche =
+    document.getElementById(
+      "searchInput"
+    )
+    .value
+    .trim()
+    .toLowerCase();
 
-  let liste=toutesLesAnnonces.filter(function(annonce){
 
-    const texte=JSON.stringify(annonce).toLowerCase();
+  let liste =
+    toutesLesAnnonces.filter(
+      function(annonce){
 
-    const correspondRecherche=
-      !recherche || texte.includes(recherche);
+        const texte =
+          JSON.stringify(
+            annonce
+          ).toLowerCase();
 
-    const correspondCategorie=
-      categorieActuelle==="Toutes" ||
-      texte.includes(categorieActuelle.toLowerCase());
 
-    return correspondRecherche && correspondCategorie;
+        const correspondRecherche =
+          !recherche ||
+          texte.includes(
+            recherche
+          );
 
-  });
 
-  afficherAnnonces(liste);
+        const correspondCategorie =
+          categorieActuelle ===
+            "Toutes" ||
+
+          texte.includes(
+            categorieActuelle
+              .toLowerCase()
+          );
+
+
+        return (
+          correspondRecherche &&
+          correspondCategorie
+        );
+
+      }
+    );
+
+
+  afficherAnnonces(
+    liste
+  );
+
 }
 
 
-document.getElementById("searchInput")
-  .addEventListener("input",function(){
+document
+  .getElementById("searchInput")
+  .addEventListener(
+    "input",
+    function(){
 
-    appliquerFiltres();
+      appliquerFiltres();
 
-  });
+    }
+  );
 
 
 chargerAnnonces();
