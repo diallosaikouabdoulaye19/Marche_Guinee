@@ -5,208 +5,260 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marché Guinée 🇬🇳</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5f6f8;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f6f7;
   color:#222;
 }
 header{
-  background:#087f3e;
+  background:#07883f;
   color:white;
-  padding:14px;
-  position:sticky;
-  top:0;
-  z-index:20;
+  padding:22px 20px 28px;
 }
-.header-top{
+.top{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:10px;
+  justify-content:space-between;
+  gap:12px;
 }
 .logo{
-  font-size:21px;
-  font-weight:bold;
-}
-button{
-  border:0;
-  border-radius:10px;
-  padding:11px 15px;
-  font-size:15px;
-  cursor:pointer;
+  font-size:28px;
+  font-weight:800;
 }
 .account-btn{
   background:white;
-  color:#087f3e;
-  font-weight:bold;
+  color:#087d3b;
+  border:0;
+  border-radius:18px;
+  padding:14px 18px;
+  font-size:18px;
+  font-weight:700;
 }
 .search{
+  margin-top:22px;
   width:100%;
-  margin-top:12px;
-  padding:13px;
+  padding:18px 20px;
   border:0;
-  border-radius:10px;
-  font-size:16px;
+  border-radius:18px;
+  font-size:20px;
+  outline:none;
 }
-.container{
-  max-width:900px;
+main{
+  max-width:1100px;
   margin:auto;
-  padding:15px;
+  padding:30px 18px 70px;
 }
 .hero{
   background:white;
-  border-radius:15px;
-  padding:20px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px #00000010;
+  border-radius:25px;
+  padding:28px;
+  box-shadow:0 5px 20px #00000012;
 }
-.hero h1{margin-top:0}
+.hero h1{
+  margin:0 0 20px;
+  font-size:36px;
+}
+.hero p{
+  font-size:20px;
+}
+button{
+  cursor:pointer;
+}
 .primary{
-  background:#087f3e;
+  background:#07883f;
   color:white;
+  border:0;
+  border-radius:16px;
+  padding:15px 22px;
+  font-size:18px;
+  font-weight:700;
 }
 .secondary{
   background:#eee;
-}
-.danger{
-  background:#d92d20;
-  color:white;
-}
-.cards{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.annonce-card{
-  background:white;
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 2px 8px #00000012;
-  cursor:pointer;
-}
-.annonce-card img{
-  width:100%;
-  height:180px;
-  object-fit:cover;
-  display:block;
-}
-.annonce-content{
-  padding:12px;
-}
-.annonce-title{
-  font-weight:bold;
+  color:#087d3b;
+  border:0;
+  border-radius:15px;
+  padding:13px 18px;
   font-size:16px;
-  margin-bottom:7px;
+  font-weight:700;
+}
+.categories{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  padding:25px 0;
+}
+.cat{
+  flex:0 0 auto;
+  border:0;
+  background:#eee;
+  border-radius:16px;
+  padding:15px 20px;
+  font-size:17px;
+  font-weight:700;
+}
+.section-title{
+  font-size:34px;
+  margin:15px 0 25px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.card{
+  background:white;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 4px 15px #00000012;
+  cursor:pointer;
+  transition:.15s;
+}
+.card:active{
+  transform:scale(.98);
+}
+.card img{
+  width:100%;
+  height:210px;
+  object-fit:cover;
+  background:#eee;
+}
+.card-content{
+  padding:16px;
+}
+.card h3{
+  margin:0 0 8px;
+  font-size:19px;
 }
 .price{
-  color:#087f3e;
-  font-weight:bold;
-  font-size:17px;
+  color:#087d3b;
+  font-size:21px;
+  font-weight:800;
 }
-.small{
+.location{
   color:#666;
-  font-size:13px;
-  margin-top:5px;
+  margin-top:8px;
 }
 .empty{
   text-align:center;
-  padding:30px;
   color:#666;
+  font-size:19px;
+  padding:40px 10px;
+}
+footer{
+  text-align:center;
+  color:#777;
+  padding:25px;
 }
 .modal{
   display:none;
   position:fixed;
+  z-index:1000;
   inset:0;
   background:#0008;
-  z-index:100;
-  overflow:auto;
-  padding:20px;
+  overflow-y:auto;
+  padding:25px 15px;
 }
 .modal-box{
   background:white;
-  max-width:550px;
-  margin:30px auto;
-  border-radius:16px;
-  padding:20px;
+  max-width:600px;
+  margin:20px auto;
+  border-radius:22px;
+  padding:24px;
+  position:relative;
 }
-.modal-box h2{margin-top:0}
 .close{
-  float:right;
+  position:absolute;
+  right:15px;
+  top:12px;
+  border:0;
   background:#eee;
-  padding:7px 11px;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  font-size:23px;
+}
+.modal h2{
+  margin-top:5px;
+  font-size:28px;
 }
 input,textarea,select{
   width:100%;
-  padding:12px;
-  margin:7px 0 12px;
-  border:1px solid #ddd;
-  border-radius:9px;
-  font-size:15px;
+  padding:14px;
+  margin:7px 0 14px;
+  border:1px solid #ccc;
+  border-radius:12px;
+  font-size:16px;
 }
 textarea{
-  min-height:100px;
+  min-height:110px;
   resize:vertical;
 }
-.form-group label{
-  font-weight:bold;
-  font-size:14px;
+.form-title{
+  font-size:25px;
+  font-weight:800;
+  margin-bottom:18px;
 }
-.detail-image{
-  width:100%;
-  max-height:350px;
-  object-fit:contain;
-  background:#f1f1f1;
-  border-radius:12px;
-}
-.detail-price{
-  color:#087f3e;
-  font-size:23px;
-  font-weight:bold;
-  margin:10px 0;
-}
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:15px;
-}
-.full{
-  grid-column:1/-1;
-}
-.account-choice{
-  display:grid;
-  gap:10px;
-}
-.category-bar{
+.form-actions{
   display:flex;
-  gap:8px;
-  overflow:auto;
-  padding:10px 0;
+  gap:10px;
+  flex-wrap:wrap;
 }
-.category-bar button{
-  white-space:nowrap;
-}
-.status{
-  padding:10px;
-  border-radius:9px;
-  background:#f1f8f4;
-  color:#087f3e;
-  margin-bottom:10px;
+.preview{
+  width:100%;
+  max-height:280px;
+  object-fit:cover;
+  border-radius:15px;
+  margin:8px 0 15px;
   display:none;
 }
-footer{
-  text-align:center;
-  padding:30px 15px;
-  color:#777;
+.detail-img{
+  width:100%;
+  max-height:400px;
+  object-fit:contain;
+  background:#eee;
+  border-radius:16px;
+  margin-bottom:18px;
 }
-@media(max-width:600px){
-  .cards{grid-template-columns:1fr 1fr}
-  .annonce-card img{height:145px}
+.detail-price{
+  font-size:28px;
+  font-weight:800;
+  color:#07883f;
+  margin:10px 0;
+}
+.detail-info{
+  color:#555;
+  line-height:1.7;
+}
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:22px;
+}
+.small{
+  color:#777;
+  font-size:14px;
+}
+.message{
+  padding:12px;
+  border-radius:10px;
+  background:#f0f0f0;
+  margin-bottom:12px;
+  display:none;
+}
+@media(max-width:650px){
+  .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .card img{height:155px}
+  .hero h1{font-size:30px}
+  .logo{font-size:24px}
+  .account-btn{font-size:15px;padding:12px}
 }
 </style>
 </head>
@@ -214,11 +266,10 @@ footer{
 <body>
 
 <header>
-  <div class="header-top">
+  <div class="top">
     <div class="logo">🇬🇳 Marché Guinée</div>
-    <button class="account-btn" id="accountButton">👤 Mon compte</button>
+    <button class="account-btn" onclick="ouvrirCompte()">👤 Mon compte</button>
   </div>
-
   <input
     id="searchInput"
     class="search"
@@ -227,28 +278,31 @@ footer{
   >
 </header>
 
-<main class="container">
+<main>
 
-  <section class="hero">
-    <h1>Bienvenue sur Marché Guinée 🇬🇳</h1>
-    <p>Achetez et vendez facilement en Guinée.</p>
-    <button class="primary" id="publishButton">➕ Publier une annonce</button>
-  </section>
+<section class="hero">
+  <h1>Bienvenue sur Marché Guinée 🇬🇳</h1>
+  <p>Achetez et vendez facilement en Guinée.</p>
+  <button class="primary" onclick="ouvrirVente()">➕ Publier une annonce</button>
+</section>
 
-  <div class="category-bar">
-    <button class="secondary category-btn" data-category="">Toutes</button>
-    <button class="secondary category-btn" data-category="Téléphones">📱 Téléphones</button>
-    <button class="secondary category-btn" data-category="Mode">👕 Mode</button>
-    <button class="secondary category-btn" data-category="Maison">🏠 Maison</button>
-    <button class="secondary category-btn" data-category="Véhicules">🚗 Véhicules</button>
-  </div>
+<div class="categories">
+  <button class="cat" onclick="filtrerCategorie('Toutes')">Toutes</button>
+  <button class="cat" onclick="filtrerCategorie('Téléphones')">📱 Téléphones</button>
+  <button class="cat" onclick="filtrerCategorie('Mode')">👕 Mode</button>
+  <button class="cat" onclick="filtrerCategorie('Maison')">🏠 Maison</button>
+  <button class="cat" onclick="filtrerCategorie('Électronique')">💻 Électronique</button>
+  <button class="cat" onclick="filtrerCategorie('Véhicules')">🚗 Véhicules</button>
+  <button class="cat" onclick="filtrerCategorie('Autres')">📦 Autres</button>
+</div>
 
-  <section>
-    <h2>🛍️ Annonces</h2>
-    <div id="listeAnnonces" class="cards">
-      <div class="empty">Chargement des annonces...</div>
-    </div>
-  </section>
+<h2 class="section-title">🛍️ Annonces</h2>
+
+<div id="annonces" class="grid"></div>
+
+<div id="empty" class="empty">
+  Chargement des annonces...
+</div>
 
 </main>
 
@@ -258,1133 +312,1057 @@ footer{
 
 
 <!-- COMPTE -->
-<div class="modal" id="accountModal">
+<div id="compteModal" class="modal">
   <div class="modal-box">
-    <button class="close" data-close="accountModal">✕</button>
+    <button class="close" onclick="fermerModal('compteModal')">×</button>
 
-    <h2>👤 Mon compte</h2>
+    <div id="compteAccueil">
+      <div class="form-title">👤 Mon compte</div>
+      <p>Crée ton compte gratuitement ou connecte-toi.</p>
 
-    <div id="accountStatus" class="status"></div>
+      <div class="form-actions">
+        <button class="primary" onclick="afficherInscription()">
+          Créer mon compte gratuitement
+        </button>
 
-    <div id="accountChoices" class="account-choice">
-      <button class="primary" id="signupOpenButton">📝 Créer mon compte gratuitement</button>
-      <button class="secondary" id="loginOpenButton">🔐 Se connecter</button>
+        <button class="secondary" onclick="afficherConnexion()">
+          Se connecter
+        </button>
+      </div>
     </div>
 
-    <div id="loggedAccount" style="display:none">
-      <h3 id="loggedName"></h3>
-      <p id="loggedPhone"></p>
-      <button class="danger" id="logoutButton">Se déconnecter</button>
-    </div>
-  </div>
-</div>
+    <div id="inscription" style="display:none">
+      <div class="form-title">Créer mon compte</div>
 
+      <div id="signupMessage" class="message"></div>
 
-<!-- INSCRIPTION -->
-<div class="modal" id="signupModal">
-  <div class="modal-box">
-    <button class="close" data-close="signupModal">✕</button>
-
-    <h2>📝 Créer mon compte</h2>
-
-    <div class="form-group">
       <label>Nom complet</label>
-      <input id="signupName" type="text" placeholder="Votre nom complet">
-    </div>
+      <input id="signupName" type="text" placeholder="Ex : Saikou Diallo">
 
-    <div class="form-group">
-      <label>Numéro de téléphone</label>
-      <input id="signupPhone" type="tel" placeholder="Ex : 622000000">
-    </div>
+      <label>Numéro</label>
+      <input id="signupPhone" type="tel" placeholder="Ex : 620000000">
 
-    <div class="form-group">
       <label>Mot de passe</label>
-      <input id="signupPassword" type="password" placeholder="Choisissez un mot de passe">
+      <input id="signupPassword" type="password" placeholder="Mot de passe">
+
+      <button class="primary" onclick="creerCompte()">
+        Créer mon compte
+      </button>
+
+      <br><br>
+      <button class="secondary" onclick="afficherConnexion()">
+        J'ai déjà un compte
+      </button>
     </div>
 
-    <button class="primary" id="signupButton">Créer mon compte</button>
-    <p id="signupMessage"></p>
-  </div>
-</div>
+    <div id="connexion" style="display:none">
+      <div class="form-title">Se connecter</div>
 
+      <div id="loginMessage" class="message"></div>
 
-<!-- CONNEXION -->
-<div class="modal" id="loginModal">
-  <div class="modal-box">
-    <button class="close" data-close="loginModal">✕</button>
+      <label>Numéro</label>
+      <input id="loginPhone" type="tel" placeholder="Ex : 620000000">
 
-    <h2>🔐 Se connecter</h2>
-
-    <div class="form-group">
-      <label>Numéro de téléphone</label>
-      <input id="loginPhone" type="tel" placeholder="Votre numéro">
-    </div>
-
-    <div class="form-group">
       <label>Mot de passe</label>
-      <input id="loginPassword" type="password" placeholder="Votre mot de passe">
+      <input id="loginPassword" type="password" placeholder="Mot de passe">
+
+      <button class="primary" onclick="connecterCompte()">
+        Se connecter
+      </button>
+
+      <br><br>
+      <button class="secondary" onclick="afficherInscription()">
+        Créer un compte
+      </button>
     </div>
 
-    <button class="primary" id="loginButton">Se connecter</button>
+    <div id="compteConnecte" style="display:none">
+      <div class="form-title">👤 Mon compte</div>
+      <p id="nomUtilisateur"></p>
+      <p id="numeroUtilisateur"></p>
 
-    <button
-      id="forgotPasswordButton"
-      style="background:none;color:#087f3e;padding:10px 0"
-    >
-      🔑 Mot de passe oublié ?
+      <button class="primary" onclick="fermerModal('compteModal')">
+        Fermer
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- VENTE -->
+<div id="venteModal" class="modal">
+  <div class="modal-box">
+    <button class="close" onclick="fermerModal('venteModal')">×</button>
+
+    <div class="form-title">🛍️ Publier une annonce</div>
+
+    <div id="venteMessage" class="message"></div>
+
+    <label>Titre de l'annonce</label>
+    <input id="titre" type="text" placeholder="Ex : iPhone 13">
+
+    <label>Description</label>
+    <textarea id="description" placeholder="Décris ton produit..."></textarea>
+
+    <label>Prix en GNF</label>
+    <input id="prix" type="number" placeholder="Ex : 5000000">
+
+    <label>État</label>
+    <select id="condition">
+      <option value="Good">Bon état</option>
+      <option value="New">Neuf</option>
+      <option value="Used">Utilisé</option>
+    </select>
+
+    <label>Catégorie</label>
+    <select id="categorie">
+      <option value="Téléphones">Téléphones</option>
+      <option value="Mode">Mode</option>
+      <option value="Maison">Maison</option>
+      <option value="Électronique">Électronique</option>
+      <option value="Véhicules">Véhicules</option>
+      <option value="Autres">Autres</option>
+    </select>
+
+    <label>Ville</label>
+    <input id="ville" type="text" placeholder="Ex : Conakry">
+
+    <label>Quartier</label>
+    <input id="quartier" type="text" placeholder="Ex : Lambanyi">
+
+    <label>Photo du produit</label>
+    <input id="photo" type="file" accept="image/*" onchange="previewPhoto()">
+
+    <img id="photoPreview" class="preview">
+
+    <button class="primary" onclick="publierAnnonce()">
+      Publier l'annonce
     </button>
-
-    <p id="loginMessage"></p>
   </div>
 </div>
 
 
-<!-- MOT DE PASSE OUBLIE -->
-<div class="modal" id="forgotModal">
+<!-- DETAIL -->
+<div id="detailModal" class="modal">
   <div class="modal-box">
-    <button class="close" data-close="forgotModal">✕</button>
 
-    <h2>🔑 Mot de passe oublié</h2>
-
-    <p>
-      Entrez votre numéro de téléphone pour commencer la récupération de votre compte.
-    </p>
-
-    <input
-      id="forgotPhone"
-      type="tel"
-      placeholder="Votre numéro de téléphone"
-    >
-
-    <button class="primary" id="forgotButton">Continuer</button>
-
-    <p id="forgotMessage"></p>
-  </div>
-</div>
-
-
-<!-- PUBLICATION -->
-<div class="modal" id="publishModal">
-  <div class="modal-box">
-    <button class="close" data-close="publishModal">✕</button>
-
-    <h2>📢 Publier une annonce</h2>
-
-    <div class="form-group">
-      <label>Nom du produit</label>
-      <input id="listingTitle" type="text" placeholder="Ex : iPhone 12">
-    </div>
-
-    <div class="form-group">
-      <label>Description</label>
-      <textarea id="listingDescription" placeholder="Décrivez votre produit"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Prix en GNF</label>
-      <input id="listingPrice" type="number" placeholder="Ex : 4500000">
-    </div>
-
-    <div class="form-group">
-      <label>Catégorie</label>
-      <select id="listingCategory">
-        <option value="">Choisir</option>
-        <option value="Téléphones">Téléphones</option>
-        <option value="Mode">Mode</option>
-        <option value="Maison">Maison</option>
-        <option value="Véhicules">Véhicules</option>
-        <option value="Autre">Autre</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>État</label>
-      <select id="listingCondition">
-        <option value="Good">Bon état</option>
-        <option value="New">Neuf</option>
-        <option value="Used">Occasion</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Ville</label>
-      <input id="listingCity" type="text" placeholder="Ex : Conakry">
-    </div>
-
-    <div class="form-group">
-      <label>Quartier</label>
-      <input id="listingNeighborhood" type="text" placeholder="Ex : Bambeto">
-    </div>
-
-    <div class="form-group">
-      <label>📸 Photo</label>
-      <input id="listingImage" type="file" accept="image/*">
-    </div>
-
-    <button class="primary" id="publishConfirmButton">
-      📢 Publier l'annonce
-    </button>
-
-    <p id="publishMessage"></p>
-  </div>
-</div>
-
-
-<!-- DETAIL ANNONCE -->
-<div class="modal" id="detailModal">
-  <div class="modal-box">
-    <button class="close" data-close="detailModal">✕</button>
+    <button class="close" onclick="fermerModal('detailModal')">×</button>
 
     <div id="detailContent">
-      Chargement...
+      <p>Chargement...</p>
     </div>
+
   </div>
 </div>
 
 
 <!-- PAIEMENT -->
-<div class="modal" id="paymentModal">
+<div id="paiementModal" class="modal">
   <div class="modal-box">
-    <button class="close" data-close="paymentModal">✕</button>
+    <button class="close" onclick="fermerModal('paiementModal')">×</button>
 
-    <h2>💳 Paiement</h2>
-
-    <div id="paymentContent"></div>
+    <div class="form-title">💳 Paiement</div>
 
     <p>
-      Le paiement sécurisé sera connecté aux moyens de paiement disponibles
-      en Guinée lors de la prochaine étape.
+      Marché Guinée applique une commission de
+      <strong>3 %</strong> sur les ventes.
     </p>
 
-    <button class="primary" id="paymentContinueButton">
-      Continuer
+    <p>
+      Les échanges entre acheteurs et vendeurs restent gratuits.
+    </p>
+
+    <button class="primary" onclick="fermerModal('paiementModal')">
+      Compris
     </button>
   </div>
 </div>
 
 
 <script>
-document.addEventListener("DOMContentLoaded", async function(){
+const SUPABASE_URL = "https://meernnpwtcgqjppyccqk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
 
-  const SUPABASE_URL = "https://meernnpwtcgqjppyccqk.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
-
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-  let annonces = [];
-  let currentUser = null;
-  let selectedCategory = "";
+let toutesLesAnnonces = [];
+let categorieActuelle = "Toutes";
+let utilisateurConnecte = null;
 
 
-  function $(id){
-    return document.getElementById(id);
+function headers(extra={}){
+  return {
+    "apikey": SUPABASE_KEY,
+    "Authorization": "Bearer " + SUPABASE_KEY,
+    "Content-Type": "application/json",
+    ...extra
+  };
+}
+
+
+function escapeHTML(value){
+  if(value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+function formatPrix(prix){
+  if(prix === null || prix === undefined) return "";
+  return Number(prix).toLocaleString("fr-FR") + " GNF";
+}
+
+
+function formatDate(date){
+  if(!date) return "";
+  try{
+    return new Date(date).toLocaleDateString("fr-FR");
+  }catch(e){
+    return "";
   }
+}
 
 
-  function ouvrir(id){
-    const element = $(id);
-    if(element) element.style.display = "block";
-  }
+function ouvrirModal(id){
+  document.getElementById(id).style.display="block";
+  document.body.style.overflow="hidden";
+}
 
 
-  function fermer(id){
-    const element = $(id);
-    if(element) element.style.display = "none";
-  }
+function fermerModal(id){
+  document.getElementById(id).style.display="none";
+  document.body.style.overflow="";
+}
 
 
-  function message(element, text, success=false){
-    element.textContent = text;
-    element.style.color = success ? "#087f3e" : "#d92d20";
-  }
-
-
-  function escapeHTML(value){
-    if(value === null || value === undefined) return "";
-    return String(value)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-
-  function formatPrice(price){
-    if(price === null || price === undefined) return "";
-    return Number(price).toLocaleString("fr-FR") + " GNF";
-  }
-
-
-  async function chargerUtilisateur(){
-
-    const {data} = await supabaseClient.auth.getUser();
-
-    currentUser = data.user || null;
-
-    if(currentUser){
-
-      $("accountChoices").style.display = "none";
-      $("loggedAccount").style.display = "block";
-
-      $("loggedName").textContent =
-        currentUser.user_metadata?.full_name ||
-        "Mon compte";
-
-      $("loggedPhone").textContent =
-        currentUser.user_metadata?.phone ||
-        currentUser.email ||
-        "";
-
-    }else{
-
-      $("accountChoices").style.display = "grid";
-      $("loggedAccount").style.display = "none";
+window.addEventListener("click",function(e){
+  document.querySelectorAll(".modal").forEach(function(modal){
+    if(e.target === modal){
+      modal.style.display="none";
+      document.body.style.overflow="";
     }
+  });
+});
+
+
+function ouvrirCompte(){
+  if(utilisateurConnecte){
+    afficherCompteConnecte();
+  }else{
+    document.getElementById("compteAccueil").style.display="block";
+    document.getElementById("inscription").style.display="none";
+    document.getElementById("connexion").style.display="none";
+    document.getElementById("compteConnecte").style.display="none";
+    ouvrirModal("compteModal");
+  }
+}
+
+
+function afficherInscription(){
+  document.getElementById("compteAccueil").style.display="none";
+  document.getElementById("inscription").style.display="block";
+  document.getElementById("connexion").style.display="none";
+  document.getElementById("compteConnecte").style.display="none";
+}
+
+
+function afficherConnexion(){
+  document.getElementById("compteAccueil").style.display="none";
+  document.getElementById("inscription").style.display="none";
+  document.getElementById("connexion").style.display="block";
+  document.getElementById("compteConnecte").style.display="none";
+}
+
+
+function afficherCompteConnecte(){
+  document.getElementById("compteAccueil").style.display="none";
+  document.getElementById("inscription").style.display="none";
+  document.getElementById("connexion").style.display="none";
+  document.getElementById("compteConnecte").style.display="block";
+
+  document.getElementById("nomUtilisateur").textContent =
+    "Nom : " + (utilisateurConnecte.fullName || "");
+
+  document.getElementById("numeroUtilisateur").textContent =
+    "Numéro : " + (utilisateurConnecte.phone || "");
+
+  ouvrirModal("compteModal");
+}
+
+
+function numeroNormalise(numero){
+  return String(numero || "")
+    .replace(/\s/g,"")
+    .replace(/^\+/,"")
+    .replace(/^00/,"");
+}
+
+
+function emailTechnique(numero){
+  return numeroNormalise(numero) + "@marche-guinee.netlify.app";
+}
+
+
+async function creerCompte(){
+
+  const nom = document.getElementById("signupName").value.trim();
+  const phone = numeroNormalise(document.getElementById("signupPhone").value);
+  const password = document.getElementById("signupPassword").value;
+
+  const msg = document.getElementById("signupMessage");
+
+  msg.style.display="block";
+
+  if(!nom || !phone || !password){
+    msg.textContent="Veuillez remplir tous les champs.";
+    return;
   }
 
+  if(password.length < 6){
+    msg.textContent="Le mot de passe doit contenir au moins 6 caractères.";
+    return;
+  }
 
-  /* =========================
-     COMPTE
-  ========================= */
+  msg.textContent="Création du compte...";
 
-  $("accountButton").addEventListener("click", async function(){
-    await chargerUtilisateur();
-    ouvrir("accountModal");
-  });
+  try{
 
-
-  $("signupOpenButton").addEventListener("click", function(){
-    fermer("accountModal");
-    ouvrir("signupModal");
-  });
-
-
-  $("loginOpenButton").addEventListener("click", function(){
-    fermer("accountModal");
-    ouvrir("loginModal");
-  });
-
-
-  $("forgotPasswordButton").addEventListener("click", function(){
-    fermer("loginModal");
-    ouvrir("forgotModal");
-  });
-
-
-  $("logoutButton").addEventListener("click", async function(){
-
-    await supabaseClient.auth.signOut();
-
-    currentUser = null;
-
-    fermer("accountModal");
-
-    alert("Vous êtes déconnecté.");
-  });
-
-
-  $("signupButton").addEventListener("click", async function(){
-
-    const name = $("signupName").value.trim();
-    const phone = $("signupPhone").value.trim();
-    const password = $("signupPassword").value;
-
-    if(!name || !phone || !password){
-      message($("signupMessage"),"Veuillez remplir tous les champs.");
-      return;
-    }
-
-    if(password.length < 6){
-      message($("signupMessage"),"Le mot de passe doit contenir au moins 6 caractères.");
-      return;
-    }
-
-    $("signupButton").disabled = true;
-    $("signupMessage").textContent = "Création du compte...";
-
-    /*
-      Le numéro sert ici à construire l'adresse technique
-      utilisée par Supabase Auth.
-    */
-    const technicalEmail =
-      phone.replace(/\D/g,"") +
-      "@marche-guinee.netlify.app";
-
-    const {data,error} =
-      await supabaseClient.auth.signUp({
-        email:technicalEmail,
-        password:password,
-        options:{
+    const signup = await fetch(
+      SUPABASE_URL + "/auth/v1/signup",
+      {
+        method:"POST",
+        headers:headers(),
+        body:JSON.stringify({
+          email:emailTechnique(phone),
+          password:password,
           data:{
-            full_name:name,
+            full_name:nom,
             phone:phone
           }
-        }
-      });
-
-    $("signupButton").disabled = false;
-
-    if(error){
-
-      message(
-        $("signupMessage"),
-        "Erreur : " + error.message
-      );
-
-      return;
-    }
-
-    currentUser = data.user;
-
-    message(
-      $("signupMessage"),
-      "Compte créé avec succès !",
-      true
-    );
-
-    setTimeout(function(){
-      fermer("signupModal");
-      chargerUtilisateur();
-    },1000);
-  });
-
-
-  $("loginButton").addEventListener("click", async function(){
-
-    const phone = $("loginPhone").value.trim();
-    const password = $("loginPassword").value;
-
-    if(!phone || !password){
-      message($("loginMessage"),"Veuillez remplir les deux champs.");
-      return;
-    }
-
-    const technicalEmail =
-      phone.replace(/\D/g,"") +
-      "@marche-guinee.netlify.app";
-
-    $("loginButton").disabled = true;
-    $("loginMessage").textContent = "Connexion...";
-
-    const {data,error} =
-      await supabaseClient.auth.signInWithPassword({
-        email:technicalEmail,
-        password:password
-      });
-
-    $("loginButton").disabled = false;
-
-    if(error){
-
-      message(
-        $("loginMessage"),
-        "Numéro ou mot de passe incorrect."
-      );
-
-      return;
-    }
-
-    currentUser = data.user;
-
-    message(
-      $("loginMessage"),
-      "Connexion réussie !",
-      true
-    );
-
-    setTimeout(function(){
-      fermer("loginModal");
-      chargerUtilisateur();
-    },700);
-  });
-
-
-  $("forgotButton").addEventListener("click", function(){
-
-    const phone = $("forgotPhone").value.trim();
-
-    if(!phone){
-      message(
-        $("forgotMessage"),
-        "Entrez votre numéro de téléphone."
-      );
-      return;
-    }
-
-    /*
-      L'interface est prête.
-      La récupération réelle par SMS nécessite un fournisseur
-      OTP/SMS connecté à Supabase.
-    */
-
-    message(
-      $("forgotMessage"),
-      "La récupération sécurisée par SMS sera activée lors de la connexion du service OTP.",
-      true
-    );
-  });
-
-
-  /* =========================
-     PUBLICATION
-  ========================= */
-
-  $("publishButton").addEventListener("click", async function(){
-
-    await chargerUtilisateur();
-
-    if(!currentUser){
-
-      alert("Vous devez créer un compte ou vous connecter pour publier.");
-
-      ouvrir("accountModal");
-
-      return;
-    }
-
-    ouvrir("publishModal");
-  });
-
-
-  $("publishConfirmButton").addEventListener("click", async function(){
-
-    const title = $("listingTitle").value.trim();
-    const description = $("listingDescription").value.trim();
-    const price = $("listingPrice").value;
-    const category = $("listingCategory").value;
-    const condition = $("listingCondition").value;
-    const city = $("listingCity").value.trim();
-    const neighborhood = $("listingNeighborhood").value.trim();
-    const imageFile = $("listingImage").files[0];
-
-    if(!title || !price || !category || !city || !neighborhood){
-
-      message(
-        $("publishMessage"),
-        "Veuillez remplir les champs obligatoires."
-      );
-
-      return;
-    }
-
-    if(!currentUser){
-
-      message(
-        $("publishMessage"),
-        "Vous devez être connecté."
-      );
-
-      return;
-    }
-
-    $("publishConfirmButton").disabled = true;
-    $("publishMessage").textContent = "Publication en cours...";
-
-    try{
-
-      /*
-        PUBLICATION PRINCIPALE
-        Les valeurs correspondent aux contraintes
-        corrigées dans Supabase.
-      */
-
-      const {data:listing,error:listingError} =
-        await supabaseClient
-        .from("listings")
-        .insert({
-          seller_id:currentUser.id,
-          category_id:category,
-          title:title,
-          description:description,
-          price_gnf:Number(price),
-          condition:condition,
-          city:city,
-          neighborhood:neighborhood,
-          status:"active",
-          views:0
         })
-        .select()
-        .single();
-
-      if(listingError){
-        throw new Error(listingError.message);
       }
+    );
 
-      /*
-        PHOTO
-      */
+    const result = await signup.json();
 
-      if(imageFile){
+    if(!signup.ok){
+      msg.textContent =
+        result.msg ||
+        result.message ||
+        result.error_description ||
+        "Impossible de créer le compte.";
+      return;
+    }
 
-        const extension =
-          imageFile.name.split(".").pop() || "jpg";
+    if(result.user){
 
-        const filePath =
-          listing.id +
-          "-" +
-          Date.now() +
-          "." +
-          extension;
+      await fetch(
+        SUPABASE_URL + "/rest/v1/Users?on_conflict=id",
+        {
+          method:"POST",
+          headers:headers({
+            "Prefer":"resolution=merge-duplicates,return=minimal"
+          }),
+          body:JSON.stringify({
+            id:result.user.id,
+            "Full name":nom,
+            "Phone":phone
+          })
+        }
+      );
 
-        const {error:uploadError} =
-          await supabaseClient
-          .storage
-          .from("Listing-image")
-          .upload(
-            filePath,
-            imageFile,
+      utilisateurConnecte={
+        id:result.user.id,
+        fullName:nom,
+        phone:phone,
+        accessToken:result.access_token || null
+      };
+
+      msg.textContent="Compte créé avec succès. 🇬🇳";
+
+      setTimeout(function(){
+        fermerModal("compteModal");
+        afficherCompteConnecte();
+      },700);
+    }
+
+  }catch(error){
+    msg.textContent="Erreur de connexion à Supabase.";
+    console.error(error);
+  }
+}
+
+
+async function connecterCompte(){
+
+  const phone = numeroNormalise(document.getElementById("loginPhone").value);
+  const password = document.getElementById("loginPassword").value;
+
+  const msg=document.getElementById("loginMessage");
+  msg.style.display="block";
+
+  if(!phone || !password){
+    msg.textContent="Veuillez remplir tous les champs.";
+    return;
+  }
+
+  msg.textContent="Connexion...";
+
+  try{
+
+    const response=await fetch(
+      SUPABASE_URL + "/auth/v1/token?grant_type=password",
+      {
+        method:"POST",
+        headers:headers(),
+        body:JSON.stringify({
+          email:emailTechnique(phone),
+          password:password
+        })
+      }
+    );
+
+    const result=await response.json();
+
+    if(!response.ok){
+      msg.textContent =
+        result.error_description ||
+        result.msg ||
+        "Numéro ou mot de passe incorrect.";
+      return;
+    }
+
+    let nom="Utilisateur";
+
+    if(result.user && result.user.user_metadata){
+      nom=result.user.user_metadata.full_name || nom;
+    }
+
+    utilisateurConnecte={
+      id:result.user.id,
+      fullName:nom,
+      phone:phone,
+      accessToken:result.access_token
+    };
+
+    msg.textContent="Connexion réussie.";
+
+    setTimeout(function(){
+      fermerModal("compteModal");
+    },600);
+
+  }catch(error){
+    msg.textContent="Erreur de connexion.";
+    console.error(error);
+  }
+}
+
+
+function ouvrirVente(){
+
+  if(!utilisateurConnecte){
+    ouvrirCompte();
+
+    setTimeout(function(){
+      afficherConnexion();
+    },100);
+
+    return;
+  }
+
+  ouvrirModal("venteModal");
+}
+
+
+function previewPhoto(){
+
+  const input=document.getElementById("photo");
+  const preview=document.getElementById("photoPreview");
+
+  if(!input.files || !input.files[0]){
+    preview.style.display="none";
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=function(e){
+    preview.src=e.target.result;
+    preview.style.display="block";
+  };
+
+  reader.readAsDataURL(input.files[0]);
+}
+
+
+async function publierAnnonce(){
+
+  const message=document.getElementById("venteMessage");
+  message.style.display="block";
+
+  if(!utilisateurConnecte){
+    message.textContent="Connecte-toi d'abord.";
+    return;
+  }
+
+  const titre=document.getElementById("titre").value.trim();
+  const description=document.getElementById("description").value.trim();
+  const prix=document.getElementById("prix").value;
+  const condition=document.getElementById("condition").value;
+  const categorie=document.getElementById("categorie").value;
+  const ville=document.getElementById("ville").value.trim();
+  const quartier=document.getElementById("quartier").value.trim();
+  const photoInput=document.getElementById("photo");
+
+  if(!titre || !prix || !ville){
+    message.textContent="Titre, prix et ville sont obligatoires.";
+    return;
+  }
+
+  message.textContent="Publication en cours...";
+
+  try{
+
+    let categoryId=null;
+
+    const catResponse=await fetch(
+      SUPABASE_URL + "/rest/v1/Catégorie?select=*",
+      {
+        headers:headers()
+      }
+    );
+
+    if(catResponse.ok){
+
+      const categories=await catResponse.json();
+
+      if(Array.isArray(categories)){
+
+        const trouve=categories.find(function(cat){
+
+          const texte=JSON.stringify(cat).toLowerCase();
+
+          return texte.includes(categorie.toLowerCase());
+
+        });
+
+        if(trouve){
+          categoryId=trouve.id;
+        }
+      }
+    }
+
+    const annonce={
+      seller_id:utilisateurConnecte.id,
+      title:titre,
+      description:description,
+      price_gnf:Number(prix),
+      condition:condition,
+      city:ville,
+      neighborhood:quartier,
+      status:"active",
+      views:0
+    };
+
+    if(categoryId){
+      annonce.category_id=categoryId;
+    }
+
+    const listingResponse=await fetch(
+      SUPABASE_URL + "/rest/v1/listings",
+      {
+        method:"POST",
+        headers:headers({
+          "Prefer":"return=representation"
+        }),
+        body:JSON.stringify(annonce)
+      }
+    );
+
+    const listingResult=await listingResponse.json();
+
+    if(!listingResponse.ok){
+
+      message.textContent=
+        listingResult.message ||
+        listingResult.hint ||
+        "Impossible de publier l'annonce.";
+
+      console.error(listingResult);
+      return;
+    }
+
+    const listing=Array.isArray(listingResult)
+      ? listingResult[0]
+      : listingResult;
+
+    const listingId=listing.id;
+
+    if(photoInput.files && photoInput.files[0]){
+
+      const fichier=photoInput.files[0];
+
+      const extension=(fichier.name.split(".").pop() || "jpg")
+        .toLowerCase();
+
+      const chemin=
+        utilisateurConnecte.id +
+        "/" +
+        listingId +
+        "-" +
+        Date.now() +
+        "." +
+        extension;
+
+      const uploadResponse=await fetch(
+        SUPABASE_URL +
+        "/storage/v1/object/Listing-image/" +
+        chemin,
+        {
+          method:"POST",
+          headers:{
+            "apikey":SUPABASE_KEY,
+            "Authorization":"Bearer " +
+              (utilisateurConnecte.accessToken || SUPABASE_KEY),
+            "Content-Type":fichier.type || "image/jpeg"
+          },
+          body:fichier
+        }
+      );
+
+      if(uploadResponse.ok){
+
+        const signedResponse=await fetch(
+          SUPABASE_URL +
+          "/storage/v1/object/sign/Listing-image/" +
+          chemin,
+          {
+            method:"POST",
+            headers:headers(),
+            body:JSON.stringify({
+              expiresIn:31536000
+            })
+          }
+        );
+
+        if(signedResponse.ok){
+
+          const signedData=await signedResponse.json();
+
+          const imageUrl=
+            SUPABASE_URL +
+            "/storage/v1/object/sign/Listing-image/" +
+            chemin +
+            "?token=" +
+            encodeURIComponent(signedData.signedURL || signedData.token || "");
+
+          await fetch(
+            SUPABASE_URL + "/rest/v1/Listing%20images",
             {
-              cacheControl:"3600",
-              upsert:false
+              method:"POST",
+              headers:headers({
+                "Prefer":"return=minimal"
+              }),
+              body:JSON.stringify({
+                listing_id:listingId,
+                image_url:imageUrl
+              })
             }
           );
 
-        if(uploadError){
-
-          $("publishMessage").textContent =
-            "Annonce publiée, mais la photo n'a pas pu être enregistrée.";
-
-        }else{
-
-          const {data:signedData} =
-            await supabaseClient
-            .storage
-            .from("Listing-image")
-            .createSignedUrl(
-              filePath,
-              60 * 60 * 24 * 365
-            );
-
-          if(signedData?.signedUrl){
-
-            const {error:imageInsertError} =
-              await supabaseClient
-              .from("Listing images")
-              .insert({
-                listing_id:listing.id,
-                image_url:signedData.signedUrl,
-                path:filePath
-              });
-
-            if(imageInsertError){
-
-              console.log(
-                "Erreur enregistrement image:",
-                imageInsertError
-              );
-            }
-          }
         }
       }
-
-      $("publishMessage").textContent =
-        "Annonce publiée avec succès !";
-
-      $("publishMessage").style.color = "#087f3e";
-
-      $("listingTitle").value = "";
-      $("listingDescription").value = "";
-      $("listingPrice").value = "";
-      $("listingCategory").value = "";
-      $("listingCity").value = "";
-      $("listingNeighborhood").value = "";
-      $("listingImage").value = "";
-
-      await chargerAnnonces();
-
-      setTimeout(function(){
-        fermer("publishModal");
-        $("publishMessage").textContent = "";
-      },1200);
-
-    }catch(error){
-
-      console.error(error);
-
-      message(
-        $("publishMessage"),
-        "Impossible de publier l'annonce : " + error.message
-      );
-
-    }finally{
-
-      $("publishConfirmButton").disabled = false;
-    }
-  });
-
-
-  /* =========================
-     CHARGEMENT ANNONCES
-  ========================= */
-
-  async function chargerAnnonces(){
-
-    const {data,error} =
-      await supabaseClient
-      .from("listings")
-      .select("*")
-      .eq("status","active")
-      .order("created_at",{ascending:false});
-
-    if(error){
-
-      console.error(error);
-
-      $("listeAnnonces").innerHTML =
-        '<div class="empty">Impossible de charger les annonces.</div>';
-
-      return;
     }
 
-    annonces = data || [];
+    message.textContent="Annonce publiée avec succès ! 🇬🇳";
 
-    await afficherAnnonces();
+    document.getElementById("titre").value="";
+    document.getElementById("description").value="";
+    document.getElementById("prix").value="";
+    document.getElementById("ville").value="";
+    document.getElementById("quartier").value="";
+    document.getElementById("photo").value="";
+    document.getElementById("photoPreview").style.display="none";
+
+    setTimeout(function(){
+      fermerModal("venteModal");
+      chargerAnnonces();
+    },900);
+
+  }catch(error){
+
+    console.error(error);
+    message.textContent="Une erreur est survenue pendant la publication.";
   }
+}
 
 
-  async function obtenirPhoto(listingId){
+async function chargerImages(listingId){
 
-    const {data,error} =
-      await supabaseClient
-      .from("Listing images")
-      .select("*")
-      .eq("listing_id",listingId)
-      .limit(1);
+  const noms=[
+    "Listing%20images",
+    "listing_images"
+  ];
 
-    if(error || !data || !data.length){
-      return null;
-    }
-
-    const image = data[0];
-
-    if(image.path){
-
-      const {data:signedData} =
-        await supabaseClient
-        .storage
-        .from("Listing-image")
-        .createSignedUrl(
-          image.path,
-          60 * 60
-        );
-
-      if(signedData?.signedUrl){
-        return signedData.signedUrl;
-      }
-    }
-
-    if(image.image_url){
-      return image.image_url;
-    }
-
-    return null;
-  }
-
-
-  async function afficherAnnonces(){
-
-    const recherche =
-      $("searchInput").value.trim().toLowerCase();
-
-    let resultat = annonces.filter(function(a){
-
-      const texte = (
-        (a.title || "") + " " +
-        (a.description || "") + " " +
-        (a.city || "") + " " +
-        (a.neighborhood || "")
-      ).toLowerCase();
-
-      const rechercheOK =
-        !recherche || texte.includes(recherche);
-
-      const categorieOK =
-        !selectedCategory ||
-        a.category_id === selectedCategory;
-
-      return rechercheOK && categorieOK;
-    });
-
-    if(!resultat.length){
-
-      $("listeAnnonces").innerHTML =
-        '<div class="empty">Aucune annonce trouvée.</div>';
-
-      return;
-    }
-
-    $("listeAnnonces").innerHTML = "";
-
-    for(const annonce of resultat){
-
-      const image = await obtenirPhoto(annonce.id);
-
-      const card = document.createElement("article");
-
-      card.className = "annonce-card";
-      card.dataset.id = annonce.id;
-
-      card.innerHTML = `
-        ${
-          image
-          ?
-          `<img src="${escapeHTML(image)}" alt="${escapeHTML(annonce.title)}">`
-          :
-          `<div style="height:180px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:50px">📦</div>`
-        }
-
-        <div class="annonce-content">
-
-          <div class="annonce-title">
-            ${escapeHTML(annonce.title)}
-          </div>
-
-          <div class="price">
-            ${formatPrice(annonce.price_gnf)}
-          </div>
-
-          <div class="small">
-            📍 ${escapeHTML(annonce.city || "")}
-            ${annonce.neighborhood ? " • " + escapeHTML(annonce.neighborhood) : ""}
-          </div>
-
-          <div class="small">
-            👁️ ${annonce.views || 0} vue(s)
-          </div>
-
-        </div>
-      `;
-
-      $("listeAnnonces").appendChild(card);
-    }
-  }
-
-
-  /* =========================
-     CLIC SUR UNE ANNONCE
-  ========================= */
-
-  $("listeAnnonces").addEventListener("click", async function(event){
-
-    const card =
-      event.target.closest(".annonce-card");
-
-    if(!card) return;
-
-    const id = card.dataset.id;
-
-    if(id){
-      await ouvrirDetailAnnonce(id);
-    }
-  });
-
-
-  async function ouvrirDetailAnnonce(id){
-
-    ouvrir("detailModal");
-
-    $("detailContent").innerHTML =
-      "<p>Chargement de l'annonce...</p>";
-
-    const annonce =
-      annonces.find(a => String(a.id) === String(id));
-
-    if(!annonce){
-
-      $("detailContent").innerHTML =
-        "<p>Annonce introuvable.</p>";
-
-      return;
-    }
-
-    const image =
-      await obtenirPhoto(annonce.id);
-
-    $("detailContent").innerHTML = `
-
-      ${
-        image
-        ?
-        `<img class="detail-image"
-              src="${escapeHTML(image)}"
-              alt="${escapeHTML(annonce.title)}">`
-        :
-        `<div style="height:220px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:70px;border-radius:12px">
-          📦
-        </div>`
-      }
-
-      <h2>${escapeHTML(annonce.title)}</h2>
-
-      <div class="detail-price">
-        ${formatPrice(annonce.price_gnf)}
-      </div>
-
-      <p>
-        📍 ${escapeHTML(annonce.city || "")}
-        ${annonce.neighborhood ? " • " + escapeHTML(annonce.neighborhood) : ""}
-      </p>
-
-      <p>
-        🏷️ État :
-        ${escapeHTML(annonce.condition || "")}
-      </p>
-
-      <p>
-        👁️ ${annonce.views || 0} vue(s)
-      </p>
-
-      <hr>
-
-      <h3>Description</h3>
-
-      <p>
-        ${escapeHTML(annonce.description || "Aucune description.")}
-      </p>
-
-      <div class="actions">
-
-        <button
-          class="primary"
-          id="contactSellerButton"
-        >
-          💬 Contacter le vendeur
-        </button>
-
-        <button
-          class="secondary"
-          id="favoriteButton"
-        >
-          ❤️ Ajouter aux favoris
-        </button>
-
-        <button
-          class="primary full"
-          id="buyButton"
-        >
-          💳 Acheter / Payer
-        </button>
-
-      </div>
-    `;
-
-
-    /* VUES */
+  for(const nom of noms){
 
     try{
 
-      await supabaseClient
-        .from("listings")
-        .update({
-          views:(annonce.views || 0) + 1
-        })
-        .eq("id",annonce.id);
-
-      annonce.views =
-        (annonce.views || 0) + 1;
-
-    }catch(e){
-      console.log(e);
-    }
-
-
-    /* CONTACTER */
-
-    $("contactSellerButton").addEventListener("click",async function(){
-
-      await chargerUtilisateur();
-
-      if(!currentUser){
-
-        alert("Connectez-vous pour contacter le vendeur.");
-
-        fermer("detailModal");
-        ouvrir("accountModal");
-
-        return;
-      }
-
-      alert(
-        "💬 La messagerie entre acheteurs et vendeurs sera activée dans la prochaine étape."
-      );
-    });
-
-
-    /* FAVORIS */
-
-    $("favoriteButton").addEventListener("click",async function(){
-
-      await chargerUtilisateur();
-
-      if(!currentUser){
-
-        alert("Connectez-vous pour ajouter cette annonce aux favoris.");
-
-        fermer("detailModal");
-        ouvrir("accountModal");
-
-        return;
-      }
-
-      const {data:existing,error:checkError} =
-        await supabaseClient
-        .from("Favorite")
-        .select("*")
-        .eq("user_id",currentUser.id)
-        .eq("listing_id",annonce.id)
-        .maybeSingle();
-
-      if(checkError){
-
-        alert("Impossible de vérifier les favoris.");
-
-        return;
-      }
-
-      if(existing){
-
-        await supabaseClient
-          .from("Favorite")
-          .delete()
-          .eq("user_id",currentUser.id)
-          .eq("listing_id",annonce.id);
-
-        $("favoriteButton").textContent =
-          "❤️ Ajouter aux favoris";
-
-      }else{
-
-        const {error} =
-          await supabaseClient
-          .from("Favorite")
-          .insert({
-            user_id:currentUser.id,
-            listing_id:annonce.id
-          });
-
-        if(error){
-
-          alert("Impossible d'ajouter aux favoris.");
-
-          return;
+      const response=await fetch(
+        SUPABASE_URL +
+        "/rest/v1/" +
+        nom +
+        "?select=listing_id,image_url&listing_id=eq." +
+        encodeURIComponent(listingId),
+        {
+          headers:headers()
         }
+      );
 
-        $("favoriteButton").textContent =
-          "❤️ Dans mes favoris";
-      }
-    });
+      if(response.ok){
 
+        const data=await response.json();
 
-    /* ACHAT / PAIEMENT */
-
-    $("buyButton").addEventListener("click",async function(){
-
-      await chargerUtilisateur();
-
-      if(!currentUser){
-
-        alert("Connectez-vous pour acheter.");
-
-        fermer("detailModal");
-        ouvrir("accountModal");
-
-        return;
+        if(Array.isArray(data) && data.length){
+          return data;
+        }
       }
 
-      fermer("detailModal");
-
-      $("paymentContent").innerHTML = `
-        <p><strong>${escapeHTML(annonce.title)}</strong></p>
-        <p class="detail-price">${formatPrice(annonce.price_gnf)}</p>
-        <p>📍 ${escapeHTML(annonce.city || "")}</p>
-      `;
-
-      ouvrir("paymentModal");
-    });
-
+    }catch(e){}
   }
 
-
-  /* =========================
-     RECHERCHE
-  ========================= */
-
-  $("searchInput").addEventListener("input",function(){
-    afficherAnnonces();
-  });
+  return [];
+}
 
 
-  /* =========================
-     CATEGORIES
-  ========================= */
+async function chargerAnnonces(){
 
-  document.querySelectorAll(".category-btn")
-    .forEach(function(button){
+  const conteneur=document.getElementById("annonces");
+  const empty=document.getElementById("empty");
 
-      button.addEventListener("click",function(){
+  conteneur.innerHTML="";
+  empty.style.display="block";
+  empty.textContent="Chargement des annonces...";
 
-        selectedCategory =
-          button.dataset.category || "";
+  try{
 
-        afficherAnnonces();
-      });
-    });
-
-
-  /* =========================
-     FERMETURE MODALES
-  ========================= */
-
-  document.querySelectorAll("[data-close]")
-    .forEach(function(button){
-
-      button.addEventListener("click",function(){
-
-        fermer(button.dataset.close);
-
-      });
-    });
-
-
-  document.querySelectorAll(".modal")
-    .forEach(function(modal){
-
-      modal.addEventListener("click",function(event){
-
-        if(event.target === modal){
-          modal.style.display = "none";
-        }
-
-      });
-    });
-
-
-  /* =========================
-     PAIEMENT
-  ========================= */
-
-  $("paymentContinueButton").addEventListener("click",function(){
-
-    alert(
-      "💳 Le système de paiement sera connecté aux moyens de paiement disponibles en Guinée dans la prochaine étape."
+    const response=await fetch(
+      SUPABASE_URL +
+      "/rest/v1/listings?select=*&order=created_at.desc",
+      {
+        headers:headers()
+      }
     );
 
+    if(!response.ok){
+      const err=await response.text();
+      console.error(err);
+      empty.textContent="Impossible de charger les annonces.";
+      return;
+    }
+
+    const data=await response.json();
+
+    toutesLesAnnonces=Array.isArray(data) ? data : [];
+
+    await afficherAnnonces(toutesLesAnnonces);
+
+  }catch(error){
+
+    console.error(error);
+    empty.textContent="Erreur de connexion.";
+  }
+}
+
+
+async function afficherAnnonces(liste){
+
+  const conteneur=document.getElementById("annonces");
+  const empty=document.getElementById("empty");
+
+  conteneur.innerHTML="";
+
+  if(!liste.length){
+
+    empty.style.display="block";
+    empty.textContent="Aucune annonce trouvée.";
+    return;
+  }
+
+  empty.style.display="none";
+
+  for(const annonce of liste){
+
+    const images=await chargerImages(annonce.id);
+
+    let image="";
+
+    if(images.length){
+      image=images[0].image_url || "";
+    }
+
+    const article=document.createElement("article");
+    article.className="card";
+
+    article.setAttribute("data-annonce-id",annonce.id);
+
+    article.innerHTML=`
+      ${
+        image
+        ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(annonce.title)}">`
+        : `<div style="height:210px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:50px">📦</div>`
+      }
+
+      <div class="card-content">
+        <h3>${escapeHTML(annonce.title || "Sans titre")}</h3>
+
+        <div class="price">
+          ${formatPrix(annonce.price_gnf)}
+        </div>
+
+        <div class="location">
+          📍 ${escapeHTML(annonce.city || "")}
+          ${annonce.neighborhood ? " • " + escapeHTML(annonce.neighborhood) : ""}
+        </div>
+
+        <div class="small">
+          👁️ ${Number(annonce.views || 0)} vue(s)
+        </div>
+      </div>
+    `;
+
+    article.addEventListener("click",function(){
+
+      const id=this.getAttribute("data-annonce-id");
+
+      ouvrirDetailAnnonce(id);
+
+    });
+
+    conteneur.appendChild(article);
+  }
+}
+
+
+async function ouvrirDetailAnnonce(id){
+
+  const annonce=toutesLesAnnonces.find(function(a){
+    return String(a.id)===String(id);
+  });
+
+  if(!annonce){
+    alert("Annonce introuvable.");
+    return;
+  }
+
+  const content=document.getElementById("detailContent");
+
+  content.innerHTML="<p>Chargement...</p>";
+
+  ouvrirModal("detailModal");
+
+  const images=await chargerImages(id);
+
+  let imageHTML="";
+
+  if(images.length){
+
+    imageHTML=images.map(function(img){
+
+      return `
+        <img
+          class="detail-img"
+          src="${escapeHTML(img.image_url)}"
+          alt="${escapeHTML(annonce.title)}"
+        >
+      `;
+
+    }).join("");
+
+  }else{
+
+    imageHTML=`
+      <div
+        style="
+          height:250px;
+          background:#eee;
+          border-radius:16px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:70px;
+          margin-bottom:18px;
+        "
+      >📦</div>
+    `;
+  }
+
+  content.innerHTML=`
+
+    ${imageHTML}
+
+    <h2>${escapeHTML(annonce.title || "Annonce")}</h2>
+
+    <div class="detail-price">
+      ${formatPrix(annonce.price_gnf)}
+    </div>
+
+    <div class="detail-info">
+
+      📍 <strong>Lieu :</strong>
+      ${escapeHTML(annonce.city || "")}
+      ${annonce.neighborhood
+        ? " • " + escapeHTML(annonce.neighborhood)
+        : ""
+      }
+
+      <br>
+
+      🏷️ <strong>État :</strong>
+      ${escapeHTML(annonce.condition || "")}
+
+      <br>
+
+      👁️ <strong>Vues :</strong>
+      ${Number(annonce.views || 0)}
+
+      <br>
+
+      📅 <strong>Publié le :</strong>
+      ${formatDate(annonce.created_at)}
+
+    </div>
+
+    <hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+
+    <h3>Description</h3>
+
+    <p style="line-height:1.6">
+      ${escapeHTML(annonce.description || "Aucune description.")}
+    </p>
+
+    <div class="actions">
+
+      <button class="primary" onclick="ouvrirMessageVendeur()">
+        💬 Contacter le vendeur
+      </button>
+
+      <button class="secondary" onclick="ouvrirPaiement()">
+        💳 Acheter
+      </button>
+
+    </div>
+  `;
+
+  enregistrerVue(id,Number(annonce.views || 0));
+}
+
+
+async function enregistrerVue(id,vues){
+
+  try{
+
+    await fetch(
+      SUPABASE_URL +
+      "/rest/v1/listings?id=eq." +
+      encodeURIComponent(id),
+      {
+        method:"PATCH",
+        headers:headers({
+          "Prefer":"return=minimal"
+        }),
+        body:JSON.stringify({
+          views:vues+1
+        })
+      }
+    );
+
+    const annonce=toutesLesAnnonces.find(function(a){
+      return String(a.id)===String(id);
+    });
+
+    if(annonce){
+      annonce.views=vues+1;
+    }
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+
+function ouvrirMessageVendeur(){
+
+  if(!utilisateurConnecte){
+
+    alert("Connecte-toi pour contacter le vendeur.");
+
+    fermerModal("detailModal");
+    ouvrirCompte();
+
+    return;
+  }
+
+  alert("La messagerie sera reliée aux conversations Marché Guinée.");
+}
+
+
+function ouvrirPaiement(){
+
+  fermerModal("detailModal");
+  ouvrirModal("paiementModal");
+}
+
+
+function filtrerCategorie(categorie){
+
+  categorieActuelle=categorie;
+
+  appliquerFiltres();
+
+}
+
+
+function appliquerFiltres(){
+
+  const recherche=
+    document.getElementById("searchInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+  let liste=toutesLesAnnonces.filter(function(annonce){
+
+    const texte=JSON.stringify(annonce).toLowerCase();
+
+    const correspondRecherche=
+      !recherche || texte.includes(recherche);
+
+    const correspondCategorie=
+      categorieActuelle==="Toutes" ||
+      texte.includes(categorieActuelle.toLowerCase());
+
+    return correspondRecherche && correspondCategorie;
+
+  });
+
+  afficherAnnonces(liste);
+}
+
+
+document.getElementById("searchInput")
+  .addEventListener("input",function(){
+
+    appliquerFiltres();
+
   });
 
 
-  /* =========================
-     INITIALISATION
-  ========================= */
+chargerAnnonces();
 
-  await chargerUtilisateur();
-
-  await chargerAnnonces();
-
-});
 </script>
 
 </body>
