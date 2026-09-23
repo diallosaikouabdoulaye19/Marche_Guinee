@@ -1991,7 +1991,7 @@ function retourConversations(){
    ACHAT
 ========================= */
 
-function ouvrirPaiement(listingId){
+async function ouvrirPaiement(listingId){
 
   const annonce =
     toutesLesAnnonces.find(a => a.id === listingId);
@@ -2008,6 +2008,112 @@ function ouvrirPaiement(listingId){
 
     return;
   }
+
+  if(annonce.status !== "active"){
+    alert("Cette annonce n'est plus disponible.");
+    return;
+  }
+
+  if(annonce.seller_id === utilisateurConnecte.id){
+    alert("Tu ne peux pas acheter ta propre annonce.");
+    return;
+  }
+
+  const prix = Number(annonce.price_gnf || 0);
+
+  if(!prix || prix <= 0){
+    alert("Prix de l'annonce invalide.");
+    return;
+  }
+
+  const commission = Math.round(prix * 0.03);
+  const montantVendeur = prix - commission;
+
+  const confirmation = confirm(
+    "Confirmer la commande ?\n\n" +
+    "Produit : " + annonce.title + "\n" +
+    "Prix : " + prix.toLocaleString("fr-FR") + " GNF\n\n" +
+    "Tu paieras : " +
+    prix.toLocaleString("fr-FR") +
+    " GNF\n\n" +
+    "Commission Marché Guinée : 3 % prélevée au vendeur.\n\n" +
+    "Confirmer la commande ?"
+  );
+
+  if(!confirmation) return;
+
+  try{
+
+    const commande = await supabaseFetch(
+      "/rest/v1/orders",
+      {
+        method:"POST",
+        headers:{
+          "Prefer":"return=representation"
+        },
+        body:JSON.stringify({
+
+          order_number:
+            "MG-" +
+            Date.now().toString().slice(-8),
+
+          listing_id: annonce.id,
+
+          buyer_id: utilisateurConnecte.id,
+
+          seller_id: annonce.seller_id,
+
+          product_title: annonce.title,
+
+          price_gnf: prix,
+
+          status: "pending",
+
+          commission_gnf: commission,
+
+          seller_amount_gnf: montantVendeur,
+
+          delivery_status: "pending"
+
+        })
+      }
+    );
+
+    const nouvelleCommande =
+      Array.isArray(commande)
+        ? commande[0]
+        : commande;
+
+    if(!nouvelleCommande){
+      throw new Error(
+        "La commande n'a pas pu être créée."
+      );
+    }
+
+    fermerModal("detailModal");
+
+    alert(
+      "✅ Commande créée !\n\n" +
+      "Numéro : " +
+      (nouvelleCommande.order_number || "En attente") +
+      "\n\n" +
+      "Le code de livraison sera généré automatiquement.\n\n" +
+      "Commande en attente de livraison."
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur création commande :",
+      error
+    );
+
+    alert(
+      "Impossible de créer la commande.\n\n" +
+      (error.message || "Erreur inconnue.")
+    );
+  }
+}
 
   const prix = Number(annonce.price_gnf || 0);
 
