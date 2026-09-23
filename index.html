@@ -6290,7 +6290,36 @@ async function chargerTableauAdmin(){
         )}
 
       </div>
+<!-- UTILISATEURS ADMIN -->
 
+<div style="
+  margin-top:18px;
+  padding:18px;
+  background:#f8fafc;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+">
+
+  <h3 style="margin-top:0;">
+    👥 Utilisateurs
+  </h3>
+
+  <div id="listeUtilisateursAdmin">
+    Chargement...
+  </div>
+
+</div>
+
+
+<!-- FINANCES -->
+
+<div style="
+  margin-top:18px;
+  padding:18px;
+  background:#f0fdf4;
+  border:1px solid #bbf7d0;
+  border-radius:16px;
+">
 
       <!-- FINANCES -->
 
@@ -6717,7 +6746,150 @@ setTimeout(
   afficherBoutonAdmin,
   1000
 );
+async function chargerUtilisateursAdmin(){
 
+  const container =
+    document.getElementById(
+      "listeUtilisateursAdmin"
+    );
+
+  if(!container) return;
+
+  try{
+
+    const estAdmin =
+      await verifierAccesAdmin();
+
+    if(!estAdmin){
+
+      container.innerHTML =
+        "Accès refusé.";
+
+      return;
+    }
+
+    const utilisateurs =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/users" +
+        "?select=id,full_name,phone,city,neighborhood,status,created_at" +
+        "&order=created_at.desc"
+      );
+
+    const liste =
+      Array.isArray(utilisateurs)
+        ? utilisateurs
+        : [];
+
+    if(!liste.length){
+
+      container.innerHTML = `
+        <div style="
+          padding:15px;
+          text-align:center;
+          color:#777;
+        ">
+          Aucun utilisateur trouvé.
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    liste.forEach(
+      utilisateur => {
+
+        const div =
+          document.createElement("div");
+
+        div.style.cssText =
+          "border:1px solid #ddd;" +
+          "border-radius:12px;" +
+          "padding:13px;" +
+          "margin-bottom:10px;" +
+          "background:white;";
+
+        div.innerHTML = `
+
+          <strong>
+            👤 ${
+              escapeHTML(
+                utilisateur.full_name ||
+                "Utilisateur"
+              )
+            }
+          </strong>
+
+          <div style="
+            margin-top:6px;
+            font-size:14px;
+          ">
+            📱 ${
+              escapeHTML(
+                utilisateur.phone || ""
+              )
+            }
+          </div>
+
+          <div style="
+            font-size:14px;
+          ">
+            📍 ${
+              escapeHTML(
+                utilisateur.city || ""
+              )
+            }
+          </div>
+
+          <div style="
+            font-size:13px;
+            color:#777;
+            margin-top:5px;
+          ">
+            Statut :
+            ${
+              escapeHTML(
+                utilisateur.status ||
+                "Actif"
+              )
+            }
+          </div>
+
+        `;
+
+        container.appendChild(div);
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur utilisateurs admin :",
+      error
+    );
+
+    container.innerHTML = `
+      <div style="
+        padding:12px;
+        background:#fee2e2;
+        color:#b91c1c;
+        border-radius:10px;
+      ">
+        Impossible de charger les utilisateurs.
+        <br><br>
+        ${escapeHTML(
+          error.message ||
+          "Erreur inconnue."
+        )}
+      </div>
+    `;
+
+  }
+
+}
 </script>
 </body>
 </html>
