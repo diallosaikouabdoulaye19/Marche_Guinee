@@ -453,7 +453,11 @@ footer{
     ⚠️ Signaler un problème
   </button>
 
-  <button class="btn-primary" onclick="ouvrirMessages()">
+<button class="btn-primary" onclick="ouvrirMesVentes()">
+  📦 Mes ventes
+</button>
+ 
+ <button class="btn-primary" onclick="ouvrirMessages()">
     💬 Mes messages
   </button>
 
@@ -1349,6 +1353,153 @@ async function chargerSoldeVendeur(){
       "Impossible de charger le solde.";
   }
 }
+  function ouvrirMesVentes(){
+
+  if(!utilisateurConnecte){
+
+    alert("Connecte-toi pour voir tes ventes.");
+
+    ouvrirCompte();
+
+    return;
+  }
+
+  document.getElementById("mesVentesModal").style.display = "flex";
+
+  chargerMesVentes();
+}
+
+
+function fermerMesVentes(){
+
+  document.getElementById("mesVentesModal").style.display = "none";
+}
+
+
+async function chargerMesVentes(){
+
+  const container =
+    document.getElementById("listeMesVentes");
+
+  if(!container) return;
+
+  container.innerHTML =
+    "Chargement...";
+
+  try{
+
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&order=created_at.desc"
+    );
+
+    const ventes =
+      Array.isArray(commandes)
+        ? commandes
+        : [];
+
+    if(!ventes.length){
+
+      container.innerHTML =
+        '<div style="padding:15px;text-align:center;color:#666;">' +
+        'Aucune vente pour le moment.' +
+        '</div>';
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    ventes.forEach(vente => {
+
+      const prix =
+        Number(vente.price_gnf || 0);
+
+      const commission =
+        Number(vente.commission_gnf || 0);
+
+      const montantVendeur =
+        Number(vente.seller_amount_gnf || 0);
+
+      const div =
+        document.createElement("div");
+
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:14px;" +
+        "padding:15px;" +
+        "margin-bottom:12px;" +
+        "background:#fafafa;";
+
+      div.innerHTML =
+
+        "<strong>" +
+        escapeHTML(
+          vente.product_title || "Produit"
+        ) +
+        "</strong>" +
+
+        "<div style='margin-top:8px;'>" +
+        "🧾 Commande : " +
+        escapeHTML(
+          vente.order_number || ""
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "💰 Prix : " +
+        prix.toLocaleString("fr-FR") +
+        " GNF" +
+        "</div>" +
+
+        "<div>" +
+        "🏦 Commission Marché Guinée : " +
+        commission.toLocaleString("fr-FR") +
+        " GNF" +
+        "</div>" +
+
+        "<div>" +
+        "💵 Tu recevras : " +
+        montantVendeur.toLocaleString("fr-FR") +
+        " GNF" +
+        "</div>" +
+
+        "<div style='margin-top:8px;'>" +
+        "📦 Statut : " +
+        escapeHTML(
+          vente.status || ""
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "🚚 Livraison : " +
+        escapeHTML(
+          vente.delivery_status || ""
+        ) +
+        "</div>";
+
+      container.appendChild(div);
+
+    });
+
+  }catch(error){
+
+    console.error(
+      "Erreur chargement mes ventes :",
+      error
+    );
+
+    container.innerHTML =
+      '<div style="padding:15px;color:#dc2626;">' +
+      'Impossible de charger les ventes.' +
+      '</div>';
+  }
+}
+
   
   async function chargerAnnonces(){
 
@@ -2842,5 +2993,58 @@ async function envoyerSignalement(){
 
 
 </script>
+<!-- =========================
+     MES VENTES
+========================= -->
+
+<div id="mesVentesModal"
+     style="
+       display:none;
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,.55);
+       z-index:10001;
+       align-items:center;
+       justify-content:center;
+       padding:20px;
+     ">
+
+  <div style="
+    background:white;
+    width:100%;
+    max-width:450px;
+    max-height:85vh;
+    overflow-y:auto;
+    border-radius:18px;
+    padding:24px;
+    box-sizing:border-box;
+  ">
+
+    <h2 style="margin-top:0;">
+      📦 Mes ventes
+    </h2>
+
+    <div id="listeMesVentes">
+      Chargement...
+    </div>
+
+    <button
+      onclick="fermerMesVentes()"
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:15px;
+        border:none;
+        background:#eee;
+        border-radius:10px;
+        cursor:pointer;
+      "
+    >
+      Fermer
+    </button>
+
+  </div>
+</div>
+  
 </body>
 </html>
