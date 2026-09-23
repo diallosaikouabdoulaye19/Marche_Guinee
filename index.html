@@ -2199,39 +2199,6 @@ async function ouvrirPaiement(listingId){
   }
 }
 
-  const prix = Number(annonce.price_gnf || 0);
-
-  const commission = prix * 0.03;
-  
-  const total = prix;
-
-  document.getElementById("paymentContent").innerHTML = `
-
-    <h3>${escapeHTML(annonce.title)}</h3>
-
-    <p>
-      Prix : <strong>${formatPrix(annonce.price_gnf)}</strong>
-    </p>
-
-    <p>
-  Commission Marché Guinée (3 % prélevée au vendeur) :
-  <strong>${formatPrix(commission)}</strong>
-</p>
-
-    <hr>
-
-    <p>
-      Total :
-      <strong>${formatPrix(total)}</strong>
-    </p>
-  `;
-
-  fermerModal("detailModal");
-
-  document.getElementById("paymentModal").style.display = "block";
-}
-
-
 /* =========================
    DÉMARRAGE
 ========================= */
