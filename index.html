@@ -586,20 +586,17 @@ let utilisateurConnecte = null;
 
 
 function headers(extra={}){
+  const token =
+    utilisateurConnecte && utilisateurConnecte.accessToken
+      ? utilisateurConnecte.accessToken
+      : SUPABASE_KEY;
 
   return {
-
     "apikey": SUPABASE_KEY,
-
-    "Authorization":
-      "Bearer " + SUPABASE_KEY,
-
-    "Content-Type":
-      "application/json",
-
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
     ...extra
   };
-
 }
 
 
