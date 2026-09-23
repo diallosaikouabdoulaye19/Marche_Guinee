@@ -10,256 +10,285 @@
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:#f5f6f7;
-  color:#222;
+  background:#f5f6f8;
+  color:#171717
 }
 header{
-  background:#07883f;
-  color:white;
-  padding:22px 20px 28px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:12px;
 }
-.top{
+.header-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
 }
 .logo{
-  font-size:28px;
-  font-weight:800;
-}
-.account-btn{
-  background:white;
-  color:#087d3b;
-  border:0;
-  border-radius:18px;
-  padding:14px 18px;
-  font-size:18px;
-  font-weight:700;
-}
-.search{
-  margin-top:22px;
-  width:100%;
-  padding:18px 20px;
-  border:0;
-  border-radius:18px;
   font-size:20px;
-  outline:none;
+  font-weight:bold;
+  color:#111;
+  white-space:nowrap;
 }
-main{
-  max-width:1100px;
-  margin:auto;
-  padding:30px 18px 70px;
-}
-.hero{
-  background:white;
-  border-radius:25px;
-  padding:28px;
-  box-shadow:0 5px 20px #00000012;
-}
-.hero h1{
-  margin:0 0 20px;
-  font-size:36px;
-}
-.hero p{
-  font-size:20px;
+.header-actions{
+  display:flex;
+  gap:7px;
 }
 button{
+  border:0;
+  border-radius:9px;
+  padding:11px 14px;
   cursor:pointer;
+  font-weight:bold;
 }
-.primary{
-  background:#07883f;
-  color:white;
-  border:0;
-  border-radius:16px;
-  padding:15px 22px;
-  font-size:18px;
-  font-weight:700;
+.btn-primary{background:#111;color:#fff}
+.btn-green{background:#087f3f;color:#fff}
+.btn-light{background:#eee;color:#111}
+.btn-danger{background:#c62828;color:#fff}
+.search{
+  margin-top:10px;
+  display:flex;
+  gap:7px;
 }
-.secondary{
-  background:#eee;
-  color:#087d3b;
-  border:0;
+.search input{
+  flex:1;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:9px;
+  font-size:15px;
+}
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:15px;
+}
+.hero{
+  background:#111;
+  color:#fff;
   border-radius:15px;
-  padding:13px 18px;
-  font-size:16px;
-  font-weight:700;
+  padding:25px 18px;
+  margin-bottom:18px;
 }
+.hero h1{margin:0 0 8px;font-size:28px}
+.hero p{margin:0 0 18px;color:#ddd}
 .categories{
   display:flex;
-  gap:12px;
+  gap:8px;
   overflow-x:auto;
-  padding:25px 0;
+  padding:5px 0 15px;
 }
-.cat{
-  flex:0 0 auto;
-  border:0;
-  background:#eee;
-  border-radius:16px;
-  padding:15px 20px;
-  font-size:17px;
-  font-weight:700;
+.categories button{
+  white-space:nowrap;
+}
+.category-active{
+  background:#111!important;
+  color:#fff!important;
 }
 .section-title{
-  font-size:34px;
-  margin:15px 0 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:10px 0;
 }
 .grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:13px;
 }
 .card{
-  background:white;
-  border-radius:20px;
+  background:#fff;
+  border-radius:13px;
   overflow:hidden;
-  box-shadow:0 4px 15px #00000012;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
   cursor:pointer;
-  transition:.15s;
 }
-.card:active{
-  transform:scale(.98);
-}
-.card img{
+.card-img{
   width:100%;
-  height:210px;
+  height:180px;
   object-fit:cover;
   background:#eee;
-  display:block;
 }
-.card-content{
-  padding:16px;
-}
-.card h3{
-  margin:0 0 8px;
-  font-size:19px;
+.card-body{padding:12px}
+.card-title{
+  font-weight:bold;
+  margin-bottom:7px;
 }
 .price{
-  color:#087d3b;
-  font-size:21px;
-  font-weight:800;
+  font-size:18px;
+  font-weight:bold;
 }
-.location{
-  color:#666;
+.meta{
+  color:#777;
+  font-size:13px;
+  margin-top:6px;
+}
+.condition{
+  display:inline-block;
+  background:#eee;
+  padding:4px 7px;
+  border-radius:6px;
+  font-size:12px;
   margin-top:8px;
 }
 .empty{
-  text-align:center;
-  color:#666;
-  font-size:19px;
-  padding:40px 10px;
-}
-footer{
-  text-align:center;
-  color:#777;
+  background:#fff;
   padding:25px;
+  text-align:center;
+  border-radius:12px;
 }
 .modal{
   display:none;
   position:fixed;
-  z-index:1000;
   inset:0;
-  background:#0008;
-  overflow-y:auto;
-  padding:25px 15px;
+  z-index:100;
+  background:rgba(0,0,0,.55);
+  padding:15px;
+  overflow:auto;
 }
 .modal-box{
-  background:white;
-  max-width:600px;
-  margin:20px auto;
-  border-radius:22px;
-  padding:24px;
+  background:#fff;
+  max-width:650px;
+  margin:30px auto;
+  border-radius:15px;
+  padding:18px;
   position:relative;
 }
 .close{
   position:absolute;
-  right:15px;
-  top:12px;
-  border:0;
-  background:#eee;
-  border-radius:50%;
-  width:40px;
-  height:40px;
-  font-size:23px;
+  right:12px;
+  top:10px;
+  font-size:24px;
+  cursor:pointer;
 }
-.modal h2{
-  margin-top:5px;
-  font-size:28px;
+.form-group{margin-bottom:12px}
+.form-group label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:5px;
 }
-input,textarea,select{
+.form-group input,
+.form-group textarea,
+.form-group select{
   width:100%;
-  padding:14px;
-  margin:7px 0 14px;
+  padding:11px;
   border:1px solid #ccc;
-  border-radius:12px;
-  font-size:16px;
+  border-radius:8px;
+  font-size:15px;
 }
-textarea{
-  min-height:110px;
+.form-group textarea{
+  min-height:100px;
   resize:vertical;
-}
-.form-title{
-  font-size:25px;
-  font-weight:800;
-  margin-bottom:18px;
 }
 .form-actions{
   display:flex;
-  gap:10px;
+  gap:8px;
   flex-wrap:wrap;
-}
-.preview{
-  width:100%;
-  max-height:280px;
-  object-fit:cover;
-  border-radius:15px;
-  margin:8px 0 15px;
-  display:none;
 }
 .detail-img{
   width:100%;
-  max-height:400px;
-  object-fit:contain;
+  max-height:380px;
+  object-fit:cover;
+  border-radius:12px;
   background:#eee;
-  border-radius:16px;
-  margin-bottom:18px;
 }
 .detail-price{
-  font-size:28px;
-  font-weight:800;
-  color:#07883f;
-  margin:10px 0;
+  font-size:25px;
+  font-weight:bold;
+  margin:12px 0;
 }
-.detail-info{
-  color:#555;
-  line-height:1.7;
-}
-.actions{
+.account-tabs{
   display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:22px;
+  gap:8px;
+  margin-bottom:15px;
 }
-.small{
-  color:#777;
-  font-size:14px;
+.account-tabs button{flex:1}
+.hidden{display:none!important}
+.success{
+  background:#e7f7ed;
+  color:#087f3f;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+.error{
+  background:#fdeaea;
+  color:#b00020;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+
+/* MESSAGERIE */
+.chat-box{
+  height:430px;
+  overflow-y:auto;
+  background:#f1f2f4;
+  border-radius:12px;
+  padding:12px;
+  margin:12px 0;
+}
+.message-row{
+  display:flex;
+  margin:8px 0;
+}
+.message-row.mine{
+  justify-content:flex-end;
 }
 .message{
-  padding:12px;
-  border-radius:10px;
-  background:#f0f0f0;
-  margin-bottom:12px;
-  display:none;
+  max-width:78%;
+  padding:10px 12px;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+  word-break:break-word;
 }
-@media(max-width:650px){
-  .grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-  }
-  .card img{height:155px}
-  .hero h1{font-size:30px}
-  .logo{font-size:24px}
-  .account-btn{font-size:15px;padding:12px}
+.message-row.mine .message{
+  background:#111;
+  color:#fff;
+}
+.message-time{
+  display:block;
+  font-size:10px;
+  opacity:.6;
+  margin-top:4px;
+}
+.chat-input{
+  display:flex;
+  gap:7px;
+}
+.chat-input input{
+  flex:1;
+  border:1px solid #ccc;
+  border-radius:9px;
+  padding:12px;
+}
+.conversation-item{
+  background:#f6f6f6;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:8px;
+  cursor:pointer;
+}
+.conversation-item:hover{background:#eee}
+.conversation-title{font-weight:bold}
+.conversation-date{
+  color:#777;
+  font-size:12px;
+  margin-top:4px;
+}
+.photo-preview{
+  max-width:150px;
+  max-height:150px;
+  border-radius:10px;
+  margin-top:8px;
+}
+footer{
+  text-align:center;
+  color:#777;
+  padding:35px 15px;
 }
 </style>
 </head>
@@ -267,323 +296,275 @@ textarea{
 <body>
 
 <header>
-  <div class="top">
+  <div class="header-top">
     <div class="logo">🇬🇳 Marché Guinée</div>
-    <button class="account-btn" onclick="ouvrirCompte()">👤 Mon compte</button>
+
+    <div class="header-actions">
+      <button class="btn-light" onclick="ouvrirMessages()">💬</button>
+      <button class="btn-light" onclick="ouvrirCompte()">👤</button>
+    </div>
   </div>
 
-  <input
-    id="searchInput"
-    class="search"
-    type="search"
-    placeholder="🔎 Rechercher un produit..."
-  >
+  <div class="search">
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Rechercher un produit..."
+      oninput="filtrerAnnonces()"
+    >
+  </div>
 </header>
 
 <main>
 
-<section class="hero">
-  <h1>Bienvenue sur Marché Guinée 🇬🇳</h1>
-  <p>Achetez et vendez facilement en Guinée.</p>
+  <section class="hero">
+    <h1>Achetez et vendez en Guinée 🇬🇳</h1>
+    <p>Publiez vos annonces gratuitement et échangez directement avec les acheteurs et vendeurs.</p>
+    <button class="btn-green" onclick="ouvrirVente()">+ Publier une annonce</button>
+  </section>
 
-  <button class="primary" onclick="ouvrirVente()">
-    ➕ Publier une annonce
-  </button>
-</section>
+  <div class="categories">
+    <button class="btn-light category-active" onclick="choisirCategorie('Toutes',this)">Toutes</button>
+    <button class="btn-light" onclick="choisirCategorie('Téléphones',this)">Téléphones</button>
+    <button class="btn-light" onclick="choisirCategorie('Mode',this)">Mode</button>
+    <button class="btn-light" onclick="choisirCategorie('Maison',this)">Maison</button>
+    <button class="btn-light" onclick="choisirCategorie('Électronique',this)">Électronique</button>
+    <button class="btn-light" onclick="choisirCategorie('Véhicules',this)">Véhicules</button>
+    <button class="btn-light" onclick="choisirCategorie('Autres',this)">Autres</button>
+  </div>
 
-<div class="categories">
-  <button class="cat" onclick="filtrerCategorie('Toutes')">Toutes</button>
-  <button class="cat" onclick="filtrerCategorie('Téléphones')">📱 Téléphones</button>
-  <button class="cat" onclick="filtrerCategorie('Mode')">👕 Mode</button>
-  <button class="cat" onclick="filtrerCategorie('Maison')">🏠 Maison</button>
-  <button class="cat" onclick="filtrerCategorie('Électronique')">💻 Électronique</button>
-  <button class="cat" onclick="filtrerCategorie('Véhicules')">🚗 Véhicules</button>
-  <button class="cat" onclick="filtrerCategorie('Autres')">📦 Autres</button>
-</div>
+  <div class="section-title">
+    <h2>Annonces</h2>
+    <span id="nombreAnnonces"></span>
+  </div>
 
-<h2 class="section-title">🛍️ Annonces</h2>
-
-<div id="annonces" class="grid"></div>
-
-<div id="empty" class="empty">
-  Chargement des annonces...
-</div>
+  <div id="annonces" class="grid">
+    <div class="empty">Chargement des annonces...</div>
+  </div>
 
 </main>
 
 <footer>
-  Marché Guinée 🇬🇳 — Acheter • Vendre • Échanger
+  Marché Guinée 🇬🇳 — Acheter, vendre et échanger simplement.
 </footer>
 
 
 <!-- COMPTE -->
-<div id="compteModal" class="modal">
+<div id="accountModal" class="modal">
   <div class="modal-box">
+    <span class="close" onclick="fermerModal('accountModal')">×</span>
 
-    <button class="close" onclick="fermerModal('compteModal')">×</button>
+    <h2 id="accountTitle">Mon compte</h2>
 
-    <div id="compteAccueil">
-      <div class="form-title">👤 Mon compte</div>
+    <div id="accountMessage"></div>
 
-      <p>Crée ton compte gratuitement ou connecte-toi.</p>
+    <div id="accountForms">
+
+      <div class="account-tabs">
+        <button id="signupTab" class="btn-primary" onclick="afficherInscription()">Créer un compte</button>
+        <button id="loginTab" class="btn-light" onclick="afficherConnexion()">Se connecter</button>
+      </div>
+
+      <div id="signupForm">
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input id="signupName" type="text" placeholder="Ex : Saikou Abdoulaye Diallo">
+        </div>
+
+        <div class="form-group">
+          <label>Numéro</label>
+          <input id="signupPhone" type="tel" placeholder="Ex : 622000000">
+        </div>
+
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input id="signupPassword" type="password" placeholder="Mot de passe">
+        </div>
+
+        <button class="btn-green" onclick="creerCompte()">Créer mon compte gratuitement</button>
+      </div>
+
+      <div id="loginForm" class="hidden">
+        <div class="form-group">
+          <label>Numéro</label>
+          <input id="loginPhone" type="tel" placeholder="Numéro">
+        </div>
+
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input id="loginPassword" type="password" placeholder="Mot de passe">
+        </div>
+
+        <button class="btn-primary" onclick="connecterCompte()">Se connecter</button>
+      </div>
+
+    </div>
+
+    <div id="accountConnected" class="hidden">
+      <div class="success">
+        Tu es connecté à ton compte Marché Guinée.
+      </div>
+
+      <p><strong id="connectedName"></strong></p>
+      <p id="connectedPhone"></p>
 
       <div class="form-actions">
-
-        <button class="primary" onclick="afficherInscription()">
-          Créer mon compte gratuitement
-        </button>
-
-        <button class="secondary" onclick="afficherConnexion()">
-          Se connecter
-        </button>
-
+        <button class="btn-primary" onclick="ouvrirMessages()">💬 Mes messages</button>
+        <button class="btn-green" onclick="fermerModal('accountModal');ouvrirVente()">+ Publier une annonce</button>
+        <button class="btn-danger" onclick="deconnecter()">Se déconnecter</button>
       </div>
     </div>
 
-
-    <div id="inscription" style="display:none">
-
-      <div class="form-title">Créer mon compte</div>
-
-      <div id="signupMessage" class="message"></div>
-
-      <label>Nom complet</label>
-      <input
-        id="signupName"
-        type="text"
-        placeholder="Ex : Saikou Diallo"
-      >
-
-      <label>Numéro</label>
-      <input
-        id="signupPhone"
-        type="tel"
-        placeholder="Ex : 620000000"
-      >
-
-      <label>Mot de passe</label>
-      <input
-        id="signupPassword"
-        type="password"
-        placeholder="Mot de passe"
-      >
-
-      <button class="primary" onclick="creerCompte()">
-        Créer mon compte
-      </button>
-
-      <br><br>
-
-      <button class="secondary" onclick="afficherConnexion()">
-        J'ai déjà un compte
-      </button>
-
-    </div>
-
-
-    <div id="connexion" style="display:none">
-
-      <div class="form-title">Se connecter</div>
-
-      <div id="loginMessage" class="message"></div>
-
-      <label>Numéro</label>
-      <input
-        id="loginPhone"
-        type="tel"
-        placeholder="Ex : 620000000"
-      >
-
-      <label>Mot de passe</label>
-      <input
-        id="loginPassword"
-        type="password"
-        placeholder="Mot de passe"
-      >
-
-      <button class="primary" onclick="connecterCompte()">
-        Se connecter
-      </button>
-
-      <br><br>
-
-      <button class="secondary" onclick="afficherInscription()">
-        Créer un compte
-      </button>
-
-    </div>
-
-
-    <div id="compteConnecte" style="display:none">
-
-      <div class="form-title">👤 Mon compte</div>
-
-      <p id="nomUtilisateur"></p>
-      <p id="numeroUtilisateur"></p>
-
-      <button class="primary" onclick="fermerModal('compteModal')">
-        Fermer
-      </button>
-
-    </div>
-
   </div>
 </div>
 
 
-<!-- VENTE -->
-<div id="venteModal" class="modal">
-
+<!-- PUBLICATION -->
+<div id="publishModal" class="modal">
   <div class="modal-box">
+    <span class="close" onclick="fermerModal('publishModal')">×</span>
 
-    <button class="close" onclick="fermerModal('venteModal')">×</button>
+    <h2>Publier une annonce</h2>
+    <div id="publishMessage"></div>
 
-    <div class="form-title">🛍️ Publier une annonce</div>
+    <div class="form-group">
+      <label>Titre</label>
+      <input id="listingTitle" type="text" placeholder="Ex : iPhone 13">
+    </div>
 
-    <div id="venteMessage" class="message"></div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="listingDescription" placeholder="Décris ton produit..."></textarea>
+    </div>
 
-    <label>Titre de l'annonce</label>
-    <input
-      id="titre"
-      type="text"
-      placeholder="Ex : iPhone 13"
-    >
+    <div class="form-group">
+      <label>Prix (GNF)</label>
+      <input id="listingPrice" type="number" placeholder="Ex : 5000000">
+    </div>
 
-    <label>Description</label>
+    <div class="form-group">
+      <label>État</label>
+      <select id="listingCondition">
+        <option value="Neuf">Neuf</option>
+        <option value="Comme neuf">Comme neuf</option>
+        <option value="Bon état">Bon état</option>
+        <option value="État moyen">État moyen</option>
+        <option value="À réparer">À réparer</option>
+      </select>
+    </div>
 
-    <textarea
-      id="description"
-      placeholder="Décris ton produit..."
-    ></textarea>
+    <div class="form-group">
+      <label>Catégorie</label>
+      <select id="listingCategory">
+        <option value="Téléphones">Téléphones</option>
+        <option value="Mode">Mode</option>
+        <option value="Maison">Maison</option>
+        <option value="Électronique">Électronique</option>
+        <option value="Véhicules">Véhicules</option>
+        <option value="Autres">Autres</option>
+      </select>
+    </div>
 
-    <label>Prix en GNF</label>
+    <div class="form-group">
+      <label>Ville</label>
+      <input id="listingCity" type="text" value="Conakry">
+    </div>
 
-    <input
-      id="prix"
-      type="number"
-      placeholder="Ex : 5000000"
-    >
+    <div class="form-group">
+      <label>Quartier</label>
+      <input id="listingNeighborhood" type="text" placeholder="Ex : Bambéto">
+    </div>
 
-    <label>État</label>
+    <div class="form-group">
+      <label>Photo</label>
+      <input id="listingPhoto" type="file" accept="image/*" onchange="previewPhoto()">
+      <img id="photoPreview" class="photo-preview hidden">
+    </div>
 
-    <select id="condition">
-      <option value="Good">Bon état</option>
-      <option value="New">Neuf</option>
-      <option value="Used">Utilisé</option>
-    </select>
-
-    <label>Catégorie</label>
-
-    <select id="categorie">
-      <option value="Téléphones">Téléphones</option>
-      <option value="Mode">Mode</option>
-      <option value="Maison">Maison</option>
-      <option value="Électronique">Électronique</option>
-      <option value="Véhicules">Véhicules</option>
-      <option value="Autres">Autres</option>
-    </select>
-
-    <label>Ville</label>
-
-    <input
-      id="ville"
-      type="text"
-      placeholder="Ex : Conakry"
-    >
-
-    <label>Quartier</label>
-
-    <input
-      id="quartier"
-      type="text"
-      placeholder="Ex : Lambanyi"
-    >
-
-    <label>Photo du produit</label>
-
-    <input
-      id="photo"
-      type="file"
-      accept="image/*"
-      onchange="previewPhoto()"
-    >
-
-    <img id="photoPreview" class="preview">
-
-    <button class="primary" onclick="publierAnnonce()">
-      Publier l'annonce
-    </button>
-
+    <button class="btn-green" onclick="publierAnnonce()">Publier l'annonce</button>
   </div>
-
 </div>
 
 
-<!-- DETAIL -->
+<!-- DETAIL ANNONCE -->
 <div id="detailModal" class="modal">
-
   <div class="modal-box">
-
-    <button class="close" onclick="fermerModal('detailModal')">
-      ×
-    </button>
+    <span class="close" onclick="fermerModal('detailModal')">×</span>
 
     <div id="detailContent">
-      <p>Chargement...</p>
+      Chargement...
     </div>
-
   </div>
-
 </div>
 
 
 <!-- PAIEMENT -->
-<div id="paiementModal" class="modal">
-
+<div id="paymentModal" class="modal">
   <div class="modal-box">
+    <span class="close" onclick="fermerModal('paymentModal')">×</span>
 
-    <button class="close" onclick="fermerModal('paiementModal')">
-      ×
-    </button>
+    <h2>Achat</h2>
 
-    <div class="form-title">💳 Paiement</div>
+    <div id="paymentContent"></div>
 
-    <p>
-      Marché Guinée applique une commission de
-      <strong>3 %</strong> sur les ventes.
-    </p>
+    <div class="success">
+      Commission Marché Guinée : <strong>3 %</strong> de la vente.
+    </div>
 
-    <p>
-      Les échanges entre acheteurs et vendeurs restent gratuits.
-    </p>
+    <p>Le paiement sera relié au système de paiement de Marché Guinée dans la prochaine étape.</p>
 
-    <button
-      class="primary"
-      onclick="fermerModal('paiementModal')"
-    >
-      Compris
-    </button>
+    <button class="btn-primary" onclick="fermerModal('paymentModal')">Fermer</button>
+  </div>
+</div>
+
+
+<!-- MESSAGES -->
+<div id="messagesModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="fermerModal('messagesModal')">×</span>
+
+    <h2>💬 Messagerie</h2>
+
+    <div id="messagesList"></div>
+
+    <div id="chatContainer" class="hidden">
+      <button class="btn-light" onclick="retourConversations()">← Retour</button>
+
+      <h3 id="chatTitle">Conversation</h3>
+
+      <div id="chatBox" class="chat-box"></div>
+
+      <div class="chat-input">
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Écrire un message..."
+          onkeydown="gererToucheMessage(event)"
+        >
+        <button class="btn-primary" onclick="envoyerMessage()">Envoyer</button>
+      </div>
+    </div>
 
   </div>
-
 </div>
 
 
 <script>
-
-const SUPABASE_URL =
-  "https://meernnpwtcgqjppyccqk.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
-
-
-let toutesLesAnnonces = [];
-
-let categorieActuelle = "Toutes";
+const SUPABASE_URL = "https://meernnpwtcgqjppyccqk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
 
 let utilisateurConnecte = null;
+let toutesLesAnnonces = [];
+let categorieActuelle = "Toutes";
 
+let conversationActuelle = null;
+let annonceConversationActuelle = null;
+let intervalMessages = null;
+
+
+/* =========================
+   OUTILS SUPABASE
+========================= */
 
 function headers(extra={}){
   const token =
@@ -599,1777 +580,1431 @@ function headers(extra={}){
   };
 }
 
+async function supabaseFetch(url, options={}){
+  const response = await fetch(url, {
+    ...options,
+    headers:{
+      ...headers(),
+      ...(options.headers || {})
+    }
+  });
 
-function escapeHTML(value){
+  const text = await response.text();
 
-  if(value === null || value === undefined){
-    return "";
+  let data = null;
+
+  try{
+    data = text ? JSON.parse(text) : null;
+  }catch(e){
+    data = text;
   }
 
+  if(!response.ok){
+    const message =
+      data && data.message
+        ? data.message
+        : data && data.error_description
+        ? data.error_description
+        : typeof data === "string"
+        ? data
+        : "Erreur Supabase";
+
+    throw new Error(message);
+  }
+
+  return data;
+}
+
+
+/* =========================
+   OUTILS GÉNÉRAUX
+========================= */
+
+function escapeHTML(value){
+  if(value === null || value === undefined) return "";
   return String(value)
-
     .replace(/&/g,"&amp;")
-
     .replace(/</g,"&lt;")
-
     .replace(/>/g,"&gt;")
-
     .replace(/"/g,"&quot;")
-
     .replace(/'/g,"&#039;");
 }
 
-
 function formatPrix(prix){
-
-  if(prix === null || prix === undefined){
-    return "";
-  }
-
-  return Number(prix).toLocaleString("fr-FR") + " GNF";
+  return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
 }
-
 
 function formatDate(date){
-
-  if(!date){
-    return "";
-  }
-
-  try{
-
-    return new Date(date)
-      .toLocaleDateString("fr-FR");
-
-  }catch(e){
-
-    return "";
-
-  }
+  if(!date) return "";
+  return new Date(date).toLocaleDateString("fr-FR",{
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric"
+  });
 }
 
-
-function ouvrirModal(id){
-
-  document.getElementById(id).style.display="block";
-
-  document.body.style.overflow="hidden";
+function formatHeure(date){
+  if(!date) return "";
+  return new Date(date).toLocaleTimeString("fr-FR",{
+    hour:"2-digit",
+    minute:"2-digit"
+  });
 }
-
 
 function fermerModal(id){
+  document.getElementById(id).style.display = "none";
 
-  document.getElementById(id).style.display="none";
-
-  document.body.style.overflow="";
+  if(id === "messagesModal" && intervalMessages){
+    clearInterval(intervalMessages);
+    intervalMessages = null;
+  }
 }
 
 
-window.addEventListener("click",function(e){
-
-  document.querySelectorAll(".modal")
-    .forEach(function(modal){
-
-      if(e.target === modal){
-
-        modal.style.display="none";
-
-        document.body.style.overflow="";
-
-      }
-
-    });
-
-});
-
+/* =========================
+   COMPTE
+========================= */
 
 function ouvrirCompte(){
+  document.getElementById("accountModal").style.display = "block";
 
   if(utilisateurConnecte){
+    document.getElementById("accountForms").classList.add("hidden");
+    document.getElementById("accountConnected").classList.remove("hidden");
 
-    afficherCompteConnecte();
+    document.getElementById("connectedName").textContent =
+      utilisateurConnecte.fullName || "Utilisateur";
 
+    document.getElementById("connectedPhone").textContent =
+      utilisateurConnecte.phone || "";
   }else{
-
-    document.getElementById("compteAccueil")
-      .style.display="block";
-
-    document.getElementById("inscription")
-      .style.display="none";
-
-    document.getElementById("connexion")
-      .style.display="none";
-
-    document.getElementById("compteConnecte")
-      .style.display="none";
-
-    ouvrirModal("compteModal");
-
+    document.getElementById("accountForms").classList.remove("hidden");
+    document.getElementById("accountConnected").classList.add("hidden");
+    afficherInscription();
   }
-
 }
-
 
 function afficherInscription(){
+  document.getElementById("signupForm").classList.remove("hidden");
+  document.getElementById("loginForm").classList.add("hidden");
 
-  document.getElementById("compteAccueil")
-    .style.display="none";
-
-  document.getElementById("inscription")
-    .style.display="block";
-
-  document.getElementById("connexion")
-    .style.display="none";
-
-  document.getElementById("compteConnecte")
-    .style.display="none";
-
+  document.getElementById("signupTab").className = "btn-primary";
+  document.getElementById("loginTab").className = "btn-light";
 }
-
 
 function afficherConnexion(){
+  document.getElementById("signupForm").classList.add("hidden");
+  document.getElementById("loginForm").classList.remove("hidden");
 
-  document.getElementById("compteAccueil")
-    .style.display="none";
-
-  document.getElementById("inscription")
-    .style.display="none";
-
-  document.getElementById("connexion")
-    .style.display="block";
-
-  document.getElementById("compteConnecte")
-    .style.display="none";
-
+  document.getElementById("signupTab").className = "btn-light";
+  document.getElementById("loginTab").className = "btn-primary";
 }
-
-
-function afficherCompteConnecte(){
-
-  document.getElementById("compteAccueil")
-    .style.display="none";
-
-  document.getElementById("inscription")
-    .style.display="none";
-
-  document.getElementById("connexion")
-    .style.display="none";
-
-  document.getElementById("compteConnecte")
-    .style.display="block";
-
-
-  document.getElementById("nomUtilisateur")
-    .textContent =
-    "Nom : " +
-    (utilisateurConnecte.fullName || "");
-
-
-  document.getElementById("numeroUtilisateur")
-    .textContent =
-    "Numéro : " +
-    (utilisateurConnecte.phone || "");
-
-
-  ouvrirModal("compteModal");
-
-}
-
-
-function numeroNormalise(numero){
-
-  return String(numero || "")
-
-    .replace(/\s/g,"")
-
-    .replace(/^\+/,"")
-
-    .replace(/^00/,"");
-
-}
-
 
 function emailTechnique(numero){
+  const propre = String(numero || "")
+    .replace(/\s+/g,"")
+    .replace(/\+/g,"")
+    .replace(/[^0-9]/g,"");
 
-  return numeroNormalise(numero) +
-    "@marche-guinee.netlify.app";
-
+  return propre + "@marche-guinee.netlify.app";
 }
-
 
 async function creerCompte(){
 
-  const nom =
-    document.getElementById("signupName")
-      .value
-      .trim();
+  const fullName = document.getElementById("signupName").value.trim();
+  const phone = document.getElementById("signupPhone").value.trim();
+  const password = document.getElementById("signupPassword").value;
 
-  const phone =
-    numeroNormalise(
-      document.getElementById("signupPhone").value
-    );
+  const box = document.getElementById("accountMessage");
 
-  const password =
-    document.getElementById("signupPassword")
-      .value;
-
-
-  const msg =
-    document.getElementById("signupMessage");
-
-
-  msg.style.display="block";
-
-
-  if(!nom || !phone || !password){
-
-    msg.textContent =
-      "Veuillez remplir tous les champs.";
-
+  if(!fullName || !phone || !password){
+    box.innerHTML = '<div class="error">Remplis tous les champs.</div>';
     return;
-
   }
-
 
   if(password.length < 6){
-
-    msg.textContent =
-      "Le mot de passe doit contenir au moins 6 caractères.";
-
+    box.innerHTML = '<div class="error">Le mot de passe doit contenir au moins 6 caractères.</div>';
     return;
-
   }
 
-
-  msg.textContent =
-    "Création du compte...";
-
+  box.innerHTML = '<div class="success">Création du compte...</div>';
 
   try{
 
-    const signup =
-      await fetch(
+    const auth = await fetch(
+      SUPABASE_URL + "/auth/v1/signup",
+      {
+        method:"POST",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          email:emailTechnique(phone),
+          password:password,
+          data:{
+            full_name:fullName,
+            phone:phone
+          }
+        })
+      }
+    );
 
-        SUPABASE_URL +
-        "/auth/v1/signup",
+    const authText = await auth.text();
 
-        {
+    let authData;
 
-          method:"POST",
+    try{
+      authData = JSON.parse(authText);
+    }catch(e){
+      authData = {};
+    }
 
-          headers:headers(),
-
-          body:JSON.stringify({
-
-            email:
-              emailTechnique(phone),
-
-            password:
-              password,
-
-            data:{
-
-              full_name:
-                nom,
-
-              phone:
-                phone
-
-            }
-
-          })
-
-        }
-
+    if(!auth.ok){
+      throw new Error(
+        authData.msg ||
+        authData.message ||
+        authData.error_description ||
+        "Impossible de créer le compte."
       );
+    }
 
+    const userId =
+      authData.user && authData.user.id
+        ? authData.user.id
+        : null;
 
-    const result =
-      await signup.json();
+    if(!userId){
+      box.innerHTML =
+        '<div class="success">Compte créé. Tu peux maintenant te connecter.</div>';
 
-
-    if(!signup.ok){
-
-      msg.textContent =
-        result.msg ||
-        result.message ||
-        result.error_description ||
-        "Impossible de créer le compte.";
-
+      afficherConnexion();
       return;
-
     }
 
+    await fetch(
+      SUPABASE_URL + "/rest/v1/users?on_conflict=id",
+      {
+        method:"POST",
+        headers:{
+          ...headers(),
+          "Prefer":"resolution=merge-duplicates,return=minimal"
+        },
+        body:JSON.stringify({
+          id:userId,
+          full_name:fullName,
+          phone:phone
+        })
+      }
+    );
 
-    if(result.user){
+    box.innerHTML =
+      '<div class="success">Compte créé avec succès. Tu peux maintenant te connecter.</div>';
 
-      await fetch(
-
-        SUPABASE_URL +
-        "/rest/v1/Users?on_conflict=id",
-
-        {
-
-          method:"POST",
-
-          headers:headers({
-
-            "Prefer":
-              "resolution=merge-duplicates,return=minimal"
-
-          }),
-
-          body:JSON.stringify({
-
-            id:
-              result.user.id,
-
-            "Full name":
-              nom,
-
-            "Phone":
-              phone
-
-          })
-
-        }
-
-      );
-
-
-      utilisateurConnecte={
-
-        id:
-          result.user.id,
-
-        fullName:
-          nom,
-
-        phone:
-          phone,
-
-        accessToken:
-          result.access_token || null
-
-      };
-
-
-      msg.textContent =
-        "Compte créé avec succès. 🇬🇳";
-
-
-      setTimeout(function(){
-
-        fermerModal("compteModal");
-
-        afficherCompteConnecte();
-
-      },700);
-
-    }
-
+    afficherConnexion();
 
   }catch(error){
-
-    msg.textContent =
-      "Erreur de connexion à Supabase.";
-
     console.error(error);
 
+    box.innerHTML =
+      '<div class="error">' +
+      escapeHTML(error.message) +
+      '</div>';
   }
-
 }
 
 
 async function connecterCompte(){
 
-  const phone =
-    numeroNormalise(
-      document.getElementById("loginPhone").value
-    );
+  const phone = document.getElementById("loginPhone").value.trim();
+  const password = document.getElementById("loginPassword").value;
 
-  const password =
-    document.getElementById("loginPassword").value;
-
-
-  const msg =
-    document.getElementById("loginMessage");
-
-
-  msg.style.display="block";
-
+  const box = document.getElementById("accountMessage");
 
   if(!phone || !password){
-
-    msg.textContent =
-      "Veuillez remplir tous les champs.";
-
+    box.innerHTML =
+      '<div class="error">Entre ton numéro et ton mot de passe.</div>';
     return;
-
   }
 
-
-  msg.textContent =
-    "Connexion...";
-
+  box.innerHTML =
+    '<div class="success">Connexion...</div>';
 
   try{
 
-    const response =
-      await fetch(
+    const response = await fetch(
+      SUPABASE_URL + "/auth/v1/token?grant_type=password",
+      {
+        method:"POST",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          email:emailTechnique(phone),
+          password:password
+        })
+      }
+    );
 
-        SUPABASE_URL +
-        "/auth/v1/token?grant_type=password",
-
-        {
-
-          method:"POST",
-
-          headers:headers(),
-
-          body:JSON.stringify({
-
-            email:
-              emailTechnique(phone),
-
-            password:
-              password
-
-          })
-
-        }
-
-      );
-
-
-    const result =
-      await response.json();
-
+    const data = await response.json();
 
     if(!response.ok){
-
-      msg.textContent =
-        result.error_description ||
-        result.msg ||
-        "Numéro ou mot de passe incorrect.";
-
-      return;
-
+      throw new Error(
+        data.error_description ||
+        data.msg ||
+        "Numéro ou mot de passe incorrect."
+      );
     }
 
+    const userId = data.user.id;
 
-    let nom="Utilisateur";
+    let fullName = data.user.user_metadata?.full_name || "Utilisateur";
 
+    try{
+      const userRows = await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/users?id=eq." +
+        encodeURIComponent(userId) +
+        "&select=*"
+      );
 
-    if(
-      result.user &&
-      result.user.user_metadata
-    ){
-
-      nom =
-        result.user.user_metadata.full_name ||
-        nom;
-
+      if(userRows && userRows.length){
+        fullName = userRows[0].full_name || fullName;
+      }
+    }catch(e){
+      console.log("Profil users non récupéré :",e);
     }
 
-
-    utilisateurConnecte={
-
-      id:
-        result.user.id,
-
-      fullName:
-        nom,
-
-      phone:
-        phone,
-
-      accessToken:
-        result.access_token
-
+    utilisateurConnecte = {
+      id:userId,
+      fullName:fullName,
+      phone:phone,
+      accessToken:data.access_token
     };
 
+    localStorage.setItem(
+      "marche_guinee_session",
+      JSON.stringify(utilisateurConnecte)
+    );
 
-    msg.textContent =
-      "Connexion réussie.";
+    box.innerHTML =
+      '<div class="success">Connexion réussie.</div>';
 
+    ouvrirCompte();
 
-    setTimeout(function(){
-
-      fermerModal("compteModal");
-
-    },600);
-
+    setTimeout(()=>{
+      fermerModal("accountModal");
+    },700);
 
   }catch(error){
-
-    msg.textContent =
-      "Erreur de connexion.";
-
     console.error(error);
 
+    box.innerHTML =
+      '<div class="error">' +
+      escapeHTML(error.message) +
+      '</div>';
   }
-
 }
 
+
+function deconnecter(){
+
+  utilisateurConnecte = null;
+  localStorage.removeItem("marche_guinee_session");
+
+  fermerModal("accountModal");
+
+  alert("Tu es déconnecté.");
+}
+
+
+function restaurerSession(){
+
+  try{
+    const saved = localStorage.getItem("marche_guinee_session");
+
+    if(saved){
+      utilisateurConnecte = JSON.parse(saved);
+    }
+  }catch(e){
+    utilisateurConnecte = null;
+  }
+}
+
+
+/* =========================
+   PUBLICATION
+========================= */
 
 function ouvrirVente(){
 
   if(!utilisateurConnecte){
-
+    alert("Connecte-toi ou crée ton compte pour publier une annonce.");
     ouvrirCompte();
-
-    setTimeout(function(){
-
-      afficherConnexion();
-
-    },100);
-
     return;
-
   }
 
-  ouvrirModal("venteModal");
-
+  document.getElementById("publishModal").style.display = "block";
 }
-
 
 function previewPhoto(){
 
-  const input =
-    document.getElementById("photo");
+  const file = document.getElementById("listingPhoto").files[0];
+  const img = document.getElementById("photoPreview");
 
-  const preview =
-    document.getElementById("photoPreview");
-
-
-  if(
-    !input.files ||
-    !input.files[0]
-  ){
-
-    preview.style.display="none";
-
+  if(!file){
+    img.classList.add("hidden");
     return;
-
   }
 
-
-  const reader =
-    new FileReader();
-
-
-  reader.onload=function(e){
-
-    preview.src =
-      e.target.result;
-
-    preview.style.display =
-      "block";
-
-  };
-
-
-  reader.readAsDataURL(
-    input.files[0]
-  );
-
+  img.src = URL.createObjectURL(file);
+  img.classList.remove("hidden");
 }
 
 
-/* CONSTRUIT L'URL D'UNE IMAGE SUPABASE */
-function construireImageUrl(imageUrl){
+async function obtenirCategorieId(nomCategorie){
 
-  if(!imageUrl){
-    return "";
-  }
-
-
-  let valeur =
-    String(imageUrl).trim();
-
-
-  /*
-    Si image_url contient déjà une URL,
-    on récupère uniquement le nom du fichier.
-  */
-  if(
-    valeur.startsWith("http://") ||
-    valeur.startsWith("https://")
-  ){
-
-    try{
-
-      const url =
-        new URL(valeur);
-
-      const morceaux =
-        url.pathname.split("/");
-
-      const dernier =
-        morceaux[morceaux.length - 1];
-
-      if(dernier){
-
-        valeur =
-          decodeURIComponent(dernier);
-
-      }
-
-    }catch(e){
-
-      valeur =
-        valeur.split("?")[0]
-          .split("/")
-          .pop();
-
-    }
-
-  }
-
-
-  /*
-    Si le chemin contient encore des dossiers,
-    on garde le chemin complet.
-  */
-  valeur =
-    valeur.replace(/^\/+/,"");
-
-
-  return (
+  const rows = await supabaseFetch(
     SUPABASE_URL +
-    "/storage/v1/object/public/Listing-image/" +
-    valeur
+    "/rest/v1/categories?select=*&name=eq." +
+    encodeURIComponent(nomCategorie) +
+    "&limit=1"
   );
 
+  if(rows && rows.length){
+    return rows[0].id;
+  }
+
+  const all = await supabaseFetch(
+    SUPABASE_URL +
+    "/rest/v1/categories?select=*"
+  );
+
+  if(all && all.length){
+    const trouve = all.find(c =>
+      String(c.name || "").toLowerCase() ===
+      String(nomCategorie || "").toLowerCase()
+    );
+
+    if(trouve) return trouve.id;
+  }
+
+  return null;
 }
 
 
 async function publierAnnonce(){
 
-  const message =
-    document.getElementById("venteMessage");
-
-
-  message.style.display="block";
-
+  const messageBox = document.getElementById("publishMessage");
 
   if(!utilisateurConnecte){
-
-    message.textContent =
-      "Connecte-toi d'abord.";
-
+    messageBox.innerHTML =
+      '<div class="error">Connecte-toi d’abord.</div>';
     return;
-
   }
 
+  const title = document.getElementById("listingTitle").value.trim();
+  const description = document.getElementById("listingDescription").value.trim();
+  const price = document.getElementById("listingPrice").value;
+  const condition = document.getElementById("listingCondition").value;
+  const categoryName = document.getElementById("listingCategory").value;
+  const city = document.getElementById("listingCity").value.trim();
+  const neighborhood = document.getElementById("listingNeighborhood").value.trim();
+  const file = document.getElementById("listingPhoto").files[0];
 
-  const titre =
-    document.getElementById("titre")
-      .value
-      .trim();
-
-
-  const description =
-    document.getElementById("description")
-      .value
-      .trim();
-
-
-  const prix =
-    document.getElementById("prix").value;
-
-
-  const condition =
-    document.getElementById("condition").value;
-
-
-  const categorie =
-    document.getElementById("categorie").value;
-
-
-  const ville =
-    document.getElementById("ville")
-      .value
-      .trim();
-
-
-  const quartier =
-    document.getElementById("quartier")
-      .value
-      .trim();
-
-
-  const photoInput =
-    document.getElementById("photo");
-
-
-  if(!titre || !prix || !ville){
-
-    message.textContent =
-      "Titre, prix et ville sont obligatoires.";
-
+  if(!title || !price || !city){
+    messageBox.innerHTML =
+      '<div class="error">Remplis au minimum le titre, le prix et la ville.</div>';
     return;
-
   }
 
-
-  message.textContent =
-    "Publication en cours...";
-
+  messageBox.innerHTML =
+    '<div class="success">Publication en cours...</div>';
 
   try{
 
-    let categoryId=null;
+    const categoryId = await obtenirCategorieId(categoryName);
 
-
-    const catResponse =
-      await fetch(
-
-        SUPABASE_URL +
-        "/rest/v1/Catégorie?select=*",
-
-        {
-          headers:headers()
-        }
-
+    if(!categoryId){
+      throw new Error(
+        "La catégorie « " + categoryName + " » n'a pas été trouvée."
       );
+    }
 
-
-    if(catResponse.ok){
-
-      const categories =
-        await catResponse.json();
-
-
-      if(Array.isArray(categories)){
-
-        const trouve =
-          categories.find(function(cat){
-
-            const texte =
-              JSON.stringify(cat)
-                .toLowerCase();
-
-
-            return texte.includes(
-              categorie.toLowerCase()
-            );
-
-          });
-
-
-        if(trouve){
-
-          categoryId =
-            trouve.id;
-
-        }
-
+    const listingRows = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/listings",
+      {
+        method:"POST",
+        headers:{
+          "Prefer":"return=representation"
+        },
+        body:JSON.stringify({
+          seller_id:utilisateurConnecte.id,
+          category_id:categoryId,
+          title:title,
+          description:description,
+          price_gnf:Number(price),
+          condition:condition,
+          city:city,
+          neighborhood:neighborhood,
+          status:"active",
+          views:0
+        })
       }
+    );
 
+    if(!listingRows || !listingRows.length){
+      throw new Error("L'annonce n'a pas été créée.");
     }
 
+    const listing = listingRows[0];
 
-    const annonce={
-
-      seller_id:
-        utilisateurConnecte.id,
-
-      title:
-        titre,
-
-      description:
-        description,
-
-      price_gnf:
-        Number(prix),
-
-      condition:
-        condition,
-
-      city:
-        ville,
-
-      neighborhood:
-        quartier,
-
-      status:
-        "active",
-
-      views:
-        0
-
-    };
-
-
-    if(categoryId){
-
-      annonce.category_id =
-        categoryId;
-
-    }
-
-
-    const listingResponse =
-      await fetch(
-
-        SUPABASE_URL +
-        "/rest/v1/listings",
-
-        {
-
-          method:"POST",
-
-          headers:headers({
-
-            "Prefer":
-              "return=representation"
-
-          }),
-
-          body:
-            JSON.stringify(annonce)
-
-        }
-
-      );
-
-
-    const listingResult =
-      await listingResponse.json();
-
-
-    if(!listingResponse.ok){
-
-      message.textContent =
-        listingResult.message ||
-        listingResult.hint ||
-        "Impossible de publier l'annonce.";
-
-      console.error(listingResult);
-
-      return;
-
-    }
-
-
-    const listing =
-      Array.isArray(listingResult)
-      ? listingResult[0]
-      : listingResult;
-
-
-    const listingId =
-      listing.id;
-
-
-    /*
-      ENVOI DE LA PHOTO
-    */
-    if(
-      photoInput.files &&
-      photoInput.files[0]
-    ){
-
-      const fichier =
-        photoInput.files[0];
-
+    if(file){
 
       const extension =
-        (
-          fichier.name.split(".").pop() ||
-          "jpg"
-        ).toLowerCase();
-
+        file.name.includes(".")
+          ? file.name.split(".").pop().toLowerCase()
+          : "jpg";
 
       const chemin =
         utilisateurConnecte.id +
         "/" +
-        listingId +
+        listing.id +
         "-" +
         Date.now() +
         "." +
         extension;
 
-
-      const uploadResponse =
-        await fetch(
-
-          SUPABASE_URL +
-          "/storage/v1/object/Listing-image/" +
-          chemin,
-
-          {
-
-            method:"POST",
-
-            headers:{
-
-              "apikey":
-                SUPABASE_KEY,
-
-              "Authorization":
-                "Bearer " +
-                (
-                  utilisateurConnecte.accessToken ||
-                  SUPABASE_KEY
-                ),
-
-              "Content-Type":
-                fichier.type ||
-                "image/jpeg"
-
-            },
-
-            body:
-              fichier
-
-          }
-
-        );
-
-
-      if(uploadResponse.ok){
-
-        /*
-          On enregistre maintenant le CHEMIN
-          du fichier et non un lien signé temporaire.
-        */
-
-        const imageResponse =
-          await fetch(
-
-            SUPABASE_URL +
-            "/rest/v1/listing_images",
-
-            {
-
-              method:"POST",
-
-              headers:headers({
-
-                "Prefer":
-                  "return=minimal"
-
-              }),
-
-              body:
-                JSON.stringify({
-
-                  listing_id:
-                    listingId,
-
-                  image_url:
-                    chemin
-
-                })
-
-            }
-
-          );
-
-
-        if(!imageResponse.ok){
-
-          console.error(
-            await imageResponse.text()
-          );
-
+      const uploadResponse = await fetch(
+        SUPABASE_URL +
+        "/storage/v1/object/Listing-image/" +
+        chemin,
+        {
+          method:"POST",
+          headers:{
+            "apikey":SUPABASE_KEY,
+            "Authorization":"Bearer " +
+              utilisateurConnecte.accessToken,
+            "Content-Type":file.type || "image/jpeg"
+          },
+          body:file
         }
+      );
 
+      if(!uploadResponse.ok){
+        const errorText = await uploadResponse.text();
+        console.error(errorText);
       }else{
 
-        console.error(
-          "Erreur upload image:",
-          await uploadResponse.text()
+        await supabaseFetch(
+          SUPABASE_URL + "/rest/v1/listing_images",
+          {
+            method:"POST",
+            headers:{
+              "Prefer":"return=minimal"
+            },
+            body:JSON.stringify({
+              listing_id:listing.id,
+              image_url:chemin
+            })
+          }
         );
-
       }
-
     }
 
+    messageBox.innerHTML =
+      '<div class="success">Annonce publiée avec succès !</div>';
 
-    message.textContent =
-      "Annonce publiée avec succès ! 🇬🇳";
+    setTimeout(()=>{
+      fermerModal("publishModal");
 
-
-    document.getElementById("titre").value="";
-
-    document.getElementById("description").value="";
-
-    document.getElementById("prix").value="";
-
-    document.getElementById("ville").value="";
-
-    document.getElementById("quartier").value="";
-
-    document.getElementById("photo").value="";
-
-    document.getElementById("photoPreview")
-      .style.display="none";
-
-
-    setTimeout(function(){
-
-      fermerModal("venteModal");
+      document.getElementById("listingTitle").value = "";
+      document.getElementById("listingDescription").value = "";
+      document.getElementById("listingPrice").value = "";
+      document.getElementById("listingNeighborhood").value = "";
+      document.getElementById("listingPhoto").value = "";
+      document.getElementById("photoPreview").classList.add("hidden");
+      document.getElementById("publishMessage").innerHTML = "";
 
       chargerAnnonces();
-
-    },900);
-
+    },700);
 
   }catch(error){
 
     console.error(error);
 
-    message.textContent =
-      "Une erreur est survenue pendant la publication.";
+    messageBox.innerHTML =
+      '<div class="error">Impossible de publier l’annonce : ' +
+      escapeHTML(error.message) +
+      '</div>';
+  }
+}
 
+
+/* =========================
+   ANNONCES
+========================= */
+
+function construireImageUrl(imageUrl){
+
+  if(!imageUrl) return "";
+
+  if(
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://")
+  ){
+    return imageUrl;
   }
 
+  return (
+    SUPABASE_URL +
+    "/storage/v1/object/public/Listing-image/" +
+    imageUrl
+  );
 }
 
 
 async function chargerImages(listingId){
 
-  const noms=[
+  try{
 
-    "Listing%20images",
+    const rows = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/listing_images?listing_id=eq." +
+      encodeURIComponent(listingId) +
+      "&select=*&limit=1"
+    );
 
-    "listing_images"
-
-  ];
-
-
-  for(const nom of noms){
-
-    try{
-
-      const response =
-        await fetch(
-
-          SUPABASE_URL +
-          "/rest/v1/" +
-          nom +
-          "?select=listing_id,image_url&listing_id=eq." +
-          encodeURIComponent(listingId),
-
-          {
-            headers:headers()
-          }
-
-        );
-
-
-      if(response.ok){
-
-        const data =
-          await response.json();
-
-
-        if(
-          Array.isArray(data) &&
-          data.length
-        ){
-
-          return data;
-
-        }
-
-      }
-
-    }catch(e){
-
-      console.error(e);
-
+    if(rows && rows.length){
+      return construireImageUrl(rows[0].image_url);
     }
 
+  }catch(e){
+    console.log("Image non trouvée",e);
   }
 
-
-  return [];
-
+  return "";
 }
 
 
 async function chargerAnnonces(){
 
-  const conteneur =
-    document.getElementById("annonces");
+  const container = document.getElementById("annonces");
 
-
-  const empty =
-    document.getElementById("empty");
-
-
-  conteneur.innerHTML="";
-
-  empty.style.display="block";
-
-  empty.textContent =
-    "Chargement des annonces...";
-
+  container.innerHTML =
+    '<div class="empty">Chargement des annonces...</div>';
 
   try{
 
-    const response =
-      await fetch(
-
-        SUPABASE_URL +
-        "/rest/v1/listings?select=*&order=created_at.desc",
-
-        {
-          headers:headers()
-        }
-
-      );
-
-
-    if(!response.ok){
-
-      const err =
-        await response.text();
-
-      console.error(err);
-
-      empty.textContent =
-        "Impossible de charger les annonces.";
-
-      return;
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    toutesLesAnnonces =
-      Array.isArray(data)
-      ? data
-      : [];
-
-
-    await afficherAnnonces(
-      toutesLesAnnonces
+    toutesLesAnnonces = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/listings?select=*&order=created_at.desc"
     );
 
+    if(!toutesLesAnnonces || !toutesLesAnnonces.length){
+
+      container.innerHTML =
+        '<div class="empty">Aucune annonce pour le moment.</div>';
+
+      document.getElementById("nombreAnnonces").textContent = "";
+      return;
+    }
+
+    await afficherAnnonces();
 
   }catch(error){
 
     console.error(error);
 
-    empty.textContent =
-      "Erreur de connexion.";
-
+    container.innerHTML =
+      '<div class="error">Impossible de charger les annonces.</div>';
   }
-
 }
 
 
-/*
-  AFFICHAGE COMPLET DES ANNONCES
-  AVEC CORRECTION DES IMAGES
-*/
-async function afficherAnnonces(liste){
+async function afficherAnnonces(){
 
-  const conteneur =
-    document.getElementById("annonces");
+  const container = document.getElementById("annonces");
 
+  const recherche =
+    document.getElementById("searchInput").value
+      .trim()
+      .toLowerCase();
 
-  const empty =
-    document.getElementById("empty");
+  let annonces = toutesLesAnnonces.filter(a => {
 
+    const texte = (
+      (a.title || "") + " " +
+      (a.description || "") + " " +
+      (a.city || "") + " " +
+      (a.neighborhood || "")
+    ).toLowerCase();
 
-  conteneur.innerHTML="";
+    const matchRecherche =
+      !recherche || texte.includes(recherche);
 
+    const matchCategorie =
+      categorieActuelle === "Toutes" ||
+      String(a.category_id || "").toLowerCase() ===
+      categorieActuelle.toLowerCase() ||
+      String(a.category || "").toLowerCase() ===
+      categorieActuelle.toLowerCase();
 
-  if(!liste.length){
+    return matchRecherche && matchCategorie;
+  });
 
-    empty.style.display="block";
+  document.getElementById("nombreAnnonces").textContent =
+    annonces.length + " annonce" + (annonces.length > 1 ? "s" : "");
 
-    empty.textContent =
-      "Aucune annonce trouvée.";
+  if(!annonces.length){
+
+    container.innerHTML =
+      '<div class="empty">Aucune annonce trouvée.</div>';
 
     return;
-
   }
 
+  container.innerHTML = "";
 
-  empty.style.display="none";
+  for(const annonce of annonces){
 
+    const image = await chargerImages(annonce.id);
 
-  for(const annonce of liste){
+    const card = document.createElement("div");
+    card.className = "card";
 
-    const images =
-      await chargerImages(
-        annonce.id
-      );
-
-
-    let image="";
-
-
-    if(images.length){
-
-      image =
-        construireImageUrl(
-          images[0].image_url
-        );
-
-    }
-
-
-    const article =
-      document.createElement("article");
-
-
-    article.className="card";
-
-
-    article.setAttribute(
-      "data-annonce-id",
-      annonce.id
-    );
-
-
-    article.innerHTML=`
-
+    card.innerHTML = `
       ${
         image
-
-        ? `
-
-          <img
-            src="${escapeHTML(image)}"
-            alt="${escapeHTML(
-              annonce.title || "Annonce"
-            )}"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-          >
-
-          <div
-            style="
-              height:210px;
-              background:#eee;
-              display:none;
-              align-items:center;
-              justify-content:center;
-              font-size:50px;
-            "
-          >📦</div>
-
-        `
-
-        : `
-
-          <div
-            style="
-              height:210px;
-              background:#eee;
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              font-size:50px
-            "
-          >📦</div>
-
-        `
+        ? `<img class="card-img" src="${escapeHTML(image)}" alt="">`
+        : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;font-size:50px">📦</div>`
       }
 
-
-      <div class="card-content">
-
-        <h3>
-          ${escapeHTML(
-            annonce.title || "Sans titre"
-          )}
-        </h3>
-
+      <div class="card-body">
+        <div class="card-title">
+          ${escapeHTML(annonce.title)}
+        </div>
 
         <div class="price">
-
-          ${formatPrix(
-            annonce.price_gnf
-          )}
-
+          ${formatPrix(annonce.price_gnf)}
         </div>
 
-
-        <div class="location">
-
-          📍
-          ${escapeHTML(
-            annonce.city || ""
-          )}
-
-          ${
-            annonce.neighborhood
-            ? " • " +
-              escapeHTML(
-                annonce.neighborhood
-              )
-            : ""
-          }
-
+        <div class="meta">
+          📍 ${escapeHTML(annonce.city || "")}
+          ${annonce.neighborhood ? " · " + escapeHTML(annonce.neighborhood) : ""}
         </div>
 
-
-        <div class="small">
-
-          👁️
-          ${Number(
-            annonce.views || 0
-          )}
-          vue(s)
-
+        <div class="condition">
+          ${escapeHTML(annonce.condition || "")}
         </div>
-
       </div>
-
     `;
 
+    card.onclick = () => ouvrirDetailAnnonce(annonce.id);
 
-    article.addEventListener(
-      "click",
-      function(){
-
-        const id =
-          this.getAttribute(
-            "data-annonce-id"
-          );
-
-
-        ouvrirDetailAnnonce(id);
-
-      }
-    );
-
-
-    conteneur.appendChild(
-      article
-    );
-
+    container.appendChild(card);
   }
-
 }
 
+
+function filtrerAnnonces(){
+  afficherAnnonces();
+}
+
+function choisirCategorie(categorie,button){
+
+  categorieActuelle = categorie;
+
+  document
+    .querySelectorAll(".categories button")
+    .forEach(b => b.classList.remove("category-active"));
+
+  button.classList.add("category-active");
+
+  afficherAnnonces();
+}
+
+
+/* =========================
+   DÉTAIL ANNONCE
+========================= */
 
 async function ouvrirDetailAnnonce(id){
 
-  const annonce =
-    toutesLesAnnonces.find(
-      function(a){
+  const annonce = toutesLesAnnonces.find(a => a.id === id);
 
-        return String(a.id) ===
-          String(id);
+  if(!annonce) return;
 
-      }
-    );
+  const modal = document.getElementById("detailModal");
+  const content = document.getElementById("detailContent");
 
+  modal.style.display = "block";
 
-  if(!annonce){
+  content.innerHTML = "Chargement...";
 
-    alert(
-      "Annonce introuvable."
-    );
+  const image = await chargerImages(id);
 
-    return;
+  content.innerHTML = `
 
-  }
+    ${
+      image
+      ? `<img class="detail-img" src="${escapeHTML(image)}" alt="">`
+      : `<div class="detail-img" style="height:250px;display:flex;align-items:center;justify-content:center;font-size:70px">📦</div>`
+    }
 
-
-  const content =
-    document.getElementById(
-      "detailContent"
-    );
-
-
-  content.innerHTML =
-    "<p>Chargement...</p>";
-
-
-  ouvrirModal(
-    "detailModal"
-  );
-
-
-  const images =
-    await chargerImages(id);
-
-
-  let imageHTML="";
-
-
-  if(images.length){
-
-    imageHTML =
-      images.map(
-        function(img){
-
-          const image =
-            construireImageUrl(
-              img.image_url
-            );
-
-
-          return `
-
-            <img
-              class="detail-img"
-              src="${escapeHTML(image)}"
-              alt="${escapeHTML(
-                annonce.title || "Annonce"
-              )}"
-            >
-
-          `;
-
-        }
-      ).join("");
-
-
-  }else{
-
-    imageHTML=`
-
-      <div
-        style="
-          height:250px;
-          background:#eee;
-          border-radius:16px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          font-size:70px;
-          margin-bottom:18px;
-        "
-      >📦</div>
-
-    `;
-
-  }
-
-
-  content.innerHTML=`
-
-    ${imageHTML}
-
-
-    <h2>
-      ${escapeHTML(
-        annonce.title || "Annonce"
-      )}
-    </h2>
-
+    <h2>${escapeHTML(annonce.title)}</h2>
 
     <div class="detail-price">
-
-      ${formatPrix(
-        annonce.price_gnf
-      )}
-
+      ${formatPrix(annonce.price_gnf)}
     </div>
 
-
-    <div class="detail-info">
-
-      📍
-      <strong>Lieu :</strong>
-
-      ${escapeHTML(
-        annonce.city || ""
-      )}
-
-      ${
-        annonce.neighborhood
-        ? " • " +
-          escapeHTML(
-            annonce.neighborhood
-          )
-        : ""
-      }
-
-
-      <br>
-
-
-      🏷️
-      <strong>État :</strong>
-
-      ${escapeHTML(
-        annonce.condition || ""
-      )}
-
-
-      <br>
-
-
-      👁️
-      <strong>Vues :</strong>
-
-      ${Number(
-        annonce.views || 0
-      )}
-
-
-      <br>
-
-
-      📅
-      <strong>Publié le :</strong>
-
-      ${formatDate(
-        annonce.created_at
-      )}
-
-    </div>
-
-
-    <hr
-      style="
-        border:0;
-        border-top:1px solid #eee;
-        margin:20px 0
-      "
-    >
-
-
-    <h3>
-      Description
-    </h3>
-
-
-    <p
-      style="
-        line-height:1.6
-      "
-    >
-
-      ${escapeHTML(
-        annonce.description ||
-        "Aucune description."
-      )}
-
+    <p>
+      📍 ${escapeHTML(annonce.city || "")}
+      ${annonce.neighborhood ? " — " + escapeHTML(annonce.neighborhood) : ""}
     </p>
 
+    <p>
+      <strong>État :</strong>
+      ${escapeHTML(annonce.condition || "")}
+    </p>
 
-    <div class="actions">
+    <p>
+      <strong>Vues :</strong>
+      ${Number(annonce.views || 0)}
+    </p>
+
+    <p>
+      <strong>Publié le :</strong>
+      ${formatDate(annonce.created_at)}
+    </p>
+
+    <hr>
+
+    <p>
+      ${escapeHTML(annonce.description || "Aucune description.")}
+    </p>
+
+    <div class="form-actions">
 
       <button
-        class="primary"
-        onclick="ouvrirMessageVendeur()"
-      >
+        class="btn-primary"
+        onclick="ouvrirMessageVendeur('${annonce.id}')">
         💬 Contacter le vendeur
       </button>
 
-
       <button
-        class="secondary"
-        onclick="ouvrirPaiement()"
-      >
-        💳 Acheter
+        class="btn-green"
+        onclick="ouvrirPaiement('${annonce.id}')">
+        🛒 Acheter
       </button>
 
     </div>
-
   `;
 
-
-  enregistrerVue(
-    id,
-    Number(
-      annonce.views || 0
-    )
-  );
-
+  enregistrerVue(annonce);
 }
 
 
-async function enregistrerVue(
-  id,
-  vues
-){
+async function enregistrerVue(annonce){
+
+  const vues = Number(annonce.views || 0) + 1;
+
+  annonce.views = vues;
 
   try{
 
-    await fetch(
-
+    await supabaseFetch(
       SUPABASE_URL +
       "/rest/v1/listings?id=eq." +
-      encodeURIComponent(id),
-
+      encodeURIComponent(annonce.id),
       {
-
         method:"PATCH",
-
-        headers:headers({
-
-          "Prefer":
-            "return=minimal"
-
-        }),
-
-        body:
-          JSON.stringify({
-
-            views:
-              vues + 1
-
-          })
-
+        headers:{
+          "Prefer":"return=minimal"
+        },
+        body:JSON.stringify({
+          views:vues
+        })
       }
-
     );
 
-
-    const annonce =
-      toutesLesAnnonces.find(
-        function(a){
-
-          return String(a.id) ===
-            String(id);
-
-        }
-      );
-
-
-    if(annonce){
-
-      annonce.views =
-        vues + 1;
-
-    }
-
   }catch(e){
-
-    console.error(e);
-
+    console.log("Vue non enregistrée",e);
   }
-
 }
 
 
-function ouvrirMessageVendeur(){
+/* =========================================================
+   VRAIE MESSAGERIE
+========================================================= */
+
+async function ouvrirMessageVendeur(listingId){
 
   if(!utilisateurConnecte){
 
-    alert(
-      "Connecte-toi pour contacter le vendeur."
-    );
+    fermerModal("detailModal");
 
-
-    fermerModal(
-      "detailModal"
-    );
-
+    alert("Connecte-toi pour contacter le vendeur.");
 
     ouvrirCompte();
 
-
     return;
-
   }
 
+  const annonce =
+    toutesLesAnnonces.find(a => a.id === listingId);
 
-  alert(
-    "La messagerie sera reliée aux conversations Marché Guinée."
-  );
+  if(!annonce) return;
 
+  if(annonce.seller_id === utilisateurConnecte.id){
+
+    alert("Tu ne peux pas contacter ton propre compte depuis cette annonce.");
+
+    return;
+  }
+
+  try{
+
+    /*
+      On cherche d'abord une conversation existante
+      entre cet acheteur, ce vendeur et cette annonce.
+    */
+
+    const conversations = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/conversations" +
+      "?listing_id=eq." +
+      encodeURIComponent(listingId) +
+      "&buyer_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&seller_id=eq." +
+      encodeURIComponent(annonce.seller_id) +
+      "&select=*" +
+      "&limit=1"
+    );
+
+    let conversation;
+
+    if(conversations && conversations.length){
+
+      conversation = conversations[0];
+
+    }else{
+
+      /*
+        Aucune conversation :
+        on en crée une.
+      */
+
+      const created = await supabaseFetch(
+        SUPABASE_URL + "/rest/v1/conversations",
+        {
+          method:"POST",
+          headers:{
+            "Prefer":"return=representation"
+          },
+          body:JSON.stringify({
+            listing_id:listingId,
+            buyer_id:utilisateurConnecte.id,
+            seller_id:annonce.seller_id
+          })
+        }
+      );
+
+      if(!created || !created.length){
+        throw new Error("La conversation n'a pas pu être créée.");
+      }
+
+      conversation = created[0];
+    }
+
+    conversationActuelle = conversation;
+    annonceConversationActuelle = annonce;
+
+    fermerModal("detailModal");
+
+    document.getElementById("messagesModal").style.display = "block";
+
+    afficherChat();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Impossible d'ouvrir la conversation : " +
+      error.message
+    );
+  }
 }
 
 
-function ouvrirPaiement(){
+async function afficherChat(){
 
-  fermerModal(
-    "detailModal"
+  document.getElementById("messagesList").classList.add("hidden");
+
+  document.getElementById("chatContainer").classList.remove("hidden");
+
+  document.getElementById("chatTitle").textContent =
+    annonceConversationActuelle
+      ? "💬 " + annonceConversationActuelle.title
+      : "💬 Conversation";
+
+  await chargerMessages();
+
+  document.getElementById("messageInput").focus();
+
+  if(intervalMessages){
+    clearInterval(intervalMessages);
+  }
+
+  /*
+    Actualisation automatique toutes les 3 secondes
+    pour que les nouveaux messages apparaissent.
+  */
+  intervalMessages = setInterval(
+    chargerMessages,
+    3000
   );
-
-  ouvrirModal(
-    "paiementModal"
-  );
-
 }
 
 
-function filtrerCategorie(
-  categorie
-){
+async function chargerMessages(){
 
-  categorieActuelle =
-    categorie;
+  if(!conversationActuelle) return;
 
-  appliquerFiltres();
+  try{
 
-}
+    const messages = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/messages" +
+      "?conversation_id=eq." +
+      encodeURIComponent(conversationActuelle.id) +
+      "&select=*" +
+      "&order=created_at.asc"
+    );
 
+    const box = document.getElementById("chatBox");
 
-function appliquerFiltres(){
+    if(!messages || !messages.length){
 
-  const recherche =
-    document.getElementById(
-      "searchInput"
-    )
-    .value
-    .trim()
-    .toLowerCase();
+      box.innerHTML =
+        '<div style="text-align:center;color:#777;padding:30px">Aucun message.<br>Commence la conversation 👋</div>';
 
+      return;
+    }
 
-  let liste =
-    toutesLesAnnonces.filter(
-      function(annonce){
+    box.innerHTML = "";
 
-        const texte =
-          JSON.stringify(
-            annonce
-          ).toLowerCase();
+    for(const msg of messages){
 
+      const mine =
+        msg.sender_id === utilisateurConnecte.id;
 
-        const correspondRecherche =
-          !recherche ||
-          texte.includes(
-            recherche
-          );
+      const row = document.createElement("div");
 
+      row.className =
+        "message-row" +
+        (mine ? " mine" : "");
 
-        const correspondCategorie =
-          categorieActuelle ===
-            "Toutes" ||
+      const messageDiv =
+        document.createElement("div");
 
-          texte.includes(
-            categorieActuelle
-              .toLowerCase()
-          );
+      messageDiv.className = "message";
 
+      messageDiv.innerHTML = `
+        <div>${escapeHTML(msg.message || "")}</div>
 
-        return (
-          correspondRecherche &&
-          correspondCategorie
+        ${
+          msg.image_url
+          ? `<div style="margin-top:7px">
+              <img
+                src="${escapeHTML(construireImageUrl(msg.image_url))}"
+                style="max-width:180px;border-radius:8px"
+              >
+            </div>`
+          : ""
+        }
+
+        <span class="message-time">
+          ${formatHeure(msg.created_at)}
+          ${
+            mine && msg.read_at
+              ? " · Vu"
+              : ""
+          }
+        </span>
+      `;
+
+      row.appendChild(messageDiv);
+
+      box.appendChild(row);
+    }
+
+    box.scrollTop = box.scrollHeight;
+
+    /*
+      Marquer comme lus les messages reçus.
+    */
+
+    const unread = messages.filter(m =>
+      m.sender_id !== utilisateurConnecte.id &&
+      !m.read_at
+    );
+
+    for(const msg of unread){
+
+      try{
+
+        await supabaseFetch(
+          SUPABASE_URL +
+          "/rest/v1/messages?id=eq." +
+          encodeURIComponent(msg.id),
+          {
+            method:"PATCH",
+            headers:{
+              "Prefer":"return=minimal"
+            },
+            body:JSON.stringify({
+              read_at:new Date().toISOString()
+            })
+          }
         );
 
+      }catch(e){
+        console.log("Impossible de marquer comme lu",e);
+      }
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById("chatBox").innerHTML =
+      '<div class="error">Impossible de charger les messages.</div>';
+  }
+}
+
+
+async function envoyerMessage(){
+
+  if(!utilisateurConnecte || !conversationActuelle){
+    return;
+  }
+
+  const input =
+    document.getElementById("messageInput");
+
+  const message = input.value.trim();
+
+  if(!message) return;
+
+  input.disabled = true;
+
+  try{
+
+    await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/messages",
+      {
+        method:"POST",
+        headers:{
+          "Prefer":"return=minimal"
+        },
+        body:JSON.stringify({
+          conversation_id:conversationActuelle.id,
+          sender_id:utilisateurConnecte.id,
+          message:message,
+          image_url:null
+        })
       }
     );
 
+    input.value = "";
 
-  afficherAnnonces(
-    liste
-  );
+    await chargerMessages();
 
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Impossible d'envoyer le message : " +
+      error.message
+    );
+
+  }finally{
+
+    input.disabled = false;
+    input.focus();
+  }
 }
 
 
-document
-  .getElementById("searchInput")
-  .addEventListener(
-    "input",
-    function(){
+function gererToucheMessage(event){
 
-      appliquerFiltres();
+  if(event.key === "Enter"){
+    event.preventDefault();
+    envoyerMessage();
+  }
+}
 
+
+/* =========================
+   LISTE DES CONVERSATIONS
+========================= */
+
+async function ouvrirMessages(){
+
+  if(!utilisateurConnecte){
+
+    fermerModal("accountModal");
+
+    alert("Connecte-toi pour accéder à ta messagerie.");
+
+    ouvrirCompte();
+
+    return;
+  }
+
+  fermerModal("accountModal");
+
+  document.getElementById("messagesModal").style.display = "block";
+
+  document.getElementById("messagesList").classList.remove("hidden");
+  document.getElementById("chatContainer").classList.add("hidden");
+
+  await chargerListeConversations();
+
+  if(intervalMessages){
+    clearInterval(intervalMessages);
+    intervalMessages = null;
+  }
+}
+
+
+async function chargerListeConversations(){
+
+  const container =
+    document.getElementById("messagesList");
+
+  container.innerHTML =
+    '<div class="empty">Chargement des conversations...</div>';
+
+  try{
+
+    /*
+      On récupère les conversations où l'utilisateur
+      est acheteur OU vendeur.
+    */
+
+    const buyerRows = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/conversations" +
+      "?buyer_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*" +
+      "&order=created_at.desc"
+    );
+
+    const sellerRows = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/conversations" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*" +
+      "&order=created_at.desc"
+    );
+
+    const map = new Map();
+
+    [...(buyerRows || []), ...(sellerRows || [])]
+      .forEach(c => map.set(c.id,c));
+
+    const conversations =
+      Array.from(map.values())
+        .sort(
+          (a,b) =>
+            new Date(b.created_at) -
+            new Date(a.created_at)
+        );
+
+    if(!conversations.length){
+
+      container.innerHTML =
+        '<div class="empty">Tu n’as encore aucune conversation.</div>';
+
+      return;
     }
-  );
 
+    container.innerHTML = "";
+
+    for(const conversation of conversations){
+
+      let titre = "Annonce";
+
+      try{
+
+        const annonces = await supabaseFetch(
+          SUPABASE_URL +
+          "/rest/v1/listings?id=eq." +
+          encodeURIComponent(conversation.listing_id) +
+          "&select=title,price_gnf"
+        );
+
+        if(annonces && annonces.length){
+          titre = annonces[0].title;
+        }
+
+      }catch(e){}
+
+      const item =
+        document.createElement("div");
+
+      item.className = "conversation-item";
+
+      const role =
+        conversation.buyer_id === utilisateurConnecte.id
+          ? "Acheteur"
+          : "Vendeur";
+
+      item.innerHTML = `
+        <div class="conversation-title">
+          💬 ${escapeHTML(titre)}
+        </div>
+
+        <div class="conversation-date">
+          ${role} · ${formatDate(conversation.created_at)}
+        </div>
+      `;
+
+      item.onclick = async () => {
+
+        try{
+
+          const annonces = await supabaseFetch(
+            SUPABASE_URL +
+            "/rest/v1/listings?id=eq." +
+            encodeURIComponent(conversation.listing_id) +
+            "&select=*"
+          );
+
+          annonceConversationActuelle =
+            annonces && annonces.length
+              ? annonces[0]
+              : {
+                  id:conversation.listing_id,
+                  title:titre,
+                  seller_id:conversation.seller_id
+                };
+
+        }catch(e){
+
+          annonceConversationActuelle = {
+            id:conversation.listing_id,
+            title:titre,
+            seller_id:conversation.seller_id
+          };
+        }
+
+        conversationActuelle = conversation;
+
+        afficherChat();
+      };
+
+      container.appendChild(item);
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    container.innerHTML =
+      '<div class="error">Impossible de charger les conversations : ' +
+      escapeHTML(error.message) +
+      '</div>';
+  }
+}
+
+
+function retourConversations(){
+
+  if(intervalMessages){
+    clearInterval(intervalMessages);
+    intervalMessages = null;
+  }
+
+  conversationActuelle = null;
+  annonceConversationActuelle = null;
+
+  document.getElementById("chatContainer").classList.add("hidden");
+  document.getElementById("messagesList").classList.remove("hidden");
+
+  chargerListeConversations();
+}
+
+
+/* =========================
+   ACHAT
+========================= */
+
+function ouvrirPaiement(listingId){
+
+  const annonce =
+    toutesLesAnnonces.find(a => a.id === listingId);
+
+  if(!annonce) return;
+
+  if(!utilisateurConnecte){
+
+    fermerModal("detailModal");
+
+    alert("Connecte-toi pour acheter.");
+
+    ouvrirCompte();
+
+    return;
+  }
+
+  const commission =
+    Number(annonce.price_gnf || 0) * 0.03;
+
+  const total =
+    Number(annonce.price_gnf || 0) +
+    commission;
+
+  document.getElementById("paymentContent").innerHTML = `
+
+    <h3>${escapeHTML(annonce.title)}</h3>
+
+    <p>
+      Prix : <strong>${formatPrix(annonce.price_gnf)}</strong>
+    </p>
+
+    <p>
+      Commission 3 % :
+      <strong>${formatPrix(commission)}</strong>
+    </p>
+
+    <hr>
+
+    <p>
+      Total :
+      <strong>${formatPrix(total)}</strong>
+    </p>
+  `;
+
+  fermerModal("detailModal");
+
+  document.getElementById("paymentModal").style.display = "block";
+}
+
+
+/* =========================
+   DÉMARRAGE
+========================= */
+
+restaurerSession();
 
 chargerAnnonces();
 
