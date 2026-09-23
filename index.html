@@ -5821,6 +5821,903 @@ async function envoyerSignalement(){
 
 </div>
 
+<!-- ==========================================
+     TABLEAU DE BORD ADMIN — MARCHÉ GUINÉE
+========================================== -->
 
+<script>
+
+async function verifierAccesAdmin(){
+
+  if(!utilisateurConnecte || !utilisateurConnecte.accessToken){
+    return false;
+  }
+
+  try{
+
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/is_admin",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:"{}"
+      }
+    );
+
+    return resultat === true;
+
+  }catch(error){
+
+    console.error(
+      "Erreur vérification admin :",
+      error
+    );
+
+    return false;
+  }
+}
+
+
+async function afficherBoutonAdmin(){
+
+  const estAdmin =
+    await verifierAccesAdmin();
+
+  if(!estAdmin) return;
+
+  if(document.getElementById("boutonAdmin")){
+    return;
+  }
+
+  const actions =
+    document.querySelector(
+      "#accountConnected .form-actions"
+    );
+
+  if(!actions) return;
+
+  const bouton =
+    document.createElement("button");
+
+  bouton.id = "boutonAdmin";
+
+  bouton.className = "btn-primary";
+
+  bouton.innerHTML =
+    "📊 Tableau de bord administrateur";
+
+  bouton.onclick =
+    ouvrirTableauAdmin;
+
+  actions.insertBefore(
+    bouton,
+    actions.firstChild
+  );
+}
+
+
+function fermerTableauAdmin(){
+
+  const modal =
+    document.getElementById(
+      "adminDashboardModal"
+    );
+
+  if(modal){
+    modal.style.display = "none";
+  }
+
+}
+
+
+async function ouvrirTableauAdmin(){
+
+  const estAdmin =
+    await verifierAccesAdmin();
+
+  if(!estAdmin){
+
+    alert(
+      "Accès refusé.\n\n" +
+      "Cette section est réservée aux administrateurs."
+    );
+
+    return;
+  }
+
+  let modal =
+    document.getElementById(
+      "adminDashboardModal"
+    );
+
+  if(!modal){
+
+    modal =
+      document.createElement("div");
+
+    modal.id =
+      "adminDashboardModal";
+
+    modal.style.cssText =
+      "display:none;" +
+      "position:fixed;" +
+      "inset:0;" +
+      "background:rgba(0,0,0,.65);" +
+      "z-index:20000;" +
+      "padding:15px;" +
+      "box-sizing:border-box;" +
+      "overflow-y:auto;";
+
+    modal.innerHTML = `
+
+      <div style="
+        background:white;
+        width:100%;
+        max-width:600px;
+        margin:20px auto;
+        border-radius:20px;
+        padding:20px;
+        box-sizing:border-box;
+      ">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+        ">
+
+          <h2 style="margin:0;">
+            📊 Administration
+          </h2>
+
+          <button
+            onclick="fermerTableauAdmin()"
+            style="
+              border:none;
+              background:#eee;
+              border-radius:10px;
+              padding:10px 14px;
+              font-size:18px;
+            ">
+            ✕
+          </button>
+
+        </div>
+
+        <div
+          id="adminDashboardContent"
+          style="margin-top:20px;">
+          Chargement...
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+  }
+
+  modal.style.display = "block";
+
+  chargerTableauAdmin();
+
+}
+
+
+function carteAdmin(
+  titre,
+  valeur,
+  emoji
+){
+
+  return `
+
+    <div style="
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      border-radius:15px;
+      padding:16px;
+    ">
+
+      <div style="
+        font-size:14px;
+        color:#666;
+      ">
+        ${emoji} ${titre}
+      </div>
+
+      <div style="
+        margin-top:7px;
+        font-size:24px;
+        font-weight:bold;
+      ">
+        ${valeur}
+      </div>
+
+    </div>
+
+  `;
+}
+
+
+async function chargerTableauAdmin(){
+
+  const container =
+    document.getElementById(
+      "adminDashboardContent"
+    );
+
+  if(!container) return;
+
+  container.innerHTML = `
+    <div style="
+      padding:20px;
+      text-align:center;
+      color:#666;
+    ">
+      Chargement des données administrateur...
+    </div>
+  `;
+
+  try{
+
+    const estAdmin =
+      await verifierAccesAdmin();
+
+    if(!estAdmin){
+
+      container.innerHTML =
+        "<p>Accès refusé.</p>";
+
+      return;
+    }
+
+
+    /* =========================
+       UTILISATEURS
+    ========================= */
+
+    const utilisateurs =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/users?select=id"
+      );
+
+    const nombreUtilisateurs =
+      Array.isArray(utilisateurs)
+        ? utilisateurs.length
+        : 0;
+
+
+    /* =========================
+       ANNONCES
+    ========================= */
+
+    const annonces =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/listings?select=id,status"
+      );
+
+    const listeAnnonces =
+      Array.isArray(annonces)
+        ? annonces
+        : [];
+
+    const annoncesActives =
+      listeAnnonces.filter(
+        a => a.status === "active"
+      ).length;
+
+    const annoncesVendues =
+      listeAnnonces.filter(
+        a => a.status === "sold"
+      ).length;
+
+
+    /* =========================
+       COMMANDES
+    ========================= */
+
+    const commandes =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?select=id,status,delivery_status,price_gnf,commission_gnf,seller_amount_gnf"
+      );
+
+    const listeCommandes =
+      Array.isArray(commandes)
+        ? commandes
+        : [];
+
+    const commandesTerminees =
+      listeCommandes.filter(
+        c =>
+          c.status === "completed" &&
+          c.delivery_status === "delivered"
+      );
+
+
+    /* =========================
+       FINANCES
+    ========================= */
+
+    let totalVentes = 0;
+    let totalCommission = 0;
+    let totalVendeur = 0;
+
+    commandesTerminees.forEach(
+      commande => {
+
+        totalVentes +=
+          Number(
+            commande.price_gnf || 0
+          );
+
+        totalCommission +=
+          Number(
+            commande.commission_gnf || 0
+          );
+
+        totalVendeur +=
+          Number(
+            commande.seller_amount_gnf || 0
+          );
+
+      }
+    );
+
+
+    /* =========================
+       RETRAITS ADMIN
+    ========================= */
+
+    const retraits =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/admin_withdrawals" +
+        "?select=id,amount_gnf,method,phone,status,reference,created_at" +
+        "&order=created_at.desc"
+      );
+
+    const listeRetraits =
+      Array.isArray(retraits)
+        ? retraits
+        : [];
+
+
+    let totalRetraitsTermines = 0;
+
+    listeRetraits.forEach(
+      retrait => {
+
+        if(
+          retrait.status === "completed"
+        ){
+
+          totalRetraitsTermines +=
+            Number(
+              retrait.amount_gnf || 0
+            );
+
+        }
+
+      }
+    );
+
+
+    const soldeDisponible =
+      Math.max(
+        0,
+        totalCommission -
+        totalRetraitsTermines
+      );
+
+
+    /* =========================
+       LITIGES
+    ========================= */
+
+    const litiges =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/disputes" +
+        "?select=id,status"
+      );
+
+    const listeLitiges =
+      Array.isArray(litiges)
+        ? litiges
+        : [];
+
+    const litigesOuverts =
+      listeLitiges.filter(
+        l => l.status === "open"
+      ).length;
+
+
+    /* =========================
+       AFFICHAGE
+    ========================= */
+
+    container.innerHTML = `
+
+      <div style="
+        display:grid;
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+        gap:12px;
+      ">
+
+        ${carteAdmin(
+          "Utilisateurs",
+          nombreUtilisateurs,
+          "👥"
+        )}
+
+        ${carteAdmin(
+          "Annonces",
+          listeAnnonces.length,
+          "📦"
+        )}
+
+        ${carteAdmin(
+          "Commandes",
+          listeCommandes.length,
+          "🛒"
+        )}
+
+        ${carteAdmin(
+          "Commandes terminées",
+          commandesTerminees.length,
+          "✅"
+        )}
+
+        ${carteAdmin(
+          "Annonces disponibles",
+          annoncesActives,
+          "🟢"
+        )}
+
+        ${carteAdmin(
+          "Annonces vendues",
+          annoncesVendues,
+          "🔴"
+        )}
+
+      </div>
+
+
+      <!-- FINANCES -->
+
+      <div style="
+        margin-top:18px;
+        padding:18px;
+        background:#f0fdf4;
+        border:1px solid #bbf7d0;
+        border-radius:16px;
+      ">
+
+        <h3 style="margin-top:0;">
+          💰 Finances Marché Guinée
+        </h3>
+
+        <p>
+          Total des ventes :
+          <strong>
+            ${totalVentes.toLocaleString("fr-FR")}
+            GNF
+          </strong>
+        </p>
+
+        <p>
+          Commission plateforme (3 %) :
+          <strong>
+            ${totalCommission.toLocaleString("fr-FR")}
+            GNF
+          </strong>
+        </p>
+
+        <p>
+          Montant total vendeurs :
+          <strong>
+            ${totalVendeur.toLocaleString("fr-FR")}
+            GNF
+          </strong>
+        </p>
+
+        <div style="
+          margin-top:12px;
+          padding:15px;
+          background:white;
+          border-radius:12px;
+          border:1px solid #bbf7d0;
+        ">
+
+          <div style="
+            color:#666;
+            font-size:13px;
+          ">
+            💵 Solde disponible de Marché Guinée
+          </div>
+
+          <div style="
+            margin-top:5px;
+            font-size:26px;
+            font-weight:bold;
+            color:#16a34a;
+          ">
+            ${soldeDisponible.toLocaleString("fr-FR")}
+            GNF
+          </div>
+
+        </div>
+
+        <button
+          onclick="ouvrirDemandeRetraitAdmin()"
+          style="
+            width:100%;
+            margin-top:15px;
+            padding:13px;
+            border:none;
+            border-radius:11px;
+            background:#16a34a;
+            color:white;
+            font-size:15px;
+            font-weight:bold;
+          ">
+          💸 Demander un retrait
+        </button>
+
+        <small style="
+          display:block;
+          margin-top:10px;
+          color:#777;
+        ">
+          Le transfert réel vers MTN MoMo ou Orange Money
+          sera connecté après validation du fournisseur de paiement.
+        </small>
+
+      </div>
+
+
+      <!-- LITIGES -->
+
+      <div style="
+        margin-top:18px;
+        padding:18px;
+        background:#fff7ed;
+        border:1px solid #fed7aa;
+        border-radius:16px;
+      ">
+
+        <h3 style="margin-top:0;">
+          ⚠️ Litiges
+        </h3>
+
+        <p>
+          Total :
+          <strong>
+            ${listeLitiges.length}
+          </strong>
+        </p>
+
+        <p>
+          Litiges ouverts :
+          <strong>
+            ${litigesOuverts}
+          </strong>
+        </p>
+
+      </div>
+
+
+      <!-- RETRAITS -->
+
+      <div style="
+        margin-top:18px;
+      ">
+
+        <h3>
+          💸 Historique des retraits
+        </h3>
+
+        ${
+          listeRetraits.length
+            ? listeRetraits.map(
+                retrait => `
+
+                  <div style="
+                    border:1px solid #ddd;
+                    border-radius:13px;
+                    padding:13px;
+                    margin-bottom:10px;
+                  ">
+
+                    <strong>
+                      ${Number(
+                        retrait.amount_gnf || 0
+                      ).toLocaleString("fr-FR")}
+                      GNF
+                    </strong>
+
+                    <div>
+                      🏦 ${
+                        retrait.method === "MTN_MOMO"
+                          ? "MTN MoMo"
+                          : "Orange Money"
+                      }
+                    </div>
+
+                    <div>
+                      📱 ${
+                        escapeHTML(
+                          retrait.phone || ""
+                        )
+                      }
+                    </div>
+
+                    <div>
+                      📌 Statut :
+                      ${
+                        escapeHTML(
+                          retrait.status || ""
+                        )
+                      }
+                    </div>
+
+                  </div>
+
+                `
+              ).join("")
+            : `
+              <div style="
+                padding:15px;
+                text-align:center;
+                color:#777;
+                background:#f8fafc;
+                border-radius:12px;
+              ">
+                Aucun retrait enregistré.
+              </div>
+            `
+        }
+
+      </div>
+
+
+      <button
+        onclick="chargerTableauAdmin()"
+        style="
+          width:100%;
+          margin-top:20px;
+          padding:12px;
+          border:none;
+          border-radius:10px;
+          background:#eee;
+        ">
+        🔄 Actualiser
+      </button>
+
+    `;
+
+  }catch(error){
+
+    console.error(
+      "Erreur tableau admin :",
+      error
+    );
+
+    container.innerHTML = `
+
+      <div style="
+        padding:15px;
+        background:#fee2e2;
+        color:#b91c1c;
+        border-radius:12px;
+      ">
+
+        <strong>
+          Impossible de charger le tableau de bord.
+        </strong>
+
+        <br><br>
+
+        ${escapeHTML(
+          error.message ||
+          "Erreur inconnue."
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* ==========================================
+   DEMANDE DE RETRAIT ADMIN
+========================================== */
+
+async function ouvrirDemandeRetraitAdmin(){
+
+  const estAdmin =
+    await verifierAccesAdmin();
+
+  if(!estAdmin){
+
+    alert(
+      "Accès réservé à l'administrateur."
+    );
+
+    return;
+  }
+
+  const montant =
+    prompt(
+      "Montant du retrait en GNF :"
+    );
+
+  if(!montant) return;
+
+  const montantNumber =
+    Number(
+      String(montant)
+        .replace(/\s/g,"")
+        .replace(/,/g,"")
+    );
+
+  if(
+    !Number.isFinite(montantNumber) ||
+    montantNumber <= 0
+  ){
+
+    alert(
+      "Montant invalide."
+    );
+
+    return;
+  }
+
+
+  const choix =
+    prompt(
+      "Méthode de retrait :\n\n" +
+      "1 = MTN MoMo\n" +
+      "2 = Orange Money"
+    );
+
+  let method = "";
+
+  if(choix === "1"){
+    method = "MTN_MOMO";
+  }
+
+  if(choix === "2"){
+    method = "ORANGE_MONEY";
+  }
+
+  if(!method){
+
+    alert(
+      "Méthode invalide."
+    );
+
+    return;
+  }
+
+
+  const phone =
+    prompt(
+      "Numéro qui recevra le retrait :"
+    );
+
+  if(!phone){
+
+    alert(
+      "Numéro obligatoire."
+    );
+
+    return;
+  }
+
+
+  try{
+
+    await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/admin_withdrawals",
+      {
+        method:"POST",
+
+        headers:{
+          "Prefer":
+            "return=representation"
+        },
+
+        body:JSON.stringify({
+
+          admin_id:
+            utilisateurConnecte.id,
+
+          amount_gnf:
+            Math.round(
+              montantNumber
+            ),
+
+          method:
+            method,
+
+          phone:
+            phone.trim(),
+
+          status:
+            "pending"
+
+        })
+      }
+    );
+
+
+    alert(
+      "✅ Demande de retrait enregistrée.\n\n" +
+      "Elle est actuellement en attente."
+    );
+
+
+    chargerTableauAdmin();
+
+  }catch(error){
+
+    console.error(
+      "Erreur retrait admin :",
+      error
+    );
+
+    alert(
+      "Impossible d'enregistrer le retrait.\n\n" +
+      (
+        error.message ||
+        "Erreur inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* ==========================================
+   ACTIVER LE BOUTON ADMIN APRÈS CONNEXION
+========================================== */
+
+const ancienneOuvrirCompte =
+  window.ouvrirCompte;
+
+window.ouvrirCompte =
+  function(){
+
+    ancienneOuvrirCompte();
+
+    setTimeout(
+      afficherBoutonAdmin,
+      300
+    );
+
+  };
+
+
+setTimeout(
+  afficherBoutonAdmin,
+  1000
+);
+
+</script>
 </body>
 </html>
