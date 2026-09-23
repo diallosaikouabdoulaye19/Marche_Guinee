@@ -2571,12 +2571,21 @@ function fermerProblemeModal(){
   document.getElementById("problemeModal").style.display = "none";
 }
 
-
 async function envoyerSignalement(){
 
   if(!utilisateurConnecte){
 
     alert("Connecte-toi pour signaler un problème.");
+
+    return;
+  }
+
+  if(!utilisateurConnecte.id){
+
+    alert(
+      "Impossible d'identifier ton compte.\n\n" +
+      "Déconnecte-toi puis reconnecte-toi."
+    );
 
     return;
   }
@@ -2646,31 +2655,40 @@ async function envoyerSignalement(){
       return;
     }
 
+    const signalement = {
+
+      order_id: commande.id,
+
+      reporter_id:
+        utilisateurConnecte.id,
+
+      opened_by:
+        utilisateurConnecte.id,
+
+      reason: reason,
+
+      description: description,
+
+      status: "open"
+
+    };
+
+    console.log(
+      "Signalement envoyé à Supabase :",
+      signalement
+    );
+
     await supabaseFetch(
       SUPABASE_URL +
       "/rest/v1/disputes",
       {
         method:"POST",
+
         headers:{
           "Prefer":"return=representation"
         },
-        body:JSON.stringify({
 
-  order_id: commande.id,
-
-  reporter_id:
-    utilisateurConnecte.id,
-
-  opened_by:
-    utilisateurConnecte.id,
-
-  reason: reason,
-
-  description: description,
-
-  status: "open"
-
-})
+        body:JSON.stringify(signalement)
       }
     );
 
@@ -2696,6 +2714,7 @@ async function envoyerSignalement(){
     );
   }
 }
+
 
 </script>
 </body>
