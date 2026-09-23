@@ -1195,17 +1195,54 @@ async function chargerAnnonces(){
 
   try{
 
-    toutesLesAnnonces = await supabaseFetch(
+    const response = await fetch(
       SUPABASE_URL +
-      "/rest/v1/listings?select=*&order=created_at.desc"
+      "/rest/v1/listings?select=*&order=created_at.desc",
+      {
+        method:"GET",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":"Bearer " + SUPABASE_KEY,
+          "Content-Type":"application/json"
+        }
+      }
     );
 
-    if(!toutesLesAnnonces || !toutesLesAnnonces.length){
+    const text = await response.text();
+
+    let data = null;
+
+    try{
+      data = text ? JSON.parse(text) : null;
+    }catch(e){
+      data = null;
+    }
+
+    if(!response.ok){
+
+      console.error(
+        "Erreur chargement annonces :",
+        response.status,
+        text
+      );
+
+      throw new Error(
+        data?.message ||
+        data?.hint ||
+        data?.details ||
+        "Erreur lors du chargement des annonces."
+      );
+    }
+
+    toutesLesAnnonces = Array.isArray(data) ? data : [];
+
+    if(!toutesLesAnnonces.length){
 
       container.innerHTML =
         '<div class="empty">Aucune annonce pour le moment.</div>';
 
       document.getElementById("nombreAnnonces").textContent = "";
+
       return;
     }
 
@@ -1213,10 +1250,18 @@ async function chargerAnnonces(){
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "Impossible de charger les annonces :",
+      error
+    );
 
     container.innerHTML =
-      '<div class="error">Impossible de charger les annonces.</div>';
+      '<div class="error">' +
+      'Impossible de charger les annonces.<br>' +
+      '<small>' +
+      escapeHTML(error.message) +
+      '</small>' +
+      '</div>';
   }
 }
 
