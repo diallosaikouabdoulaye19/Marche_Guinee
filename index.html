@@ -7,12 +7,14 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
   background:#f5f6f8;
   color:#171717
 }
+
 header{
   position:sticky;
   top:0;
@@ -21,22 +23,26 @@ header{
   border-bottom:1px solid #ddd;
   padding:12px;
 }
+
 .header-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
 }
+
 .logo{
   font-size:20px;
   font-weight:bold;
   color:#111;
   white-space:nowrap;
 }
+
 .header-actions{
   display:flex;
   gap:7px;
 }
+
 button{
   border:0;
   border-radius:9px;
@@ -44,15 +50,18 @@ button{
   cursor:pointer;
   font-weight:bold;
 }
+
 .btn-primary{background:#111;color:#fff}
 .btn-green{background:#087f3f;color:#fff}
 .btn-light{background:#eee;color:#111}
 .btn-danger{background:#c62828;color:#fff}
+
 .search{
   margin-top:10px;
   display:flex;
   gap:7px;
 }
+
 .search input{
   flex:1;
   padding:12px;
@@ -60,11 +69,13 @@ button{
   border-radius:9px;
   font-size:15px;
 }
+
 main{
   max-width:1200px;
   margin:auto;
   padding:15px;
 }
+
 .hero{
   background:#111;
   color:#fff;
@@ -72,32 +83,46 @@ main{
   padding:25px 18px;
   margin-bottom:18px;
 }
-.hero h1{margin:0 0 8px;font-size:28px}
-.hero p{margin:0 0 18px;color:#ddd}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:28px
+}
+
+.hero p{
+  margin:0 0 18px;
+  color:#ddd
+}
+
 .categories{
   display:flex;
   gap:8px;
   overflow-x:auto;
   padding:5px 0 15px;
 }
+
 .categories button{
   white-space:nowrap;
 }
+
 .category-active{
   background:#111!important;
   color:#fff!important;
 }
+
 .section-title{
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin:10px 0;
 }
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
   gap:13px;
 }
+
 .card{
   background:#fff;
   border-radius:13px;
@@ -105,26 +130,34 @@ main{
   box-shadow:0 2px 8px rgba(0,0,0,.08);
   cursor:pointer;
 }
+
 .card-img{
   width:100%;
   height:180px;
   object-fit:cover;
   background:#eee;
 }
-.card-body{padding:12px}
+
+.card-body{
+  padding:12px
+}
+
 .card-title{
   font-weight:bold;
   margin-bottom:7px;
 }
+
 .price{
   font-size:18px;
   font-weight:bold;
 }
+
 .meta{
   color:#777;
   font-size:13px;
   margin-top:6px;
 }
+
 .condition{
   display:inline-block;
   background:#eee;
@@ -133,12 +166,14 @@ main{
   font-size:12px;
   margin-top:8px;
 }
+
 .empty{
   background:#fff;
   padding:25px;
   text-align:center;
   border-radius:12px;
 }
+
 .modal{
   display:none;
   position:fixed;
@@ -148,6 +183,7 @@ main{
   padding:15px;
   overflow:auto;
 }
+
 .modal-box{
   background:#fff;
   max-width:650px;
@@ -156,6 +192,7 @@ main{
   padding:18px;
   position:relative;
 }
+
 .close{
   position:absolute;
   right:12px;
@@ -163,12 +200,17 @@ main{
   font-size:24px;
   cursor:pointer;
 }
-.form-group{margin-bottom:12px}
+
+.form-group{
+  margin-bottom:12px
+}
+
 .form-group label{
   display:block;
   font-weight:bold;
   margin-bottom:5px;
 }
+
 .form-group input,
 .form-group textarea,
 .form-group select{
@@ -178,15 +220,18 @@ main{
   border-radius:8px;
   font-size:15px;
 }
+
 .form-group textarea{
   min-height:100px;
   resize:vertical;
 }
+
 .form-actions{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
 }
+
 .detail-img{
   width:100%;
   max-height:380px;
@@ -194,18 +239,27 @@ main{
   border-radius:12px;
   background:#eee;
 }
+
 .detail-price{
   font-size:25px;
   font-weight:bold;
   margin:12px 0;
 }
+
 .account-tabs{
   display:flex;
   gap:8px;
   margin-bottom:15px;
 }
-.account-tabs button{flex:1}
-.hidden{display:none!important}
+
+.account-tabs button{
+  flex:1
+}
+
+.hidden{
+  display:none!important
+}
+
 .success{
   background:#e7f7ed;
   color:#087f3f;
@@ -213,6 +267,7 @@ main{
   border-radius:8px;
   margin-bottom:10px;
 }
+
 .error{
   background:#fdeaea;
   color:#b00020;
@@ -222,6 +277,7 @@ main{
 }
 
 /* MESSAGERIE */
+
 .chat-box{
   height:430px;
   overflow-y:auto;
@@ -230,13 +286,16 @@ main{
   padding:12px;
   margin:12px 0;
 }
+
 .message-row{
   display:flex;
   margin:8px 0;
 }
+
 .message-row.mine{
   justify-content:flex-end;
 }
+
 .message{
   max-width:78%;
   padding:10px 12px;
@@ -245,26 +304,31 @@ main{
   box-shadow:0 1px 3px rgba(0,0,0,.08);
   word-break:break-word;
 }
+
 .message-row.mine .message{
   background:#111;
   color:#fff;
 }
+
 .message-time{
   display:block;
   font-size:10px;
   opacity:.6;
   margin-top:4px;
 }
+
 .chat-input{
   display:flex;
   gap:7px;
 }
+
 .chat-input input{
   flex:1;
   border:1px solid #ccc;
   border-radius:9px;
   padding:12px;
 }
+
 .conversation-item{
   background:#f6f6f6;
   border-radius:10px;
@@ -272,19 +336,28 @@ main{
   margin-bottom:8px;
   cursor:pointer;
 }
-.conversation-item:hover{background:#eee}
-.conversation-title{font-weight:bold}
+
+.conversation-item:hover{
+  background:#eee
+}
+
+.conversation-title{
+  font-weight:bold
+}
+
 .conversation-date{
   color:#777;
   font-size:12px;
   margin-top:4px;
 }
+
 .photo-preview{
   max-width:150px;
   max-height:150px;
   border-radius:10px;
   margin-top:8px;
 }
+
 footer{
   text-align:center;
   color:#777;
@@ -296,322 +369,764 @@ footer{
 <body>
 
 <header>
+
   <div class="header-top">
-    <div class="logo">🇬🇳 Marché Guinée</div>
+
+    <div class="logo">
+      🇬🇳 Marché Guinée
+    </div>
 
     <div class="header-actions">
-  <button class="btn-light" onclick="ouvrirMessages()">💬</button>
-  <button class="btn-light" onclick="ouvrirCompte()">👤</button>
-  <button class="btn-light" onclick="ouvrirVerificationLivraison()">🚚</button>
-</div>
+
+      <button
+        class="btn-light"
+        onclick="ouvrirMessages()">
+        💬
+      </button>
+
+      <button
+        class="btn-light"
+        onclick="ouvrirCompte()">
+        👤
+      </button>
+
+      <button
+        class="btn-light"
+        onclick="ouvrirVerificationLivraison()">
+        🚚
+      </button>
+
+    </div>
+
   </div>
 
   <div class="search">
+
     <input
       id="searchInput"
       type="search"
       placeholder="Rechercher un produit..."
       oninput="filtrerAnnonces()"
     >
+
   </div>
+
 </header>
+
 
 <main>
 
   <section class="hero">
-    <h1>Achetez et vendez en Guinée 🇬🇳</h1>
-    <p>Publiez vos annonces gratuitement et échangez directement avec les acheteurs et vendeurs.</p>
-    <button class="btn-green" onclick="ouvrirVente()">+ Publier une annonce</button>
+
+    <h1>
+      Achetez et vendez en Guinée 🇬🇳
+    </h1>
+
+    <p>
+      Publiez vos annonces gratuitement et échangez directement avec les acheteurs et vendeurs.
+    </p>
+
+    <button
+      class="btn-green"
+      onclick="ouvrirVente()">
+      + Publier une annonce
+    </button>
+
   </section>
 
+
   <div class="categories">
-    <button class="btn-light category-active" onclick="choisirCategorie('Toutes',this)">Toutes</button>
-    <button class="btn-light" onclick="choisirCategorie('Téléphones',this)">Téléphones</button>
-    <button class="btn-light" onclick="choisirCategorie('Mode',this)">Mode</button>
-    <button class="btn-light" onclick="choisirCategorie('Maison',this)">Maison</button>
-    <button class="btn-light" onclick="choisirCategorie('Électronique',this)">Électronique</button>
-    <button class="btn-light" onclick="choisirCategorie('Véhicules',this)">Véhicules</button>
-    <button class="btn-light" onclick="choisirCategorie('Autres',this)">Autres</button>
+
+    <button
+      class="btn-light category-active"
+      onclick="choisirCategorie('Toutes',this)">
+      Toutes
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Téléphones',this)">
+      Téléphones
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Mode',this)">
+      Mode
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Maison',this)">
+      Maison
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Électronique',this)">
+      Électronique
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Véhicules',this)">
+      Véhicules
+    </button>
+
+    <button
+      class="btn-light"
+      onclick="choisirCategorie('Autres',this)">
+      Autres
+    </button>
+
   </div>
+
 
   <div class="section-title">
-    <h2>Annonces</h2>
+
+    <h2>
+      Annonces
+    </h2>
+
     <span id="nombreAnnonces"></span>
+
   </div>
 
-  <div id="annonces" class="grid">
-    <div class="empty">Chargement des annonces...</div>
+
+  <div
+    id="annonces"
+    class="grid">
+
+    <div class="empty">
+      Chargement des annonces...
+    </div>
+
   </div>
 
 </main>
+
 
 <footer>
   Marché Guinée 🇬🇳 — Acheter, vendre et échanger simplement.
 </footer>
 
 
-<!-- COMPTE -->
-<div id="accountModal" class="modal">
-  <div class="modal-box">
-    <span class="close" onclick="fermerModal('accountModal')">×</span>
+<!-- =========================
+     COMPTE
+========================= -->
 
-    <h2 id="accountTitle">Mon compte</h2>
+<div
+  id="accountModal"
+  class="modal">
+
+  <div class="modal-box">
+
+    <span
+      class="close"
+      onclick="fermerModal('accountModal')">
+      ×
+    </span>
+
+    <h2 id="accountTitle">
+      Mon compte
+    </h2>
 
     <div id="accountMessage"></div>
+
 
     <div id="accountForms">
 
       <div class="account-tabs">
-        <button id="signupTab" class="btn-primary" onclick="afficherInscription()">Créer un compte</button>
-        <button id="loginTab" class="btn-light" onclick="afficherConnexion()">Se connecter</button>
+
+        <button
+          id="signupTab"
+          class="btn-primary"
+          onclick="afficherInscription()">
+          Créer un compte
+        </button>
+
+        <button
+          id="loginTab"
+          class="btn-light"
+          onclick="afficherConnexion()">
+          Se connecter
+        </button>
+
       </div>
+
 
       <div id="signupForm">
-        <div class="form-group">
-          <label>Nom complet</label>
-          <input id="signupName" type="text" placeholder="Ex : Saikou Abdoulaye Diallo">
-        </div>
 
         <div class="form-group">
-          <label>Numéro</label>
-          <input id="signupPhone" type="tel" placeholder="Ex : 622000000">
+
+          <label>
+            Nom complet
+          </label>
+
+          <input
+            id="signupName"
+            type="text"
+            placeholder="Ex : Saikou Abdoulaye Diallo">
+
         </div>
+
 
         <div class="form-group">
-          <label>Mot de passe</label>
-          <input id="signupPassword" type="password" placeholder="Mot de passe">
+
+          <label>
+            Numéro
+          </label>
+
+          <input
+            id="signupPhone"
+            type="tel"
+            placeholder="Ex : 622000000">
+
         </div>
 
-        <button class="btn-green" onclick="creerCompte()">Créer mon compte gratuitement</button>
+
+        <div class="form-group">
+
+          <label>
+            Mot de passe
+          </label>
+
+          <input
+            id="signupPassword"
+            type="password"
+            placeholder="Mot de passe">
+
+        </div>
+
+
+        <button
+          class="btn-green"
+          onclick="creerCompte()">
+
+          Créer mon compte gratuitement
+
+        </button>
+
       </div>
 
-      <div id="loginForm" class="hidden">
-        <div class="form-group">
-          <label>Numéro</label>
-          <input id="loginPhone" type="tel" placeholder="Numéro">
-        </div>
+
+      <div
+        id="loginForm"
+        class="hidden">
 
         <div class="form-group">
-          <label>Mot de passe</label>
-          <input id="loginPassword" type="password" placeholder="Mot de passe">
+
+          <label>
+            Numéro
+          </label>
+
+          <input
+            id="loginPhone"
+            type="tel"
+            placeholder="Numéro">
+
         </div>
 
-        <button class="btn-primary" onclick="connecterCompte()">Se connecter</button>
+
+        <div class="form-group">
+
+          <label>
+            Mot de passe
+          </label>
+
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="Mot de passe">
+
+        </div>
+
+
+        <button
+          class="btn-primary"
+          onclick="connecterCompte()">
+
+          Se connecter
+
+        </button>
+
       </div>
 
     </div>
 
-    <div id="accountConnected" class="hidden">
+
+    <div
+      id="accountConnected"
+      class="hidden">
+
       <div class="success">
         Tu es connecté à ton compte Marché Guinée.
       </div>
 
-      <p><strong id="connectedName"></strong></p>
+      <p>
+        <strong id="connectedName"></strong>
+      </p>
+
       <p id="connectedPhone"></p>
 
-<!-- SOLDE VENDEUR -->
 
-<div id="soldeVendeurBox"
-     style="
-       margin:15px 0;
-       padding:18px;
-       background:#f0fdf4;
-       border:1px solid #bbf7d0;
-       border-radius:15px;
-     ">
+      <!-- SOLDE VENDEUR -->
 
-  <div style="
-    font-size:14px;
-    color:#666;
-    margin-bottom:6px;
-  ">
-    💰 Mon solde vendeur
-  </div>
+      <div
+        id="soldeVendeurBox"
+        style="
+          margin:15px 0;
+          padding:18px;
+          background:#f0fdf4;
+          border:1px solid #bbf7d0;
+          border-radius:15px;
+        ">
 
-  <div id="soldeVendeur"
-       style="
-         font-size:26px;
-         font-weight:bold;
-         color:#16a34a;
-       ">
-    0 GNF
-  </div>
+        <div
+          style="
+            font-size:14px;
+            color:#666;
+            margin-bottom:6px;
+          ">
 
-  <div id="detailsSoldeVendeur"
-       style="
-         margin-top:8px;
-         font-size:13px;
-         color:#666;
-       ">
-    Chargement...
+          💰 Mon solde vendeur
+
+        </div>
+
+
+        <div
+          id="soldeVendeur"
+          style="
+            font-size:26px;
+            font-weight:bold;
+            color:#16a34a;
+          ">
+
+          0 GNF
+
+        </div>
+
+
+        <div
+          id="detailsSoldeVendeur"
+          style="
+            margin-top:8px;
+            font-size:13px;
+            color:#666;
+          ">
+
+          Chargement...
+
+        </div>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          class="btn-primary"
+          onclick="ouvrirSignalement()">
+
+          ⚠️ Signaler un problème
+
+        </button>
+
+
+        <button
+          class="btn-primary"
+          onclick="ouvrirMesVentes()">
+
+          📦 Mes ventes
+
+        </button>
+
+
+        <button
+          class="btn-primary"
+          onclick="ouvrirMessages()">
+
+          💬 Mes messages
+
+        </button>
+
+
+        <button
+          class="btn-green"
+          onclick="fermerModal('accountModal');ouvrirVente()">
+
+          + Publier une annonce
+
+        </button>
+
+
+        <button
+          class="btn-danger"
+          onclick="deconnecter()">
+
+          Se déconnecter
+
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
 </div>
-      
-          <div class="form-actions">
-  <button class="btn-primary" onclick="ouvrirSignalement()">
-    ⚠️ Signaler un problème
-  </button>
-
-<button class="btn-primary" onclick="ouvrirMesVentes()">
-  📦 Mes ventes
-</button>
- 
- <button class="btn-primary" onclick="ouvrirMessages()">
-    💬 Mes messages
-  </button>
-
-  <button class="btn-green" onclick="fermerModal('accountModal');ouvrirVente()">
-    + Publier une annonce
-  </button>
-
-  <button class="btn-danger" onclick="deconnecter()">
-    Se déconnecter
-  </button>
-</div>
-
-  </div>
-</div>
 
 
-<!-- PUBLICATION -->
-<div id="publishModal" class="modal">
+<!-- =========================
+     PUBLICATION
+========================= -->
+
+<div
+  id="publishModal"
+  class="modal">
+
   <div class="modal-box">
-    <span class="close" onclick="fermerModal('publishModal')">×</span>
 
-    <h2>Publier une annonce</h2>
+    <span
+      class="close"
+      onclick="fermerModal('publishModal')">
+      ×
+    </span>
+
+    <h2>
+      Publier une annonce
+    </h2>
+
     <div id="publishMessage"></div>
 
-    <div class="form-group">
-      <label>Titre</label>
-      <input id="listingTitle" type="text" placeholder="Ex : iPhone 13">
-    </div>
 
     <div class="form-group">
-      <label>Description</label>
-      <textarea id="listingDescription" placeholder="Décris ton produit..."></textarea>
+
+      <label>
+        Titre
+      </label>
+
+      <input
+        id="listingTitle"
+        type="text"
+        placeholder="Ex : iPhone 13">
+
     </div>
 
-    <div class="form-group">
-      <label>Prix (GNF)</label>
-      <input id="listingPrice" type="number" placeholder="Ex : 5000000">
-    </div>
 
     <div class="form-group">
-      <label>État</label>
+
+      <label>
+        Description
+      </label>
+
+      <textarea
+        id="listingDescription"
+        placeholder="Décris ton produit..."></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Prix (GNF)
+      </label>
+
+      <input
+        id="listingPrice"
+        type="number"
+        placeholder="Ex : 5000000">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        État
+      </label>
+
       <select id="listingCondition">
-  <option value="Good">Bon état</option>
-  <option value="New">Neuf</option>
-  <option value="Used">Occasion</option>
-</select>
-    </div>
 
-    <div class="form-group">
-      <label>Catégorie</label>
-      <select id="listingCategory">
-        <option value="Téléphones">Téléphones</option>
-        <option value="Mode">Mode</option>
-        <option value="Maison">Maison</option>
-        <option value="Électronique">Électronique</option>
-        <option value="Véhicules">Véhicules</option>
-        <option value="Autres">Autres</option>
+        <option value="Good">
+          Bon état
+        </option>
+
+        <option value="New">
+          Neuf
+        </option>
+
+        <option value="Used">
+          Occasion
+        </option>
+
       </select>
+
     </div>
+
 
     <div class="form-group">
-      <label>Ville</label>
-      <input id="listingCity" type="text" value="Conakry">
+
+      <label>
+        Catégorie
+      </label>
+
+      <select id="listingCategory">
+
+        <option value="Téléphones">
+          Téléphones
+        </option>
+
+        <option value="Mode">
+          Mode
+        </option>
+
+        <option value="Maison">
+          Maison
+        </option>
+
+        <option value="Électronique">
+          Électronique
+        </option>
+
+        <option value="Véhicules">
+          Véhicules
+        </option>
+
+        <option value="Autres">
+          Autres
+        </option>
+
+      </select>
+
     </div>
+
 
     <div class="form-group">
-      <label>Quartier</label>
-      <input id="listingNeighborhood" type="text" placeholder="Ex : Bambéto">
+
+      <label>
+        Ville
+      </label>
+
+      <input
+        id="listingCity"
+        type="text"
+        value="Conakry">
+
     </div>
+
 
     <div class="form-group">
-      <label>Photo</label>
-      <input id="listingPhoto" type="file" accept="image/*" onchange="previewPhoto()">
-      <img id="photoPreview" class="photo-preview hidden">
+
+      <label>
+        Quartier
+      </label>
+
+      <input
+        id="listingNeighborhood"
+        type="text"
+        placeholder="Ex : Bambéto">
+
     </div>
 
-    <button class="btn-green" onclick="publierAnnonce()">Publier l'annonce</button>
+
+    <div class="form-group">
+
+      <label>
+        Photo
+      </label>
+
+      <input
+        id="listingPhoto"
+        type="file"
+        accept="image/*"
+        onchange="previewPhoto()">
+
+      <img
+        id="photoPreview"
+        class="photo-preview hidden">
+
+    </div>
+
+
+    <button
+      class="btn-green"
+      onclick="publierAnnonce()">
+
+      Publier l'annonce
+
+    </button>
+
   </div>
+
 </div>
 
 
-<!-- DETAIL ANNONCE -->
-<div id="detailModal" class="modal">
+<!-- =========================
+     DETAIL ANNONCE
+========================= -->
+
+<div
+  id="detailModal"
+  class="modal">
+
   <div class="modal-box">
-    <span class="close" onclick="fermerModal('detailModal')">×</span>
+
+    <span
+      class="close"
+      onclick="fermerModal('detailModal')">
+      ×
+    </span>
 
     <div id="detailContent">
       Chargement...
     </div>
+
   </div>
+
 </div>
 
 
-<!-- PAIEMENT -->
-<div id="paymentModal" class="modal">
-  <div class="modal-box">
-    <span class="close" onclick="fermerModal('paymentModal')">×</span>
+<!-- =========================
+     PAIEMENT
+========================= -->
 
-    <h2>Achat</h2>
+<div
+  id="paymentModal"
+  class="modal">
+
+  <div class="modal-box">
+
+    <span
+      class="close"
+      onclick="fermerModal('paymentModal')">
+      ×
+    </span>
+
+    <h2>
+      Achat
+    </h2>
 
     <div id="paymentContent"></div>
 
     <div class="success">
-      Commission Marché Guinée : <strong>3 %</strong> de la vente.
+
+      Commission Marché Guinée :
+      <strong>3 %</strong>
+      de la vente.
+
     </div>
 
-    <p>Le paiement sera relié au système de paiement de Marché Guinée dans la prochaine étape.</p>
+    <p>
+      Le paiement sera relié au système de paiement de Marché Guinée dans la prochaine étape.
+    </p>
 
-    <button class="btn-primary" onclick="fermerModal('paymentModal')">Fermer</button>
+    <button
+      class="btn-primary"
+      onclick="fermerModal('paymentModal')">
+
+      Fermer
+
+    </button>
+
   </div>
+
 </div>
 
 
-<!-- MESSAGES -->
-<div id="messagesModal" class="modal">
-  <div class="modal-box">
-    <span class="close" onclick="fermerModal('messagesModal')">×</span>
+<!-- =========================
+     MESSAGES
+========================= -->
 
-    <h2>💬 Messagerie</h2>
+<div
+  id="messagesModal"
+  class="modal">
+
+  <div class="modal-box">
+
+    <span
+      class="close"
+      onclick="fermerModal('messagesModal')">
+      ×
+    </span>
+
+    <h2>
+      💬 Messagerie
+    </h2>
 
     <div id="messagesList"></div>
 
-    <div id="chatContainer" class="hidden">
-      <button class="btn-light" onclick="retourConversations()">← Retour</button>
 
-      <h3 id="chatTitle">Conversation</h3>
+    <div
+      id="chatContainer"
+      class="hidden">
 
-      <div id="chatBox" class="chat-box"></div>
+      <button
+        class="btn-light"
+        onclick="retourConversations()">
+
+        ← Retour
+
+      </button>
+
+
+      <h3 id="chatTitle">
+        Conversation
+      </h3>
+
+
+      <div
+        id="chatBox"
+        class="chat-box">
+      </div>
+
 
       <div class="chat-input">
+
         <input
           id="messageInput"
           type="text"
           placeholder="Écrire un message..."
           onkeydown="gererToucheMessage(event)"
         >
-        <button class="btn-primary" onclick="envoyerMessage()">Envoyer</button>
+
+        <button
+          class="btn-primary"
+          onclick="envoyerMessage()">
+
+          Envoyer
+
+        </button>
+
       </div>
+
     </div>
 
   </div>
+
 </div>
 
 
 <script>
-const SUPABASE_URL = "https://meernnpwtcgqjppyccqk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
+
+const SUPABASE_URL =
+  "https://meernnpwtcgqjppyccqk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
+
 
 let utilisateurConnecte = null;
+
 let toutesLesAnnonces = [];
+
 let categorieActuelle = "Toutes";
 
 let conversationActuelle = null;
+
 let annonceConversationActuelle = null;
+
 let intervalMessages = null;
 
 
@@ -620,52 +1135,98 @@ let intervalMessages = null;
 ========================= */
 
 function headers(extra={}){
+
   const token =
-    utilisateurConnecte && utilisateurConnecte.accessToken
+    utilisateurConnecte &&
+    utilisateurConnecte.accessToken
       ? utilisateurConnecte.accessToken
       : SUPABASE_KEY;
 
   return {
-    "apikey": SUPABASE_KEY,
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json",
+
+    "apikey":
+      SUPABASE_KEY,
+
+    "Authorization":
+      "Bearer " + token,
+
+    "Content-Type":
+      "application/json",
+
     ...extra
+
   };
+
 }
 
-async function supabaseFetch(url, options={}){
-  const response = await fetch(url, {
-    ...options,
-    headers:{
-      ...headers(),
-      ...(options.headers || {})
-    }
-  });
 
-  const text = await response.text();
+async function supabaseFetch(url,options={}){
+
+  const response =
+    await fetch(
+      url,
+      {
+        ...options,
+
+        headers:{
+          ...headers(),
+
+          ...(options.headers || {})
+        }
+      }
+    );
+
+
+  const text =
+    await response.text();
+
 
   let data = null;
 
+
   try{
-    data = text ? JSON.parse(text) : null;
+
+    data =
+      text
+        ? JSON.parse(text)
+        : null;
+
   }catch(e){
+
     data = text;
+
   }
+
 
   if(!response.ok){
+
     const message =
+
       data && data.message
         ? data.message
-        : data && data.error_description
+
+      : data && data.error_description
         ? data.error_description
-        : typeof data === "string"
+
+      : data && data.hint
+        ? data.hint
+
+      : data && data.details
+        ? data.details
+
+      : typeof data === "string"
         ? data
-        : "Erreur Supabase";
+
+      : "Erreur Supabase";
+
 
     throw new Error(message);
+
   }
 
+
   return data;
+
 }
 
 
@@ -674,43 +1235,100 @@ async function supabaseFetch(url, options={}){
 ========================= */
 
 function escapeHTML(value){
-  if(value === null || value === undefined) return "";
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+
   return String(value)
+
     .replace(/&/g,"&amp;")
+
     .replace(/</g,"&lt;")
+
     .replace(/>/g,"&gt;")
+
     .replace(/"/g,"&quot;")
+
     .replace(/'/g,"&#039;");
+
 }
+
 
 function formatPrix(prix){
-  return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
+
+  return Number(prix || 0)
+    .toLocaleString("fr-FR") +
+    " GNF";
+
 }
+
 
 function formatDate(date){
+
   if(!date) return "";
-  return new Date(date).toLocaleDateString("fr-FR",{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  });
+
+  return new Date(date)
+    .toLocaleDateString(
+      "fr-FR",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric"
+      }
+    );
+
 }
+
 
 function formatHeure(date){
+
   if(!date) return "";
-  return new Date(date).toLocaleTimeString("fr-FR",{
-    hour:"2-digit",
-    minute:"2-digit"
-  });
+
+  return new Date(date)
+    .toLocaleTimeString(
+      "fr-FR",
+      {
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    );
+
 }
 
-function fermerModal(id){
-  document.getElementById(id).style.display = "none";
 
-  if(id === "messagesModal" && intervalMessages){
-    clearInterval(intervalMessages);
-    intervalMessages = null;
+function fermerModal(id){
+
+  const element =
+    document.getElementById(id);
+
+  if(element){
+
+    element.style.display =
+      "none";
+
   }
+
+
+  if(
+    id === "messagesModal" &&
+    intervalMessages
+  ){
+
+    clearInterval(
+      intervalMessages
+    );
+
+    intervalMessages = null;
+
+  }
+
 }
 
 
@@ -719,273 +1337,596 @@ function fermerModal(id){
 ========================= */
 
 function ouvrirCompte(){
-  document.getElementById("accountModal").style.display = "block";
+
+  document.getElementById(
+    "accountModal"
+  ).style.display = "block";
+
 
   if(utilisateurConnecte){
-    document.getElementById("accountForms").classList.add("hidden");
-    document.getElementById("accountConnected").classList.remove("hidden");
 
-    document.getElementById("connectedName").textContent =
-      utilisateurConnecte.fullName || "Utilisateur";
+    document.getElementById(
+      "accountForms"
+    ).classList.add("hidden");
 
-    document.getElementById("connectedPhone").textContent =
-      utilisateurConnecte.phone || "";
 
-        chargerSoldeVendeur();
-  
+    document.getElementById(
+      "accountConnected"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+      "connectedName"
+    ).textContent =
+
+      utilisateurConnecte.fullName ||
+      "Utilisateur";
+
+
+    document.getElementById(
+      "connectedPhone"
+    ).textContent =
+
+      utilisateurConnecte.phone ||
+      "";
+
+
+    chargerSoldeVendeur();
+
   }else{
-    document.getElementById("accountForms").classList.remove("hidden");
-    document.getElementById("accountConnected").classList.add("hidden");
+
+    document.getElementById(
+      "accountForms"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+      "accountConnected"
+    ).classList.add("hidden");
+
+
     afficherInscription();
+
   }
+
 }
+
 
 function afficherInscription(){
-  document.getElementById("signupForm").classList.remove("hidden");
-  document.getElementById("loginForm").classList.add("hidden");
 
-  document.getElementById("signupTab").className = "btn-primary";
-  document.getElementById("loginTab").className = "btn-light";
+  document.getElementById(
+    "signupForm"
+  ).classList.remove("hidden");
+
+
+  document.getElementById(
+    "loginForm"
+  ).classList.add("hidden");
+
+
+  document.getElementById(
+    "signupTab"
+  ).className =
+    "btn-primary";
+
+
+  document.getElementById(
+    "loginTab"
+  ).className =
+    "btn-light";
+
 }
+
 
 function afficherConnexion(){
-  document.getElementById("signupForm").classList.add("hidden");
-  document.getElementById("loginForm").classList.remove("hidden");
 
-  document.getElementById("signupTab").className = "btn-light";
-  document.getElementById("loginTab").className = "btn-primary";
+  document.getElementById(
+    "signupForm"
+  ).classList.add("hidden");
+
+
+  document.getElementById(
+    "loginForm"
+  ).classList.remove("hidden");
+
+
+  document.getElementById(
+    "signupTab"
+  ).className =
+    "btn-light";
+
+
+  document.getElementById(
+    "loginTab"
+  ).className =
+    "btn-primary";
+
 }
+
 
 function emailTechnique(numero){
-  const propre = String(numero || "")
-    .replace(/\s+/g,"")
-    .replace(/\+/g,"")
-    .replace(/[^0-9]/g,"");
 
-  return propre + "@marche-guinee.netlify.app";
+  const propre =
+    String(numero || "")
+
+      .replace(/\s+/g,"")
+
+      .replace(/\+/g,"")
+
+      .replace(/[^0-9]/g,"");
+
+
+  return (
+    propre +
+    "@marche-guinee.netlify.app"
+  );
+
 }
+
 
 async function creerCompte(){
 
-  const fullName = document.getElementById("signupName").value.trim();
-  const phone = document.getElementById("signupPhone").value.trim();
-  const password = document.getElementById("signupPassword").value;
+  const fullName =
+    document.getElementById(
+      "signupName"
+    ).value.trim();
 
-  const box = document.getElementById("accountMessage");
 
-  if(!fullName || !phone || !password){
-    box.innerHTML = '<div class="error">Remplis tous les champs.</div>';
-    return;
-  }
+  const phone =
+    document.getElementById(
+      "signupPhone"
+    ).value.trim();
 
-  if(password.length < 6){
-    box.innerHTML = '<div class="error">Le mot de passe doit contenir au moins 6 caractères.</div>';
-    return;
-  }
 
-  box.innerHTML = '<div class="success">Création du compte...</div>';
+  const password =
+    document.getElementById(
+      "signupPassword"
+    ).value;
 
-  try{
 
-    const auth = await fetch(
-      SUPABASE_URL + "/auth/v1/signup",
-      {
-        method:"POST",
-        headers:{
-          "apikey":SUPABASE_KEY,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          email:emailTechnique(phone),
-          password:password,
-          data:{
-            full_name:fullName,
-            phone:phone
-          }
-        })
-      }
+  const box =
+    document.getElementById(
+      "accountMessage"
     );
 
-    const authText = await auth.text();
 
-    let authData;
-
-    try{
-      authData = JSON.parse(authText);
-    }catch(e){
-      authData = {};
-    }
-
-    if(!auth.ok){
-      throw new Error(
-        authData.msg ||
-        authData.message ||
-        authData.error_description ||
-        "Impossible de créer le compte."
-      );
-    }
-
-    const userId =
-      authData.user && authData.user.id
-        ? authData.user.id
-        : null;
-
-    if(!userId){
-      box.innerHTML =
-        '<div class="success">Compte créé. Tu peux maintenant te connecter.</div>';
-
-      afficherConnexion();
-      return;
-    }
-
-    await fetch(
-      SUPABASE_URL + "/rest/v1/users?on_conflict=id",
-      {
-        method:"POST",
-        headers:{
-          ...headers(),
-          "Prefer":"resolution=merge-duplicates,return=minimal"
-        },
-        body:JSON.stringify({
-          id:userId,
-          full_name:fullName,
-          phone:phone
-        })
-      }
-    );
-
-    box.innerHTML =
-      '<div class="success">Compte créé avec succès. Tu peux maintenant te connecter.</div>';
-
-    afficherConnexion();
-
-  }catch(error){
-    console.error(error);
+  if(
+    !fullName ||
+    !phone ||
+    !password
+  ){
 
     box.innerHTML =
       '<div class="error">' +
-      escapeHTML(error.message) +
+      'Remplis tous les champs.' +
       '</div>';
+
+    return;
+
   }
+
+
+  if(password.length < 6){
+
+    box.innerHTML =
+      '<div class="error">' +
+      'Le mot de passe doit contenir au moins 6 caractères.' +
+      '</div>';
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    '<div class="success">' +
+    'Création du compte...' +
+    '</div>';
+
+
+  try{
+
+    const auth =
+      await fetch(
+        SUPABASE_URL +
+        "/auth/v1/signup",
+        {
+          method:"POST",
+
+          headers:{
+            "apikey":
+              SUPABASE_KEY,
+
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            email:
+              emailTechnique(phone),
+
+            password:
+              password,
+
+            data:{
+              full_name:
+                fullName,
+
+              phone:
+                phone
+            }
+
+          })
+
+        }
+      );
+
+
+    const authText =
+      await auth.text();
+
+
+    let authData;
+
+
+    try{
+
+      authData =
+        JSON.parse(authText);
+
+    }catch(e){
+
+      authData = {};
+
+    }
+
+
+    if(!auth.ok){
+
+      throw new Error(
+
+        authData.msg ||
+
+        authData.message ||
+
+        authData.error_description ||
+
+        "Impossible de créer le compte."
+
+      );
+
+    }
+
+
+    const userId =
+
+      authData.user &&
+      authData.user.id
+
+        ? authData.user.id
+
+        : null;
+
+
+    if(!userId){
+
+      box.innerHTML =
+        '<div class="success">' +
+        'Compte créé. Tu peux maintenant te connecter.' +
+        '</div>';
+
+      afficherConnexion();
+
+      return;
+
+    }
+
+
+    await fetch(
+
+      SUPABASE_URL +
+      "/rest/v1/users?on_conflict=id",
+
+      {
+        method:"POST",
+
+        headers:{
+          ...headers(),
+
+          "Prefer":
+            "resolution=merge-duplicates,return=minimal"
+        },
+
+        body:JSON.stringify({
+
+          id:userId,
+
+          full_name:
+            fullName,
+
+          phone:
+            phone
+
+        })
+
+      }
+
+    );
+
+
+    box.innerHTML =
+      '<div class="success">' +
+      'Compte créé avec succès. Tu peux maintenant te connecter.' +
+      '</div>';
+
+
+    afficherConnexion();
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    box.innerHTML =
+      '<div class="error">' +
+      escapeHTML(
+        error.message
+      ) +
+      '</div>';
+
+  }
+
 }
 
 
 async function connecterCompte(){
 
-  const phone = document.getElementById("loginPhone").value.trim();
-  const password = document.getElementById("loginPassword").value;
+  const phone =
+    document.getElementById(
+      "loginPhone"
+    ).value.trim();
 
-  const box = document.getElementById("accountMessage");
 
-  if(!phone || !password){
-    box.innerHTML =
-      '<div class="error">Entre ton numéro et ton mot de passe.</div>';
-    return;
-  }
+  const password =
+    document.getElementById(
+      "loginPassword"
+    ).value;
 
-  box.innerHTML =
-    '<div class="success">Connexion...</div>';
 
-  try{
-
-    const response = await fetch(
-      SUPABASE_URL + "/auth/v1/token?grant_type=password",
-      {
-        method:"POST",
-        headers:{
-          "apikey":SUPABASE_KEY,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          email:emailTechnique(phone),
-          password:password
-        })
-      }
+  const box =
+    document.getElementById(
+      "accountMessage"
     );
 
-    const data = await response.json();
 
-    if(!response.ok){
-      throw new Error(
-        data.error_description ||
-        data.msg ||
-        "Numéro ou mot de passe incorrect."
-      );
-    }
-
-    const userId = data.user.id;
-
-    let fullName = data.user.user_metadata?.full_name || "Utilisateur";
-
-    try{
-      const userRows = await supabaseFetch(
-        SUPABASE_URL +
-        "/rest/v1/users?id=eq." +
-        encodeURIComponent(userId) +
-        "&select=*"
-      );
-
-      if(userRows && userRows.length){
-        fullName = userRows[0].full_name || fullName;
-      }
-    }catch(e){
-      console.log("Profil users non récupéré :",e);
-    }
-
-    utilisateurConnecte = {
-      id:userId,
-      fullName:fullName,
-      phone:phone,
-      accessToken:data.access_token
-    };
-
-    localStorage.setItem(
-      "marche_guinee_session",
-      JSON.stringify(utilisateurConnecte)
-    );
-
-    box.innerHTML =
-      '<div class="success">Connexion réussie.</div>';
-
-    ouvrirCompte();
-
-    setTimeout(()=>{
-      fermerModal("accountModal");
-    },700);
-
-  }catch(error){
-    console.error(error);
+  if(
+    !phone ||
+    !password
+  ){
 
     box.innerHTML =
       '<div class="error">' +
-      escapeHTML(error.message) +
+      'Entre ton numéro et ton mot de passe.' +
       '</div>';
+
+    return;
+
   }
+
+
+  box.innerHTML =
+    '<div class="success">' +
+    'Connexion...' +
+    '</div>';
+
+
+  try{
+
+    const response =
+      await fetch(
+
+        SUPABASE_URL +
+        "/auth/v1/token?grant_type=password",
+
+        {
+          method:"POST",
+
+          headers:{
+            "apikey":
+              SUPABASE_KEY,
+
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            email:
+              emailTechnique(phone),
+
+            password:
+              password
+
+          })
+
+        }
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+
+        data.error_description ||
+
+        data.msg ||
+
+        "Numéro ou mot de passe incorrect."
+
+      );
+
+    }
+
+
+    const userId =
+      data.user.id;
+
+
+    let fullName =
+      data.user.user_metadata?.full_name ||
+      "Utilisateur";
+
+
+    try{
+
+      const userRows =
+        await supabaseFetch(
+
+          SUPABASE_URL +
+          "/rest/v1/users?id=eq." +
+          encodeURIComponent(userId) +
+          "&select=*"
+
+        );
+
+
+      if(
+        userRows &&
+        userRows.length
+      ){
+
+        fullName =
+          userRows[0].full_name ||
+          fullName;
+
+      }
+
+    }catch(e){
+
+      console.log(
+        "Profil users non récupéré :",
+        e
+      );
+
+    }
+
+
+    utilisateurConnecte = {
+
+      id:userId,
+
+      fullName:
+        fullName,
+
+      phone:
+        phone,
+
+      accessToken:
+        data.access_token,
+
+      refreshToken:
+        data.refresh_token || null
+
+    };
+
+
+    localStorage.setItem(
+
+      "marche_guinee_session",
+
+      JSON.stringify(
+        utilisateurConnecte
+      )
+
+    );
+
+
+    box.innerHTML =
+      '<div class="success">' +
+      'Connexion réussie.' +
+      '</div>';
+
+
+    ouvrirCompte();
+
+
+    setTimeout(
+      ()=>{
+        fermerModal(
+          "accountModal"
+        );
+      },
+      700
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    box.innerHTML =
+      '<div class="error">' +
+      escapeHTML(
+        error.message
+      ) +
+      '</div>';
+
+  }
+
 }
 
 
 function deconnecter(){
 
   utilisateurConnecte = null;
-  localStorage.removeItem("marche_guinee_session");
 
-  fermerModal("accountModal");
+  localStorage.removeItem(
+    "marche_guinee_session"
+  );
 
-  alert("Tu es déconnecté.");
+  fermerModal(
+    "accountModal"
+  );
+
+  alert(
+    "Tu es déconnecté."
+  );
+
 }
 
 
 function restaurerSession(){
 
   try{
-    const saved = localStorage.getItem("marche_guinee_session");
+
+    const saved =
+      localStorage.getItem(
+        "marche_guinee_session"
+      );
+
 
     if(saved){
-      utilisateurConnecte = JSON.parse(saved);
+
+      utilisateurConnecte =
+        JSON.parse(saved);
+
     }
+
   }catch(e){
-    utilisateurConnecte = null;
+
+    utilisateurConnecte =
+      null;
+
   }
+
 }
 
 
@@ -996,134 +1937,327 @@ function restaurerSession(){
 function ouvrirVente(){
 
   if(!utilisateurConnecte){
-    alert("Connecte-toi ou crée ton compte pour publier une annonce.");
+
+    alert(
+      "Connecte-toi ou crée ton compte pour publier une annonce."
+    );
+
     ouvrirCompte();
+
     return;
+
   }
 
-  document.getElementById("publishModal").style.display = "block";
+
+  document.getElementById(
+    "publishModal"
+  ).style.display =
+    "block";
+
 }
+
 
 function previewPhoto(){
 
-  const file = document.getElementById("listingPhoto").files[0];
-  const img = document.getElementById("photoPreview");
+  const file =
+    document.getElementById(
+      "listingPhoto"
+    ).files[0];
+
+
+  const img =
+    document.getElementById(
+      "photoPreview"
+    );
+
 
   if(!file){
-    img.classList.add("hidden");
+
+    img.classList.add(
+      "hidden"
+    );
+
     return;
+
   }
 
-  img.src = URL.createObjectURL(file);
-  img.classList.remove("hidden");
+
+  img.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  img.classList.remove(
+    "hidden"
+  );
+
 }
 
 
-async function obtenirCategorieId(nomCategorie){
+async function obtenirCategorieId(
+  nomCategorie
+){
 
-  const rows = await supabaseFetch(
-    SUPABASE_URL +
-    "/rest/v1/categories?select=*&name=eq." +
-    encodeURIComponent(nomCategorie) +
-    "&limit=1"
-  );
+  const rows =
+    await supabaseFetch(
 
-  if(rows && rows.length){
-    return rows[0].id;
-  }
+      SUPABASE_URL +
+      "/rest/v1/categories?select=*&name=eq." +
+      encodeURIComponent(
+        nomCategorie
+      ) +
+      "&limit=1"
 
-  const all = await supabaseFetch(
-    SUPABASE_URL +
-    "/rest/v1/categories?select=*"
-  );
-
-  if(all && all.length){
-    const trouve = all.find(c =>
-      String(c.name || "").toLowerCase() ===
-      String(nomCategorie || "").toLowerCase()
     );
 
-    if(trouve) return trouve.id;
+
+  if(
+    rows &&
+    rows.length
+  ){
+
+    return rows[0].id;
+
   }
 
+
+  const all =
+    await supabaseFetch(
+
+      SUPABASE_URL +
+      "/rest/v1/categories?select=*"
+
+    );
+
+
+  if(
+    all &&
+    all.length
+  ){
+
+    const trouve =
+      all.find(
+        c =>
+
+          String(
+            c.name || ""
+          ).toLowerCase() ===
+
+          String(
+            nomCategorie || ""
+          ).toLowerCase()
+      );
+
+
+    if(trouve){
+
+      return trouve.id;
+
+    }
+
+  }
+
+
   return null;
+
 }
 
 
 async function publierAnnonce(){
 
-  const messageBox = document.getElementById("publishMessage");
+  const messageBox =
+    document.getElementById(
+      "publishMessage"
+    );
+
 
   if(!utilisateurConnecte){
+
     messageBox.innerHTML =
-      '<div class="error">Connecte-toi d’abord.</div>';
+      '<div class="error">' +
+      'Connecte-toi d’abord.' +
+      '</div>';
+
     return;
+
   }
 
-  const title = document.getElementById("listingTitle").value.trim();
-  const description = document.getElementById("listingDescription").value.trim();
-  const price = document.getElementById("listingPrice").value;
-  const condition = document.getElementById("listingCondition").value;
-  const categoryName = document.getElementById("listingCategory").value;
-  const city = document.getElementById("listingCity").value.trim();
-  const neighborhood = document.getElementById("listingNeighborhood").value.trim();
-  const file = document.getElementById("listingPhoto").files[0];
 
-  if(!title || !price || !city){
+  const title =
+    document.getElementById(
+      "listingTitle"
+    ).value.trim();
+
+
+  const description =
+    document.getElementById(
+      "listingDescription"
+    ).value.trim();
+
+
+  const price =
+    document.getElementById(
+      "listingPrice"
+    ).value;
+
+
+  const condition =
+    document.getElementById(
+      "listingCondition"
+    ).value;
+
+
+  const categoryName =
+    document.getElementById(
+      "listingCategory"
+    ).value;
+
+
+  const city =
+    document.getElementById(
+      "listingCity"
+    ).value.trim();
+
+
+  const neighborhood =
+    document.getElementById(
+      "listingNeighborhood"
+    ).value.trim();
+
+
+  const file =
+    document.getElementById(
+      "listingPhoto"
+    ).files[0];
+
+
+  if(
+    !title ||
+    !price ||
+    !city
+  ){
+
     messageBox.innerHTML =
-      '<div class="error">Remplis au minimum le titre, le prix et la ville.</div>';
+      '<div class="error">' +
+      'Remplis au minimum le titre, le prix et la ville.' +
+      '</div>';
+
     return;
+
   }
+
 
   messageBox.innerHTML =
-    '<div class="success">Publication en cours...</div>';
+    '<div class="success">' +
+    'Publication en cours...' +
+    '</div>';
+
 
   try{
 
-    const categoryId = await obtenirCategorieId(categoryName);
+    const categoryId =
+      await obtenirCategorieId(
+        categoryName
+      );
+
 
     if(!categoryId){
+
       throw new Error(
-        "La catégorie « " + categoryName + " » n'a pas été trouvée."
+        "La catégorie « " +
+        categoryName +
+        " » n'a pas été trouvée."
       );
+
     }
 
-    const listingRows = await supabaseFetch(
-      SUPABASE_URL + "/rest/v1/listings",
-      {
-        method:"POST",
-        headers:{
-          "Prefer":"return=representation"
-        },
-        body:JSON.stringify({
-          seller_id:utilisateurConnecte.id,
-          category_id:categoryId,
-          title:title,
-          description:description,
-          price_gnf:Number(price),
-          condition:condition,
-          city:city,
-          neighborhood:neighborhood,
-          status:"active",
-          views:0
-        })
-      }
-    );
 
-    if(!listingRows || !listingRows.length){
-      throw new Error("L'annonce n'a pas été créée.");
+    const listingRows =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/listings",
+
+        {
+          method:"POST",
+
+          headers:{
+            "Prefer":
+              "return=representation"
+          },
+
+          body:JSON.stringify({
+
+            seller_id:
+              utilisateurConnecte.id,
+
+            category_id:
+              categoryId,
+
+            title:
+              title,
+
+            description:
+              description,
+
+            price_gnf:
+              Number(price),
+
+            condition:
+              condition,
+
+            city:
+              city,
+
+            neighborhood:
+              neighborhood,
+
+            status:
+              "active",
+
+            views:
+              0
+
+          })
+
+        }
+
+      );
+
+
+    if(
+      !listingRows ||
+      !listingRows.length
+    ){
+
+      throw new Error(
+        "L'annonce n'a pas été créée."
+      );
+
     }
 
-    const listing = listingRows[0];
+
+    const listing =
+      listingRows[0];
+
 
     if(file){
 
       const extension =
+
         file.name.includes(".")
-          ? file.name.split(".").pop().toLowerCase()
+
+          ? file.name
+              .split(".")
+              .pop()
+              .toLowerCase()
+
           : "jpg";
 
+
       const chemin =
+
         utilisateurConnecte.id +
         "/" +
         listing.id +
@@ -1132,69 +2266,158 @@ async function publierAnnonce(){
         "." +
         extension;
 
-      const uploadResponse = await fetch(
-        SUPABASE_URL +
-        "/storage/v1/object/Listing-image/" +
-        chemin,
-        {
-          method:"POST",
-          headers:{
-            "apikey":SUPABASE_KEY,
-            "Authorization":"Bearer " +
-              utilisateurConnecte.accessToken,
-            "Content-Type":file.type || "image/jpeg"
-          },
-          body:file
-        }
-      );
+
+      const uploadResponse =
+        await fetch(
+
+          SUPABASE_URL +
+          "/storage/v1/object/Listing-image/" +
+          chemin,
+
+          {
+            method:"POST",
+
+            headers:{
+
+              "apikey":
+                SUPABASE_KEY,
+
+              "Authorization":
+                "Bearer " +
+                utilisateurConnecte.accessToken,
+
+              "Content-Type":
+                file.type ||
+                "image/jpeg"
+
+            },
+
+            body:file
+
+          }
+
+        );
+
 
       if(!uploadResponse.ok){
-        const errorText = await uploadResponse.text();
-        console.error(errorText);
+
+        const errorText =
+          await uploadResponse.text();
+
+        console.error(
+          errorText
+        );
+
       }else{
 
         await supabaseFetch(
-          SUPABASE_URL + "/rest/v1/listing_images",
+
+          SUPABASE_URL +
+          "/rest/v1/listing_images",
+
           {
             method:"POST",
+
             headers:{
-              "Prefer":"return=minimal"
+              "Prefer":
+                "return=minimal"
             },
+
             body:JSON.stringify({
-              listing_id:listing.id,
-              image_url:chemin
+
+              listing_id:
+                listing.id,
+
+              image_url:
+                chemin
+
             })
+
           }
+
         );
+
       }
+
     }
 
+
     messageBox.innerHTML =
-      '<div class="success">Annonce publiée avec succès !</div>';
+      '<div class="success">' +
+      'Annonce publiée avec succès !' +
+      '</div>';
 
-    setTimeout(()=>{
-      fermerModal("publishModal");
 
-      document.getElementById("listingTitle").value = "";
-      document.getElementById("listingDescription").value = "";
-      document.getElementById("listingPrice").value = "";
-      document.getElementById("listingNeighborhood").value = "";
-      document.getElementById("listingPhoto").value = "";
-      document.getElementById("photoPreview").classList.add("hidden");
-      document.getElementById("publishMessage").innerHTML = "";
+    setTimeout(
 
-      chargerAnnonces();
-    },700);
+      ()=>{
+
+        fermerModal(
+          "publishModal"
+        );
+
+
+        document.getElementById(
+          "listingTitle"
+        ).value = "";
+
+
+        document.getElementById(
+          "listingDescription"
+        ).value = "";
+
+
+        document.getElementById(
+          "listingPrice"
+        ).value = "";
+
+
+        document.getElementById(
+          "listingNeighborhood"
+        ).value = "";
+
+
+        document.getElementById(
+          "listingPhoto"
+        ).value = "";
+
+
+        document.getElementById(
+          "photoPreview"
+        ).classList.add(
+          "hidden"
+        );
+
+
+        document.getElementById(
+          "publishMessage"
+        ).innerHTML = "";
+
+
+        chargerAnnonces();
+
+      },
+
+      700
+
+    );
+
 
   }catch(error){
 
     console.error(error);
 
+
     messageBox.innerHTML =
-      '<div class="error">Impossible de publier l’annonce : ' +
-      escapeHTML(error.message) +
+      '<div class="error">' +
+      'Impossible de publier l’annonce : ' +
+      escapeHTML(
+        error.message
+      ) +
       '</div>';
+
   }
+
 }
 
 
@@ -1202,142 +2425,272 @@ async function publierAnnonce(){
    ANNONCES
 ========================= */
 
-function construireImageUrl(imageUrl){
+function construireImageUrl(
+  imageUrl
+){
 
   if(!imageUrl) return "";
 
+
   if(
-    imageUrl.startsWith("http://") ||
-    imageUrl.startsWith("https://")
+    imageUrl.startsWith(
+      "http://"
+    ) ||
+    imageUrl.startsWith(
+      "https://"
+    )
   ){
+
     return imageUrl;
+
   }
 
+
   return (
+
     SUPABASE_URL +
     "/storage/v1/object/public/Listing-image/" +
     imageUrl
+
   );
+
 }
 
 
-async function chargerImages(listingId){
+async function chargerImages(
+  listingId
+){
 
-  const controller = new AbortController();
+  const controller =
+    new AbortController();
 
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, 5000);
+
+  const timeout =
+    setTimeout(
+      ()=>{
+        controller.abort();
+      },
+      5000
+    );
+
 
   try{
 
-    const response = await fetch(
-      SUPABASE_URL +
-      "/rest/v1/listing_images?listing_id=eq." +
-      encodeURIComponent(listingId) +
-      "&select=image_url&limit=1",
-      {
-        method:"GET",
-        headers:{
-          "apikey":SUPABASE_KEY,
-          "Authorization":"Bearer " + SUPABASE_KEY,
-          "Content-Type":"application/json"
-        },
-        signal: controller.signal
-      }
+    const response =
+      await fetch(
+
+        SUPABASE_URL +
+        "/rest/v1/listing_images?listing_id=eq." +
+        encodeURIComponent(
+          listingId
+        ) +
+        "&select=image_url&limit=1",
+
+        {
+          method:"GET",
+
+          headers:{
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              "Bearer " +
+              SUPABASE_KEY,
+
+            "Content-Type":
+              "application/json"
+          },
+
+          signal:
+            controller.signal
+
+        }
+
+      );
+
+
+    clearTimeout(
+      timeout
     );
 
-    clearTimeout(timeout);
 
     if(!response.ok){
-      console.warn("Image non chargée :", response.status);
+
+      console.warn(
+        "Image non chargée :",
+        response.status
+      );
+
       return "";
+
     }
 
-    const rows = await response.json();
 
-    if(Array.isArray(rows) && rows.length){
-      return construireImageUrl(rows[0].image_url);
+    const rows =
+      await response.json();
+
+
+    if(
+      Array.isArray(rows) &&
+      rows.length
+    ){
+
+      return construireImageUrl(
+        rows[0].image_url
+      );
+
     }
 
   }catch(e){
 
-    clearTimeout(timeout);
+    clearTimeout(
+      timeout
+    );
 
-    console.warn("Image non trouvée :", e);
+    console.warn(
+      "Image non trouvée :",
+      e
+    );
 
   }
 
+
   return "";
+
 }
+
+
+/* =========================
+   SOLDE VENDEUR
+========================= */
 
 async function chargerSoldeVendeur(){
 
   const soldeElement =
-    document.getElementById("soldeVendeur");
+    document.getElementById(
+      "soldeVendeur"
+    );
+
 
   const detailsElement =
-    document.getElementById("detailsSoldeVendeur");
+    document.getElementById(
+      "detailsSoldeVendeur"
+    );
 
-  if(!soldeElement || !detailsElement) return;
+
+  if(
+    !soldeElement ||
+    !detailsElement
+  ){
+
+    return;
+
+  }
+
 
   if(!utilisateurConnecte){
 
-    soldeElement.textContent = "0 GNF";
+    soldeElement.textContent =
+      "0 GNF";
+
 
     detailsElement.textContent =
       "Connecte-toi pour voir ton solde.";
 
+
     return;
+
   }
+
 
   try{
 
-    const commandes = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/orders" +
-      "?seller_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&status=eq.completed" +
-      "&delivery_status=eq.delivered" +
-      "&select=price_gnf,commission_gnf,seller_amount_gnf"
-    );
+    const commandes =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?seller_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&status=eq.completed" +
+        "&delivery_status=eq.delivered" +
+        "&select=price_gnf,commission_gnf,seller_amount_gnf"
+
+      );
+
 
     const ventes =
       Array.isArray(commandes)
         ? commandes
         : [];
 
+
     let totalVentes = 0;
+
     let totalCommission = 0;
+
     let solde = 0;
 
-    ventes.forEach(commande => {
 
-      totalVentes +=
-        Number(commande.price_gnf || 0);
+    ventes.forEach(
+      commande => {
 
-      totalCommission +=
-        Number(commande.commission_gnf || 0);
+        totalVentes +=
+          Number(
+            commande.price_gnf || 0
+          );
 
-      solde +=
-        Number(commande.seller_amount_gnf || 0);
 
-    });
+        totalCommission +=
+          Number(
+            commande.commission_gnf || 0
+          );
+
+
+        solde +=
+          Number(
+            commande.seller_amount_gnf || 0
+          );
+
+      }
+    );
+
 
     soldeElement.textContent =
-      solde.toLocaleString("fr-FR") +
+      solde.toLocaleString(
+        "fr-FR"
+      ) +
       " GNF";
 
+
     detailsElement.textContent =
+
       ventes.length +
+
       " vente" +
-      (ventes.length > 1 ? "s" : "") +
+
+      (
+        ventes.length > 1
+          ? "s"
+          : ""
+      ) +
+
       " • " +
-      totalVentes.toLocaleString("fr-FR") +
+
+      totalVentes.toLocaleString(
+        "fr-FR"
+      ) +
+
       " GNF de ventes • Commission : " +
-      totalCommission.toLocaleString("fr-FR") +
+
+      totalCommission.toLocaleString(
+        "fr-FR"
+      ) +
+
       " GNF";
+
 
   }catch(error){
 
@@ -1346,292 +2699,362 @@ async function chargerSoldeVendeur(){
       error
     );
 
+
     soldeElement.textContent =
       "Erreur";
 
+
     detailsElement.textContent =
+      error.message ||
       "Impossible de charger le solde.";
-  }
-}
-  function ouvrirMesVentes(){
 
-  if(!utilisateurConnecte){
-
-    alert("Connecte-toi pour voir tes ventes.");
-
-    ouvrirCompte();
-
-    return;
   }
 
-  document.getElementById("mesVentesModal").style.display = "flex";
-
-  chargerMesVentes();
 }
 
 
-function fermerMesVentes(){
-
-  document.getElementById("mesVentesModal").style.display = "none";
-}
-
-
-async function chargerMesVentes(){
-
-  const container =
-    document.getElementById("listeMesVentes");
-
-  if(!container) return;
-
-  container.innerHTML =
-    "Chargement...";
-
-  try{
-
-    const commandes = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/orders" +
-      "?seller_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&select=order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
-      "&order=created_at.desc"
-    );
-
-    const ventes =
-      Array.isArray(commandes)
-        ? commandes
-        : [];
-
-    if(!ventes.length){
-
-      container.innerHTML =
-        '<div style="padding:15px;text-align:center;color:#666;">' +
-        'Aucune vente pour le moment.' +
-        '</div>';
-
-      return;
-    }
-
-    container.innerHTML = "";
-
-    ventes.forEach(vente => {
-
-      const prix =
-        Number(vente.price_gnf || 0);
-
-      const commission =
-        Number(vente.commission_gnf || 0);
-
-      const montantVendeur =
-        Number(vente.seller_amount_gnf || 0);
-
-      const div =
-        document.createElement("div");
-
-      div.style.cssText =
-        "border:1px solid #ddd;" +
-        "border-radius:14px;" +
-        "padding:15px;" +
-        "margin-bottom:12px;" +
-        "background:#fafafa;";
-
-      div.innerHTML =
-
-        "<strong>" +
-        escapeHTML(
-          vente.product_title || "Produit"
-        ) +
-        "</strong>" +
-
-        "<div style='margin-top:8px;'>" +
-        "🧾 Commande : " +
-        escapeHTML(
-          vente.order_number || ""
-        ) +
-        "</div>" +
-
-        "<div>" +
-        "💰 Prix : " +
-        prix.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
-
-        "<div>" +
-        "🏦 Commission Marché Guinée : " +
-        commission.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
-
-        "<div>" +
-        "💵 Tu recevras : " +
-        montantVendeur.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
-
-        "<div style='margin-top:8px;'>" +
-        "📦 Statut : " +
-        escapeHTML(
-          vente.status || ""
-        ) +
-        "</div>" +
-
-        "<div>" +
-        "🚚 Livraison : " +
-        escapeHTML(
-          vente.delivery_status || ""
-        ) +
-        "</div>";
-
-      container.appendChild(div);
-
-    });
-
-  }catch(error){
-
-    console.error(
-      "Erreur chargement mes ventes :",
-      error
-    );
-
-    container.innerHTML =
-      '<div style="padding:15px;color:#dc2626;">' +
-      'Impossible de charger les ventes.' +
-      '</div>';
-  }
-}
+/* =========================
+   MES VENTES
+   VERSION CORRIGÉE
+========================= */
 
 function ouvrirMesVentes(){
 
   if(!utilisateurConnecte){
 
-    alert("Connecte-toi pour voir tes ventes.");
+    alert(
+      "Connecte-toi pour voir tes ventes."
+    );
 
     ouvrirCompte();
 
     return;
+
   }
 
-  document.getElementById("mesVentesModal").style.display = "flex";
+
+  document.getElementById(
+    "mesVentesModal"
+  ).style.display =
+    "flex";
+
 
   chargerMesVentes();
+
 }
 
 
 function fermerMesVentes(){
 
-  document.getElementById("mesVentesModal").style.display = "none";
+  document.getElementById(
+    "mesVentesModal"
+  ).style.display =
+    "none";
+
+}
+
+
+function statutCommandeTexte(
+  status
+){
+
+  const statuts = {
+
+    payment_pending:
+      "Paiement en attente",
+
+    payment_confirmed:
+      "Paiement confirmé",
+
+    accepted:
+      "Commande acceptée",
+
+    preparing:
+      "Préparation",
+
+    handed_to_courier:
+      "Remise au livreur",
+
+    in_delivery:
+      "En livraison",
+
+    awaiting_receipt:
+      "En attente de réception",
+
+    completed:
+      "Terminée",
+
+    dispute:
+      "Litige",
+
+    cancelled:
+      "Annulée"
+
+  };
+
+
+  return (
+    statuts[status] ||
+    status ||
+    "Inconnu"
+  );
+
+}
+
+
+function livraisonTexte(
+  status
+){
+
+  const statuts = {
+
+    pending:
+      "En attente",
+
+    delivered:
+      "Livrée"
+
+  };
+
+
+  return (
+    statuts[status] ||
+    status ||
+    "Inconnu"
+  );
+
 }
 
 
 async function chargerMesVentes(){
 
   const container =
-    document.getElementById("listeMesVentes");
+    document.getElementById(
+      "listeMesVentes"
+    );
 
-  if(!container) return;
+
+  if(!container){
+
+    return;
+
+  }
+
+
+  if(!utilisateurConnecte){
+
+    container.innerHTML =
+      '<div class="error">' +
+      'Connecte-toi pour voir tes ventes.' +
+      '</div>';
+
+    return;
+
+  }
+
 
   container.innerHTML =
-    "Chargement...";
+    '<div style="padding:15px;text-align:center;color:#666;">' +
+    'Chargement des ventes...' +
+    '</div>';
+
 
   try{
 
-    const commandes = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/orders" +
-      "?seller_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&select=order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
-      "&order=created_at.desc"
-    );
+    const commandes =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?seller_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+        "&order=created_at.desc"
+
+      );
+
 
     const ventes =
       Array.isArray(commandes)
         ? commandes
         : [];
 
+
     if(!ventes.length){
 
       container.innerHTML =
-        '<div style="padding:15px;text-align:center;color:#666;">' +
-        'Aucune vente pour le moment.' +
+
+        '<div style="' +
+        'padding:20px;' +
+        'text-align:center;' +
+        'color:#666;' +
+        '">' +
+
+        '📦 Aucune vente pour le moment.' +
+
+        '<br><br>' +
+
+        '<small>' +
+        'Quand un client achètera un de tes produits, la commande apparaîtra ici.' +
+        '</small>' +
+
         '</div>';
 
       return;
+
     }
+
 
     container.innerHTML = "";
 
-    ventes.forEach(vente => {
 
-      const prix =
-        Number(vente.price_gnf || 0);
+    ventes.forEach(
+      vente => {
 
-      const commission =
-        Number(vente.commission_gnf || 0);
+        const prix =
+          Number(
+            vente.price_gnf || 0
+          );
 
-      const montantVendeur =
-        Number(vente.seller_amount_gnf || 0);
 
-      const div =
-        document.createElement("div");
+        const commission =
+          Number(
+            vente.commission_gnf || 0
+          );
 
-      div.style.cssText =
-        "border:1px solid #ddd;" +
-        "border-radius:14px;" +
-        "padding:15px;" +
-        "margin-bottom:12px;" +
-        "background:#fafafa;";
 
-      div.innerHTML =
+        const montantVendeur =
+          Number(
+            vente.seller_amount_gnf || 0
+          );
 
-        "<strong>" +
-        escapeHTML(
-          vente.product_title || "Produit"
-        ) +
-        "</strong>" +
 
-        "<div style='margin-top:8px;'>" +
-        "🧾 Commande : " +
-        escapeHTML(
-          vente.order_number || ""
-        ) +
-        "</div>" +
+        const div =
+          document.createElement(
+            "div"
+          );
 
-        "<div>" +
-        "💰 Prix : " +
-        prix.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
 
-        "<div>" +
-        "🏦 Commission Marché Guinée : " +
-        commission.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
+        div.style.cssText =
 
-        "<div>" +
-        "💵 Tu recevras : " +
-        montantVendeur.toLocaleString("fr-FR") +
-        " GNF" +
-        "</div>" +
+          "border:1px solid #ddd;" +
+          "border-radius:14px;" +
+          "padding:15px;" +
+          "margin-bottom:12px;" +
+          "background:#fafafa;";
 
-        "<div style='margin-top:8px;'>" +
-        "📦 Statut : " +
-        escapeHTML(
-          vente.status || ""
-        ) +
-        "</div>" +
 
-        "<div>" +
-        "🚚 Livraison : " +
-        escapeHTML(
-          vente.delivery_status || ""
-        ) +
-        "</div>";
+        div.innerHTML =
 
-      container.appendChild(div);
+          "<strong>" +
 
-    });
+          escapeHTML(
+            vente.product_title ||
+            "Produit"
+          ) +
+
+          "</strong>" +
+
+
+          "<div style='margin-top:8px;'>" +
+
+          "🧾 Commande : " +
+
+          escapeHTML(
+            vente.order_number ||
+            ""
+          ) +
+
+          "</div>" +
+
+
+          "<div>" +
+
+          "💰 Prix : " +
+
+          prix.toLocaleString(
+            "fr-FR"
+          ) +
+
+          " GNF" +
+
+          "</div>" +
+
+
+          "<div>" +
+
+          "🏦 Commission Marché Guinée : " +
+
+          commission.toLocaleString(
+            "fr-FR"
+          ) +
+
+          " GNF" +
+
+          "</div>" +
+
+
+          "<div>" +
+
+          "💵 Montant vendeur : " +
+
+          montantVendeur.toLocaleString(
+            "fr-FR"
+          ) +
+
+          " GNF" +
+
+          "</div>" +
+
+
+          "<div style='margin-top:8px;'>" +
+
+          "📦 Statut : " +
+
+          escapeHTML(
+            statutCommandeTexte(
+              vente.status
+            )
+          ) +
+
+          "</div>" +
+
+
+          "<div>" +
+
+          "🚚 Livraison : " +
+
+          escapeHTML(
+            livraisonTexte(
+              vente.delivery_status
+            )
+          ) +
+
+          "</div>" +
+
+
+          "<div style='margin-top:8px;color:#777;font-size:12px;'>" +
+
+          "📅 " +
+
+          escapeHTML(
+            formatDate(
+              vente.created_at
+            )
+          ) +
+
+          "</div>";
+
+
+        container.appendChild(
+          div
+        );
+
+      }
+    );
+
 
   }catch(error){
 
@@ -1640,44 +3063,106 @@ async function chargerMesVentes(){
       error
     );
 
-    container.innerHTML =
-      '<div style="padding:15px;color:#dc2626;">' +
-      'Impossible de charger les ventes.' +
-      '</div>';
-  }
-}
-  
-  async function chargerAnnonces(){
 
-  const container = document.getElementById("annonces");
+    container.innerHTML =
+
+      '<div style="' +
+      'padding:15px;' +
+      'color:#dc2626;' +
+      'background:#fdeaea;' +
+      'border-radius:10px;' +
+      '">' +
+
+      "<strong>" +
+      "Impossible de charger les ventes." +
+      "</strong>" +
+
+      "<br><br>" +
+
+      escapeHTML(
+        error.message ||
+        "Erreur Supabase inconnue."
+      ) +
+
+      "<br><br>" +
+
+      "<small>" +
+      "Si le message indique « JWT expired », déconnecte-toi puis reconnecte-toi." +
+      "</small>" +
+
+      "</div>";
+
+  }
+
+}
+
+
+/* =========================
+   CHARGEMENT ANNONCES
+========================= */
+
+async function chargerAnnonces(){
+
+  const container =
+    document.getElementById(
+      "annonces"
+    );
+
 
   container.innerHTML =
-    '<div class="empty">Chargement des annonces...</div>';
+    '<div class="empty">' +
+    'Chargement des annonces...' +
+    '</div>';
+
 
   try{
 
-    const response = await fetch(
-      SUPABASE_URL +
-      "/rest/v1/listings?select=*&order=created_at.desc",
-      {
-        method:"GET",
-        headers:{
-          "apikey":SUPABASE_KEY,
-          "Authorization":"Bearer " + SUPABASE_KEY,
-          "Content-Type":"application/json"
-        }
-      }
-    );
+    const response =
+      await fetch(
 
-    const text = await response.text();
+        SUPABASE_URL +
+        "/rest/v1/listings?select=*&order=created_at.desc",
+
+        {
+          method:"GET",
+
+          headers:{
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              "Bearer " +
+              SUPABASE_KEY,
+
+            "Content-Type":
+              "application/json"
+          }
+
+        }
+
+      );
+
+
+    const text =
+      await response.text();
+
 
     let data = null;
 
+
     try{
-      data = text ? JSON.parse(text) : null;
+
+      data =
+        text
+          ? JSON.parse(text)
+          : null;
+
     }catch(e){
+
       data = null;
+
     }
+
 
     if(!response.ok){
 
@@ -1687,27 +3172,50 @@ async function chargerMesVentes(){
         text
       );
 
+
       throw new Error(
+
         data?.message ||
+
         data?.hint ||
+
         data?.details ||
+
         "Erreur lors du chargement des annonces."
+
       );
+
     }
 
-    toutesLesAnnonces = Array.isArray(data) ? data : [];
 
-    if(!toutesLesAnnonces.length){
+    toutesLesAnnonces =
+      Array.isArray(data)
+        ? data
+        : [];
+
+
+    if(
+      !toutesLesAnnonces.length
+    ){
 
       container.innerHTML =
-        '<div class="empty">Aucune annonce pour le moment.</div>';
+        '<div class="empty">' +
+        'Aucune annonce pour le moment.' +
+        '</div>';
 
-      document.getElementById("nombreAnnonces").textContent = "";
+
+      document.getElementById(
+        "nombreAnnonces"
+      ).textContent = "";
+
 
       return;
+
     }
 
+
     await afficherAnnonces();
+
 
   }catch(error){
 
@@ -1716,283 +3224,569 @@ async function chargerMesVentes(){
       error
     );
 
+
     container.innerHTML =
+
       '<div class="error">' +
-      'Impossible de charger les annonces.<br>' +
+
+      'Impossible de charger les annonces.' +
+
+      '<br>' +
+
       '<small>' +
-      escapeHTML(error.message) +
+
+      escapeHTML(
+        error.message
+      ) +
+
       '</small>' +
+
       '</div>';
-  }
-}
-
-
-async function afficherAnnonces(){
-
-  const container = document.getElementById("annonces");
-
-  const recherche =
-    document.getElementById("searchInput").value
-      .trim()
-      .toLowerCase();
-
-  let annonces = toutesLesAnnonces.filter(a => {
-
-    const texte = (
-      (a.title || "") + " " +
-      (a.description || "") + " " +
-      (a.city || "") + " " +
-      (a.neighborhood || "")
-    ).toLowerCase();
-
-    const matchRecherche =
-      !recherche || texte.includes(recherche);
-
-    const matchCategorie =
-      categorieActuelle === "Toutes" ||
-      String(a.category_id || "").toLowerCase() ===
-      categorieActuelle.toLowerCase() ||
-      String(a.category || "").toLowerCase() ===
-      categorieActuelle.toLowerCase();
-
-    return matchRecherche && matchCategorie;
-  });
-
-  document.getElementById("nombreAnnonces").textContent =
-    annonces.length +
-    " annonce" +
-    (annonces.length > 1 ? "s" : "");
-
-  if(!annonces.length){
-
-    container.innerHTML =
-      '<div class="empty">Aucune annonce trouvée.</div>';
-
-    return;
-  }
-
-  /*
-   * IMPORTANT :
-   * On affiche d'abord les annonces.
-   * Les images seront ajoutées ensuite.
-   */
-
-  container.innerHTML = "";
-
-  for(const annonce of annonces){
-
-    const card = document.createElement("div");
-
-    card.className = "card";
-
-    card.innerHTML = `
-
-      <div class="card-img"
-           style="
-             display:flex;
-             align-items:center;
-             justify-content:center;
-             font-size:50px;
-           ">
-        📦
-      </div>
-
-      <div class="card-body">
-
-        <div class="card-title">
-          ${escapeHTML(annonce.title || "")}
-        </div>
-
-        <div class="price">
-          ${formatPrix(annonce.price_gnf)}
-        </div>
-
-        <div class="meta">
-          📍 ${escapeHTML(annonce.city || "")}
-          ${
-            annonce.neighborhood
-              ? " · " + escapeHTML(annonce.neighborhood)
-              : ""
-          }
-        </div>
-
-        <div class="condition">
-          ${escapeHTML(annonce.condition || "")}
-        </div>
-
-      </div>
-    `;
-
-    card.onclick = () =>
-      ouvrirDetailAnnonce(annonce.id);
-
-    container.appendChild(card);
-
-    /*
-     * L'image est chargée APRÈS l'affichage
-     * de la carte.
-     */
-
-    chargerImages(annonce.id)
-      .then(image => {
-
-        if(!image) return;
-
-        const img = document.createElement("img");
-
-        img.className = "card-img";
-
-        img.src = image;
-
-        img.alt = "";
-
-        const ancienneImage =
-          card.querySelector(".card-img");
-
-        if(ancienneImage){
-
-          ancienneImage.replaceWith(img);
-
-        }
-
-      })
-      .catch(error => {
-
-        console.warn(
-          "Image ignorée :",
-          error
-        );
-
-      });
 
   }
-}
 
-
-function filtrerAnnonces(){
-  afficherAnnonces();
-}
-
-function choisirCategorie(categorie,button){
-
-  categorieActuelle = categorie;
-
-  document
-    .querySelectorAll(".categories button")
-    .forEach(b => b.classList.remove("category-active"));
-
-  button.classList.add("category-active");
-
-  afficherAnnonces();
 }
 
 
 /* =========================
-   DÉTAIL ANNONCE
+   AFFICHER ANNONCES
 ========================= */
 
-async function ouvrirDetailAnnonce(id){
+async function afficherAnnonces(){
 
-  const annonce = toutesLesAnnonces.find(a => a.id === id);
+  const container =
+    document.getElementById(
+      "annonces"
+    );
+
+
+  const recherche =
+    document.getElementById(
+      "searchInput"
+    ).value
+      .trim()
+      .toLowerCase();
+
+
+  let annonces =
+    toutesLesAnnonces.filter(
+      a => {
+
+        const texte =
+
+          (
+            (a.title || "") +
+            " " +
+            (a.description || "") +
+            " " +
+            (a.city || "") +
+            " " +
+            (a.neighborhood || "")
+          )
+          .toLowerCase();
+
+
+        const matchRecherche =
+
+          !recherche ||
+          texte.includes(
+            recherche
+          );
+
+
+        const matchCategorie =
+
+          categorieActuelle ===
+          "Toutes"
+
+          ||
+
+          String(
+            a.category_id || ""
+          )
+          .toLowerCase()
+          ===
+          categorieActuelle
+            .toLowerCase()
+
+          ||
+
+          String(
+            a.category || ""
+          )
+          .toLowerCase()
+          ===
+          categorieActuelle
+            .toLowerCase();
+
+
+        return (
+          matchRecherche &&
+          matchCategorie
+        );
+
+      }
+    );
+
+
+  document.getElementById(
+    "nombreAnnonces"
+  ).textContent =
+
+    annonces.length +
+
+    " annonce" +
+
+    (
+      annonces.length > 1
+        ? "s"
+        : ""
+    );
+
+
+  if(!annonces.length){
+
+    container.innerHTML =
+      '<div class="empty">' +
+      'Aucune annonce trouvée.' +
+      '</div>';
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  for(
+    const annonce of annonces
+  ){
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+
+    card.className =
+      "card";
+
+
+    card.innerHTML = `
+
+      <div
+        class="card-img"
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:50px;
+        ">
+
+        📦
+
+      </div>
+
+
+      <div class="card-body">
+
+        <div class="card-title">
+
+          ${escapeHTML(
+            annonce.title || ""
+          )}
+
+        </div>
+
+
+        <div class="price">
+
+          ${formatPrix(
+            annonce.price_gnf
+          )}
+
+        </div>
+
+
+        <div class="meta">
+
+          📍 ${escapeHTML(
+            annonce.city || ""
+          )}
+
+          ${
+            annonce.neighborhood
+              ? " · " +
+                escapeHTML(
+                  annonce.neighborhood
+                )
+              : ""
+          }
+
+        </div>
+
+
+        <div class="condition">
+
+          ${escapeHTML(
+            annonce.condition || ""
+          )}
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    card.onclick =
+      () =>
+        ouvrirDetailAnnonce(
+          annonce.id
+        );
+
+
+    container.appendChild(
+      card
+    );
+
+
+    chargerImages(
+      annonce.id
+    )
+
+      .then(
+        image => {
+
+          if(!image) return;
+
+
+          const img =
+            document.createElement(
+              "img"
+            );
+
+
+          img.className =
+            "card-img";
+
+
+          img.src =
+            image;
+
+
+          img.alt = "";
+
+
+          const ancienneImage =
+            card.querySelector(
+              ".card-img"
+            );
+
+
+          if(
+            ancienneImage
+          ){
+
+            ancienneImage.replaceWith(
+              img
+            );
+
+          }
+
+        }
+      )
+
+      .catch(
+        error => {
+
+          console.warn(
+            "Image ignorée :",
+            error
+          );
+
+        }
+      );
+
+  }
+
+}
+
+
+function filtrerAnnonces(){
+
+  afficherAnnonces();
+
+}
+
+
+function choisirCategorie(
+  categorie,
+  button
+){
+
+  categorieActuelle =
+    categorie;
+
+
+  document
+    .querySelectorAll(
+      ".categories button"
+    )
+    .forEach(
+      b =>
+        b.classList.remove(
+          "category-active"
+        )
+    );
+
+
+  button.classList.add(
+    "category-active"
+  );
+
+
+  afficherAnnonces();
+
+}
+
+
+/* =========================
+   DETAIL ANNONCE
+========================= */
+
+async function ouvrirDetailAnnonce(
+  id
+){
+
+  const annonce =
+    toutesLesAnnonces.find(
+      a => a.id === id
+    );
+
 
   if(!annonce) return;
 
-  const modal = document.getElementById("detailModal");
-  const content = document.getElementById("detailContent");
 
-  modal.style.display = "block";
+  const modal =
+    document.getElementById(
+      "detailModal"
+    );
 
-  content.innerHTML = "Chargement...";
 
-  const image = await chargerImages(id);
+  const content =
+    document.getElementById(
+      "detailContent"
+    );
+
+
+  modal.style.display =
+    "block";
+
+
+  content.innerHTML =
+    "Chargement...";
+
+
+  const image =
+    await chargerImages(
+      id
+    );
+
 
   content.innerHTML = `
 
     ${
       image
-      ? `<img class="detail-img" src="${escapeHTML(image)}" alt="">`
-      : `<div class="detail-img" style="height:250px;display:flex;align-items:center;justify-content:center;font-size:70px">📦</div>`
+
+      ? `<img
+          class="detail-img"
+          src="${escapeHTML(image)}"
+          alt="">`
+
+      : `<div
+          class="detail-img"
+          style="
+            height:250px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:70px
+          ">
+          📦
+        </div>`
     }
 
-    <h2>${escapeHTML(annonce.title)}</h2>
+
+    <h2>
+      ${escapeHTML(
+        annonce.title
+      )}
+    </h2>
+
 
     <div class="detail-price">
-      ${formatPrix(annonce.price_gnf)}
+
+      ${formatPrix(
+        annonce.price_gnf
+      )}
+
     </div>
 
-    <p>
-      📍 ${escapeHTML(annonce.city || "")}
-      ${annonce.neighborhood ? " — " + escapeHTML(annonce.neighborhood) : ""}
-    </p>
 
     <p>
-      <strong>État :</strong>
-      ${escapeHTML(annonce.condition || "")}
+
+      📍 ${escapeHTML(
+        annonce.city || ""
+      )}
+
+      ${
+        annonce.neighborhood
+          ? " — " +
+            escapeHTML(
+              annonce.neighborhood
+            )
+          : ""
+      }
+
     </p>
 
-    <p>
-      <strong>Vues :</strong>
-      ${Number(annonce.views || 0)}
-    </p>
 
     <p>
-      <strong>Publié le :</strong>
-      ${formatDate(annonce.created_at)}
+
+      <strong>
+        État :
+      </strong>
+
+      ${escapeHTML(
+        annonce.condition || ""
+      )}
+
     </p>
+
+
+    <p>
+
+      <strong>
+        Vues :
+      </strong>
+
+      ${Number(
+        annonce.views || 0
+      )}
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Publié le :
+      </strong>
+
+      ${formatDate(
+        annonce.created_at
+      )}
+
+    </p>
+
 
     <hr>
 
+
     <p>
-      ${escapeHTML(annonce.description || "Aucune description.")}
+
+      ${escapeHTML(
+        annonce.description ||
+        "Aucune description."
+      )}
+
     </p>
 
+
     <div class="form-actions">
+
 
       <button
         class="btn-primary"
         onclick="ouvrirMessageVendeur('${annonce.id}')">
+
         💬 Contacter le vendeur
+
       </button>
+
 
       <button
         class="btn-green"
         onclick="ouvrirPaiement('${annonce.id}')">
+
         🛒 Acheter
+
       </button>
 
+
     </div>
+
   `;
 
-  enregistrerVue(annonce);
+
+  enregistrerVue(
+    annonce
+  );
+
 }
 
 
-async function enregistrerVue(annonce){
+async function enregistrerVue(
+  annonce
+){
 
-  const vues = Number(annonce.views || 0) + 1;
+  const vues =
+    Number(
+      annonce.views || 0
+    ) + 1;
 
-  annonce.views = vues;
+
+  annonce.views =
+    vues;
+
 
   try{
 
     await supabaseFetch(
+
       SUPABASE_URL +
       "/rest/v1/listings?id=eq." +
-      encodeURIComponent(annonce.id),
+      encodeURIComponent(
+        annonce.id
+      ),
+
       {
         method:"PATCH",
+
         headers:{
-          "Prefer":"return=minimal"
+          "Prefer":
+            "return=minimal"
         },
+
         body:JSON.stringify({
           views:vues
         })
+
       }
+
     );
 
   }catch(e){
-    console.log("Vue non enregistrée",e);
+
+    console.log(
+      "Vue non enregistrée",
+      e
+    );
+
   }
+
 }
 
 
@@ -2000,314 +3794,570 @@ async function enregistrerVue(annonce){
    VRAIE MESSAGERIE
 ========================================================= */
 
-async function ouvrirMessageVendeur(listingId){
+async function ouvrirMessageVendeur(
+  listingId
+){
 
   if(!utilisateurConnecte){
 
-    fermerModal("detailModal");
+    fermerModal(
+      "detailModal"
+    );
 
-    alert("Connecte-toi pour contacter le vendeur.");
+
+    alert(
+      "Connecte-toi pour contacter le vendeur."
+    );
+
 
     ouvrirCompte();
 
+
     return;
+
   }
 
+
   const annonce =
-    toutesLesAnnonces.find(a => a.id === listingId);
+    toutesLesAnnonces.find(
+      a => a.id === listingId
+    );
+
 
   if(!annonce) return;
 
-  if(annonce.seller_id === utilisateurConnecte.id){
 
-    alert("Tu ne peux pas contacter ton propre compte depuis cette annonce.");
+  if(
+    annonce.seller_id ===
+    utilisateurConnecte.id
+  ){
+
+    alert(
+      "Tu ne peux pas contacter ton propre compte depuis cette annonce."
+    );
 
     return;
+
   }
+
 
   try{
 
-    /*
-      On cherche d'abord une conversation existante
-      entre cet acheteur, ce vendeur et cette annonce.
-    */
+    const conversations =
+      await supabaseFetch(
 
-    const conversations = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/conversations" +
-      "?listing_id=eq." +
-      encodeURIComponent(listingId) +
-      "&buyer_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&seller_id=eq." +
-      encodeURIComponent(annonce.seller_id) +
-      "&select=*" +
-      "&limit=1"
-    );
+        SUPABASE_URL +
+        "/rest/v1/conversations" +
+        "?listing_id=eq." +
+        encodeURIComponent(
+          listingId
+        ) +
+        "&buyer_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&seller_id=eq." +
+        encodeURIComponent(
+          annonce.seller_id
+        ) +
+        "&select=*" +
+        "&limit=1"
+
+      );
+
 
     let conversation;
 
-    if(conversations && conversations.length){
 
-      conversation = conversations[0];
+    if(
+      conversations &&
+      conversations.length
+    ){
+
+      conversation =
+        conversations[0];
 
     }else{
 
-      /*
-        Aucune conversation :
-        on en crée une.
-      */
+      const created =
+        await supabaseFetch(
 
-      const created = await supabaseFetch(
-        SUPABASE_URL + "/rest/v1/conversations",
-        {
-          method:"POST",
-          headers:{
-            "Prefer":"return=representation"
-          },
-          body:JSON.stringify({
-            listing_id:listingId,
-            buyer_id:utilisateurConnecte.id,
-            seller_id:annonce.seller_id
-          })
-        }
-      );
+          SUPABASE_URL +
+          "/rest/v1/conversations",
 
-      if(!created || !created.length){
-        throw new Error("La conversation n'a pas pu être créée.");
+          {
+            method:"POST",
+
+            headers:{
+              "Prefer":
+                "return=representation"
+            },
+
+            body:JSON.stringify({
+
+              listing_id:
+                listingId,
+
+              buyer_id:
+                utilisateurConnecte.id,
+
+              seller_id:
+                annonce.seller_id
+
+            })
+
+          }
+
+        );
+
+
+      if(
+        !created ||
+        !created.length
+      ){
+
+        throw new Error(
+          "La conversation n'a pas pu être créée."
+        );
+
       }
 
-      conversation = created[0];
+
+      conversation =
+        created[0];
+
     }
 
-    conversationActuelle = conversation;
-    annonceConversationActuelle = annonce;
 
-    fermerModal("detailModal");
+    conversationActuelle =
+      conversation;
 
-    document.getElementById("messagesModal").style.display = "block";
+
+    annonceConversationActuelle =
+      annonce;
+
+
+    fermerModal(
+      "detailModal"
+    );
+
+
+    document.getElementById(
+      "messagesModal"
+    ).style.display =
+      "block";
+
 
     afficherChat();
 
+
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Impossible d'ouvrir la conversation : " +
       error.message
     );
+
   }
+
 }
 
 
 async function afficherChat(){
 
-  document.getElementById("messagesList").classList.add("hidden");
+  document.getElementById(
+    "messagesList"
+  ).classList.add(
+    "hidden"
+  );
 
-  document.getElementById("chatContainer").classList.remove("hidden");
 
-  document.getElementById("chatTitle").textContent =
+  document.getElementById(
+    "chatContainer"
+  ).classList.remove(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "chatTitle"
+  ).textContent =
+
     annonceConversationActuelle
-      ? "💬 " + annonceConversationActuelle.title
+
+      ? "💬 " +
+        annonceConversationActuelle.title
+
       : "💬 Conversation";
+
 
   await chargerMessages();
 
-  document.getElementById("messageInput").focus();
+
+  document.getElementById(
+    "messageInput"
+  ).focus();
+
 
   if(intervalMessages){
-    clearInterval(intervalMessages);
+
+    clearInterval(
+      intervalMessages
+    );
+
   }
 
-  /*
-    Actualisation automatique toutes les 3 secondes
-    pour que les nouveaux messages apparaissent.
-  */
-  intervalMessages = setInterval(
-    chargerMessages,
-    3000
-  );
+
+  intervalMessages =
+    setInterval(
+      chargerMessages,
+      3000
+    );
+
 }
 
 
 async function chargerMessages(){
 
-  if(!conversationActuelle) return;
+  if(!conversationActuelle)
+    return;
+
 
   try{
 
-    const messages = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/messages" +
-      "?conversation_id=eq." +
-      encodeURIComponent(conversationActuelle.id) +
-      "&select=*" +
-      "&order=created_at.asc"
-    );
+    const messages =
+      await supabaseFetch(
 
-    const box = document.getElementById("chatBox");
+        SUPABASE_URL +
+        "/rest/v1/messages" +
+        "?conversation_id=eq." +
+        encodeURIComponent(
+          conversationActuelle.id
+        ) +
+        "&select=*" +
+        "&order=created_at.asc"
 
-    if(!messages || !messages.length){
+      );
+
+
+    const box =
+      document.getElementById(
+        "chatBox"
+      );
+
+
+    if(
+      !messages ||
+      !messages.length
+    ){
 
       box.innerHTML =
-        '<div style="text-align:center;color:#777;padding:30px">Aucun message.<br>Commence la conversation 👋</div>';
+        '<div style="text-align:center;color:#777;padding:30px">' +
+        'Aucun message.<br>' +
+        'Commence la conversation 👋' +
+        '</div>';
 
       return;
+
     }
 
-    box.innerHTML = "";
 
-    for(const msg of messages){
+    box.innerHTML =
+      "";
+
+
+    for(
+      const msg of messages
+    ){
 
       const mine =
-        msg.sender_id === utilisateurConnecte.id;
+        msg.sender_id ===
+        utilisateurConnecte.id;
 
-      const row = document.createElement("div");
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
 
       row.className =
         "message-row" +
-        (mine ? " mine" : "");
+        (
+          mine
+            ? " mine"
+            : ""
+        );
+
 
       const messageDiv =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
-      messageDiv.className = "message";
+
+      messageDiv.className =
+        "message";
+
 
       messageDiv.innerHTML = `
-        <div>${escapeHTML(msg.message || "")}</div>
+
+        <div>
+          ${escapeHTML(
+            msg.message || ""
+          )}
+        </div>
+
 
         ${
           msg.image_url
+
           ? `<div style="margin-top:7px">
+
               <img
-                src="${escapeHTML(construireImageUrl(msg.image_url))}"
-                style="max-width:180px;border-radius:8px"
+                src="${escapeHTML(
+                  construireImageUrl(
+                    msg.image_url
+                  )
+                )}"
+                style="
+                  max-width:180px;
+                  border-radius:8px
+                "
               >
+
             </div>`
+
           : ""
         }
 
+
         <span class="message-time">
-          ${formatHeure(msg.created_at)}
+
+          ${formatHeure(
+            msg.created_at
+          )}
+
           ${
-            mine && msg.read_at
+            mine &&
+            msg.read_at
               ? " · Vu"
               : ""
           }
+
         </span>
+
       `;
 
-      row.appendChild(messageDiv);
 
-      box.appendChild(row);
+      row.appendChild(
+        messageDiv
+      );
+
+
+      box.appendChild(
+        row
+      );
+
     }
 
-    box.scrollTop = box.scrollHeight;
 
-    /*
-      Marquer comme lus les messages reçus.
-    */
+    box.scrollTop =
+      box.scrollHeight;
 
-    const unread = messages.filter(m =>
-      m.sender_id !== utilisateurConnecte.id &&
-      !m.read_at
-    );
 
-    for(const msg of unread){
+    const unread =
+      messages.filter(
+        m =>
+          m.sender_id !==
+          utilisateurConnecte.id &&
+          !m.read_at
+      );
+
+
+    for(
+      const msg of unread
+    ){
 
       try{
 
         await supabaseFetch(
+
           SUPABASE_URL +
           "/rest/v1/messages?id=eq." +
-          encodeURIComponent(msg.id),
+          encodeURIComponent(
+            msg.id
+          ),
+
           {
             method:"PATCH",
+
             headers:{
-              "Prefer":"return=minimal"
+              "Prefer":
+                "return=minimal"
             },
+
             body:JSON.stringify({
-              read_at:new Date().toISOString()
+
+              read_at:
+                new Date()
+                  .toISOString()
+
             })
+
           }
+
         );
 
       }catch(e){
-        console.log("Impossible de marquer comme lu",e);
+
+        console.log(
+          "Impossible de marquer comme lu",
+          e
+        );
+
       }
+
     }
+
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
 
-    document.getElementById("chatBox").innerHTML =
-      '<div class="error">Impossible de charger les messages.</div>';
+
+    document.getElementById(
+      "chatBox"
+    ).innerHTML =
+
+      '<div class="error">' +
+      'Impossible de charger les messages.' +
+      '</div>';
+
   }
+
 }
 
 
 async function envoyerMessage(){
 
-  if(!utilisateurConnecte || !conversationActuelle){
+  if(
+    !utilisateurConnecte ||
+    !conversationActuelle
+  ){
+
     return;
+
   }
 
-  const input =
-    document.getElementById("messageInput");
 
-  const message = input.value.trim();
+  const input =
+    document.getElementById(
+      "messageInput"
+    );
+
+
+  const message =
+    input.value.trim();
+
 
   if(!message) return;
 
-  input.disabled = true;
+
+  input.disabled =
+    true;
+
 
   try{
 
     await supabaseFetch(
-      SUPABASE_URL + "/rest/v1/messages",
+
+      SUPABASE_URL +
+      "/rest/v1/messages",
+
       {
         method:"POST",
+
         headers:{
-          "Prefer":"return=minimal"
+          "Prefer":
+            "return=minimal"
         },
+
         body:JSON.stringify({
-          conversation_id:conversationActuelle.id,
-          sender_id:utilisateurConnecte.id,
-          message:message,
-          image_url:null
+
+          conversation_id:
+            conversationActuelle.id,
+
+          sender_id:
+            utilisateurConnecte.id,
+
+          message:
+            message,
+
+          image_url:
+            null
+
         })
+
       }
+
     );
 
-    input.value = "";
+
+    input.value =
+      "";
+
 
     await chargerMessages();
 
+
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Impossible d'envoyer le message : " +
       error.message
     );
 
+
   }finally{
 
-    input.disabled = false;
+    input.disabled =
+      false;
+
     input.focus();
+
   }
+
 }
 
 
-function gererToucheMessage(event){
+function gererToucheMessage(
+  event
+){
 
-  if(event.key === "Enter"){
+  if(
+    event.key ===
+    "Enter"
+  ){
+
     event.preventDefault();
+
     envoyerMessage();
+
   }
+
 }
 
 
@@ -2319,189 +4369,377 @@ async function ouvrirMessages(){
 
   if(!utilisateurConnecte){
 
-    fermerModal("accountModal");
+    fermerModal(
+      "accountModal"
+    );
 
-    alert("Connecte-toi pour accéder à ta messagerie.");
+
+    alert(
+      "Connecte-toi pour accéder à ta messagerie."
+    );
+
 
     ouvrirCompte();
 
+
     return;
+
   }
 
-  fermerModal("accountModal");
 
-  document.getElementById("messagesModal").style.display = "block";
+  fermerModal(
+    "accountModal"
+  );
 
-  document.getElementById("messagesList").classList.remove("hidden");
-  document.getElementById("chatContainer").classList.add("hidden");
+
+  document.getElementById(
+    "messagesModal"
+  ).style.display =
+    "block";
+
+
+  document.getElementById(
+    "messagesList"
+  ).classList.remove(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "chatContainer"
+  ).classList.add(
+    "hidden"
+  );
+
 
   await chargerListeConversations();
 
+
   if(intervalMessages){
-    clearInterval(intervalMessages);
-    intervalMessages = null;
+
+    clearInterval(
+      intervalMessages
+    );
+
+    intervalMessages =
+      null;
+
   }
+
 }
 
 
 async function chargerListeConversations(){
 
   const container =
-    document.getElementById("messagesList");
+    document.getElementById(
+      "messagesList"
+    );
+
 
   container.innerHTML =
-    '<div class="empty">Chargement des conversations...</div>';
+    '<div class="empty">' +
+    'Chargement des conversations...' +
+    '</div>';
+
 
   try{
 
-    /*
-      On récupère les conversations où l'utilisateur
-      est acheteur OU vendeur.
-    */
+    const buyerRows =
+      await supabaseFetch(
 
-    const buyerRows = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/conversations" +
-      "?buyer_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&select=*" +
-      "&order=created_at.desc"
+        SUPABASE_URL +
+        "/rest/v1/conversations" +
+        "?buyer_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&select=*" +
+        "&order=created_at.desc"
+
+      );
+
+
+    const sellerRows =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/conversations" +
+        "?seller_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&select=*" +
+        "&order=created_at.desc"
+
+      );
+
+
+    const map =
+      new Map();
+
+
+    [
+      ...(buyerRows || []),
+      ...(sellerRows || [])
+    ]
+    .forEach(
+      c =>
+        map.set(
+          c.id,
+          c
+        )
     );
 
-    const sellerRows = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/conversations" +
-      "?seller_id=eq." +
-      encodeURIComponent(utilisateurConnecte.id) +
-      "&select=*" +
-      "&order=created_at.desc"
-    );
-
-    const map = new Map();
-
-    [...(buyerRows || []), ...(sellerRows || [])]
-      .forEach(c => map.set(c.id,c));
 
     const conversations =
-      Array.from(map.values())
-        .sort(
-          (a,b) =>
-            new Date(b.created_at) -
-            new Date(a.created_at)
-        );
+      Array.from(
+        map.values()
+      )
+      .sort(
+        (a,b) =>
+          new Date(
+            b.created_at
+          ) -
+          new Date(
+            a.created_at
+          )
+      );
 
-    if(!conversations.length){
+
+    if(
+      !conversations.length
+    ){
 
       container.innerHTML =
-        '<div class="empty">Tu n’as encore aucune conversation.</div>';
+        '<div class="empty">' +
+        'Tu n’as encore aucune conversation.' +
+        '</div>';
 
       return;
+
     }
 
-    container.innerHTML = "";
 
-    for(const conversation of conversations){
+    container.innerHTML =
+      "";
 
-      let titre = "Annonce";
+
+    for(
+      const conversation of conversations
+    ){
+
+      let titre =
+        "Annonce";
+
 
       try{
 
-        const annonces = await supabaseFetch(
-          SUPABASE_URL +
-          "/rest/v1/listings?id=eq." +
-          encodeURIComponent(conversation.listing_id) +
-          "&select=title,price_gnf"
-        );
+        const annonces =
+          await supabaseFetch(
 
-        if(annonces && annonces.length){
-          titre = annonces[0].title;
+            SUPABASE_URL +
+            "/rest/v1/listings?id=eq." +
+            encodeURIComponent(
+              conversation.listing_id
+            ) +
+            "&select=title,price_gnf"
+
+          );
+
+
+        if(
+          annonces &&
+          annonces.length
+        ){
+
+          titre =
+            annonces[0].title;
+
         }
 
       }catch(e){}
 
-      const item =
-        document.createElement("div");
 
-      item.className = "conversation-item";
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "conversation-item";
+
 
       const role =
-        conversation.buyer_id === utilisateurConnecte.id
+
+        conversation.buyer_id ===
+        utilisateurConnecte.id
+
           ? "Acheteur"
+
           : "Vendeur";
 
+
       item.innerHTML = `
+
         <div class="conversation-title">
-          💬 ${escapeHTML(titre)}
+
+          💬 ${escapeHTML(
+            titre
+          )}
+
         </div>
+
 
         <div class="conversation-date">
-          ${role} · ${formatDate(conversation.created_at)}
+
+          ${role}
+          ·
+          ${formatDate(
+            conversation.created_at
+          )}
+
         </div>
+
       `;
 
-      item.onclick = async () => {
 
-        try{
+      item.onclick =
+        async () => {
 
-          const annonces = await supabaseFetch(
-            SUPABASE_URL +
-            "/rest/v1/listings?id=eq." +
-            encodeURIComponent(conversation.listing_id) +
-            "&select=*"
-          );
+          try{
 
-          annonceConversationActuelle =
-            annonces && annonces.length
-              ? annonces[0]
-              : {
-                  id:conversation.listing_id,
-                  title:titre,
-                  seller_id:conversation.seller_id
-                };
+            const annonces =
+              await supabaseFetch(
 
-        }catch(e){
+                SUPABASE_URL +
+                "/rest/v1/listings?id=eq." +
+                encodeURIComponent(
+                  conversation.listing_id
+                ) +
+                "&select=*"
 
-          annonceConversationActuelle = {
-            id:conversation.listing_id,
-            title:titre,
-            seller_id:conversation.seller_id
-          };
-        }
+              );
 
-        conversationActuelle = conversation;
 
-        afficherChat();
-      };
+            annonceConversationActuelle =
 
-      container.appendChild(item);
+              annonces &&
+              annonces.length
+
+                ? annonces[0]
+
+                : {
+
+                    id:
+                      conversation.listing_id,
+
+                    title:
+                      titre,
+
+                    seller_id:
+                      conversation.seller_id
+
+                  };
+
+
+          }catch(e){
+
+            annonceConversationActuelle = {
+
+              id:
+                conversation.listing_id,
+
+              title:
+                titre,
+
+              seller_id:
+                conversation.seller_id
+
+            };
+
+          }
+
+
+          conversationActuelle =
+            conversation;
+
+
+          afficherChat();
+
+        };
+
+
+      container.appendChild(
+        item
+      );
+
     }
+
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     container.innerHTML =
-      '<div class="error">Impossible de charger les conversations : ' +
-      escapeHTML(error.message) +
+
+      '<div class="error">' +
+
+      'Impossible de charger les conversations : ' +
+
+      escapeHTML(
+        error.message
+      ) +
+
       '</div>';
+
   }
+
 }
 
 
 function retourConversations(){
 
   if(intervalMessages){
-    clearInterval(intervalMessages);
-    intervalMessages = null;
+
+    clearInterval(
+      intervalMessages
+    );
+
+    intervalMessages =
+      null;
+
   }
 
-  conversationActuelle = null;
-  annonceConversationActuelle = null;
 
-  document.getElementById("chatContainer").classList.add("hidden");
-  document.getElementById("messagesList").classList.remove("hidden");
+  conversationActuelle =
+    null;
+
+
+  annonceConversationActuelle =
+    null;
+
+
+  document.getElementById(
+    "chatContainer"
+  ).classList.add(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "messagesList"
+  ).classList.remove(
+    "hidden"
+  );
+
 
   chargerListeConversations();
+
 }
 
 
@@ -2509,115 +4747,243 @@ function retourConversations(){
    ACHAT
 ========================= */
 
-async function ouvrirPaiement(listingId){
+async function ouvrirPaiement(
+  listingId
+){
 
   const annonce =
-    toutesLesAnnonces.find(a => a.id === listingId);
+    toutesLesAnnonces.find(
+      a => a.id === listingId
+    );
+
 
   if(!annonce) return;
 
+
   if(!utilisateurConnecte){
 
-    fermerModal("detailModal");
+    fermerModal(
+      "detailModal"
+    );
 
-    alert("Connecte-toi pour acheter.");
+
+    alert(
+      "Connecte-toi pour acheter."
+    );
+
 
     ouvrirCompte();
 
+
     return;
+
   }
 
-  if(annonce.status !== "active"){
-    alert("Cette annonce n'est plus disponible.");
+
+  if(
+    annonce.status !==
+    "active"
+  ){
+
+    alert(
+      "Cette annonce n'est plus disponible."
+    );
+
     return;
+
   }
 
-  if(annonce.seller_id === utilisateurConnecte.id){
-    alert("Tu ne peux pas acheter ta propre annonce.");
+
+  if(
+    annonce.seller_id ===
+    utilisateurConnecte.id
+  ){
+
+    alert(
+      "Tu ne peux pas acheter ta propre annonce."
+    );
+
     return;
+
   }
 
-  const prix = Number(annonce.price_gnf || 0);
 
-  if(!prix || prix <= 0){
-    alert("Prix de l'annonce invalide.");
+  const prix =
+    Number(
+      annonce.price_gnf || 0
+    );
+
+
+  if(
+    !prix ||
+    prix <= 0
+  ){
+
+    alert(
+      "Prix de l'annonce invalide."
+    );
+
     return;
+
   }
 
-  const commission = Math.round(prix * 0.03);
-  const montantVendeur = prix - commission;
 
-  const confirmation = confirm(
-    "Confirmer la commande ?\n\n" +
-    "Produit : " + annonce.title + "\n" +
-    "Prix : " + prix.toLocaleString("fr-FR") + " GNF\n\n" +
-    "Tu paieras : " +
-    prix.toLocaleString("fr-FR") +
-    " GNF\n\n" +
-    "Commission Marché Guinée : 3 % prélevée au vendeur.\n\n" +
-    "Confirmer la commande ?"
-  );
+  const commission =
+    Math.round(
+      prix * 0.03
+    );
 
-  if(!confirmation) return;
+
+  const montantVendeur =
+    prix -
+    commission;
+
+
+  const confirmation =
+    confirm(
+
+      "Confirmer la commande ?\n\n" +
+
+      "Produit : " +
+      annonce.title +
+      "\n" +
+
+      "Prix : " +
+      prix.toLocaleString(
+        "fr-FR"
+      ) +
+      " GNF\n\n" +
+
+      "Tu paieras : " +
+      prix.toLocaleString(
+        "fr-FR"
+      ) +
+      " GNF\n\n" +
+
+      "Commission Marché Guinée : 3 % prélevée au vendeur.\n\n" +
+
+      "Confirmer la commande ?"
+
+    );
+
+
+  if(!confirmation)
+    return;
+
 
   try{
 
-    const commande = await supabaseFetch(
-      SUPABASE_URL + "/rest/v1/orders",
-      {
-        method:"POST",
-        headers:{
-          "Prefer":"return=representation"
-        },
-        body:JSON.stringify({
+    const commande =
+      await supabaseFetch(
 
-          order_number:
-            "MG-" +
-            Date.now().toString().slice(-8),
+        SUPABASE_URL +
+        "/rest/v1/orders",
 
-          listing_id: annonce.id,
+        {
+          method:"POST",
 
-          buyer_id: utilisateurConnecte.id,
+          headers:{
+            "Prefer":
+              "return=representation"
+          },
 
-          seller_id: annonce.seller_id,
+          body:JSON.stringify({
 
-          product_title: annonce.title,
+            order_number:
 
-          price_gnf: prix,
+              "MG-" +
 
-          status: "payment_pending",
+              Date.now()
+                .toString()
+                .slice(-8),
 
-          commission_gnf: commission,
 
-          seller_amount_gnf: montantVendeur,
+            listing_id:
+              annonce.id,
 
-          delivery_status: "pending"
 
-        })
-      }
-    );
+            buyer_id:
+              utilisateurConnecte.id,
+
+
+            seller_id:
+              annonce.seller_id,
+
+
+            product_title:
+              annonce.title,
+
+
+            price_gnf:
+              prix,
+
+
+            status:
+              "payment_pending",
+
+
+            commission_gnf:
+              commission,
+
+
+            seller_amount_gnf:
+              montantVendeur,
+
+
+            delivery_status:
+              "pending"
+
+          })
+
+        }
+
+      );
+
 
     const nouvelleCommande =
-      Array.isArray(commande)
+
+      Array.isArray(
+        commande
+      )
+
         ? commande[0]
+
         : commande;
 
+
     if(!nouvelleCommande){
+
       throw new Error(
         "La commande n'a pas pu être créée."
       );
+
     }
 
-    fermerModal("detailModal");
+
+    fermerModal(
+      "detailModal"
+    );
+
 
     alert(
+
       "✅ Commande créée !\n\n" +
+
       "Numéro : " +
-      (nouvelleCommande.order_number || "En attente") +
+
+      (
+        nouvelleCommande.order_number ||
+        "En attente"
+      ) +
+
       "\n\n" +
+
       "Le code de livraison sera généré automatiquement.\n\n" +
+
       "Commande en attente de livraison."
+
     );
+
 
   }catch(error){
 
@@ -2626,12 +4992,22 @@ async function ouvrirPaiement(listingId){
       error
     );
 
+
     alert(
+
       "Impossible de créer la commande.\n\n" +
-      (error.message || "Erreur inconnue.")
+
+      (
+        error.message ||
+        "Erreur inconnue."
+      )
+
     );
+
   }
+
 }
+
 
 /* =========================
    DÉMARRAGE
@@ -2643,39 +5019,46 @@ chargerAnnonces();
 
 </script>
 
-  <!-- =========================
+
+<!-- =========================
      VÉRIFICATION LIVRAISON
 ========================= -->
 
-<div id="livraisonModal"
-     style="
-       display:none;
-       position:fixed;
-       inset:0;
-       background:rgba(0,0,0,.55);
-       z-index:9999;
-       align-items:center;
-       justify-content:center;
-       padding:20px;
-     ">
-
-  <div style="
-    background:white;
-    width:100%;
-    max-width:420px;
-    border-radius:18px;
-    padding:24px;
-    box-sizing:border-box;
-    box-shadow:0 10px 40px rgba(0,0,0,.25);
+<div
+  id="livraisonModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
   ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:420px;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    ">
 
     <h2 style="margin-top:0;">
       🚚 Vérifier une livraison
     </h2>
 
+
     <p style="color:#666;">
+
       Entre le numéro de commande et le code de livraison donné par l’acheteur.
+
     </p>
+
 
     <input
       id="verificationOrderNumber"
@@ -2690,6 +5073,7 @@ chargerAnnonces();
         box-sizing:border-box;
       "
     >
+
 
     <input
       id="verificationCode"
@@ -2710,6 +5094,7 @@ chargerAnnonces();
       "
     >
 
+
     <button
       onclick="verifierLivraison()"
       style="
@@ -2722,10 +5107,12 @@ chargerAnnonces();
         font-size:16px;
         font-weight:bold;
         cursor:pointer;
-      "
-    >
+      ">
+
       ✅ Vérifier le code
+
     </button>
+
 
     <button
       onclick="fermerLivraisonModal()"
@@ -2737,103 +5124,180 @@ chargerAnnonces();
         background:#eee;
         border-radius:10px;
         cursor:pointer;
-      "
-    >
+      ">
+
       Annuler
+
     </button>
 
   </div>
+
 </div>
+
 
 <script>
 
 function ouvrirVerificationLivraison(){
 
-  document.getElementById("verificationOrderNumber").value = "";
-  document.getElementById("verificationCode").value = "";
+  document.getElementById(
+    "verificationOrderNumber"
+  ).value = "";
 
-  document.getElementById("livraisonModal").style.display = "flex";
+
+  document.getElementById(
+    "verificationCode"
+  ).value = "";
+
+
+  document.getElementById(
+    "livraisonModal"
+  ).style.display =
+    "flex";
+
 }
+
 
 function fermerLivraisonModal(){
 
-  document.getElementById("livraisonModal").style.display = "none";
+  document.getElementById(
+    "livraisonModal"
+  ).style.display =
+    "none";
+
 }
+
 
 async function verifierLivraison(){
 
   const orderNumber =
-    document.getElementById("verificationOrderNumber")
-      .value
-      .trim();
+    document.getElementById(
+      "verificationOrderNumber"
+    ).value.trim();
+
 
   const code =
-    document.getElementById("verificationCode")
-      .value
-      .trim();
+    document.getElementById(
+      "verificationCode"
+    ).value.trim();
+
 
   if(!orderNumber){
 
-    alert("Entre le numéro de commande.");
+    alert(
+      "Entre le numéro de commande."
+    );
 
     return;
+
   }
+
 
   if(!/^\d{6}$/.test(code)){
 
-    alert("Le code doit contenir exactement 6 chiffres.");
+    alert(
+      "Le code doit contenir exactement 6 chiffres."
+    );
 
     return;
+
   }
+
 
   try{
 
-    const commandes = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/orders?order_number=eq." +
-      encodeURIComponent(orderNumber) +
-      "&select=id,order_number,delivery_code,status,delivery_status"
-    );
+    const commandes =
+      await supabaseFetch(
 
-    if(!Array.isArray(commandes) || !commandes.length){
+        SUPABASE_URL +
+        "/rest/v1/orders?order_number=eq." +
+        encodeURIComponent(
+          orderNumber
+        ) +
+        "&select=id,order_number,delivery_code,status,delivery_status"
 
-      alert("Commande introuvable.");
+      );
 
-      return;
-    }
 
-    const commande = commandes[0];
-
-    const resultat = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/rpc/confirm_delivery",
-      {
-        method:"POST",
-        body:JSON.stringify({
-          p_order_id: commande.id,
-          p_delivery_code: code
-        })
-      }
-    );
-
-    if(!resultat || resultat.success !== true){
+    if(
+      !Array.isArray(
+        commandes
+      ) ||
+      !commandes.length
+    ){
 
       alert(
-        resultat?.message ||
-        "Code de livraison incorrect."
+        "Commande introuvable."
       );
 
       return;
+
     }
+
+
+    const commande =
+      commandes[0];
+
+
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/rpc/confirm_delivery",
+
+        {
+          method:"POST",
+
+          body:JSON.stringify({
+
+            p_order_id:
+              commande.id,
+
+            p_delivery_code:
+              code
+
+          })
+
+        }
+
+      );
+
+
+    if(
+      !resultat ||
+      resultat.success !== true
+    ){
+
+      alert(
+
+        resultat?.message ||
+
+        "Code de livraison incorrect."
+
+      );
+
+      return;
+
+    }
+
 
     fermerLivraisonModal();
 
+
     alert(
+
       "✅ Livraison confirmée !\n\n" +
+
       "La commande " +
+
       commande.order_number +
+
       " est maintenant livrée."
+
     );
+
+
+    chargerAnnonces();
+
 
   }catch(error){
 
@@ -2842,47 +5306,62 @@ async function verifierLivraison(){
       error
     );
 
+
     alert(
+
       "Impossible de vérifier la livraison.\n\n" +
-      (error.message || "Erreur inconnue.")
+
+      (
+        error.message ||
+        "Erreur inconnue."
+      )
+
     );
+
   }
+
 }
 
 </script>
+
+
 <!-- =========================
      SIGNALEMENT / LITIGE
 ========================= -->
 
-<div id="problemeModal"
-     style="
-       display:none;
-       position:fixed;
-       inset:0;
-       background:rgba(0,0,0,.55);
-       z-index:10000;
-       align-items:center;
-       justify-content:center;
-       padding:20px;
-     ">
-
-  <div style="
-    background:white;
-    width:100%;
-    max-width:420px;
-    border-radius:18px;
-    padding:24px;
-    box-sizing:border-box;
-    box-shadow:0 10px 40px rgba(0,0,0,.25);
+<div
+  id="problemeModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:10000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
   ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:420px;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    ">
 
     <h2 style="margin-top:0;">
       ⚠️ Signaler un problème
     </h2>
 
+
     <p style="color:#666;">
       Signale un problème concernant une commande.
     </p>
+
 
     <input
       id="problemeOrderNumber"
@@ -2898,6 +5377,7 @@ async function verifierLivraison(){
       "
     >
 
+
     <select
       id="problemeReason"
       style="
@@ -2907,15 +5387,34 @@ async function verifierLivraison(){
         border:1px solid #ddd;
         border-radius:10px;
         box-sizing:border-box;
-      "
-    >
-      <option value="">Choisir le problème</option>
-      <option value="Produit non reçu">Produit non reçu</option>
-      <option value="Produit différent">Produit différent de l'annonce</option>
-      <option value="Produit endommagé">Produit endommagé</option>
-      <option value="Problème de livraison">Problème de livraison</option>
-      <option value="Autre">Autre problème</option>
+      ">
+
+      <option value="">
+        Choisir le problème
+      </option>
+
+      <option value="Produit non reçu">
+        Produit non reçu
+      </option>
+
+      <option value="Produit différent">
+        Produit différent de l'annonce
+      </option>
+
+      <option value="Produit endommagé">
+        Produit endommagé
+      </option>
+
+      <option value="Problème de livraison">
+        Problème de livraison
+      </option>
+
+      <option value="Autre">
+        Autre problème
+      </option>
+
     </select>
+
 
     <textarea
       id="problemeDescription"
@@ -2932,6 +5431,7 @@ async function verifierLivraison(){
       "
     ></textarea>
 
+
     <button
       onclick="envoyerSignalement()"
       style="
@@ -2944,10 +5444,12 @@ async function verifierLivraison(){
         font-size:16px;
         font-weight:bold;
         cursor:pointer;
-      "
-    >
+      ">
+
       ⚠️ Envoyer le signalement
+
     </button>
+
 
     <button
       onclick="fermerProblemeModal()"
@@ -2959,13 +5461,16 @@ async function verifierLivraison(){
         background:#eee;
         border-radius:10px;
         cursor:pointer;
-      "
-    >
+      ">
+
       Annuler
+
     </button>
 
   </div>
+
 </div>
+
 
 <script>
 
@@ -2973,113 +5478,193 @@ function ouvrirSignalement(){
 
   if(!utilisateurConnecte){
 
-    alert("Connecte-toi pour signaler un problème.");
+    alert(
+      "Connecte-toi pour signaler un problème."
+    );
+
 
     ouvrirCompte();
 
+
     return;
+
   }
 
-  document.getElementById("problemeOrderNumber").value = "";
-  document.getElementById("problemeReason").value = "";
-  document.getElementById("problemeDescription").value = "";
 
-  document.getElementById("problemeModal").style.display = "flex";
+  document.getElementById(
+    "problemeOrderNumber"
+  ).value = "";
+
+
+  document.getElementById(
+    "problemeReason"
+  ).value = "";
+
+
+  document.getElementById(
+    "problemeDescription"
+  ).value = "";
+
+
+  document.getElementById(
+    "problemeModal"
+  ).style.display =
+    "flex";
+
 }
 
 
 function fermerProblemeModal(){
 
-  document.getElementById("problemeModal").style.display = "none";
+  document.getElementById(
+    "problemeModal"
+  ).style.display =
+    "none";
+
 }
+
 
 async function envoyerSignalement(){
 
   if(!utilisateurConnecte){
 
-    alert("Connecte-toi pour signaler un problème.");
+    alert(
+      "Connecte-toi pour signaler un problème."
+    );
 
     return;
+
   }
+
 
   if(!utilisateurConnecte.id){
 
     alert(
+
       "Impossible d'identifier ton compte.\n\n" +
+
       "Déconnecte-toi puis reconnecte-toi."
+
     );
 
     return;
+
   }
 
+
   const orderNumber =
-    document.getElementById("problemeOrderNumber")
-      .value
-      .trim();
+    document.getElementById(
+      "problemeOrderNumber"
+    ).value.trim();
+
 
   const reason =
-    document.getElementById("problemeReason")
-      .value;
+    document.getElementById(
+      "problemeReason"
+    ).value;
+
 
   const description =
-    document.getElementById("problemeDescription")
-      .value
-      .trim();
+    document.getElementById(
+      "problemeDescription"
+    ).value.trim();
+
 
   if(!orderNumber){
 
-    alert("Entre le numéro de commande.");
+    alert(
+      "Entre le numéro de commande."
+    );
 
     return;
+
   }
+
 
   if(!reason){
 
-    alert("Choisis le problème.");
+    alert(
+      "Choisis le problème."
+    );
 
     return;
+
   }
+
 
   if(!description){
 
-    alert("Explique brièvement le problème.");
+    alert(
+      "Explique brièvement le problème."
+    );
 
     return;
+
   }
+
 
   try{
 
-    const commandes = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/orders?order_number=eq." +
-      encodeURIComponent(orderNumber) +
-      "&select=id,buyer_id,seller_id,order_number"
-    );
+    const commandes =
+      await supabaseFetch(
 
-    if(!Array.isArray(commandes) || !commandes.length){
+        SUPABASE_URL +
+        "/rest/v1/orders?order_number=eq." +
+        encodeURIComponent(
+          orderNumber
+        ) +
+        "&select=id,buyer_id,seller_id,order_number"
 
-      alert("Commande introuvable.");
+      );
 
-      return;
-    }
-
-    const commande = commandes[0];
 
     if(
-      commande.buyer_id !== utilisateurConnecte.id &&
-      commande.seller_id !== utilisateurConnecte.id
+      !Array.isArray(
+        commandes
+      ) ||
+      !commandes.length
     ){
 
       alert(
-        "Tu ne peux signaler qu'une commande à laquelle tu participes."
+        "Commande introuvable."
       );
 
       return;
+
     }
+
+
+    const commande =
+      commandes[0];
+
+
+    if(
+
+      commande.buyer_id !==
+      utilisateurConnecte.id
+
+      &&
+
+      commande.seller_id !==
+      utilisateurConnecte.id
+
+    ){
+
+      alert(
+
+        "Tu ne peux signaler qu'une commande à laquelle tu participes."
+
+      );
+
+      return;
+
+    }
+
 
     const signalement = {
 
-      order_id: commande.id,
+      order_id:
+        commande.id,
 
       reporter_id:
         utilisateurConnecte.id,
@@ -3087,92 +5672,134 @@ async function envoyerSignalement(){
       opened_by:
         utilisateurConnecte.id,
 
-      reason: reason,
+      reason:
+        reason,
 
-      description: description,
+      description:
+        description,
 
-      status: "open"
+      status:
+        "open"
 
     };
 
+
     console.log(
+
       "Signalement envoyé à Supabase :",
+
       signalement
+
     );
 
+
     await supabaseFetch(
+
       SUPABASE_URL +
       "/rest/v1/disputes",
+
       {
         method:"POST",
 
         headers:{
-          "Prefer":"return=representation"
+          "Prefer":
+            "return=representation"
         },
 
-        body:JSON.stringify(signalement)
+        body:
+          JSON.stringify(
+            signalement
+          )
+
       }
+
     );
+
 
     fermerProblemeModal();
 
+
     alert(
+
       "✅ Signalement envoyé !\n\n" +
+
       "Notre équipe pourra examiner le problème concernant la commande " +
+
       commande.order_number +
+
       "."
+
     );
+
 
   }catch(error){
 
     console.error(
+
       "Erreur signalement :",
       error
+
     );
+
 
     alert(
+
       "Impossible d'envoyer le signalement.\n\n" +
-      (error.message || "Erreur inconnue.")
+
+      (
+        error.message ||
+        "Erreur inconnue."
+      )
+
     );
+
   }
+
 }
 
-
 </script>
+
+
 <!-- =========================
      MES VENTES
 ========================= -->
 
-<div id="mesVentesModal"
-     style="
-       display:none;
-       position:fixed;
-       inset:0;
-       background:rgba(0,0,0,.55);
-       z-index:10001;
-       align-items:center;
-       justify-content:center;
-       padding:20px;
-     ">
-
-  <div style="
-    background:white;
-    width:100%;
-    max-width:450px;
-    max-height:85vh;
-    overflow-y:auto;
-    border-radius:18px;
-    padding:24px;
-    box-sizing:border-box;
+<div
+  id="mesVentesModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:10001;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
   ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:450px;
+      max-height:85vh;
+      overflow-y:auto;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+    ">
 
     <h2 style="margin-top:0;">
       📦 Mes ventes
     </h2>
 
+
     <div id="listeMesVentes">
+
       Chargement...
+
     </div>
+
 
     <button
       onclick="fermerMesVentes()"
@@ -3184,13 +5811,16 @@ async function envoyerSignalement(){
         background:#eee;
         border-radius:10px;
         cursor:pointer;
-      "
-    >
+      ">
+
       Fermer
+
     </button>
 
   </div>
+
 </div>
-  
+
+
 </body>
 </html>
