@@ -1325,7 +1325,9 @@ async function afficherAnnonces(){
   });
 
   document.getElementById("nombreAnnonces").textContent =
-    annonces.length + " annonce" + (annonces.length > 1 ? "s" : "");
+    annonces.length +
+    " annonce" +
+    (annonces.length > 1 ? "s" : "");
 
   if(!annonces.length){
 
@@ -1335,25 +1337,36 @@ async function afficherAnnonces(){
     return;
   }
 
+  /*
+   * IMPORTANT :
+   * On affiche d'abord les annonces.
+   * Les images seront ajoutées ensuite.
+   */
+
   container.innerHTML = "";
 
   for(const annonce of annonces){
 
-    const image = await chargerImages(annonce.id);
-
     const card = document.createElement("div");
+
     card.className = "card";
 
     card.innerHTML = `
-      ${
-        image
-        ? `<img class="card-img" src="${escapeHTML(image)}" alt="">`
-        : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;font-size:50px">📦</div>`
-      }
+
+      <div class="card-img"
+           style="
+             display:flex;
+             align-items:center;
+             justify-content:center;
+             font-size:50px;
+           ">
+        📦
+      </div>
 
       <div class="card-body">
+
         <div class="card-title">
-          ${escapeHTML(annonce.title)}
+          ${escapeHTML(annonce.title || "")}
         </div>
 
         <div class="price">
@@ -1362,18 +1375,62 @@ async function afficherAnnonces(){
 
         <div class="meta">
           📍 ${escapeHTML(annonce.city || "")}
-          ${annonce.neighborhood ? " · " + escapeHTML(annonce.neighborhood) : ""}
+          ${
+            annonce.neighborhood
+              ? " · " + escapeHTML(annonce.neighborhood)
+              : ""
+          }
         </div>
 
         <div class="condition">
           ${escapeHTML(annonce.condition || "")}
         </div>
+
       </div>
     `;
 
-    card.onclick = () => ouvrirDetailAnnonce(annonce.id);
+    card.onclick = () =>
+      ouvrirDetailAnnonce(annonce.id);
 
     container.appendChild(card);
+
+    /*
+     * L'image est chargée APRÈS l'affichage
+     * de la carte.
+     */
+
+    chargerImages(annonce.id)
+      .then(image => {
+
+        if(!image) return;
+
+        const img = document.createElement("img");
+
+        img.className = "card-img";
+
+        img.src = image;
+
+        img.alt = "";
+
+        const ancienneImage =
+          card.querySelector(".card-img");
+
+        if(ancienneImage){
+
+          ancienneImage.replaceWith(img);
+
+        }
+
+      })
+      .catch(error => {
+
+        console.warn(
+          "Image ignorée :",
+          error
+        );
+
+      });
+
   }
 }
 
