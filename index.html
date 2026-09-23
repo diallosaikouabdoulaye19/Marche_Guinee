@@ -409,6 +409,45 @@ footer{
       <p><strong id="connectedName"></strong></p>
       <p id="connectedPhone"></p>
 
+<!-- SOLDE VENDEUR -->
+
+<div id="soldeVendeurBox"
+     style="
+       margin:15px 0;
+       padding:18px;
+       background:#f0fdf4;
+       border:1px solid #bbf7d0;
+       border-radius:15px;
+     ">
+
+  <div style="
+    font-size:14px;
+    color:#666;
+    margin-bottom:6px;
+  ">
+    💰 Mon solde vendeur
+  </div>
+
+  <div id="soldeVendeur"
+       style="
+         font-size:26px;
+         font-weight:bold;
+         color:#16a34a;
+       ">
+    0 GNF
+  </div>
+
+  <div id="detailsSoldeVendeur"
+       style="
+         margin-top:8px;
+         font-size:13px;
+         color:#666;
+       ">
+    Chargement...
+  </div>
+
+</div>
+      
           <div class="form-actions">
   <button class="btn-primary" onclick="ouvrirSignalement()">
     ⚠️ Signaler un problème
@@ -687,6 +726,9 @@ function ouvrirCompte(){
 
     document.getElementById("connectedPhone").textContent =
       utilisateurConnecte.phone || "";
+
+        chargerSoldeVendeur();
+  
   }else{
     document.getElementById("accountForms").classList.remove("hidden");
     document.getElementById("accountConnected").classList.add("hidden");
@@ -1225,7 +1267,90 @@ async function chargerImages(listingId){
   return "";
 }
 
-async function chargerAnnonces(){
+async function chargerSoldeVendeur(){
+
+  const soldeElement =
+    document.getElementById("soldeVendeur");
+
+  const detailsElement =
+    document.getElementById("detailsSoldeVendeur");
+
+  if(!soldeElement || !detailsElement) return;
+
+  if(!utilisateurConnecte){
+
+    soldeElement.textContent = "0 GNF";
+
+    detailsElement.textContent =
+      "Connecte-toi pour voir ton solde.";
+
+    return;
+  }
+
+  try{
+
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&status=eq.completed" +
+      "&delivery_status=eq.delivered" +
+      "&select=price_gnf,commission_gnf,seller_amount_gnf"
+    );
+
+    const ventes =
+      Array.isArray(commandes)
+        ? commandes
+        : [];
+
+    let totalVentes = 0;
+    let totalCommission = 0;
+    let solde = 0;
+
+    ventes.forEach(commande => {
+
+      totalVentes +=
+        Number(commande.price_gnf || 0);
+
+      totalCommission +=
+        Number(commande.commission_gnf || 0);
+
+      solde +=
+        Number(commande.seller_amount_gnf || 0);
+
+    });
+
+    soldeElement.textContent =
+      solde.toLocaleString("fr-FR") +
+      " GNF";
+
+    detailsElement.textContent =
+      ventes.length +
+      " vente" +
+      (ventes.length > 1 ? "s" : "") +
+      " • " +
+      totalVentes.toLocaleString("fr-FR") +
+      " GNF de ventes • Commission : " +
+      totalCommission.toLocaleString("fr-FR") +
+      " GNF";
+
+  }catch(error){
+
+    console.error(
+      "Erreur chargement solde vendeur :",
+      error
+    );
+
+    soldeElement.textContent =
+      "Erreur";
+
+    detailsElement.textContent =
+      "Impossible de charger le solde.";
+  }
+}
+  
+  async function chargerAnnonces(){
 
   const container = document.getElementById("annonces");
 
