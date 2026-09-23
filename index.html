@@ -409,12 +409,23 @@ footer{
       <p><strong id="connectedName"></strong></p>
       <p id="connectedPhone"></p>
 
-      <div class="form-actions">
-        <button class="btn-primary" onclick="ouvrirMessages()">💬 Mes messages</button>
-        <button class="btn-green" onclick="fermerModal('accountModal');ouvrirVente()">+ Publier une annonce</button>
-        <button class="btn-danger" onclick="deconnecter()">Se déconnecter</button>
-      </div>
-    </div>
+          <div class="form-actions">
+  <button class="btn-primary" onclick="ouvrirSignalement()">
+    ⚠️ Signaler un problème
+  </button>
+
+  <button class="btn-primary" onclick="ouvrirMessages()">
+    💬 Mes messages
+  </button>
+
+  <button class="btn-green" onclick="fermerModal('accountModal');ouvrirVente()">
+    + Publier une annonce
+  </button>
+
+  <button class="btn-danger" onclick="deconnecter()">
+    Se déconnecter
+  </button>
+</div>
 
   </div>
 </div>
