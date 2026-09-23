@@ -2656,18 +2656,21 @@ async function envoyerSignalement(){
         },
         body:JSON.stringify({
 
-          order_id: commande.id,
+  order_id: commande.id,
 
-          reporter_id:
-            utilisateurConnecte.id,
+  reporter_id:
+    utilisateurConnecte.id,
 
-          reason: reason,
+  opened_by:
+    utilisateurConnecte.id,
 
-          description: description,
+  reason: reason,
 
-          status: "open"
+  description: description,
 
-        })
+  status: "open"
+
+})
       }
     );
 
