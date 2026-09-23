@@ -2209,5 +2209,212 @@ chargerAnnonces();
 
 </script>
 
+  <!-- =========================
+     VÉRIFICATION LIVRAISON
+========================= -->
+
+<div id="livraisonModal"
+     style="
+       display:none;
+       position:fixed;
+       inset:0;
+       background:rgba(0,0,0,.55);
+       z-index:9999;
+       align-items:center;
+       justify-content:center;
+       padding:20px;
+     ">
+
+  <div style="
+    background:white;
+    width:100%;
+    max-width:420px;
+    border-radius:18px;
+    padding:24px;
+    box-sizing:border-box;
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+  ">
+
+    <h2 style="margin-top:0;">
+      🚚 Vérifier une livraison
+    </h2>
+
+    <p style="color:#666;">
+      Entre le numéro de commande et le code de livraison donné par l’acheteur.
+    </p>
+
+    <input
+      id="verificationOrderNumber"
+      type="text"
+      placeholder="Numéro de commande (ex : MG-73302702)"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:12px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+      "
+    >
+
+    <input
+      id="verificationCode"
+      type="text"
+      inputmode="numeric"
+      maxlength="6"
+      placeholder="Code de livraison à 6 chiffres"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:15px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+        font-size:20px;
+        text-align:center;
+        letter-spacing:5px;
+      "
+    >
+
+    <button
+      onclick="verifierLivraison()"
+      style="
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:10px;
+        background:#16a34a;
+        color:white;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+      "
+    >
+      ✅ Vérifier le code
+    </button>
+
+    <button
+      onclick="fermerLivraisonModal()"
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:10px;
+        border:none;
+        background:#eee;
+        border-radius:10px;
+        cursor:pointer;
+      "
+    >
+      Annuler
+    </button>
+
+  </div>
+</div>
+
+<script>
+
+function ouvrirVerificationLivraison(){
+
+  document.getElementById("verificationOrderNumber").value = "";
+  document.getElementById("verificationCode").value = "";
+
+  document.getElementById("livraisonModal").style.display = "flex";
+}
+
+function fermerLivraisonModal(){
+
+  document.getElementById("livraisonModal").style.display = "none";
+}
+
+async function verifierLivraison(){
+
+  const orderNumber =
+    document.getElementById("verificationOrderNumber")
+      .value
+      .trim();
+
+  const code =
+    document.getElementById("verificationCode")
+      .value
+      .trim();
+
+  if(!orderNumber){
+
+    alert("Entre le numéro de commande.");
+
+    return;
+  }
+
+  if(!/^\d{6}$/.test(code)){
+
+    alert("Le code doit contenir exactement 6 chiffres.");
+
+    return;
+  }
+
+  try{
+
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders?order_number=eq." +
+      encodeURIComponent(orderNumber) +
+      "&select=id,order_number,delivery_code,status,delivery_status"
+    );
+
+    if(!Array.isArray(commandes) || !commandes.length){
+
+      alert("Commande introuvable.");
+
+      return;
+    }
+
+    const commande = commandes[0];
+
+    const resultat = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/rpc/confirm_delivery",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          p_order_id: commande.id,
+          p_delivery_code: code
+        })
+      }
+    );
+
+    if(!resultat || resultat.success !== true){
+
+      alert(
+        resultat?.message ||
+        "Code de livraison incorrect."
+      );
+
+      return;
+    }
+
+    fermerLivraisonModal();
+
+    alert(
+      "✅ Livraison confirmée !\n\n" +
+      "La commande " +
+      commande.order_number +
+      " est maintenant livrée."
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur vérification livraison :",
+      error
+    );
+
+    alert(
+      "Impossible de vérifier la livraison.\n\n" +
+      (error.message || "Erreur inconnue.")
+    );
+  }
+}
+
+</script>
 </body>
 </html>
