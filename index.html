@@ -1964,12 +1964,11 @@ function ouvrirPaiement(listingId){
     return;
   }
 
-  const commission =
-    Number(annonce.price_gnf || 0) * 0.03;
+  const prix = Number(annonce.price_gnf || 0);
 
-  const total =
-    Number(annonce.price_gnf || 0) +
-    commission;
+  const commission = prix * 0.03;
+  
+  const total = prix;
 
   document.getElementById("paymentContent").innerHTML = `
 
