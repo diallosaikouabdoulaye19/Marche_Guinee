@@ -2129,7 +2129,7 @@ async function ouvrirPaiement(listingId){
   try{
 
     const commande = await supabaseFetch(
-      "/rest/v1/orders",
+      SUPABASE_URL + "/rest/v1/orders",
       {
         method:"POST",
         headers:{
