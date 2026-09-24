@@ -3556,15 +3556,16 @@ function ouvrirPaiement(listingId){
       a => a.id === listingId
     );
 
+  if(!annonce){
+    alert("Annonce introuvable.");
+    return;
+  }
 
-  if(!annonce) return;
 
-
+  // Vérifier que l'utilisateur est connecté
   if(!utilisateurConnecte){
 
-    fermerModal(
-      "detailModal"
-    );
+    fermerModal("detailModal");
 
     alert(
       "Connecte-toi pour acheter."
@@ -3573,10 +3574,21 @@ function ouvrirPaiement(listingId){
     ouvrirCompte();
 
     return;
-
   }
 
 
+  // Calcul de la commission de 3 %
+  const prix =
+    Number(annonce.price_gnf) || 0;
+
+  const commission =
+    Math.round(prix * 0.03);
+
+  const montantVendeur =
+    prix - commission;
+
+
+  // Afficher la fenêtre d'achat
   document.getElementById(
     "paymentContent"
   ).innerHTML = `
@@ -3590,36 +3602,176 @@ function ouvrirPaiement(listingId){
     <p>
       Prix :
       <strong>
-        ${formatPrix(
-          annonce.price_gnf
-        )}
+        ${formatPrix(prix)}
       </strong>
     </p>
 
     <p>
-      L'achat sera finalisé après connexion au système de paiement de Marché Guinée.
+      Commission Marché Guinée :
+      <strong>
+        ${formatPrix(commission)}
+      </strong>
+      (3 %)
+    </p>
+
+    <p>
+      Montant vendeur après commission :
+      <strong>
+        ${formatPrix(montantVendeur)}
+      </strong>
+    </p>
+
+    <p>
+      L'achat sera finalisé après
+      connexion au système de paiement
+      de Marché Guinée.
     </p>
 
     <button
       class="btn-green"
-      onclick="fermerModal('paymentModal')">
+      onclick="continuerPaiement('${annonce.id}')">
+
       Continuer
+
     </button>
 
   `;
 
 
+  // Fermer la fenêtre de l'annonce
   fermerModal(
     "detailModal"
   );
 
 
+  // Ouvrir la fenêtre de paiement
   document.getElementById(
     "paymentModal"
   ).style.display = "block";
 
 }
 
+
+// =========================
+// BOUTON « CONTINUER »
+// =========================
+
+async function continuerPaiement(listingId){
+
+  const annonce =
+    toutesLesAnnonces.find(
+      a => a.id === listingId
+    );
+
+  if(!annonce){
+
+    alert(
+      "Annonce introuvable."
+    );
+
+    return;
+  }
+
+
+  if(!utilisateurConnecte){
+
+    fermerModal(
+      "paymentModal"
+    );
+
+    alert(
+      "Connecte-toi pour continuer."
+    );
+
+    ouvrirCompte();
+
+    return;
+  }
+
+
+  const prix =
+    Number(annonce.price_gnf) || 0;
+
+  const commission =
+    Math.round(prix * 0.03);
+
+  const montantVendeur =
+    prix - commission;
+
+
+  // Pour l'instant, on affiche l'étape
+  // suivante sans fermer brutalement
+  // la fenêtre de paiement.
+
+  document.getElementById(
+    "paymentContent"
+  ).innerHTML = `
+
+    <h3>
+      Confirmation de l'achat
+    </h3>
+
+    <p>
+      Article :
+      <strong>
+        ${escapeHTML(
+          annonce.title
+        )}
+      </strong>
+    </p>
+
+    <p>
+      Prix :
+      <strong>
+        ${formatPrix(prix)}
+      </strong>
+    </p>
+
+    <p>
+      Commission :
+      <strong>
+        ${formatPrix(commission)}
+      </strong>
+      (3 %)
+    </p>
+
+    <p>
+      Montant vendeur :
+      <strong>
+        ${formatPrix(montantVendeur)}
+      </strong>
+    </p>
+
+    <div class="success">
+
+      <strong>
+        Étape suivante
+      </strong>
+
+      <br><br>
+
+      La commande sera créée avec
+      son numéro et son code unique
+      de livraison.
+
+    </div>
+
+    <p>
+      Le système de paiement de
+      Marché Guinée sera connecté
+      ensuite.
+    </p>
+
+    <button
+      class="btn-green"
+      onclick="fermerModal('paymentModal')">
+
+      Fermer
+
+    </button>
+
+  `;
+}
 
 /* =========================
    MESSAGERIE
