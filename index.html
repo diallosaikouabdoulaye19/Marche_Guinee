@@ -3953,17 +3953,18 @@ async function continuerPaiement(listingId){
 
     `;
 
-  }catch(erreur){
+   }catch(erreur){
 
-    console.error(
-      "Erreur commande :",
-      erreur
-    );
+  console.error(
+    "Erreur commande :",
+    erreur
+  );
 
-    alert(
-      "Une erreur est survenue lors de la création de la commande."
-    );
-  }
+  alert(
+    "ERREUR : " +
+    (erreur?.message || JSON.stringify(erreur))
+  );
+
 }
 
 /* =========================
