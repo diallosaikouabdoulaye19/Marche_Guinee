@@ -3655,7 +3655,6 @@ function ouvrirPaiement(listingId){
 // =========================
 // BOUTON « CONTINUER »
 // =========================
-
 async function continuerPaiement(listingId){
 
   const annonce =
@@ -3664,113 +3663,306 @@ async function continuerPaiement(listingId){
     );
 
   if(!annonce){
-
-    alert(
-      "Annonce introuvable."
-    );
-
+    alert("Annonce introuvable.");
     return;
   }
-
 
   if(!utilisateurConnecte){
-
-    fermerModal(
-      "paymentModal"
-    );
-
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
+    fermerModal("paymentModal");
+    alert("Connecte-toi pour continuer.");
     ouvrirCompte();
-
     return;
   }
 
+  try{
 
-  const prix =
-    Number(annonce.price_gnf) || 0;
+    /* =========================
+       RÉCUPÉRER L'UTILISATEUR
+    ========================= */
 
-  const commission =
-    Math.round(prix * 0.03);
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
 
-  const montantVendeur =
-    prix - commission;
+    if(userError || !user){
+      alert("Impossible de récupérer ton compte.");
+      return;
+    }
 
+    /* =========================
+       EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
+    ========================= */
 
-  // Pour l'instant, on affiche l'étape
-  // suivante sans fermer brutalement
-  // la fenêtre de paiement.
+    if(
+      annonce.seller_id &&
+      annonce.seller_id === user.id
+    ){
+      alert("Tu ne peux pas acheter ta propre annonce.");
+      return;
+    }
 
-  document.getElementById(
-    "paymentContent"
-  ).innerHTML = `
+    /* =========================
+       CALCUL DES MONTANTS
+    ========================= */
 
-    <h3>
-      Confirmation de l'achat
-    </h3>
+    const prix =
+      Number(annonce.price_gnf) || 0;
 
-    <p>
-      Article :
-      <strong>
-        ${escapeHTML(
-          annonce.title
-        )}
-      </strong>
-    </p>
+    if(prix <= 0){
+      alert("Le prix de cette annonce est invalide.");
+      return;
+    }
 
-    <p>
-      Prix :
-      <strong>
-        ${formatPrix(prix)}
-      </strong>
-    </p>
+    const commission =
+      Math.round(prix * 0.03);
 
-    <p>
-      Commission :
-      <strong>
-        ${formatPrix(commission)}
-      </strong>
-      (3 %)
-    </p>
+    const montantVendeur =
+      prix - commission;
 
-    <p>
-      Montant vendeur :
-      <strong>
-        ${formatPrix(montantVendeur)}
-      </strong>
-    </p>
+    /* =========================
+       NUMÉRO DE COMMANDE
+       MG 000001, MG 000002...
+    ========================= */
 
-    <div class="success">
+    const dernieresCommandes =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?select=order_number&order=created_at.desc&limit=1`,
+        {
+          headers:{
+            "apikey": SUPABASE_KEY,
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
 
-      <strong>
-        Étape suivante
-      </strong>
+    let prochainNumero = 1;
 
-      <br><br>
+    if(dernieresCommandes.ok){
 
-      La commande sera créée avec
-      son numéro et son code unique
-      de livraison.
+      const commandes =
+        await dernieresCommandes.json();
 
-    </div>
+      if(
+        commandes.length > 0 &&
+        commandes[0].order_number
+      ){
 
-    <p>
-      Le système de paiement de
-      Marché Guinée sera connecté
-      ensuite.
-    </p>
+        const numero =
+          parseInt(
+            String(
+              commandes[0].order_number
+            ).replace(/\D/g,""),
+            10
+          );
 
-    <button
-      class="btn-green"
-      onclick="fermerModal('paymentModal')">
+        if(!isNaN(numero)){
+          prochainNumero = numero + 1;
+        }
+      }
+    }
 
-      Fermer
+    const orderNumber =
+      "MG " +
+      String(prochainNumero).padStart(6,"0");
 
-    </button>
+    /* =========================
+       CODE UNIQUE DE LIVRAISON
+       ========================= */
 
-  `;
+    const deliveryCode =
+      String(
+        Math.floor(
+          100000 +
+          Math.random() * 900000
+        )
+      );
+
+    /* =========================
+       CRÉER LA COMMANDE
+       ========================= */
+
+    const commande = {
+
+      order_number:
+        orderNumber,
+
+      buyer_id:
+        user.id,
+
+      seller_id:
+        annonce.seller_id,
+
+      listing_id:
+        annonce.id,
+
+      price_gnf:
+        prix,
+
+      commission_gnf:
+        commission,
+
+      seller_amount_gnf:
+        montantVendeur,
+
+      delivery_code:
+        deliveryCode,
+
+      status:
+        "pending",
+
+      product_title:
+        annonce.title,
+
+      problem_reported:
+        false,
+
+      delivery_status:
+        "pending"
+    };
+
+    const reponse =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/orders`,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`,
+
+            "Prefer":
+              "return=representation"
+          },
+
+          body:
+            JSON.stringify(commande)
+        }
+      );
+
+    const resultat =
+      await reponse.json();
+
+    if(!reponse.ok){
+
+      console.error(
+        "Erreur création commande :",
+        resultat
+      );
+
+      alert(
+        "Impossible de créer la commande : " +
+        (
+          resultat.message ||
+          resultat.error_description ||
+          resultat.hint ||
+          "erreur Supabase"
+        )
+      );
+
+      return;
+    }
+
+    /* =========================
+       AFFICHER LA COMMANDE
+    ========================= */
+
+    document.getElementById(
+      "paymentContent"
+    ).innerHTML = `
+
+      <h3>
+        Commande créée ✅
+      </h3>
+
+      <p>
+        Article :
+        <strong>
+          ${escapeHTML(annonce.title)}
+        </strong>
+      </p>
+
+      <p>
+        Numéro de commande :
+        <strong>
+          ${escapeHTML(orderNumber)}
+        </strong>
+      </p>
+
+      <p>
+        Prix :
+        <strong>
+          ${formatPrix(prix)}
+        </strong>
+      </p>
+
+      <p>
+        Commission Marché Guinée :
+        <strong>
+          ${formatPrix(commission)}
+        </strong>
+        (3 %)
+      </p>
+
+      <p>
+        Montant vendeur :
+        <strong>
+          ${formatPrix(montantVendeur)}
+        </strong>
+      </p>
+
+      <div class="success">
+
+        <strong>
+          Code de livraison
+        </strong>
+
+        <br><br>
+
+        <span style="
+          font-size:28px;
+          font-weight:bold;
+          letter-spacing:5px;
+        ">
+          ${deliveryCode}
+        </span>
+
+        <br><br>
+
+        Ce code devra être comparé lors de la remise du colis.
+
+      </div>
+
+      <p>
+        La commande est maintenant enregistrée dans Marché Guinée.
+      </p>
+
+      <button
+        class="btn-green"
+        onclick="fermerModal('paymentModal')">
+        Fermer
+      </button>
+
+    `;
+
+  }catch(erreur){
+
+    console.error(
+      "Erreur commande :",
+      erreur
+    );
+
+    alert(
+      "Une erreur est survenue lors de la création de la commande."
+    );
+  }
 }
 
 /* =========================
