@@ -3683,7 +3683,8 @@ async function continuerPaiement(listingId){
     const {
       data: { user },
       error: userError
-    } = await supabase.auth.getUser();
+
+    } = await supabaseClient.auth.getUser();
 
     if(userError || !user){
       alert("Impossible de récupérer ton compte.");
