@@ -6000,9 +6000,16 @@ async function ouvrirTableauAdmin(){
 
   }
 
-  modal.style.display = "block";
+    modal.style.display = "block";
 
   chargerTableauAdmin();
+
+  setTimeout(
+    chargerUtilisateursAdmin,
+    500
+  );
+
+}
 
 }
 
