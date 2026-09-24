@@ -3103,19 +3103,21 @@ async function chargerAnnonces(){
 
     await afficherAnnonces();
 
+}catch(error){
 
-  }catch(error){
+  alert("ERREUR : " + error.message);
 
-    container.innerHTML =
-      '<div class="error">' +
-      'Impossible de charger les annonces.' +
-      '<br>' +
-      '<small>' +
-      escapeHTML(
-        error.message
-      ) +
-      '</small>' +
-      '</div>';
+  container.innerHTML =
+    '<div class="error">' +
+    'Impossible de charger les annonces.' +
+    '<br>' +
+    '<small>' +
+    escapeHTML(
+      error.message
+    ) +
+    '</small>' +
+    '</div>';
+  
 
   }
 
