@@ -6852,17 +6852,14 @@ setTimeout(
     );
 
     container.innerHTML =
-      "Impossible de charger les annonces.<br><br>" +
-      escapeHTML(
-        error.message ||
-        "Erreur inconnue."
-      );
-
-  }
+  "Impossible de charger les annonces.<br><br>" +
+  escapeHTML(
+    error.message ||
+    "Erreur inconnue."
+  );
 
 }
 
-);
 async function chargerUtilisateursAdmin(){
 
   const container =
