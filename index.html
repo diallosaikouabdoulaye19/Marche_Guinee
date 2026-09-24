@@ -276,8 +276,6 @@ main{
   margin-bottom:10px;
 }
 
-/* MESSAGERIE */
-
 .chat-box{
   height:430px;
   overflow-y:auto;
@@ -413,7 +411,6 @@ footer{
 
 </header>
 
-
 <main>
 
   <section class="hero">
@@ -433,7 +430,6 @@ footer{
     </button>
 
   </section>
-
 
   <div class="categories">
 
@@ -481,7 +477,6 @@ footer{
 
   </div>
 
-
   <div class="section-title">
 
     <h2>
@@ -491,7 +486,6 @@ footer{
     <span id="nombreAnnonces"></span>
 
   </div>
-
 
   <div
     id="annonces"
@@ -505,7 +499,6 @@ footer{
 
 </main>
 
-
 <footer>
   Marché Guinée 🇬🇳 — Acheter, vendre et échanger simplement.
 </footer>
@@ -515,9 +508,7 @@ footer{
      COMPTE
 ========================= -->
 
-<div
-  id="accountModal"
-  class="modal">
+<div id="accountModal" class="modal">
 
   <div class="modal-box">
 
@@ -532,7 +523,6 @@ footer{
     </h2>
 
     <div id="accountMessage"></div>
-
 
     <div id="accountForms">
 
@@ -554,14 +544,11 @@ footer{
 
       </div>
 
-
       <div id="signupForm">
 
         <div class="form-group">
 
-          <label>
-            Nom complet
-          </label>
+          <label>Nom complet</label>
 
           <input
             id="signupName"
@@ -570,12 +557,9 @@ footer{
 
         </div>
 
-
         <div class="form-group">
 
-          <label>
-            Numéro
-          </label>
+          <label>Numéro</label>
 
           <input
             id="signupPhone"
@@ -584,12 +568,9 @@ footer{
 
         </div>
 
-
         <div class="form-group">
 
-          <label>
-            Mot de passe
-          </label>
+          <label>Mot de passe</label>
 
           <input
             id="signupPassword"
@@ -597,7 +578,6 @@ footer{
             placeholder="Mot de passe">
 
         </div>
-
 
         <button
           class="btn-green"
@@ -609,16 +589,11 @@ footer{
 
       </div>
 
-
-      <div
-        id="loginForm"
-        class="hidden">
+      <div id="loginForm" class="hidden">
 
         <div class="form-group">
 
-          <label>
-            Numéro
-          </label>
+          <label>Numéro</label>
 
           <input
             id="loginPhone"
@@ -627,12 +602,9 @@ footer{
 
         </div>
 
-
         <div class="form-group">
 
-          <label>
-            Mot de passe
-          </label>
+          <label>Mot de passe</label>
 
           <input
             id="loginPassword"
@@ -640,7 +612,6 @@ footer{
             placeholder="Mot de passe">
 
         </div>
-
 
         <button
           class="btn-primary"
@@ -654,10 +625,7 @@ footer{
 
     </div>
 
-
-    <div
-      id="accountConnected"
-      class="hidden">
+    <div id="accountConnected" class="hidden">
 
       <div class="success">
         Tu es connecté à ton compte Marché Guinée.
@@ -668,9 +636,6 @@ footer{
       </p>
 
       <p id="connectedPhone"></p>
-
-
-      <!-- SOLDE VENDEUR -->
 
       <div
         id="soldeVendeurBox"
@@ -693,7 +658,6 @@ footer{
 
         </div>
 
-
         <div
           id="soldeVendeur"
           style="
@@ -705,7 +669,6 @@ footer{
           0 GNF
 
         </div>
-
 
         <div
           id="detailsSoldeVendeur"
@@ -721,51 +684,36 @@ footer{
 
       </div>
 
-
       <div class="form-actions">
 
         <button
           class="btn-primary"
           onclick="ouvrirSignalement()">
-
           ⚠️ Signaler un problème
-
         </button>
-
 
         <button
           class="btn-primary"
           onclick="ouvrirMesVentes()">
-
           📦 Mes ventes
-
         </button>
-
 
         <button
           class="btn-primary"
           onclick="ouvrirMessages()">
-
           💬 Mes messages
-
         </button>
-
 
         <button
           class="btn-green"
           onclick="fermerModal('accountModal');ouvrirVente()">
-
           + Publier une annonce
-
         </button>
-
 
         <button
           class="btn-danger"
           onclick="deconnecter()">
-
           Se déconnecter
-
         </button>
 
       </div>
@@ -781,9 +729,7 @@ footer{
      PUBLICATION
 ========================= -->
 
-<div
-  id="publishModal"
-  class="modal">
+<div id="publishModal" class="modal">
 
   <div class="modal-box">
 
@@ -799,12 +745,9 @@ footer{
 
     <div id="publishMessage"></div>
 
-
     <div class="form-group">
 
-      <label>
-        Titre
-      </label>
+      <label>Titre</label>
 
       <input
         id="listingTitle"
@@ -813,12 +756,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Description
-      </label>
+      <label>Description</label>
 
       <textarea
         id="listingDescription"
@@ -826,12 +766,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Prix (GNF)
-      </label>
+      <label>Prix (GNF)</label>
 
       <input
         id="listingPrice"
@@ -840,12 +777,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        État
-      </label>
+      <label>État</label>
 
       <select id="listingCondition">
 
@@ -865,12 +799,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Catégorie
-      </label>
+      <label>Catégorie</label>
 
       <select id="listingCategory">
 
@@ -902,12 +833,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Ville
-      </label>
+      <label>Ville</label>
 
       <input
         id="listingCity"
@@ -916,12 +844,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Quartier
-      </label>
+      <label>Quartier</label>
 
       <input
         id="listingNeighborhood"
@@ -930,12 +855,9 @@ footer{
 
     </div>
 
-
     <div class="form-group">
 
-      <label>
-        Photo
-      </label>
+      <label>Photo</label>
 
       <input
         id="listingPhoto"
@@ -949,13 +871,10 @@ footer{
 
     </div>
 
-
     <button
       class="btn-green"
       onclick="publierAnnonce()">
-
       Publier l'annonce
-
     </button>
 
   </div>
@@ -967,9 +886,7 @@ footer{
      DETAIL ANNONCE
 ========================= -->
 
-<div
-  id="detailModal"
-  class="modal">
+<div id="detailModal" class="modal">
 
   <div class="modal-box">
 
@@ -992,9 +909,7 @@ footer{
      PAIEMENT
 ========================= -->
 
-<div
-  id="paymentModal"
-  class="modal">
+<div id="paymentModal" class="modal">
 
   <div class="modal-box">
 
@@ -1004,9 +919,7 @@ footer{
       ×
     </span>
 
-    <h2>
-      Achat
-    </h2>
+    <h2>Achat</h2>
 
     <div id="paymentContent"></div>
 
@@ -1025,9 +938,7 @@ footer{
     <button
       class="btn-primary"
       onclick="fermerModal('paymentModal')">
-
       Fermer
-
     </button>
 
   </div>
@@ -1039,9 +950,7 @@ footer{
      MESSAGES
 ========================= -->
 
-<div
-  id="messagesModal"
-  class="modal">
+<div id="messagesModal" class="modal">
 
   <div class="modal-box">
 
@@ -1051,36 +960,23 @@ footer{
       ×
     </span>
 
-    <h2>
-      💬 Messagerie
-    </h2>
+    <h2>💬 Messagerie</h2>
 
     <div id="messagesList"></div>
 
-
-    <div
-      id="chatContainer"
-      class="hidden">
+    <div id="chatContainer" class="hidden">
 
       <button
         class="btn-light"
         onclick="retourConversations()">
-
         ← Retour
-
       </button>
-
 
       <h3 id="chatTitle">
         Conversation
       </h3>
 
-
-      <div
-        id="chatBox"
-        class="chat-box">
-      </div>
-
+      <div id="chatBox" class="chat-box"></div>
 
       <div class="chat-input">
 
@@ -1094,14 +990,309 @@ footer{
         <button
           class="btn-primary"
           onclick="envoyerMessage()">
-
           Envoyer
-
         </button>
 
       </div>
 
     </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     VÉRIFICATION LIVRAISON
+========================= -->
+
+<div
+  id="livraisonModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:420px;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    ">
+
+    <h2 style="margin-top:0;">
+      🚚 Vérifier une livraison
+    </h2>
+
+    <p style="color:#666;">
+      Entre le numéro de commande et le code de livraison donné par l’acheteur.
+    </p>
+
+    <input
+      id="verificationOrderNumber"
+      type="text"
+      placeholder="Numéro de commande"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:12px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+      "
+    >
+
+    <input
+      id="verificationCode"
+      type="text"
+      inputmode="numeric"
+      maxlength="6"
+      placeholder="Code de livraison à 6 chiffres"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:15px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+        font-size:20px;
+        text-align:center;
+        letter-spacing:5px;
+      "
+    >
+
+    <button
+      onclick="verifierLivraison()"
+      style="
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:10px;
+        background:#16a34a;
+        color:white;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      ✅ Vérifier le code
+    </button>
+
+    <button
+      onclick="fermerLivraisonModal()"
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:10px;
+        border:none;
+        background:#eee;
+        border-radius:10px;
+        cursor:pointer;
+      ">
+      Annuler
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     SIGNALEMENT / LITIGE
+========================= -->
+
+<div
+  id="problemeModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:10000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:420px;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    ">
+
+    <h2 style="margin-top:0;">
+      ⚠️ Signaler un problème
+    </h2>
+
+    <p style="color:#666;">
+      Signale un problème concernant une commande.
+    </p>
+
+    <input
+      id="problemeOrderNumber"
+      type="text"
+      placeholder="Numéro de commande"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:12px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+      "
+    >
+
+    <select
+      id="problemeReason"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:12px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+      ">
+
+      <option value="">
+        Choisir le problème
+      </option>
+
+      <option value="Produit non reçu">
+        Produit non reçu
+      </option>
+
+      <option value="Produit différent">
+        Produit différent de l'annonce
+      </option>
+
+      <option value="Produit endommagé">
+        Produit endommagé
+      </option>
+
+      <option value="Problème de livraison">
+        Problème de livraison
+      </option>
+
+      <option value="Autre">
+        Autre problème
+      </option>
+
+    </select>
+
+    <textarea
+      id="problemeDescription"
+      placeholder="Explique le problème..."
+      rows="4"
+      style="
+        width:100%;
+        padding:13px;
+        margin-bottom:15px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        box-sizing:border-box;
+        resize:vertical;
+      "
+    ></textarea>
+
+    <button
+      onclick="envoyerSignalement()"
+      style="
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:10px;
+        background:#dc2626;
+        color:white;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      ⚠️ Envoyer le signalement
+    </button>
+
+    <button
+      onclick="fermerProblemeModal()"
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:10px;
+        border:none;
+        background:#eee;
+        border-radius:10px;
+        cursor:pointer;
+      ">
+      Annuler
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     MES VENTES
+========================= -->
+
+<div
+  id="mesVentesModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:10001;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  ">
+
+  <div
+    style="
+      background:white;
+      width:100%;
+      max-width:450px;
+      max-height:85vh;
+      overflow-y:auto;
+      border-radius:18px;
+      padding:24px;
+      box-sizing:border-box;
+    ">
+
+    <h2 style="margin-top:0;">
+      📦 Mes ventes
+    </h2>
+
+    <div id="listeMesVentes">
+      Chargement...
+    </div>
+
+    <button
+      onclick="fermerMesVentes()"
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:15px;
+        border:none;
+        background:#eee;
+        border-radius:10px;
+        cursor:pointer;
+      ">
+      Fermer
+    </button>
 
   </div>
 
@@ -1116,17 +1307,11 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
 
-
 let utilisateurConnecte = null;
-
 let toutesLesAnnonces = [];
-
 let categorieActuelle = "Toutes";
-
 let conversationActuelle = null;
-
 let annonceConversationActuelle = null;
-
 let intervalMessages = null;
 
 
@@ -1144,8 +1329,7 @@ function headers(extra={}){
 
   return {
 
-    "apikey":
-      SUPABASE_KEY,
+    "apikey":SUPABASE_KEY,
 
     "Authorization":
       "Bearer " + token,
@@ -1167,10 +1351,8 @@ async function supabaseFetch(url,options={}){
       url,
       {
         ...options,
-
         headers:{
           ...headers(),
-
           ...(options.headers || {})
         }
       }
@@ -1240,22 +1422,14 @@ function escapeHTML(value){
     value === null ||
     value === undefined
   ){
-
     return "";
-
   }
 
-
   return String(value)
-
     .replace(/&/g,"&amp;")
-
     .replace(/</g,"&lt;")
-
     .replace(/>/g,"&gt;")
-
     .replace(/"/g,"&quot;")
-
     .replace(/'/g,"&#039;");
 
 }
@@ -1309,10 +1483,7 @@ function fermerModal(id){
     document.getElementById(id);
 
   if(element){
-
-    element.style.display =
-      "none";
-
+    element.style.display = "none";
   }
 
 
@@ -1398,22 +1569,17 @@ function afficherInscription(){
     "signupForm"
   ).classList.remove("hidden");
 
-
   document.getElementById(
     "loginForm"
   ).classList.add("hidden");
 
-
   document.getElementById(
     "signupTab"
-  ).className =
-    "btn-primary";
-
+  ).className = "btn-primary";
 
   document.getElementById(
     "loginTab"
-  ).className =
-    "btn-light";
+  ).className = "btn-light";
 
 }
 
@@ -1424,22 +1590,17 @@ function afficherConnexion(){
     "signupForm"
   ).classList.add("hidden");
 
-
   document.getElementById(
     "loginForm"
   ).classList.remove("hidden");
 
-
   document.getElementById(
     "signupTab"
-  ).className =
-    "btn-light";
-
+  ).className = "btn-light";
 
   document.getElementById(
     "loginTab"
-  ).className =
-    "btn-primary";
+  ).className = "btn-primary";
 
 }
 
@@ -1448,13 +1609,9 @@ function emailTechnique(numero){
 
   const propre =
     String(numero || "")
-
       .replace(/\s+/g,"")
-
       .replace(/\+/g,"")
-
       .replace(/[^0-9]/g,"");
-
 
   return (
     propre +
@@ -1471,18 +1628,15 @@ async function creerCompte(){
       "signupName"
     ).value.trim();
 
-
   const phone =
     document.getElementById(
       "signupPhone"
     ).value.trim();
 
-
   const password =
     document.getElementById(
       "signupPassword"
     ).value;
-
 
   const box =
     document.getElementById(
@@ -1534,11 +1688,8 @@ async function creerCompte(){
           method:"POST",
 
           headers:{
-            "apikey":
-              SUPABASE_KEY,
-
-            "Content-Type":
-              "application/json"
+            "apikey":SUPABASE_KEY,
+            "Content-Type":"application/json"
           },
 
           body:JSON.stringify({
@@ -1571,14 +1722,10 @@ async function creerCompte(){
 
 
     try{
-
       authData =
         JSON.parse(authText);
-
     }catch(e){
-
       authData = {};
-
     }
 
 
@@ -1587,11 +1734,8 @@ async function creerCompte(){
       throw new Error(
 
         authData.msg ||
-
         authData.message ||
-
         authData.error_description ||
-
         "Impossible de créer le compte."
 
       );
@@ -1603,9 +1747,7 @@ async function creerCompte(){
 
       authData.user &&
       authData.user.id
-
         ? authData.user.id
-
         : null;
 
 
@@ -1633,7 +1775,6 @@ async function creerCompte(){
 
         headers:{
           ...headers(),
-
           "Prefer":
             "resolution=merge-duplicates,return=minimal"
         },
@@ -1668,7 +1809,6 @@ async function creerCompte(){
 
     console.error(error);
 
-
     box.innerHTML =
       '<div class="error">' +
       escapeHTML(
@@ -1688,12 +1828,10 @@ async function connecterCompte(){
       "loginPhone"
     ).value.trim();
 
-
   const password =
     document.getElementById(
       "loginPassword"
     ).value;
-
 
   const box =
     document.getElementById(
@@ -1701,10 +1839,7 @@ async function connecterCompte(){
     );
 
 
-  if(
-    !phone ||
-    !password
-  ){
+  if(!phone || !password){
 
     box.innerHTML =
       '<div class="error">' +
@@ -1734,11 +1869,8 @@ async function connecterCompte(){
           method:"POST",
 
           headers:{
-            "apikey":
-              SUPABASE_KEY,
-
-            "Content-Type":
-              "application/json"
+            "apikey":SUPABASE_KEY,
+            "Content-Type":"application/json"
           },
 
           body:JSON.stringify({
@@ -1765,9 +1897,7 @@ async function connecterCompte(){
       throw new Error(
 
         data.error_description ||
-
         data.msg ||
-
         "Numéro ou mot de passe incorrect."
 
       );
@@ -1838,13 +1968,10 @@ async function connecterCompte(){
 
 
     localStorage.setItem(
-
       "marche_guinee_session",
-
       JSON.stringify(
         utilisateurConnecte
       )
-
     );
 
 
@@ -1870,7 +1997,6 @@ async function connecterCompte(){
   }catch(error){
 
     console.error(error);
-
 
     box.innerHTML =
       '<div class="error">' +
@@ -1912,7 +2038,6 @@ function restaurerSession(){
         "marche_guinee_session"
       );
 
-
     if(saved){
 
       utilisateurConnecte =
@@ -1948,11 +2073,9 @@ function ouvrirVente(){
 
   }
 
-
   document.getElementById(
     "publishModal"
-  ).style.display =
-    "block";
+  ).style.display = "block";
 
 }
 
@@ -1964,7 +2087,6 @@ function previewPhoto(){
       "listingPhoto"
     ).files[0];
 
-
   const img =
     document.getElementById(
       "photoPreview"
@@ -1973,9 +2095,7 @@ function previewPhoto(){
 
   if(!file){
 
-    img.classList.add(
-      "hidden"
-    );
+    img.classList.add("hidden");
 
     return;
 
@@ -1983,14 +2103,9 @@ function previewPhoto(){
 
 
   img.src =
-    URL.createObjectURL(
-      file
-    );
+    URL.createObjectURL(file);
 
-
-  img.classList.remove(
-    "hidden"
-  );
+  img.classList.remove("hidden");
 
 }
 
@@ -2039,14 +2154,8 @@ async function obtenirCategorieId(
     const trouve =
       all.find(
         c =>
-
-          String(
-            c.name || ""
-          ).toLowerCase() ===
-
-          String(
-            nomCategorie || ""
-          ).toLowerCase()
+          String(c.name || "").toLowerCase() ===
+          String(nomCategorie || "").toLowerCase()
       );
 
 
@@ -2132,11 +2241,7 @@ async function publierAnnonce(){
     ).files[0];
 
 
-  if(
-    !title ||
-    !price ||
-    !city
-  ){
+  if(!title || !price || !city){
 
     messageBox.innerHTML =
       '<div class="error">' +
@@ -2247,12 +2352,7 @@ async function publierAnnonce(){
       const extension =
 
         file.name.includes(".")
-
-          ? file.name
-              .split(".")
-              .pop()
-              .toLowerCase()
-
+          ? file.name.split(".").pop().toLowerCase()
           : "jpg";
 
 
@@ -2278,9 +2378,7 @@ async function publierAnnonce(){
             method:"POST",
 
             headers:{
-
-              "apikey":
-                SUPABASE_KEY,
+              "apikey":SUPABASE_KEY,
 
               "Authorization":
                 "Bearer " +
@@ -2289,7 +2387,6 @@ async function publierAnnonce(){
               "Content-Type":
                 file.type ||
                 "image/jpeg"
-
             },
 
             body:file
@@ -2301,11 +2398,8 @@ async function publierAnnonce(){
 
       if(!uploadResponse.ok){
 
-        const errorText =
-          await uploadResponse.text();
-
         console.error(
-          errorText
+          await uploadResponse.text()
         );
 
       }else{
@@ -2356,31 +2450,25 @@ async function publierAnnonce(){
           "publishModal"
         );
 
-
         document.getElementById(
           "listingTitle"
         ).value = "";
-
 
         document.getElementById(
           "listingDescription"
         ).value = "";
 
-
         document.getElementById(
           "listingPrice"
         ).value = "";
-
 
         document.getElementById(
           "listingNeighborhood"
         ).value = "";
 
-
         document.getElementById(
           "listingPhoto"
         ).value = "";
-
 
         document.getElementById(
           "photoPreview"
@@ -2388,11 +2476,9 @@ async function publierAnnonce(){
           "hidden"
         );
 
-
         document.getElementById(
           "publishMessage"
         ).innerHTML = "";
-
 
         chargerAnnonces();
 
@@ -2406,7 +2492,6 @@ async function publierAnnonce(){
   }catch(error){
 
     console.error(error);
-
 
     messageBox.innerHTML =
       '<div class="error">' +
@@ -2425,20 +2510,13 @@ async function publierAnnonce(){
    ANNONCES
 ========================= */
 
-function construireImageUrl(
-  imageUrl
-){
+function construireImageUrl(imageUrl){
 
   if(!imageUrl) return "";
 
-
   if(
-    imageUrl.startsWith(
-      "http://"
-    ) ||
-    imageUrl.startsWith(
-      "https://"
-    )
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://")
   ){
 
     return imageUrl;
@@ -2447,23 +2525,18 @@ function construireImageUrl(
 
 
   return (
-
     SUPABASE_URL +
     "/storage/v1/object/public/Listing-image/" +
     imageUrl
-
   );
 
 }
 
 
-async function chargerImages(
-  listingId
-){
+async function chargerImages(listingId){
 
   const controller =
     new AbortController();
-
 
   const timeout =
     setTimeout(
@@ -2481,45 +2554,31 @@ async function chargerImages(
 
         SUPABASE_URL +
         "/rest/v1/listing_images?listing_id=eq." +
-        encodeURIComponent(
-          listingId
-        ) +
+        encodeURIComponent(listingId) +
         "&select=image_url&limit=1",
 
         {
           method:"GET",
 
           headers:{
-            "apikey":
-              SUPABASE_KEY,
-
+            "apikey":SUPABASE_KEY,
             "Authorization":
-              "Bearer " +
-              SUPABASE_KEY,
-
+              "Bearer " + SUPABASE_KEY,
             "Content-Type":
               "application/json"
           },
 
-          signal:
-            controller.signal
+          signal:controller.signal
 
         }
 
       );
 
 
-    clearTimeout(
-      timeout
-    );
+    clearTimeout(timeout);
 
 
     if(!response.ok){
-
-      console.warn(
-        "Image non chargée :",
-        response.status
-      );
 
       return "";
 
@@ -2543,14 +2602,7 @@ async function chargerImages(
 
   }catch(e){
 
-    clearTimeout(
-      timeout
-    );
-
-    console.warn(
-      "Image non trouvée :",
-      e
-    );
+    clearTimeout(timeout);
 
   }
 
@@ -2571,7 +2623,6 @@ async function chargerSoldeVendeur(){
       "soldeVendeur"
     );
 
-
   const detailsElement =
     document.getElementById(
       "detailsSoldeVendeur"
@@ -2582,9 +2633,7 @@ async function chargerSoldeVendeur(){
     !soldeElement ||
     !detailsElement
   ){
-
     return;
-
   }
 
 
@@ -2593,10 +2642,8 @@ async function chargerSoldeVendeur(){
     soldeElement.textContent =
       "0 GNF";
 
-
     detailsElement.textContent =
       "Connecte-toi pour voir ton solde.";
-
 
     return;
 
@@ -2628,9 +2675,7 @@ async function chargerSoldeVendeur(){
 
 
     let totalVentes = 0;
-
     let totalCommission = 0;
-
     let solde = 0;
 
 
@@ -2642,12 +2687,10 @@ async function chargerSoldeVendeur(){
             commande.price_gnf || 0
           );
 
-
         totalCommission +=
           Number(
             commande.commission_gnf || 0
           );
-
 
         solde +=
           Number(
@@ -2659,50 +2702,30 @@ async function chargerSoldeVendeur(){
 
 
     soldeElement.textContent =
-      solde.toLocaleString(
-        "fr-FR"
-      ) +
+      solde.toLocaleString("fr-FR") +
       " GNF";
 
 
     detailsElement.textContent =
 
       ventes.length +
-
       " vente" +
-
       (
         ventes.length > 1
           ? "s"
           : ""
       ) +
-
       " • " +
-
-      totalVentes.toLocaleString(
-        "fr-FR"
-      ) +
-
+      totalVentes.toLocaleString("fr-FR") +
       " GNF de ventes • Commission : " +
-
-      totalCommission.toLocaleString(
-        "fr-FR"
-      ) +
-
+      totalCommission.toLocaleString("fr-FR") +
       " GNF";
 
 
   }catch(error){
 
-    console.error(
-      "Erreur chargement solde vendeur :",
-      error
-    );
-
-
     soldeElement.textContent =
       "Erreur";
-
 
     detailsElement.textContent =
       error.message ||
@@ -2715,7 +2738,6 @@ async function chargerSoldeVendeur(){
 
 /* =========================
    MES VENTES
-   VERSION CORRIGÉE
 ========================= */
 
 function ouvrirMesVentes(){
@@ -2735,8 +2757,7 @@ function ouvrirMesVentes(){
 
   document.getElementById(
     "mesVentesModal"
-  ).style.display =
-    "flex";
+  ).style.display = "flex";
 
 
   chargerMesVentes();
@@ -2748,15 +2769,12 @@ function fermerMesVentes(){
 
   document.getElementById(
     "mesVentesModal"
-  ).style.display =
-    "none";
+  ).style.display = "none";
 
 }
 
 
-function statutCommandeTexte(
-  status
-){
+function statutCommandeTexte(status){
 
   const statuts = {
 
@@ -2802,9 +2820,7 @@ function statutCommandeTexte(
 }
 
 
-function livraisonTexte(
-  status
-){
+function livraisonTexte(status){
 
   const statuts = {
 
@@ -2834,23 +2850,7 @@ async function chargerMesVentes(){
     );
 
 
-  if(!container){
-
-    return;
-
-  }
-
-
-  if(!utilisateurConnecte){
-
-    container.innerHTML =
-      '<div class="error">' +
-      'Connecte-toi pour voir tes ventes.' +
-      '</div>';
-
-    return;
-
-  }
+  if(!container) return;
 
 
   container.innerHTML =
@@ -2885,21 +2885,10 @@ async function chargerMesVentes(){
     if(!ventes.length){
 
       container.innerHTML =
-
-        '<div style="' +
-        'padding:20px;' +
-        'text-align:center;' +
-        'color:#666;' +
-        '">' +
-
+        '<div style="padding:20px;text-align:center;color:#666;">' +
         '📦 Aucune vente pour le moment.' +
-
         '<br><br>' +
-
-        '<small>' +
-        'Quand un client achètera un de tes produits, la commande apparaîtra ici.' +
-        '</small>' +
-
+        '<small>Quand un client achètera un de tes produits, la commande apparaîtra ici.</small>' +
         '</div>';
 
       return;
@@ -2918,12 +2907,10 @@ async function chargerMesVentes(){
             vente.price_gnf || 0
           );
 
-
         const commission =
           Number(
             vente.commission_gnf || 0
           );
-
 
         const montantVendeur =
           Number(
@@ -2932,13 +2919,10 @@ async function chargerMesVentes(){
 
 
         const div =
-          document.createElement(
-            "div"
-          );
+          document.createElement("div");
 
 
         div.style.cssText =
-
           "border:1px solid #ddd;" +
           "border-radius:14px;" +
           "padding:15px;" +
@@ -2949,108 +2933,57 @@ async function chargerMesVentes(){
         div.innerHTML =
 
           "<strong>" +
-
           escapeHTML(
             vente.product_title ||
             "Produit"
           ) +
-
           "</strong>" +
 
-
           "<div style='margin-top:8px;'>" +
-
           "🧾 Commande : " +
-
           escapeHTML(
-            vente.order_number ||
-            ""
+            vente.order_number || ""
           ) +
-
           "</div>" +
 
+          "<div>💰 Prix : " +
+          prix.toLocaleString("fr-FR") +
+          " GNF</div>" +
 
-          "<div>" +
+          "<div>🏦 Commission Marché Guinée : " +
+          commission.toLocaleString("fr-FR") +
+          " GNF</div>" +
 
-          "💰 Prix : " +
+          "<div>💵 Montant vendeur : " +
+          montantVendeur.toLocaleString("fr-FR") +
+          " GNF</div>" +
 
-          prix.toLocaleString(
-            "fr-FR"
-          ) +
-
-          " GNF" +
-
-          "</div>" +
-
-
-          "<div>" +
-
-          "🏦 Commission Marché Guinée : " +
-
-          commission.toLocaleString(
-            "fr-FR"
-          ) +
-
-          " GNF" +
-
-          "</div>" +
-
-
-          "<div>" +
-
-          "💵 Montant vendeur : " +
-
-          montantVendeur.toLocaleString(
-            "fr-FR"
-          ) +
-
-          " GNF" +
-
-          "</div>" +
-
-
-          "<div style='margin-top:8px;'>" +
-
-          "📦 Statut : " +
-
+          "<div style='margin-top:8px;'>📦 Statut : " +
           escapeHTML(
             statutCommandeTexte(
               vente.status
             )
           ) +
-
           "</div>" +
 
-
-          "<div>" +
-
-          "🚚 Livraison : " +
-
+          "<div>🚚 Livraison : " +
           escapeHTML(
             livraisonTexte(
               vente.delivery_status
             )
           ) +
-
           "</div>" +
 
-
-          "<div style='margin-top:8px;color:#777;font-size:12px;'>" +
-
-          "📅 " +
-
+          "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
           escapeHTML(
             formatDate(
               vente.created_at
             )
           ) +
-
           "</div>";
 
 
-        container.appendChild(
-          div
-        );
+        container.appendChild(div);
 
       }
     );
@@ -3058,38 +2991,14 @@ async function chargerMesVentes(){
 
   }catch(error){
 
-    console.error(
-      "Erreur chargement mes ventes :",
-      error
-    );
-
-
     container.innerHTML =
-
-      '<div style="' +
-      'padding:15px;' +
-      'color:#dc2626;' +
-      'background:#fdeaea;' +
-      'border-radius:10px;' +
-      '">' +
-
-      "<strong>" +
-      "Impossible de charger les ventes." +
-      "</strong>" +
-
+      '<div style="padding:15px;color:#dc2626;background:#fdeaea;border-radius:10px;">' +
+      "<strong>Impossible de charger les ventes.</strong>" +
       "<br><br>" +
-
       escapeHTML(
         error.message ||
         "Erreur Supabase inconnue."
       ) +
-
-      "<br><br>" +
-
-      "<small>" +
-      "Si le message indique « JWT expired », déconnecte-toi puis reconnecte-toi." +
-      "</small>" +
-
       "</div>";
 
   }
@@ -3110,9 +3019,7 @@ async function chargerAnnonces(){
 
 
   container.innerHTML =
-    '<div class="empty">' +
-    'Chargement des annonces...' +
-    '</div>';
+    '<div class="empty">Chargement des annonces...</div>';
 
 
   try{
@@ -3127,13 +3034,9 @@ async function chargerAnnonces(){
           method:"GET",
 
           headers:{
-            "apikey":
-              SUPABASE_KEY,
-
+            "apikey":SUPABASE_KEY,
             "Authorization":
-              "Bearer " +
-              SUPABASE_KEY,
-
+              "Bearer " + SUPABASE_KEY,
             "Content-Type":
               "application/json"
           }
@@ -3166,23 +3069,11 @@ async function chargerAnnonces(){
 
     if(!response.ok){
 
-      console.error(
-        "Erreur chargement annonces :",
-        response.status,
-        text
-      );
-
-
       throw new Error(
-
         data?.message ||
-
         data?.hint ||
-
         data?.details ||
-
         "Erreur lors du chargement des annonces."
-
       );
 
     }
@@ -3194,20 +3085,14 @@ async function chargerAnnonces(){
         : [];
 
 
-    if(
-      !toutesLesAnnonces.length
-    ){
+    if(!toutesLesAnnonces.length){
 
       container.innerHTML =
-        '<div class="empty">' +
-        'Aucune annonce pour le moment.' +
-        '</div>';
-
+        '<div class="empty">Aucune annonce pour le moment.</div>';
 
       document.getElementById(
         "nombreAnnonces"
       ).textContent = "";
-
 
       return;
 
@@ -3219,38 +3104,21 @@ async function chargerAnnonces(){
 
   }catch(error){
 
-    console.error(
-      "Impossible de charger les annonces :",
-      error
-    );
-
-
     container.innerHTML =
-
       '<div class="error">' +
-
       'Impossible de charger les annonces.' +
-
       '<br>' +
-
       '<small>' +
-
       escapeHTML(
         error.message
       ) +
-
       '</small>' +
-
       '</div>';
 
   }
 
 }
 
-
-/* =========================
-   AFFICHER ANNONCES
-========================= */
 
 async function afficherAnnonces(){
 
@@ -3287,37 +3155,16 @@ async function afficherAnnonces(){
 
 
         const matchRecherche =
-
           !recherche ||
-          texte.includes(
-            recherche
-          );
+          texte.includes(recherche);
 
 
         const matchCategorie =
-
-          categorieActuelle ===
-          "Toutes"
-
-          ||
-
-          String(
-            a.category_id || ""
-          )
-          .toLowerCase()
-          ===
-          categorieActuelle
-            .toLowerCase()
-
-          ||
-
+          categorieActuelle === "Toutes" ||
           String(
             a.category || ""
-          )
-          .toLowerCase()
-          ===
-          categorieActuelle
-            .toLowerCase();
+          ).toLowerCase() ===
+          categorieActuelle.toLowerCase();
 
 
         return (
@@ -3334,9 +3181,7 @@ async function afficherAnnonces(){
   ).textContent =
 
     annonces.length +
-
     " annonce" +
-
     (
       annonces.length > 1
         ? "s"
@@ -3347,9 +3192,7 @@ async function afficherAnnonces(){
   if(!annonces.length){
 
     container.innerHTML =
-      '<div class="empty">' +
-      'Aucune annonce trouvée.' +
-      '</div>';
+      '<div class="empty">Aucune annonce trouvée.</div>';
 
     return;
 
@@ -3364,13 +3207,10 @@ async function afficherAnnonces(){
   ){
 
     const card =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
 
-    card.className =
-      "card";
+    card.className = "card";
 
 
     card.innerHTML = `
@@ -3383,38 +3223,27 @@ async function afficherAnnonces(){
           justify-content:center;
           font-size:50px;
         ">
-
         📦
-
       </div>
-
 
       <div class="card-body">
 
         <div class="card-title">
-
           ${escapeHTML(
             annonce.title || ""
           )}
-
         </div>
 
-
         <div class="price">
-
           ${formatPrix(
             annonce.price_gnf
           )}
-
         </div>
 
-
         <div class="meta">
-
           📍 ${escapeHTML(
             annonce.city || ""
           )}
-
           ${
             annonce.neighborhood
               ? " · " +
@@ -3423,16 +3252,12 @@ async function afficherAnnonces(){
                 )
               : ""
           }
-
         </div>
 
-
         <div class="condition">
-
           ${escapeHTML(
             annonce.condition || ""
           )}
-
         </div>
 
       </div>
@@ -3447,67 +3272,43 @@ async function afficherAnnonces(){
         );
 
 
-    container.appendChild(
-      card
-    );
+    container.appendChild(card);
 
 
     chargerImages(
       annonce.id
     )
+    .then(
+      image => {
 
-      .then(
-        image => {
-
-          if(!image) return;
-
-
-          const img =
-            document.createElement(
-              "img"
-            );
+        if(!image) return;
 
 
-          img.className =
-            "card-img";
+        const img =
+          document.createElement("img");
 
 
-          img.src =
-            image;
+        img.className = "card-img";
+
+        img.src = image;
+
+        img.alt = "";
 
 
-          img.alt = "";
-
-
-          const ancienneImage =
-            card.querySelector(
-              ".card-img"
-            );
-
-
-          if(
-            ancienneImage
-          ){
-
-            ancienneImage.replaceWith(
-              img
-            );
-
-          }
-
-        }
-      )
-
-      .catch(
-        error => {
-
-          console.warn(
-            "Image ignorée :",
-            error
+        const ancienneImage =
+          card.querySelector(
+            ".card-img"
           );
 
+
+        if(ancienneImage){
+
+          ancienneImage.replaceWith(img);
+
         }
-      );
+
+      }
+    );
 
   }
 
@@ -3556,9 +3357,7 @@ function choisirCategorie(
    DETAIL ANNONCE
 ========================= */
 
-async function ouvrirDetailAnnonce(
-  id
-){
+async function ouvrirDetailAnnonce(id){
 
   const annonce =
     toutesLesAnnonces.find(
@@ -3590,21 +3389,17 @@ async function ouvrirDetailAnnonce(
 
 
   const image =
-    await chargerImages(
-      id
-    );
+    await chargerImages(id);
 
 
   content.innerHTML = `
 
     ${
       image
-
       ? `<img
           class="detail-img"
           src="${escapeHTML(image)}"
           alt="">`
-
       : `<div
           class="detail-img"
           style="
@@ -3618,29 +3413,22 @@ async function ouvrirDetailAnnonce(
         </div>`
     }
 
-
     <h2>
       ${escapeHTML(
         annonce.title
       )}
     </h2>
 
-
     <div class="detail-price">
-
       ${formatPrix(
         annonce.price_gnf
       )}
-
     </div>
 
-
     <p>
-
       📍 ${escapeHTML(
         annonce.city || ""
       )}
-
       ${
         annonce.neighborhood
           ? " — " +
@@ -3649,82 +3437,51 @@ async function ouvrirDetailAnnonce(
             )
           : ""
       }
-
     </p>
 
-
     <p>
-
-      <strong>
-        État :
-      </strong>
-
+      <strong>État :</strong>
       ${escapeHTML(
         annonce.condition || ""
       )}
-
     </p>
 
-
     <p>
-
-      <strong>
-        Vues :
-      </strong>
-
+      <strong>Vues :</strong>
       ${Number(
         annonce.views || 0
       )}
-
     </p>
 
-
     <p>
-
-      <strong>
-        Publié le :
-      </strong>
-
+      <strong>Publié le :</strong>
       ${formatDate(
         annonce.created_at
       )}
-
     </p>
-
 
     <hr>
 
-
     <p>
-
       ${escapeHTML(
         annonce.description ||
         "Aucune description."
       )}
-
     </p>
 
-
     <div class="form-actions">
-
 
       <button
         class="btn-primary"
         onclick="ouvrirMessageVendeur('${annonce.id}')">
-
         💬 Contacter le vendeur
-
       </button>
-
 
       <button
         class="btn-green"
         onclick="ouvrirPaiement('${annonce.id}')">
-
         🛒 Acheter
-
       </button>
-
 
     </div>
 
@@ -3738,9 +3495,7 @@ async function ouvrirDetailAnnonce(
 }
 
 
-async function enregistrerVue(
-  annonce
-){
+async function enregistrerVue(annonce){
 
   const vues =
     Number(
@@ -3790,9 +3545,85 @@ async function enregistrerVue(
 }
 
 
-/* =========================================================
-   VRAIE MESSAGERIE
-========================================================= */
+/* =========================
+   PAIEMENT
+========================= */
+
+function ouvrirPaiement(listingId){
+
+  const annonce =
+    toutesLesAnnonces.find(
+      a => a.id === listingId
+    );
+
+
+  if(!annonce) return;
+
+
+  if(!utilisateurConnecte){
+
+    fermerModal(
+      "detailModal"
+    );
+
+    alert(
+      "Connecte-toi pour acheter."
+    );
+
+    ouvrirCompte();
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "paymentContent"
+  ).innerHTML = `
+
+    <h3>
+      ${escapeHTML(
+        annonce.title
+      )}
+    </h3>
+
+    <p>
+      Prix :
+      <strong>
+        ${formatPrix(
+          annonce.price_gnf
+        )}
+      </strong>
+    </p>
+
+    <p>
+      L'achat sera finalisé après connexion au système de paiement de Marché Guinée.
+    </p>
+
+    <button
+      class="btn-green"
+      onclick="fermerModal('paymentModal')">
+      Continuer
+    </button>
+
+  `;
+
+
+  fermerModal(
+    "detailModal"
+  );
+
+
+  document.getElementById(
+    "paymentModal"
+  ).style.display = "block";
+
+}
+
+
+/* =========================
+   MESSAGERIE
+========================= */
 
 async function ouvrirMessageVendeur(
   listingId
@@ -3804,14 +3635,11 @@ async function ouvrirMessageVendeur(
       "detailModal"
     );
 
-
     alert(
       "Connecte-toi pour contacter le vendeur."
     );
 
-
     ouvrirCompte();
-
 
     return;
 
@@ -3944,19 +3772,13 @@ async function ouvrirMessageVendeur(
 
     document.getElementById(
       "messagesModal"
-    ).style.display =
-      "block";
+    ).style.display = "block";
 
 
     afficherChat();
 
 
   }catch(error){
-
-    console.error(
-      error
-    );
-
 
     alert(
       "Impossible d'ouvrir la conversation : " +
@@ -3989,10 +3811,8 @@ async function afficherChat(){
   ).textContent =
 
     annonceConversationActuelle
-
       ? "💬 " +
         annonceConversationActuelle.title
-
       : "💬 Conversation";
 
 
@@ -4058,8 +3878,7 @@ async function chargerMessages(){
 
       box.innerHTML =
         '<div style="text-align:center;color:#777;padding:30px">' +
-        'Aucun message.<br>' +
-        'Commence la conversation 👋' +
+        'Aucun message.<br>Commence la conversation 👋' +
         '</div>';
 
       return;
@@ -4067,8 +3886,7 @@ async function chargerMessages(){
     }
 
 
-    box.innerHTML =
-      "";
+    box.innerHTML = "";
 
 
     for(
@@ -4113,12 +3931,9 @@ async function chargerMessages(){
           )}
         </div>
 
-
         ${
           msg.image_url
-
           ? `<div style="margin-top:7px">
-
               <img
                 src="${escapeHTML(
                   construireImageUrl(
@@ -4130,12 +3945,9 @@ async function chargerMessages(){
                   border-radius:8px
                 "
               >
-
             </div>`
-
           : ""
         }
-
 
         <span class="message-time">
 
@@ -4171,72 +3983,11 @@ async function chargerMessages(){
       box.scrollHeight;
 
 
-    const unread =
-      messages.filter(
-        m =>
-          m.sender_id !==
-          utilisateurConnecte.id &&
-          !m.read_at
-      );
-
-
-    for(
-      const msg of unread
-    ){
-
-      try{
-
-        await supabaseFetch(
-
-          SUPABASE_URL +
-          "/rest/v1/messages?id=eq." +
-          encodeURIComponent(
-            msg.id
-          ),
-
-          {
-            method:"PATCH",
-
-            headers:{
-              "Prefer":
-                "return=minimal"
-            },
-
-            body:JSON.stringify({
-
-              read_at:
-                new Date()
-                  .toISOString()
-
-            })
-
-          }
-
-        );
-
-      }catch(e){
-
-        console.log(
-          "Impossible de marquer comme lu",
-          e
-        );
-
-      }
-
-    }
-
-
   }catch(error){
-
-    console.error(
-      error
-    );
-
 
     document.getElementById(
       "chatBox"
     ).innerHTML =
-
       '<div class="error">' +
       'Impossible de charger les messages.' +
       '</div>';
@@ -4252,9 +4003,7 @@ async function envoyerMessage(){
     !utilisateurConnecte ||
     !conversationActuelle
   ){
-
     return;
-
   }
 
 
@@ -4271,8 +4020,7 @@ async function envoyerMessage(){
   if(!message) return;
 
 
-  input.disabled =
-    true;
+  input.disabled = true;
 
 
   try{
@@ -4311,8 +4059,7 @@ async function envoyerMessage(){
     );
 
 
-    input.value =
-      "";
+    input.value = "";
 
 
     await chargerMessages();
@@ -4320,22 +4067,14 @@ async function envoyerMessage(){
 
   }catch(error){
 
-    console.error(
-      error
-    );
-
-
     alert(
       "Impossible d'envoyer le message : " +
       error.message
     );
 
-
   }finally{
 
-    input.disabled =
-      false;
-
+    input.disabled = false;
     input.focus();
 
   }
@@ -4343,13 +4082,10 @@ async function envoyerMessage(){
 }
 
 
-function gererToucheMessage(
-  event
-){
+function gererToucheMessage(event){
 
   if(
-    event.key ===
-    "Enter"
+    event.key === "Enter"
   ){
 
     event.preventDefault();
@@ -4361,10 +4097,6 @@ function gererToucheMessage(
 }
 
 
-/* =========================
-   LISTE DES CONVERSATIONS
-========================= */
-
 async function ouvrirMessages(){
 
   if(!utilisateurConnecte){
@@ -4373,14 +4105,11 @@ async function ouvrirMessages(){
       "accountModal"
     );
 
-
     alert(
       "Connecte-toi pour accéder à ta messagerie."
     );
 
-
     ouvrirCompte();
-
 
     return;
 
@@ -4394,8 +4123,7 @@ async function ouvrirMessages(){
 
   document.getElementById(
     "messagesModal"
-  ).style.display =
-    "block";
+  ).style.display = "block";
 
 
   document.getElementById(
@@ -4421,8 +4149,7 @@ async function ouvrirMessages(){
       intervalMessages
     );
 
-    intervalMessages =
-      null;
+    intervalMessages = null;
 
   }
 
@@ -4435,6 +4162,9 @@ async function chargerListeConversations(){
     document.getElementById(
       "messagesList"
     );
+
+
+  if(!container) return;
 
 
   container.innerHTML =
@@ -4484,11 +4214,18 @@ async function chargerListeConversations(){
       ...(sellerRows || [])
     ]
     .forEach(
-      c =>
-        map.set(
-          c.id,
-          c
-        )
+      c => {
+
+        if(c && c.id){
+
+          map.set(
+            c.id,
+            c
+          );
+
+        }
+
+      }
     );
 
 
@@ -4499,21 +4236,23 @@ async function chargerListeConversations(){
       .sort(
         (a,b) =>
           new Date(
-            b.created_at
+            b.created_at || 0
           ) -
           new Date(
-            a.created_at
+            a.created_at || 0
           )
       );
 
 
-    if(
-      !conversations.length
-    ){
+    if(!conversations.length){
 
       container.innerHTML =
         '<div class="empty">' +
-        'Tu n’as encore aucune conversation.' +
+        'Aucune conversation pour le moment.' +
+        '<br><br>' +
+        '<small>' +
+        'Contacte un vendeur depuis une annonce pour commencer une conversation.' +
+        '</small>' +
         '</div>';
 
       return;
@@ -4521,180 +4260,115 @@ async function chargerListeConversations(){
     }
 
 
-    container.innerHTML =
-      "";
+    container.innerHTML = "";
 
 
-    for(
-      const conversation of conversations
-    ){
+    conversations.forEach(
+      conversation => {
 
-      let titre =
-        "Annonce";
-
-
-      try{
-
-        const annonces =
-          await supabaseFetch(
-
-            SUPABASE_URL +
-            "/rest/v1/listings?id=eq." +
-            encodeURIComponent(
+        const annonce =
+          toutesLesAnnonces.find(
+            a =>
+              a.id ===
               conversation.listing_id
-            ) +
-            "&select=title,price_gnf"
-
           );
 
 
-        if(
-          annonces &&
-          annonces.length
-        ){
-
-          titre =
-            annonces[0].title;
-
-        }
-
-      }catch(e){}
+        const titre =
+          annonce?.title ||
+          "Conversation";
 
 
-      const item =
-        document.createElement(
-          "div"
-        );
+        const role =
+          conversation.buyer_id ===
+          utilisateurConnecte.id
+            ? "Acheteur"
+            : "Vendeur";
 
 
-      item.className =
-        "conversation-item";
+        const div =
+          document.createElement(
+            "div"
+          );
 
 
-      const role =
-
-        conversation.buyer_id ===
-        utilisateurConnecte.id
-
-          ? "Acheteur"
-
-          : "Vendeur";
+        div.className =
+          "conversation-item";
 
 
-      item.innerHTML = `
+        div.innerHTML = `
 
-        <div class="conversation-title">
+          <div class="conversation-title">
 
-          💬 ${escapeHTML(
-            titre
-          )}
+            💬 ${escapeHTML(
+              titre
+            )}
 
-        </div>
+          </div>
+
+          <div style="
+            margin-top:5px;
+            font-size:13px;
+            color:#555;
+          ">
+
+            ${
+              role === "Acheteur"
+                ? "👤 Conversation avec le vendeur"
+                : "🛍️ Conversation avec l'acheteur"
+            }
+
+          </div>
+
+          <div class="conversation-date">
+
+            ${formatDate(
+              conversation.created_at
+            )}
+
+          </div>
+
+        `;
 
 
-        <div class="conversation-date">
+        div.onclick =
+          async () => {
 
-          ${role}
-          ·
-          ${formatDate(
-            conversation.created_at
-          )}
-
-        </div>
-
-      `;
-
-
-      item.onclick =
-        async () => {
-
-          try{
-
-            const annonces =
-              await supabaseFetch(
-
-                SUPABASE_URL +
-                "/rest/v1/listings?id=eq." +
-                encodeURIComponent(
-                  conversation.listing_id
-                ) +
-                "&select=*"
-
-              );
+            conversationActuelle =
+              conversation;
 
 
             annonceConversationActuelle =
-
-              annonces &&
-              annonces.length
-
-                ? annonces[0]
-
-                : {
-
-                    id:
-                      conversation.listing_id,
-
-                    title:
-                      titre,
-
-                    seller_id:
-                      conversation.seller_id
-
-                  };
+              annonce || {
+                title:titre,
+                id:
+                  conversation.listing_id
+              };
 
 
-          }catch(e){
+            await afficherChat();
 
-            annonceConversationActuelle = {
-
-              id:
-                conversation.listing_id,
-
-              title:
-                titre,
-
-              seller_id:
-                conversation.seller_id
-
-            };
-
-          }
+          };
 
 
-          conversationActuelle =
-            conversation;
+        container.appendChild(
+          div
+        );
 
-
-          afficherChat();
-
-        };
-
-
-      container.appendChild(
-        item
-      );
-
-    }
+      }
+    );
 
 
   }catch(error){
 
-    console.error(
-      error
-    );
-
-
     container.innerHTML =
-
       '<div class="error">' +
-
-      'Impossible de charger les conversations : ' +
-
+      'Impossible de charger les conversations.' +
+      '<br><br>' +
       escapeHTML(
-        error.message
+        error.message ||
+        "Erreur inconnue."
       ) +
-
       '</div>';
 
   }
@@ -4710,8 +4384,7 @@ function retourConversations(){
       intervalMessages
     );
 
-    intervalMessages =
-      null;
+    intervalMessages = null;
 
   }
 
@@ -4744,398 +4417,8 @@ function retourConversations(){
 
 
 /* =========================
-   ACHAT
+   LIVRAISON
 ========================= */
-
-async function ouvrirPaiement(
-  listingId
-){
-
-  const annonce =
-    toutesLesAnnonces.find(
-      a => a.id === listingId
-    );
-
-
-  if(!annonce) return;
-
-
-  if(!utilisateurConnecte){
-
-    fermerModal(
-      "detailModal"
-    );
-
-
-    alert(
-      "Connecte-toi pour acheter."
-    );
-
-
-    ouvrirCompte();
-
-
-    return;
-
-  }
-
-
-  if(
-    annonce.status !==
-    "active"
-  ){
-
-    alert(
-      "Cette annonce n'est plus disponible."
-    );
-
-    return;
-
-  }
-
-
-  if(
-    annonce.seller_id ===
-    utilisateurConnecte.id
-  ){
-
-    alert(
-      "Tu ne peux pas acheter ta propre annonce."
-    );
-
-    return;
-
-  }
-
-
-  const prix =
-    Number(
-      annonce.price_gnf || 0
-    );
-
-
-  if(
-    !prix ||
-    prix <= 0
-  ){
-
-    alert(
-      "Prix de l'annonce invalide."
-    );
-
-    return;
-
-  }
-
-
-  const commission =
-    Math.round(
-      prix * 0.03
-    );
-
-
-  const montantVendeur =
-    prix -
-    commission;
-
-
-  const confirmation =
-    confirm(
-
-      "Confirmer la commande ?\n\n" +
-
-      "Produit : " +
-      annonce.title +
-      "\n" +
-
-      "Prix : " +
-      prix.toLocaleString(
-        "fr-FR"
-      ) +
-      " GNF\n\n" +
-
-      "Tu paieras : " +
-      prix.toLocaleString(
-        "fr-FR"
-      ) +
-      " GNF\n\n" +
-
-      "Commission Marché Guinée : 3 % prélevée au vendeur.\n\n" +
-
-      "Confirmer la commande ?"
-
-    );
-
-
-  if(!confirmation)
-    return;
-
-
-  try{
-
-    const commande =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/orders",
-
-        {
-          method:"POST",
-
-          headers:{
-            "Prefer":
-              "return=representation"
-          },
-
-          body:JSON.stringify({
-
-            order_number:
-
-              "MG-" +
-
-              Date.now()
-                .toString()
-                .slice(-8),
-
-
-            listing_id:
-              annonce.id,
-
-
-            buyer_id:
-              utilisateurConnecte.id,
-
-
-            seller_id:
-              annonce.seller_id,
-
-
-            product_title:
-              annonce.title,
-
-
-            price_gnf:
-              prix,
-
-
-            status:
-              "payment_pending",
-
-
-            commission_gnf:
-              commission,
-
-
-            seller_amount_gnf:
-              montantVendeur,
-
-
-            delivery_status:
-              "pending"
-
-          })
-
-        }
-
-      );
-
-
-    const nouvelleCommande =
-
-      Array.isArray(
-        commande
-      )
-
-        ? commande[0]
-
-        : commande;
-
-
-    if(!nouvelleCommande){
-
-      throw new Error(
-        "La commande n'a pas pu être créée."
-      );
-
-    }
-
-
-    fermerModal(
-      "detailModal"
-    );
-
-
-    alert(
-
-      "✅ Commande créée !\n\n" +
-
-      "Numéro : " +
-
-      (
-        nouvelleCommande.order_number ||
-        "En attente"
-      ) +
-
-      "\n\n" +
-
-      "Le code de livraison sera généré automatiquement.\n\n" +
-
-      "Commande en attente de livraison."
-
-    );
-
-
-  }catch(error){
-
-    console.error(
-      "Erreur création commande :",
-      error
-    );
-
-
-    alert(
-
-      "Impossible de créer la commande.\n\n" +
-
-      (
-        error.message ||
-        "Erreur inconnue."
-      )
-
-    );
-
-  }
-
-}
-
-
-/* =========================
-   DÉMARRAGE
-========================= */
-
-restaurerSession();
-
-chargerAnnonces();
-
-</script>
-
-
-<!-- =========================
-     VÉRIFICATION LIVRAISON
-========================= -->
-
-<div
-  id="livraisonModal"
-  style="
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:9999;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  ">
-
-  <div
-    style="
-      background:white;
-      width:100%;
-      max-width:420px;
-      border-radius:18px;
-      padding:24px;
-      box-sizing:border-box;
-      box-shadow:0 10px 40px rgba(0,0,0,.25);
-    ">
-
-    <h2 style="margin-top:0;">
-      🚚 Vérifier une livraison
-    </h2>
-
-
-    <p style="color:#666;">
-
-      Entre le numéro de commande et le code de livraison donné par l’acheteur.
-
-    </p>
-
-
-    <input
-      id="verificationOrderNumber"
-      type="text"
-      placeholder="Numéro de commande (ex : MG-73302702)"
-      style="
-        width:100%;
-        padding:13px;
-        margin-bottom:12px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        box-sizing:border-box;
-      "
-    >
-
-
-    <input
-      id="verificationCode"
-      type="text"
-      inputmode="numeric"
-      maxlength="6"
-      placeholder="Code de livraison à 6 chiffres"
-      style="
-        width:100%;
-        padding:13px;
-        margin-bottom:15px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        box-sizing:border-box;
-        font-size:20px;
-        text-align:center;
-        letter-spacing:5px;
-      "
-    >
-
-
-    <button
-      onclick="verifierLivraison()"
-      style="
-        width:100%;
-        padding:14px;
-        border:none;
-        border-radius:10px;
-        background:#16a34a;
-        color:white;
-        font-size:16px;
-        font-weight:bold;
-        cursor:pointer;
-      ">
-
-      ✅ Vérifier le code
-
-    </button>
-
-
-    <button
-      onclick="fermerLivraisonModal()"
-      style="
-        width:100%;
-        padding:12px;
-        margin-top:10px;
-        border:none;
-        background:#eee;
-        border-radius:10px;
-        cursor:pointer;
-      ">
-
-      Annuler
-
-    </button>
-
-  </div>
-
-</div>
-
-
-<script>
 
 function ouvrirVerificationLivraison(){
 
@@ -5151,8 +4434,7 @@ function ouvrirVerificationLivraison(){
 
   document.getElementById(
     "livraisonModal"
-  ).style.display =
-    "flex";
+  ).style.display = "flex";
 
 }
 
@@ -5161,8 +4443,7 @@ function fermerLivraisonModal(){
 
   document.getElementById(
     "livraisonModal"
-  ).style.display =
-    "none";
+  ).style.display = "none";
 
 }
 
@@ -5219,9 +4500,7 @@ async function verifierLivraison(){
 
 
     if(
-      !Array.isArray(
-        commandes
-      ) ||
+      !Array.isArray(commandes) ||
       !commandes.length
     ){
 
@@ -5268,11 +4547,8 @@ async function verifierLivraison(){
     ){
 
       alert(
-
         resultat?.message ||
-
         "Code de livraison incorrect."
-
       );
 
       return;
@@ -5286,11 +4562,8 @@ async function verifierLivraison(){
     alert(
 
       "✅ Livraison confirmée !\n\n" +
-
       "La commande " +
-
       commande.order_number +
-
       " est maintenant livrée."
 
     );
@@ -5301,16 +4574,9 @@ async function verifierLivraison(){
 
   }catch(error){
 
-    console.error(
-      "Erreur vérification livraison :",
-      error
-    );
-
-
     alert(
 
       "Impossible de vérifier la livraison.\n\n" +
-
       (
         error.message ||
         "Erreur inconnue."
@@ -5322,157 +4588,10 @@ async function verifierLivraison(){
 
 }
 
-</script>
 
-
-<!-- =========================
-     SIGNALEMENT / LITIGE
-========================= -->
-
-<div
-  id="problemeModal"
-  style="
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:10000;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  ">
-
-  <div
-    style="
-      background:white;
-      width:100%;
-      max-width:420px;
-      border-radius:18px;
-      padding:24px;
-      box-sizing:border-box;
-      box-shadow:0 10px 40px rgba(0,0,0,.25);
-    ">
-
-    <h2 style="margin-top:0;">
-      ⚠️ Signaler un problème
-    </h2>
-
-
-    <p style="color:#666;">
-      Signale un problème concernant une commande.
-    </p>
-
-
-    <input
-      id="problemeOrderNumber"
-      type="text"
-      placeholder="Numéro de commande (ex : MG-12345678)"
-      style="
-        width:100%;
-        padding:13px;
-        margin-bottom:12px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        box-sizing:border-box;
-      "
-    >
-
-
-    <select
-      id="problemeReason"
-      style="
-        width:100%;
-        padding:13px;
-        margin-bottom:12px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        box-sizing:border-box;
-      ">
-
-      <option value="">
-        Choisir le problème
-      </option>
-
-      <option value="Produit non reçu">
-        Produit non reçu
-      </option>
-
-      <option value="Produit différent">
-        Produit différent de l'annonce
-      </option>
-
-      <option value="Produit endommagé">
-        Produit endommagé
-      </option>
-
-      <option value="Problème de livraison">
-        Problème de livraison
-      </option>
-
-      <option value="Autre">
-        Autre problème
-      </option>
-
-    </select>
-
-
-    <textarea
-      id="problemeDescription"
-      placeholder="Explique le problème..."
-      rows="4"
-      style="
-        width:100%;
-        padding:13px;
-        margin-bottom:15px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        box-sizing:border-box;
-        resize:vertical;
-      "
-    ></textarea>
-
-
-    <button
-      onclick="envoyerSignalement()"
-      style="
-        width:100%;
-        padding:14px;
-        border:none;
-        border-radius:10px;
-        background:#dc2626;
-        color:white;
-        font-size:16px;
-        font-weight:bold;
-        cursor:pointer;
-      ">
-
-      ⚠️ Envoyer le signalement
-
-    </button>
-
-
-    <button
-      onclick="fermerProblemeModal()"
-      style="
-        width:100%;
-        padding:12px;
-        margin-top:10px;
-        border:none;
-        background:#eee;
-        border-radius:10px;
-        cursor:pointer;
-      ">
-
-      Annuler
-
-    </button>
-
-  </div>
-
-</div>
-
-
-<script>
+/* =========================
+   SIGNALEMENT
+========================= */
 
 function ouvrirSignalement(){
 
@@ -5482,9 +4601,7 @@ function ouvrirSignalement(){
       "Connecte-toi pour signaler un problème."
     );
 
-
     ouvrirCompte();
-
 
     return;
 
@@ -5508,8 +4625,7 @@ function ouvrirSignalement(){
 
   document.getElementById(
     "problemeModal"
-  ).style.display =
-    "flex";
+  ).style.display = "flex";
 
 }
 
@@ -5518,8 +4634,7 @@ function fermerProblemeModal(){
 
   document.getElementById(
     "problemeModal"
-  ).style.display =
-    "none";
+  ).style.display = "none";
 
 }
 
@@ -5530,21 +4645,6 @@ async function envoyerSignalement(){
 
     alert(
       "Connecte-toi pour signaler un problème."
-    );
-
-    return;
-
-  }
-
-
-  if(!utilisateurConnecte.id){
-
-    alert(
-
-      "Impossible d'identifier ton compte.\n\n" +
-
-      "Déconnecte-toi puis reconnecte-toi."
-
     );
 
     return;
@@ -5619,9 +4719,7 @@ async function envoyerSignalement(){
 
 
     if(
-      !Array.isArray(
-        commandes
-      ) ||
+      !Array.isArray(commandes) ||
       !commandes.length
     ){
 
@@ -5639,58 +4737,19 @@ async function envoyerSignalement(){
 
 
     if(
-
       commande.buyer_id !==
-      utilisateurConnecte.id
-
-      &&
-
+      utilisateurConnecte.id &&
       commande.seller_id !==
       utilisateurConnecte.id
-
     ){
 
       alert(
-
         "Tu ne peux signaler qu'une commande à laquelle tu participes."
-
       );
 
       return;
 
     }
-
-
-    const signalement = {
-
-      order_id:
-        commande.id,
-
-      reporter_id:
-        utilisateurConnecte.id,
-
-      opened_by:
-        utilisateurConnecte.id,
-
-      reason:
-        reason,
-
-      description:
-        description,
-
-      status:
-        "open"
-
-    };
-
-
-    console.log(
-
-      "Signalement envoyé à Supabase :",
-
-      signalement
-
-    );
 
 
     await supabaseFetch(
@@ -5706,10 +4765,27 @@ async function envoyerSignalement(){
             "return=representation"
         },
 
-        body:
-          JSON.stringify(
-            signalement
-          )
+        body:JSON.stringify({
+
+          order_id:
+            commande.id,
+
+          reporter_id:
+            utilisateurConnecte.id,
+
+          opened_by:
+            utilisateurConnecte.id,
+
+          reason:
+            reason,
+
+          description:
+            description,
+
+          status:
+            "open"
+
+        })
 
       }
 
@@ -5722,11 +4798,8 @@ async function envoyerSignalement(){
     alert(
 
       "✅ Signalement envoyé !\n\n" +
-
       "Notre équipe pourra examiner le problème concernant la commande " +
-
       commande.order_number +
-
       "."
 
     );
@@ -5734,18 +4807,9 @@ async function envoyerSignalement(){
 
   }catch(error){
 
-    console.error(
-
-      "Erreur signalement :",
-      error
-
-    );
-
-
     alert(
 
       "Impossible d'envoyer le signalement.\n\n" +
-
       (
         error.message ||
         "Erreur inconnue."
@@ -5757,94 +4821,38 @@ async function envoyerSignalement(){
 
 }
 
-</script>
 
-
-<!-- =========================
-     MES VENTES
-========================= -->
-
-<div
-  id="mesVentesModal"
-  style="
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:10001;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  ">
-
-  <div
-    style="
-      background:white;
-      width:100%;
-      max-width:450px;
-      max-height:85vh;
-      overflow-y:auto;
-      border-radius:18px;
-      padding:24px;
-      box-sizing:border-box;
-    ">
-
-    <h2 style="margin-top:0;">
-      📦 Mes ventes
-    </h2>
-
-
-    <div id="listeMesVentes">
-
-      Chargement...
-
-    </div>
-
-
-    <button
-      onclick="fermerMesVentes()"
-      style="
-        width:100%;
-        padding:12px;
-        margin-top:15px;
-        border:none;
-        background:#eee;
-        border-radius:10px;
-        cursor:pointer;
-      ">
-
-      Fermer
-
-    </button>
-
-  </div>
-
-</div>
-
-<!-- ==========================================
-     TABLEAU DE BORD ADMIN — MARCHÉ GUINÉE
-========================================== -->
-
-<script>
+/* =========================
+   ADMIN
+========================= */
 
 async function verifierAccesAdmin(){
 
-  if(!utilisateurConnecte || !utilisateurConnecte.accessToken){
+  if(
+    !utilisateurConnecte ||
+    !utilisateurConnecte.accessToken
+  ){
     return false;
   }
 
+
   try{
 
-    const resultat = await supabaseFetch(
-      SUPABASE_URL + "/rest/v1/rpc/is_admin",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:"{}"
-      }
-    );
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/rpc/is_admin",
+
+        {
+          method:"POST",
+
+          body:"{}"
+
+        }
+
+      );
+
 
     return resultat === true;
 
@@ -5856,7 +4864,9 @@ async function verifierAccesAdmin(){
     );
 
     return false;
+
   }
+
 }
 
 
@@ -5865,36 +4875,55 @@ async function afficherBoutonAdmin(){
   const estAdmin =
     await verifierAccesAdmin();
 
+
   if(!estAdmin) return;
 
-  if(document.getElementById("boutonAdmin")){
+
+  if(
+    document.getElementById(
+      "boutonAdmin"
+    )
+  ){
     return;
   }
+
 
   const actions =
     document.querySelector(
       "#accountConnected .form-actions"
     );
 
+
   if(!actions) return;
 
+
   const bouton =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
-  bouton.id = "boutonAdmin";
 
-  bouton.className = "btn-primary";
+  bouton.id =
+    "boutonAdmin";
+
+
+  bouton.className =
+    "btn-primary";
+
 
   bouton.innerHTML =
     "📊 Tableau de bord administrateur";
 
+
   bouton.onclick =
     ouvrirTableauAdmin;
+
 
   actions.insertBefore(
     bouton,
     actions.firstChild
   );
+
 }
 
 
@@ -5905,9 +4934,50 @@ function fermerTableauAdmin(){
       "adminDashboardModal"
     );
 
+
   if(modal){
-    modal.style.display = "none";
+
+    modal.style.display =
+      "none";
+
   }
+
+}
+
+
+function carteAdmin(
+  titre,
+  valeur,
+  emoji
+){
+
+  return `
+
+    <div style="
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      border-radius:15px;
+      padding:16px;
+    ">
+
+      <div style="
+        font-size:14px;
+        color:#666;
+      ">
+        ${emoji} ${titre}
+      </div>
+
+      <div style="
+        margin-top:7px;
+        font-size:24px;
+        font-weight:bold;
+      ">
+        ${valeur}
+      </div>
+
+    </div>
+
+  `;
 
 }
 
@@ -5917,28 +4987,35 @@ async function ouvrirTableauAdmin(){
   const estAdmin =
     await verifierAccesAdmin();
 
+
   if(!estAdmin){
 
     alert(
-      "Accès refusé.\n\n" +
-      "Cette section est réservée aux administrateurs."
+      "Accès refusé.\n\nCette section est réservée aux administrateurs."
     );
 
     return;
+
   }
+
 
   let modal =
     document.getElementById(
       "adminDashboardModal"
     );
 
+
   if(!modal){
 
     modal =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     modal.id =
       "adminDashboardModal";
+
 
     modal.style.cssText =
       "display:none;" +
@@ -5949,6 +5026,7 @@ async function ouvrirTableauAdmin(){
       "padding:15px;" +
       "box-sizing:border-box;" +
       "overflow-y:auto;";
+
 
     modal.innerHTML = `
 
@@ -5994,50 +5072,23 @@ async function ouvrirTableauAdmin(){
         </div>
 
       </div>
+
     `;
 
-    document.body.appendChild(modal);
+
+    document.body.appendChild(
+      modal
+    );
 
   }
-   modal.style.display = "block";
+
+
+  modal.style.display =
+    "block";
+
 
   chargerTableauAdmin();
 
-}
-
-function carteAdmin(
-  titre,
-  valeur,
-  emoji
-){
-
-  return `
-
-    <div style="
-      background:#f8fafc;
-      border:1px solid #e5e7eb;
-      border-radius:15px;
-      padding:16px;
-    ">
-
-      <div style="
-        font-size:14px;
-        color:#666;
-      ">
-        ${emoji} ${titre}
-      </div>
-
-      <div style="
-        margin-top:7px;
-        font-size:24px;
-        font-weight:bold;
-      ">
-        ${valeur}
-      </div>
-
-    </div>
-
-  `;
 }
 
 
@@ -6048,7 +5099,9 @@ async function chargerTableauAdmin(){
       "adminDashboardContent"
     );
 
+
   if(!container) return;
+
 
   container.innerHTML = `
     <div style="
@@ -6060,10 +5113,12 @@ async function chargerTableauAdmin(){
     </div>
   `;
 
+
   try{
 
     const estAdmin =
       await verifierAccesAdmin();
+
 
     if(!estAdmin){
 
@@ -6071,12 +5126,9 @@ async function chargerTableauAdmin(){
         "<p>Accès refusé.</p>";
 
       return;
+
     }
 
-
-    /* =========================
-       UTILISATEURS
-    ========================= */
 
     const utilisateurs =
       await supabaseFetch(
@@ -6084,15 +5136,12 @@ async function chargerTableauAdmin(){
         "/rest/v1/users?select=id"
       );
 
+
     const nombreUtilisateurs =
       Array.isArray(utilisateurs)
         ? utilisateurs.length
         : 0;
 
-
-    /* =========================
-       ANNONCES
-    ========================= */
 
     const annonces =
       await supabaseFetch(
@@ -6100,25 +5149,24 @@ async function chargerTableauAdmin(){
         "/rest/v1/listings?select=id,status"
       );
 
+
     const listeAnnonces =
       Array.isArray(annonces)
         ? annonces
         : [];
+
 
     const annoncesActives =
       listeAnnonces.filter(
         a => a.status === "active"
       ).length;
 
+
     const annoncesVendues =
       listeAnnonces.filter(
         a => a.status === "sold"
       ).length;
 
-
-    /* =========================
-       COMMANDES
-    ========================= */
 
     const commandes =
       await supabaseFetch(
@@ -6127,10 +5175,12 @@ async function chargerTableauAdmin(){
         "?select=id,status,delivery_status,price_gnf,commission_gnf,seller_amount_gnf"
       );
 
+
     const listeCommandes =
       Array.isArray(commandes)
         ? commandes
         : [];
+
 
     const commandesTerminees =
       listeCommandes.filter(
@@ -6140,13 +5190,10 @@ async function chargerTableauAdmin(){
       );
 
 
-    /* =========================
-       FINANCES
-    ========================= */
-
     let totalVentes = 0;
     let totalCommission = 0;
     let totalVendeur = 0;
+
 
     commandesTerminees.forEach(
       commande => {
@@ -6170,10 +5217,6 @@ async function chargerTableauAdmin(){
     );
 
 
-    /* =========================
-       RETRAITS ADMIN
-    ========================= */
-
     const retraits =
       await supabaseFetch(
         SUPABASE_URL +
@@ -6182,6 +5225,7 @@ async function chargerTableauAdmin(){
         "&order=created_at.desc"
       );
 
+
     const listeRetraits =
       Array.isArray(retraits)
         ? retraits
@@ -6189,6 +5233,7 @@ async function chargerTableauAdmin(){
 
 
     let totalRetraitsTermines = 0;
+
 
     listeRetraits.forEach(
       retrait => {
@@ -6216,10 +5261,6 @@ async function chargerTableauAdmin(){
       );
 
 
-    /* =========================
-       LITIGES
-    ========================= */
-
     const litiges =
       await supabaseFetch(
         SUPABASE_URL +
@@ -6227,20 +5268,18 @@ async function chargerTableauAdmin(){
         "?select=id,status"
       );
 
+
     const listeLitiges =
       Array.isArray(litiges)
         ? litiges
         : [];
+
 
     const litigesOuverts =
       listeLitiges.filter(
         l => l.status === "open"
       ).length;
 
-
-    /* =========================
-       AFFICHAGE
-    ========================= */
 
     container.innerHTML = `
 
@@ -6288,46 +5327,45 @@ async function chargerTableauAdmin(){
         )}
 
       </div>
-<!-- UTILISATEURS ADMIN -->
 
-<div style="
-  margin-top:18px;
-  padding:18px;
-  background:#f8fafc;
-  border:1px solid #e5e7eb;
-  border-radius:16px;
-">
 
-  <h3 style="margin-top:0;">
-    👥 Utilisateurs
-  </h3>
+      <div style="
+        margin-top:18px;
+        padding:18px;
+        background:#f8fafc;
+        border:1px solid #e5e7eb;
+        border-radius:16px;
+      ">
 
-  <div id="listeUtilisateursAdmin">
-    Chargement...
-  </div>
+        <h3 style="margin-top:0;">
+          👥 Utilisateurs
+        </h3>
 
-</div>
-<!-- ANNONCES ADMIN -->
+        <div id="listeUtilisateursAdmin">
+          Chargement...
+        </div>
 
-<div style="
-  margin-top:18px;
-  padding:18px;
-  background:#f8fafc;
-  border:1px solid #e5e7eb;
-  border-radius:16px;
-">
+      </div>
 
-  <h3 style="margin-top:0;">
-    📦 Annonces
-  </h3>
 
-  <div id="listeAnnoncesAdmin">
-    Chargement...
-  </div>
+      <div style="
+        margin-top:18px;
+        padding:18px;
+        background:#f8fafc;
+        border:1px solid #e5e7eb;
+        border-radius:16px;
+      ">
 
-</div>
+        <h3 style="margin-top:0;">
+          📦 Annonces
+        </h3>
 
-      <!-- FINANCES -->
+        <div id="listeAnnoncesAdmin">
+          Chargement...
+        </div>
+
+      </div>
+
 
       <div style="
         margin-top:18px;
@@ -6420,8 +5458,6 @@ async function chargerTableauAdmin(){
       </div>
 
 
-      <!-- LITIGES -->
-
       <div style="
         margin-top:18px;
         padding:18px;
@@ -6450,8 +5486,6 @@ async function chargerTableauAdmin(){
 
       </div>
 
-
-      <!-- RETRAITS -->
 
       <div style="
         margin-top:18px;
@@ -6539,14 +5573,19 @@ async function chargerTableauAdmin(){
       </button>
 
     `;
+
+
     chargerUtilisateursAdmin();
-  
-      }catch(error){
+    chargerAnnoncesAdmin();
+
+
+  }catch(error){
 
     console.error(
       "Erreur tableau admin :",
       error
     );
+
 
     container.innerHTML = `
 
@@ -6577,205 +5616,35 @@ async function chargerTableauAdmin(){
 }
 
 
-/* ==========================================
-   DEMANDE DE RETRAIT ADMIN
-========================================== */
-
-async function ouvrirDemandeRetraitAdmin(){
-
-  const estAdmin =
-    await verifierAccesAdmin();
-
-  if(!estAdmin){
-
-    alert(
-      "Accès réservé à l'administrateur."
-    );
-
-    return;
-  }
-
-  const montant =
-    prompt(
-      "Montant du retrait en GNF :"
-    );
-
-  if(!montant) return;
-
-  const montantNumber =
-    Number(
-      String(montant)
-        .replace(/\s/g,"")
-        .replace(/,/g,"")
-    );
-
-  if(
-    !Number.isFinite(montantNumber) ||
-    montantNumber <= 0
-  ){
-
-    alert(
-      "Montant invalide."
-    );
-
-    return;
-  }
-
-
-  const choix =
-    prompt(
-      "Méthode de retrait :\n\n" +
-      "1 = MTN MoMo\n" +
-      "2 = Orange Money"
-    );
-
-  let method = "";
-
-  if(choix === "1"){
-    method = "MTN_MOMO";
-  }
-
-  if(choix === "2"){
-    method = "ORANGE_MONEY";
-  }
-
-  if(!method){
-
-    alert(
-      "Méthode invalide."
-    );
-
-    return;
-  }
-
-
-  const phone =
-    prompt(
-      "Numéro qui recevra le retrait :"
-    );
-
-  if(!phone){
-
-    alert(
-      "Numéro obligatoire."
-    );
-
-    return;
-  }
-
-
-  try{
-
-    await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/admin_withdrawals",
-      {
-        method:"POST",
-
-        headers:{
-          "Prefer":
-            "return=representation"
-        },
-
-        body:JSON.stringify({
-
-          admin_id:
-            utilisateurConnecte.id,
-
-          amount_gnf:
-            Math.round(
-              montantNumber
-            ),
-
-          method:
-            method,
-
-          phone:
-            phone.trim(),
-
-          status:
-            "pending"
-
-        })
-      }
-    );
-
-
-    alert(
-      "✅ Demande de retrait enregistrée.\n\n" +
-      "Elle est actuellement en attente."
-    );
-
-
-    chargerTableauAdmin();
-
-  }catch(error){
-
-    console.error(
-      "Erreur retrait admin :",
-      error
-    );
-
-    alert(
-      "Impossible d'enregistrer le retrait.\n\n" +
-      (
-        error.message ||
-        "Erreur inconnue."
-      )
-    );
-
-  }
-
-}
-
-
-/* ==========================================
-   ACTIVER LE BOUTON ADMIN APRÈS CONNEXION
-========================================== */
-
-const ancienneOuvrirCompte =
-  window.ouvrirCompte;
-
-window.ouvrirCompte =
-  function(){
-
-    ancienneOuvrirCompte();
-
-    setTimeout(
-      afficherBoutonAdmin,
-      300
-    );
-
-  };
-
-
-setTimeout(
-  afficherBoutonAdmin,
-  1000
-);
-  async function chargerAnnoncesAdmin(){
+async function chargerAnnoncesAdmin(){
 
   const container =
     document.getElementById(
       "listeAnnoncesAdmin"
     );
 
+
   if(!container) return;
+
 
   try{
 
     const annonces =
       await supabaseFetch(
+
         SUPABASE_URL +
         "/rest/v1/listings" +
         "?select=id,title,price_gnf,condition,city,neighborhood,status,created_at" +
         "&order=created_at.desc"
+
       );
+
 
     const liste =
       Array.isArray(annonces)
         ? annonces
         : [];
+
 
     if(!liste.length){
 
@@ -6783,15 +5652,21 @@ setTimeout(
         "Aucune annonce trouvée.";
 
       return;
+
     }
 
+
     container.innerHTML = "";
+
 
     liste.forEach(
       annonce => {
 
         const div =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
+
 
         div.style.cssText =
           "border:1px solid #ddd;" +
@@ -6799,6 +5674,7 @@ setTimeout(
           "padding:13px;" +
           "margin-bottom:10px;" +
           "background:white;";
+
 
         div.innerHTML = `
 
@@ -6839,10 +5715,14 @@ setTimeout(
 
         `;
 
-        container.appendChild(div);
+
+        container.appendChild(
+          div
+        );
 
       }
     );
+
 
   }catch(error){
 
@@ -6851,14 +5731,18 @@ setTimeout(
       error
     );
 
+
     container.innerHTML =
-  "Impossible de charger les annonces.<br><br>" +
-  escapeHTML(
-    error.message ||
-    "Erreur inconnue."
-  );
+      "Impossible de charger les annonces.<br><br>" +
+      escapeHTML(
+        error.message ||
+        "Erreur inconnue."
+      );
+
+  }
 
 }
+
 
 async function chargerUtilisateursAdmin(){
 
@@ -6867,12 +5751,15 @@ async function chargerUtilisateursAdmin(){
       "listeUtilisateursAdmin"
     );
 
+
   if(!container) return;
+
 
   try{
 
     const estAdmin =
       await verifierAccesAdmin();
+
 
     if(!estAdmin){
 
@@ -6880,24 +5767,31 @@ async function chargerUtilisateursAdmin(){
         "Accès refusé.";
 
       return;
+
     }
+
 
     const utilisateurs =
       await supabaseFetch(
+
         SUPABASE_URL +
         "/rest/v1/users" +
         "?select=id,full_name,phone,city,neighborhood,status,created_at" +
         "&order=created_at.desc"
+
       );
+
 
     const liste =
       Array.isArray(utilisateurs)
         ? utilisateurs
         : [];
 
+
     if(!liste.length){
 
       container.innerHTML = `
+
         <div style="
           padding:15px;
           text-align:center;
@@ -6905,18 +5799,25 @@ async function chargerUtilisateursAdmin(){
         ">
           Aucun utilisateur trouvé.
         </div>
+
       `;
 
       return;
+
     }
 
+
     container.innerHTML = "";
+
 
     liste.forEach(
       utilisateur => {
 
         const div =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
+
 
         div.style.cssText =
           "border:1px solid #ddd;" +
@@ -6924,6 +5825,7 @@ async function chargerUtilisateursAdmin(){
           "padding:13px;" +
           "margin-bottom:10px;" +
           "background:white;";
+
 
         div.innerHTML = `
 
@@ -6973,10 +5875,14 @@ async function chargerUtilisateursAdmin(){
 
         `;
 
-        container.appendChild(div);
+
+        container.appendChild(
+          div
+        );
 
       }
     );
+
 
   }catch(error){
 
@@ -6985,25 +5891,252 @@ async function chargerUtilisateursAdmin(){
       error
     );
 
+
     container.innerHTML = `
+
       <div style="
         padding:12px;
         background:#fee2e2;
         color:#b91c1c;
         border-radius:10px;
       ">
+
         Impossible de charger les utilisateurs.
+
         <br><br>
+
         ${escapeHTML(
           error.message ||
           "Erreur inconnue."
         )}
+
       </div>
+
     `;
 
   }
 
 }
+
+
+/* =========================
+   RETRAIT ADMIN
+========================= */
+
+async function ouvrirDemandeRetraitAdmin(){
+
+  const estAdmin =
+    await verifierAccesAdmin();
+
+
+  if(!estAdmin){
+
+    alert(
+      "Accès réservé à l'administrateur."
+    );
+
+    return;
+
+  }
+
+
+  const montant =
+    prompt(
+      "Montant du retrait en GNF :"
+    );
+
+
+  if(!montant) return;
+
+
+  const montantNumber =
+    Number(
+      String(montant)
+        .replace(/\s/g,"")
+        .replace(/,/g,"")
+    );
+
+
+  if(
+    !Number.isFinite(montantNumber) ||
+    montantNumber <= 0
+  ){
+
+    alert(
+      "Montant invalide."
+    );
+
+    return;
+
+  }
+
+
+  const choix =
+    prompt(
+      "Méthode de retrait :\n\n" +
+      "1 = MTN MoMo\n" +
+      "2 = Orange Money"
+    );
+
+
+  let method = "";
+
+
+  if(choix === "1"){
+    method = "MTN_MOMO";
+  }
+
+
+  if(choix === "2"){
+    method = "ORANGE_MONEY";
+  }
+
+
+  if(!method){
+
+    alert(
+      "Méthode invalide."
+    );
+
+    return;
+
+  }
+
+
+  const phone =
+    prompt(
+      "Numéro qui recevra le retrait :"
+    );
+
+
+  if(!phone){
+
+    alert(
+      "Numéro obligatoire."
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    await supabaseFetch(
+
+      SUPABASE_URL +
+      "/rest/v1/admin_withdrawals",
+
+      {
+        method:"POST",
+
+        headers:{
+          "Prefer":
+            "return=representation"
+        },
+
+        body:JSON.stringify({
+
+          admin_id:
+            utilisateurConnecte.id,
+
+          amount_gnf:
+            Math.round(
+              montantNumber
+            ),
+
+          method:
+            method,
+
+          phone:
+            phone.trim(),
+
+          status:
+            "pending"
+
+        })
+
+      }
+
+    );
+
+
+    alert(
+      "✅ Demande de retrait enregistrée.\n\n" +
+      "Elle est actuellement en attente."
+    );
+
+
+    chargerTableauAdmin();
+
+
+  }catch(error){
+
+    alert(
+      "Impossible d'enregistrer le retrait.\n\n" +
+      (
+        error.message ||
+        "Erreur inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================
+   ADMIN APRÈS CONNEXION
+========================= */
+
+const ancienneOuvrirCompte =
+  window.ouvrirCompte;
+
+
+window.ouvrirCompte =
+  function(){
+
+    ancienneOuvrirCompte();
+
+    setTimeout(
+      afficherBoutonAdmin,
+      300
+    );
+
+  };
+
+
+setTimeout(
+  afficherBoutonAdmin,
+  1000
+);
+
+
+/* =========================
+   DÉMARRAGE
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    restaurerSession();
+
+    chargerAnnonces();
+
+    if(utilisateurConnecte){
+
+      setTimeout(
+        afficherBoutonAdmin,
+        500
+      );
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>
