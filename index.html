@@ -6550,7 +6550,7 @@ async function chargerTableauAdmin(){
 
     `;
     chargerUtilisateursAdmin();
-    
+    chargerAnnoncesAdmin();
   }catch(error){
 
     console.error(
@@ -6762,6 +6762,115 @@ window.ouvrirCompte =
 setTimeout(
   afficherBoutonAdmin,
   1000
+async function chargerAnnoncesAdmin(){
+
+  const container =
+    document.getElementById(
+      "listeAnnoncesAdmin"
+    );
+
+  if(!container) return;
+
+  try{
+
+    const annonces =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/listings" +
+        "?select=id,title,price_gnf,condition,city,neighborhood,status,created_at" +
+        "&order=created_at.desc"
+      );
+
+    const liste =
+      Array.isArray(annonces)
+        ? annonces
+        : [];
+
+    if(!liste.length){
+
+      container.innerHTML =
+        "Aucune annonce trouvée.";
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    liste.forEach(
+      annonce => {
+
+        const div =
+          document.createElement("div");
+
+        div.style.cssText =
+          "border:1px solid #ddd;" +
+          "border-radius:12px;" +
+          "padding:13px;" +
+          "margin-bottom:10px;" +
+          "background:white;";
+
+        div.innerHTML = `
+
+          <strong>
+            📦 ${
+              escapeHTML(
+                annonce.title ||
+                "Annonce"
+              )
+            }
+          </strong>
+
+          <div>
+            💰 ${
+              Number(
+                annonce.price_gnf || 0
+              ).toLocaleString("fr-FR")
+            } GNF
+          </div>
+
+          <div>
+            📍 ${
+              escapeHTML(
+                annonce.city || ""
+              )
+            }
+          </div>
+
+          <div>
+            📌 Statut :
+            ${
+              escapeHTML(
+                annonce.status ||
+                "Inconnu"
+              )
+            }
+          </div>
+
+        `;
+
+        container.appendChild(div);
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur annonces admin :",
+      error
+    );
+
+    container.innerHTML =
+      "Impossible de charger les annonces.<br><br>" +
+      escapeHTML(
+        error.message ||
+        "Erreur inconnue."
+      );
+
+  }
+
+}
+
 );
 async function chargerUtilisateursAdmin(){
 
