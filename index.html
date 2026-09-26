@@ -3957,7 +3957,7 @@ async function continuerPaiement(listingId){
 
     `;
 
-   }catch(erreur){
+  }catch(erreur){
 
   console.error(
     "Erreur commande :",
@@ -3969,8 +3969,8 @@ async function continuerPaiement(listingId){
     (erreur?.message || JSON.stringify(erreur))
   );
 
+  }
 }
-
 /* =========================
    MESSAGERIE
 ========================= */
