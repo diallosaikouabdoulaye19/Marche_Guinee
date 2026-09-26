@@ -3437,11 +3437,18 @@ async function chargerMesVentes(){
 
 }
 
-  async function verifierCodeLivraison(orderId){
+ async function verifierCodeLivraison(
+  orderId
+){
 
   if(!utilisateurConnecte){
-    alert("Connecte-toi pour continuer.");
+
+    alert(
+      "Connecte-toi pour continuer."
+    );
+
     return;
+
   }
 
   const code =
@@ -3454,66 +3461,127 @@ async function chargerMesVentes(){
   const codeSaisi =
     code.trim();
 
-  if(!codeSaisi){
-    alert("Veuillez entrer le code de livraison.");
+  if(!/^\d{6}$/.test(codeSaisi)){
+
+    alert(
+      "Le code doit contenir exactement 6 chiffres."
+    );
+
     return;
+
   }
 
   try{
 
     const commandes =
       await supabaseFetch(
+
         SUPABASE_URL +
         "/rest/v1/orders" +
         "?id=eq." +
-        encodeURIComponent(orderId) +
+        encodeURIComponent(
+          orderId
+        ) +
         "&seller_id=eq." +
         encodeURIComponent(
           utilisateurConnecte.id
         ) +
-        "&select=id,delivery_code,status,delivery_status"
+        "&select=id,order_number,delivery_code,status,delivery_status"
+
       );
 
     if(
       !Array.isArray(commandes) ||
       !commandes.length
     ){
+
       alert(
         "Commande introuvable."
       );
+
       return;
+
     }
 
     const commande =
       commandes[0];
 
+
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/rpc/confirm_delivery",
+
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              p_order_id:
+                commande.id,
+
+              p_delivery_code:
+                codeSaisi
+
+            })
+
+        }
+
+      );
+
+
     if(
-      String(commande.delivery_code) !==
-      String(codeSaisi)
+      !resultat ||
+      resultat.success !== true
     ){
 
       alert(
-        "❌ Code incorrect.\n\n" +
-        "Le code présenté par l'acheteur ne correspond pas à cette commande."
+        resultat?.message ||
+        "Code de livraison incorrect."
       );
 
       return;
+
     }
+
 
     alert(
       "✅ Code vérifié avec succès !\n\n" +
-      "Le code correspond à cette commande."
+      "La livraison est maintenant enregistrée.\n\n" +
+      "L'acheteur peut maintenant confirmer la réception de son colis."
     );
+
+
+    if(
+      typeof chargerMesVentes ===
+      "function"
+    ){
+
+      chargerMesVentes();
+
+    }
+
+
+    if(
+      typeof chargerAnnonces ===
+      "function"
+    ){
+
+      chargerAnnonces();
+
+    }
 
   }catch(error){
 
     console.error(
-      "Erreur vérification code :",
+      "Erreur vérification livraison :",
       error
     );
 
     alert(
-      "Impossible de vérifier le code.\n\n" +
+      "Impossible de vérifier la livraison.\n\n" +
       (
         error.message ||
         "Erreur Supabase inconnue."
