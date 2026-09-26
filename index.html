@@ -3684,17 +3684,12 @@ async function continuerPaiement(listingId){
        RÉCUPÉRER L'UTILISATEUR
     ========================= */
 
-    const {
-      data: { user },
-      error: userError
+    const user = utilisateurConnecte;
 
-    } = await supabaseClient.auth.getUser();
-
-    if(userError || !user){
-      alert("Impossible de récupérer ton compte.");
-      return;
-    }
-
+if(!user || !user.id){
+  alert("Impossible de récupérer ton compte.");
+  return;
+}
     /* =========================
        EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
     ========================= */
