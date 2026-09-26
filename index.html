@@ -2870,7 +2870,7 @@ async function chargerMesVentes(){
         encodeURIComponent(
           utilisateurConnecte.id
         ) +
-        "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+        "&select=id,order_number,product_title,price_gnf,status,delivery_status,delivery_code,commission_gnf,seller_amount_gnf,created_at" +
         "&order=created_at.desc"
 
       );
@@ -2980,7 +2980,25 @@ async function chargerMesVentes(){
               vente.created_at
             )
           ) +
-          "</div>";
+          "</div>" +
+
+          "<button" +
+          " onclick=\"verifierCodeLivraison('" +
+          escapeHTML(vente.id) +
+          "')\"" +
+          " style='" +
+          "margin-top:12px;" +
+          "width:100%;" +
+          "padding:12px;" +
+          "border:none;" +
+          "border-radius:10px;" +
+          "background:#111827;" +
+          "color:white;" +
+          "font-weight:bold;" +
+          "cursor:pointer;" +
+          "'>" +
+          "🔐 Vérifier le code de livraison" +
+          "</button>";
 
 
         container.appendChild(div);
@@ -3005,6 +3023,92 @@ async function chargerMesVentes(){
 
 }
 
+  async function verifierCodeLivraison(orderId){
+
+  if(!utilisateurConnecte){
+    alert("Connecte-toi pour continuer.");
+    return;
+  }
+
+  const code =
+    prompt(
+      "🔐 Entre le code de livraison présenté par l'acheteur :"
+    );
+
+  if(code === null) return;
+
+  const codeSaisi =
+    code.trim();
+
+  if(!codeSaisi){
+    alert("Veuillez entrer le code de livraison.");
+    return;
+  }
+
+  try{
+
+    const commandes =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?id=eq." +
+        encodeURIComponent(orderId) +
+        "&seller_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&select=id,delivery_code,status,delivery_status"
+      );
+
+    if(
+      !Array.isArray(commandes) ||
+      !commandes.length
+    ){
+      alert(
+        "Commande introuvable."
+      );
+      return;
+    }
+
+    const commande =
+      commandes[0];
+
+    if(
+      String(commande.delivery_code) !==
+      String(codeSaisi)
+    ){
+
+      alert(
+        "❌ Code incorrect.\n\n" +
+        "Le code présenté par l'acheteur ne correspond pas à cette commande."
+      );
+
+      return;
+    }
+
+    alert(
+      "✅ Code vérifié avec succès !\n\n" +
+      "Le code correspond à cette commande."
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur vérification code :",
+      error
+    );
+
+    alert(
+      "Impossible de vérifier le code.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
 
 /* =========================
    CHARGEMENT ANNONCES
