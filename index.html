@@ -3828,19 +3828,9 @@ if(!user || !user.id){
         {
           method:"POST",
 
-          headers:{
-            "Content-Type":
-              "application/json",
-
-            "apikey":
-              SUPABASE_KEY,
-
-            "Authorization":
-              `Bearer ${SUPABASE_KEY}`,
-
-            "Prefer":
-              "return=representation"
-          },
+  headers:headers({
+  "Prefer":"return=representation"
+}),
 
           body:
             JSON.stringify(commande)
