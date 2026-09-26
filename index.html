@@ -2741,7 +2741,7 @@ async function chargerSoldeVendeur(){
 
 }
 
-  /* =========================
+/* =========================
    MES ACHATS - ACHETEUR
 ========================= */
 
@@ -2920,6 +2920,16 @@ async function chargerMesAchats(){
             achat.price_gnf || 0
           );
 
+        const commission =
+          Number(
+            achat.commission_gnf || 0
+          );
+
+        const montantVendeur =
+          Number(
+            achat.seller_amount_gnf || 0
+          );
+
         const div =
           document.createElement(
             "div"
@@ -2936,7 +2946,7 @@ async function chargerMesAchats(){
 
         if(
           achat.status ===
-            "awaiting_receipt"
+          "awaiting_receipt"
         ){
 
           boutonReception = `
@@ -2981,6 +2991,10 @@ async function chargerMesAchats(){
           prix.toLocaleString("fr-FR") +
           " GNF</div>" +
 
+          "<div>🏦 Commission : " +
+          commission.toLocaleString("fr-FR") +
+          " GNF</div>" +
+
           "<div style='margin-top:8px;'>📦 Statut : " +
           escapeHTML(
             statutCommandeTexte(
@@ -3017,6 +3031,11 @@ async function chargerMesAchats(){
 
   }catch(error){
 
+    console.error(
+      "Erreur chargement achats :",
+      error
+    );
+
     container.innerHTML =
       '<div style="padding:15px;color:#dc2626;background:#fdeaea;border-radius:10px;">' +
       "<strong>Impossible de charger tes achats.</strong>" +
@@ -3031,6 +3050,10 @@ async function chargerMesAchats(){
 
 }
 
+
+/* =========================
+   CONFIRMATION DE RÉCEPTION
+========================= */
 
 async function confirmerReceptionAchat(
   orderId
@@ -3050,53 +3073,39 @@ async function confirmerReceptionAchat(
     confirm(
       "✅ Confirmer la réception\n\n" +
       "As-tu bien reçu ton colis ?\n\n" +
-      "Après confirmation, la vente sera finalisée et le montant vendeur pourra être versé après déduction de la commission de 3 %."
+      "Après confirmation, la vente sera finalisée et le montant vendeur sera disponible après déduction de la commission de 3 %."
     );
 
   if(!confirmation) return;
 
   try{
 
-    const commandes =
+    const resultat =
       await supabaseFetch(
 
         SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?id=eq." +
-        encodeURIComponent(
-          orderId
-        ) +
-        "&buyer_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=id,order_number,status,delivery_status"
+        "/rest/v1/rpc/confirm_receipt",
+
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+              p_order_id:
+                orderId
+            })
+        }
 
       );
 
     if(
-      !Array.isArray(commandes) ||
-      !commandes.length
+      !resultat ||
+      resultat.success !== true
     ){
 
       alert(
-        "Commande introuvable."
-      );
-
-      return;
-
-    }
-
-    const commande =
-      commandes[0];
-
-    if(
-      commande.status !==
-      "awaiting_receipt"
-    ){
-
-      alert(
-        "Cette commande n'est pas encore prête pour la confirmation de réception."
+        resultat?.message ||
+        "Impossible de confirmer la réception."
       );
 
       return;
@@ -3104,8 +3113,23 @@ async function confirmerReceptionAchat(
     }
 
     alert(
-      "La commande est prête à être finalisée."
+      "✅ Réception confirmée !\n\n" +
+      "La commande est maintenant terminée.\n\n" +
+      "La vente a été finalisée."
     );
+
+    fermerMesAchats();
+
+    chargerAnnonces();
+
+    if(
+      typeof chargerSoldeVendeur ===
+      "function"
+    ){
+
+      chargerSoldeVendeur();
+
+    }
 
   }catch(error){
 
