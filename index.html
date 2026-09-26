@@ -3725,43 +3725,24 @@ if(!user || !user.id){
        MG 000001, MG 000002...
     ========================= */
 
-    const dernieresCommandes =
+    const reponseNumero =
   await fetch(
-    `${SUPABASE_URL}/rest/v1/orders?select=order_number&order=order_number.desc&limit=1`,
+    `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
     {
-      headers:headers()
+      method:"POST",
+      headers:headers(),
+      body:JSON.stringify({})
     }
   );
 
-let prochainNumero = 1;
-
-if(dernieresCommandes.ok){
-
-  const commandes =
-    await dernieresCommandes.json();
-
-  if(
-    commandes.length > 0 &&
-    commandes[0].order_number
-  ){
-
-    const numero =
-      parseInt(
-        String(
-          commandes[0].order_number
-        ).replace(/\D/g,""),
-        10
-      );
-
-    if(!isNaN(numero)){
-      prochainNumero = numero + 1;
-    }
-  }
+if(!reponseNumero.ok){
+  throw new Error(
+    "Impossible de générer le numéro de commande."
+  );
 }
 
 const orderNumber =
-  "MG " +
-  String(prochainNumero).padStart(6,"0");
+  await reponseNumero.json();
     /* =========================
        CODE UNIQUE DE LIVRAISON
        ========================= */
