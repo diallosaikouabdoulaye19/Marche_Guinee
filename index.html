@@ -4183,7 +4183,8 @@ try{
 /* =========================
    COMPTE DE PAIEMENT
 ========================= */
-const comptes =
+
+  const comptes =
   await supabaseFetch(
     SUPABASE_URL +
     "/rest/v1/payout_accounts" +
@@ -4209,10 +4210,12 @@ if(
 }
 const compte =
   comptes[0];
-/* =========================
+
+  /* =========================
    MODAL DE RETRAIT
 ========================= */
-let modal =
+
+  let modal =
   document.getElementById(
     "demandeRetraitModal"
   );
@@ -4569,9 +4572,11 @@ continuer.onclick =
     continuer.textContent =
       "⏳ Enregistrement...";
     try{
-      /* =========================
+     
+/* =========================
          CRÉATION DU RETRAIT
-      ========================= */
+  ========================= */
+      
       const resultat =
         await supabaseFetch(
           SUPABASE_URL +
