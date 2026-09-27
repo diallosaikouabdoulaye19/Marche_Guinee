@@ -1423,163 +1423,420 @@ footer{
 
 </div>
 
-
 <!-- =========================
-     PUBLICATION
+     PUBLICATION — MARCHÉ GUINÉE
 ========================= -->
 
 <div id="publishModal" class="modal">
 
-  <div class="modal-box">
+  <div class="modal-box" style="
+    max-width:620px;
+    padding:0;
+    overflow:hidden;
+    border-radius:24px;
+    background:#f7f9f8;
+  ">
 
-    <span
-      class="close"
-      onclick="fermerModal('publishModal')">
-      ×
-    </span>
+    <!-- EN-TÊTE -->
 
-    <h2>
-      Publier une annonce
-    </h2>
+    <div style="
+      background:linear-gradient(135deg,#087f3f,#10a653);
+      color:white;
+      padding:22px 20px;
+      position:relative;
+    ">
 
-    <div id="publishMessage"></div>
+      <span
+        class="close"
+        onclick="fermerModal('publishModal')"
+        style="
+          color:white;
+          right:15px;
+          top:12px;
+          width:38px;
+          height:38px;
+          border-radius:50%;
+          background:rgba(255,255,255,.15);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:26px;
+        ">
+        ×
+      </span>
 
-    <div class="form-group">
+      <div style="
+        font-size:12px;
+        font-weight:700;
+        opacity:.85;
+        margin-bottom:6px;
+      ">
+        🇬🇳 MARCHÉ GUINÉE
+      </div>
 
-      <label>Titre</label>
+      <h2 style="
+        margin:0;
+        font-size:25px;
+        font-weight:900;
+      ">
+        Publier une annonce
+      </h2>
 
-      <input
-        id="listingTitle"
-        type="text"
-        placeholder="Ex : iPhone 13">
-
-    </div>
-
-    <div class="form-group">
-
-      <label>Description</label>
-
-      <textarea
-        id="listingDescription"
-        placeholder="Décris ton produit..."></textarea>
-
-    </div>
-
-    <div class="form-group">
-
-      <label>Prix (GNF)</label>
-
-      <input
-        id="listingPrice"
-        type="number"
-        placeholder="Ex : 5000000">
-
-    </div>
-
-    <div class="form-group">
-
-      <label>État</label>
-
-      <select id="listingCondition">
-
-        <option value="Good">
-          Bon état
-        </option>
-
-        <option value="New">
-          Neuf
-        </option>
-
-        <option value="Used">
-          Occasion
-        </option>
-
-      </select>
+      <p style="
+        margin:7px 0 0;
+        font-size:13px;
+        opacity:.9;
+      ">
+        Présente ton produit aux acheteurs en Guinée.
+      </p>
 
     </div>
 
-    <div class="form-group">
 
-      <label>Catégorie</label>
+    <!-- CONTENU -->
 
-      <select id="listingCategory">
+    <div style="
+      padding:20px;
+    ">
 
-        <option value="Téléphones">
-          Téléphones
-        </option>
+      <div id="publishMessage"></div>
 
-        <option value="Mode">
-          Mode
-        </option>
 
-        <option value="Maison">
-          Maison
-        </option>
+      <!-- TITRE -->
 
-        <option value="Électronique">
-          Électronique
-        </option>
+      <div class="form-group">
 
-        <option value="Véhicules">
-          Véhicules
-        </option>
+        <label
+          for="listingTitle"
+          style="
+            font-size:13px;
+            font-weight:800;
+            color:#27332d;
+          ">
+          Nom du produit
+        </label>
 
-        <option value="Autres">
-          Autres
-        </option>
+        <input
+          id="listingTitle"
+          type="text"
+          placeholder="Ex : iPhone 13"
+          style="
+            background:white;
+            border:1px solid #dfe6e1;
+            border-radius:13px;
+            padding:13px;
+          ">
 
-      </select>
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <div class="form-group">
+
+        <label
+          for="listingDescription"
+          style="
+            font-size:13px;
+            font-weight:800;
+            color:#27332d;
+          ">
+          Description
+        </label>
+
+        <textarea
+          id="listingDescription"
+          placeholder="Décris ton produit..."
+          style="
+            background:white;
+            border:1px solid #dfe6e1;
+            border-radius:13px;
+            padding:13px;
+            min-height:120px;
+          "></textarea>
+
+      </div>
+
+
+      <!-- PRIX -->
+
+      <div class="form-group">
+
+        <label
+          for="listingPrice"
+          style="
+            font-size:13px;
+            font-weight:800;
+            color:#27332d;
+          ">
+          Prix en GNF
+        </label>
+
+        <input
+          id="listingPrice"
+          type="number"
+          inputmode="numeric"
+          placeholder="Ex : 5000000"
+          style="
+            background:white;
+            border:1px solid #dfe6e1;
+            border-radius:13px;
+            padding:13px;
+            font-size:16px;
+            font-weight:700;
+          ">
+
+      </div>
+
+
+      <!-- ÉTAT + CATÉGORIE -->
+
+      <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      ">
+
+        <div class="form-group">
+
+          <label
+            for="listingCondition"
+            style="
+              font-size:13px;
+              font-weight:800;
+            ">
+            État
+          </label>
+
+          <select
+            id="listingCondition"
+            style="
+              background:white;
+              border:1px solid #dfe6e1;
+              border-radius:13px;
+              padding:13px;
+            ">
+
+            <option value="Good">
+              Bon état
+            </option>
+
+            <option value="New">
+              Neuf
+            </option>
+
+            <option value="Used">
+              Occasion
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label
+            for="listingCategory"
+            style="
+              font-size:13px;
+              font-weight:800;
+            ">
+            Catégorie
+          </label>
+
+          <select
+            id="listingCategory"
+            style="
+              background:white;
+              border:1px solid #dfe6e1;
+              border-radius:13px;
+              padding:13px;
+            ">
+
+            <option value="Téléphones">
+              Téléphones
+            </option>
+
+            <option value="Mode">
+              Mode
+            </option>
+
+            <option value="Maison">
+              Maison
+            </option>
+
+            <option value="Électronique">
+              Électronique
+            </option>
+
+            <option value="Véhicules">
+              Véhicules
+            </option>
+
+            <option value="Autres">
+              Autres
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- LOCALISATION -->
+
+      <div style="
+        background:white;
+        border:1px solid #e5ebe7;
+        border-radius:16px;
+        padding:14px;
+        margin:5px 0 14px;
+      ">
+
+        <div style="
+          font-size:13px;
+          font-weight:900;
+          margin-bottom:10px;
+          color:#17221d;
+        ">
+          📍 Localisation
+        </div>
+
+
+        <div class="form-group">
+
+          <label
+            for="listingCity"
+            style="
+              font-size:12px;
+              font-weight:700;
+            ">
+            Ville
+          </label>
+
+          <input
+            id="listingCity"
+            type="text"
+            value="Conakry"
+            style="
+              background:#f7f9f8;
+              border:1px solid #dfe6e1;
+              border-radius:11px;
+              padding:12px;
+            ">
+
+        </div>
+
+
+        <div class="form-group" style="margin-bottom:0;">
+
+          <label
+            for="listingNeighborhood"
+            style="
+              font-size:12px;
+              font-weight:700;
+            ">
+            Quartier
+          </label>
+
+          <input
+            id="listingNeighborhood"
+            type="text"
+            placeholder="Ex : Bambéto"
+            style="
+              background:#f7f9f8;
+              border:1px solid #dfe6e1;
+              border-radius:11px;
+              padding:12px;
+            ">
+
+        </div>
+
+      </div>
+
+
+      <!-- PHOTO -->
+
+      <div class="form-group">
+
+        <label
+          for="listingPhoto"
+          style="
+            font-size:13px;
+            font-weight:800;
+          ">
+          📷 Photo du produit
+        </label>
+
+        <div style="
+          background:white;
+          border:1px dashed #b8c7bd;
+          border-radius:16px;
+          padding:15px;
+          text-align:center;
+        ">
+
+          <input
+            id="listingPhoto"
+            type="file"
+            accept="image/*"
+            onchange="previewPhoto()"
+            style="
+              width:100%;
+              font-size:13px;
+            ">
+
+          <img
+            id="photoPreview"
+            class="photo-preview hidden"
+            style="
+              max-width:100%;
+              max-height:220px;
+              margin:14px auto 0;
+              border-radius:14px;
+              object-fit:cover;
+            ">
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTON -->
+
+      <button
+        class="btn-green"
+        onclick="publierAnnonce()"
+        style="
+          width:100%;
+          padding:15px;
+          border-radius:14px;
+          font-size:15px;
+          font-weight:900;
+          margin-top:5px;
+        ">
+
+        📢 Publier l'annonce
+
+      </button>
+
+
+      <div style="
+        text-align:center;
+        margin-top:11px;
+        font-size:11px;
+        color:#77817c;
+      ">
+        Publication gratuite sur Marché Guinée 🇬🇳
+      </div>
 
     </div>
-
-    <div class="form-group">
-
-      <label>Ville</label>
-
-      <input
-        id="listingCity"
-        type="text"
-        value="Conakry">
-
-    </div>
-
-    <div class="form-group">
-
-      <label>Quartier</label>
-
-      <input
-        id="listingNeighborhood"
-        type="text"
-        placeholder="Ex : Bambéto">
-
-    </div>
-
-    <div class="form-group">
-
-      <label>Photo</label>
-
-      <input
-        id="listingPhoto"
-        type="file"
-        accept="image/*"
-        onchange="previewPhoto()">
-
-      <img
-        id="photoPreview"
-        class="photo-preview hidden">
-
-    </div>
-
-    <button
-      class="btn-green"
-      onclick="publierAnnonce()">
-      Publier l'annonce
-    </button>
 
   </div>
 
 </div>
-
 
 <!-- =========================
      DETAIL ANNONCE
