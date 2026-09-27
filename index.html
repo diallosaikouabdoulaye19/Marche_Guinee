@@ -4151,510 +4151,155 @@ async function chargerImages(listingId){
    DEMANDE DE RETRAIT
 ========================= */
 
-async function ouvrirDemandeRetrait(
-soldeDisponible
-){
+async function ouvrirDemandeRetrait(soldeDisponible){
 
-if(!utilisateurConnecte){
+  if(!utilisateurConnecte){
+    alert("Connecte-toi pour demander un retrait.");
+    return;
+  }
 
-alert(
-  "Connecte-toi pour demander un retrait."
-);
-return;
+  if(!Number.isFinite(soldeDisponible) || soldeDisponible <= 0){
+    alert("Ton solde disponible est insuffisant.");
+    return;
+  }
 
-}
+  try{
 
-if(
-!Number.isFinite(
-soldeDisponible
-) ||
-soldeDisponible <= 0
-){
+    const comptes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/payout_accounts" +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&status=eq.active" +
+      "&select=id,provider,phone,account_name" +
+      "&order=created_at.desc" +
+      "&limit=1"
+    );
 
-alert(
-  "Ton solde disponible est insuffisant."
-);
-return;
+    if(!Array.isArray(comptes) || !comptes.length){
 
-}
-
-try{
-
-/* =========================
-   COMPTE DE PAIEMENT
-========================= */
-
-  const comptes =
-  await supabaseFetch(
-    SUPABASE_URL +
-    "/rest/v1/payout_accounts" +
-    "?user_id=eq." +
-    encodeURIComponent(
-      utilisateurConnecte.id
-    ) +
-    "&status=eq.active" +
-    "&select=id,provider,phone,account_name" +
-    "&order=created_at.desc" +
-    "&limit=1"
-  );
-if(
-  !Array.isArray(comptes) ||
-  !comptes.length
-){
-  alert(
-    "🏦 Aucun compte de paiement actif.\n\n" +
-    "Enregistre d'abord ton compte Orange Money ou Mobile Money."
-  );
-  ouvrirComptePaiement();
-  return;
-}
-const compte =
-  comptes[0];
-
-  /* =========================
-   MODAL DE RETRAIT
-========================= */
-
-  let modal =
-  document.getElementById(
-    "demandeRetraitModal"
-  );
-if(modal){
-  modal.remove();
-}
-modal =
-  document.createElement(
-    "div"
-  );
-modal.id =
-  "demandeRetraitModal";
-modal.style.cssText =
-  "position:fixed;" +
-  "inset:0;" +
-  "background:rgba(4,20,12,.72);" +
-  "backdrop-filter:blur(5px);" +
-  "-webkit-backdrop-filter:blur(5px);" +
-  "z-index:17000;" +
-  "padding:12px;" +
-  "box-sizing:border-box;" +
-  "overflow-y:auto;";
-const operateur =
-  compte.provider === "orange_money"
-    ? "Orange Money"
-    : "Mobile Money";
-modal.innerHTML = `
-  <section style="
-    width:100%;
-    max-width:520px;
-    margin:12px auto;
-    background:#f7faf8;
-    border-radius:24px;
-    overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.22);
-  ">
-    <header style="
-      position:relative;
-      padding:20px;
-      background:linear-gradient(135deg,#07883f,#12a85a);
-      color:#fff;
-    ">
-      <button
-        id="fermerDemandeRetraitBtn"
-        aria-label="Fermer"
-        style="
-          position:absolute;
-          right:14px;
-          top:14px;
-          width:40px;
-          height:40px;
-          border:0;
-          border-radius:50%;
-          background:rgba(255,255,255,.18);
-          color:#fff;
-          font-size:22px;
-          cursor:pointer;
-        "
-      >
-        ×
-      </button>
-      <small style="
-        font-weight:700;
-        opacity:.88;
-      ">
-        🇬🇳 Marché Guinée
-      </small>
-      <h2 style="
-        margin:7px 0 0;
-        font-size:24px;
-        font-weight:900;
-      ">
-        💸 Demander un retrait
-      </h2>
-      <p style="
-        margin:7px 0 0;
-        font-size:13px;
-        line-height:1.45;
-        opacity:.92;
-      ">
-        Demande le versement de ton solde vendeur.
-      </p>
-    </header>
-    <main style="padding:18px;">
-      <div style="
-        padding:16px;
-        background:#eaf7ef;
-        border:1px solid #cdebd8;
-        border-radius:16px;
-      ">
-        <div style="
-          font-size:12px;
-          color:#52705e;
-          font-weight:700;
-        ">
-          SOLDE DISPONIBLE
-        </div>
-        <div style="
-          margin-top:4px;
-          font-size:25px;
-          font-weight:900;
-          color:#07883f;
-        ">
-          ${soldeDisponible.toLocaleString("fr-FR")} GNF
-        </div>
-      </div>
-      <div style="
-        margin-top:14px;
-        padding:14px;
-        background:#fff;
-        border:1px solid #e0e7e2;
-        border-radius:15px;
-      ">
-        <div style="
-          font-size:12px;
-          color:#6b756f;
-          font-weight:700;
-        ">
-          COMPTE DE RÉCEPTION
-        </div>
-        <div style="
-          margin-top:6px;
-          font-size:15px;
-          font-weight:900;
-          color:#26352d;
-        ">
-          ${operateur}
-        </div>
-        <div style="
-          margin-top:3px;
-          font-size:14px;
-          color:#66736b;
-        ">
-          ${String(compte.phone || "").replace(/</g,"&lt;")}
-        </div>
-        ${
-          compte.account_name
-            ? `
-              <div style="
-                margin-top:5px;
-                font-size:12px;
-                color:#7a857e;
-              ">
-                Titulaire : ${String(compte.account_name).replace(/</g,"&lt;")}
-              </div>
-            `
-            : ""
-        }
-      </div>
-      <label style="
-        display:block;
-        margin-top:18px;
-        font-weight:800;
-        font-size:14px;
-        color:#26352d;
-      ">
-        Montant à retirer
-      </label>
-      <div style="
-        position:relative;
-        margin-top:7px;
-      ">
-        <input
-          id="montantDemandeRetrait"
-          type="text"
-          inputmode="numeric"
-          placeholder="Exemple : 50 000"
-          style="
-            width:100%;
-            height:52px;
-            padding:0 58px 0 14px;
-            border:1px solid #d9e2dc;
-            border-radius:14px;
-            box-sizing:border-box;
-            font-size:17px;
-            font-weight:800;
-            background:#fff;
-            color:#26352d;
-            outline:none;
-          "
-        >
-        <span style="
-          position:absolute;
-          right:14px;
-          top:50%;
-          transform:translateY(-50%);
-          font-size:12px;
-          font-weight:800;
-          color:#7a857e;
-        ">
-          GNF
-        </span>
-      </div>
-      <div
-        id="messageDemandeRetrait"
-        style="
-          display:none;
-          margin-top:12px;
-          padding:12px;
-          border-radius:13px;
-          font-size:13px;
-          line-height:1.4;
-        "
-      ></div>
-      <button
-        id="confirmerDemandeRetraitBtn"
-        style="
-          width:100%;
-          height:50px;
-          margin-top:18px;
-          border:0;
-          border-radius:14px;
-          background:#07883f;
-          color:#fff;
-          font-size:15px;
-          font-weight:900;
-          cursor:pointer;
-          box-shadow:0 6px 16px rgba(7,136,63,.2);
-        "
-      >
-        💸 Continuer
-      </button>
-      <button
-        id="annulerDemandeRetraitBtn"
-        style="
-          width:100%;
-          height:46px;
-          margin-top:10px;
-          border:0;
-          border-radius:14px;
-          background:#e9efeb;
-          color:#315a43;
-          font-size:14px;
-          font-weight:800;
-          cursor:pointer;
-        "
-      >
-        Annuler
-      </button>
-      <div style="
-        margin-top:14px;
-        padding:12px;
-        background:#eef2ef;
-        border-radius:13px;
-        color:#68746d;
-        font-size:12px;
-        line-height:1.5;
-      ">
-        🔐 Ta demande sera envoyée à l'administration pour traitement.
-      </div>
-    </main>
-  </section>
-`;
-document.body.appendChild(
-  modal
-);
-const fermer =
-  () => {
-    if(modal){
-      modal.remove();
-    }
-  };
-document.getElementById(
-  "fermerDemandeRetraitBtn"
-).onclick =
-  fermer;
-document.getElementById(
-  "annulerDemandeRetraitBtn"
-).onclick =
-  fermer;
-const montantInput =
-  document.getElementById(
-    "montantDemandeRetrait"
-  );
-const message =
-  document.getElementById(
-    "messageDemandeRetrait"
-  );
-const continuer =
-  document.getElementById(
-    "confirmerDemandeRetraitBtn"
-  );
-montantInput.focus();
-continuer.onclick =
-  async function(){
-    message.style.display =
-      "none";
-    const montant =
-      montantInput.value || "";
-    const montantNettoye =
-      montant
-        .replace(/\s/g,"")
-        .replace(/,/g,"")
-        .replace(/\./g,"");
-    const montantRetrait =
-      Number(
-        montantNettoye
+      alert(
+        "🏦 Aucun compte de paiement actif.\n\n" +
+        "Enregistre d'abord ton compte Orange Money ou Mobile Money."
       );
+
+      ouvrirComptePaiement();
+      return;
+    }
+
+    const compte = comptes[0];
+
+    const operateur =
+      compte.provider === "orange_money"
+        ? "Orange Money"
+        : "Mobile Money";
+
+    const montant = prompt(
+      "💸 DEMANDE DE RETRAIT\n\n" +
+      "Solde disponible : " +
+      soldeDisponible.toLocaleString("fr-FR") +
+      " GNF\n\n" +
+      "Compte : " +
+      operateur +
+      "\n" +
+      "Numéro : " +
+      compte.phone +
+      "\n\n" +
+      "Entre le montant à retirer en GNF :"
+    );
+
+    if(montant === null){
+      return;
+    }
+
+    const montantNettoye = String(montant)
+      .replace(/\s/g,"")
+      .replace(/,/g,"")
+      .replace(/\./g,"");
+
+    const montantRetrait = Number(montantNettoye);
+
     if(
-      !Number.isInteger(
-        montantRetrait
-      ) ||
+      !Number.isInteger(montantRetrait) ||
       montantRetrait <= 0
     ){
-      message.style.display =
-        "block";
-      message.style.background =
-        "#fff1f2";
-      message.style.color =
-        "#9f1239";
-      message.textContent =
-        "Entre un montant valide en GNF.";
+      alert("❌ Montant invalide.");
       return;
     }
-    if(
-      montantRetrait >
-      soldeDisponible
-    ){
-      message.style.display =
-        "block";
-      message.style.background =
-        "#fff1f2";
-      message.style.color =
-        "#9f1239";
-      message.textContent =
-        "Montant trop élevé. Ton solde disponible est de " +
-        soldeDisponible.toLocaleString(
-          "fr-FR"
-        ) +
-        " GNF.";
-      return;
-    }
-    const confirmation =
-      confirm(
-        "💸 Confirmer la demande de retrait\n\n" +
-        "Montant : " +
-        montantRetrait.toLocaleString(
-          "fr-FR"
-        ) +
-        " GNF\n\n" +
-        "Opérateur : " +
-        operateur +
-        "\n" +
-        "Numéro : " +
-        compte.phone +
-        "\n\n" +
-        "La demande sera envoyée à l'administration pour traitement."
+
+    if(montantRetrait > soldeDisponible){
+
+      alert(
+        "❌ Montant trop élevé.\n\n" +
+        "Ton solde disponible est de " +
+        soldeDisponible.toLocaleString("fr-FR") +
+        " GNF."
       );
+
+      return;
+    }
+
+    const confirmation = confirm(
+      "💸 CONFIRMER LE RETRAIT\n\n" +
+      "Montant : " +
+      montantRetrait.toLocaleString("fr-FR") +
+      " GNF\n\n" +
+      "Opérateur : " +
+      operateur +
+      "\n" +
+      "Numéro : " +
+      compte.phone +
+      "\n\n" +
+      "Confirmer la demande ?"
+    );
+
     if(!confirmation){
       return;
     }
-    continuer.disabled =
-      true;
-    continuer.textContent =
-      "⏳ Enregistrement...";
-    try{
-     
-/* =========================
-         CRÉATION DU RETRAIT
-  ========================= */
-      
-      const resultat =
-        await supabaseFetch(
-          SUPABASE_URL +
-          "/rest/v1/payouts",
-          {
-            method:"POST",
-            body:
-              JSON.stringify({
-                seller_id:
-                  utilisateurConnecte.id,
-                amount_gnf:
-                  montantRetrait,
-                provider:
-                  compte.provider,
-                payout_phone:
-                  compte.phone,
-                status:
-                  "pending"
-              })
-          }
-        );
-      console.log(
-        "Retrait créé :",
-        resultat
-      );
-      fermer();
-      alert(
-        "✅ Demande de retrait enregistrée !\n\n" +
-        "Montant : " +
-        montantRetrait.toLocaleString(
-          "fr-FR"
-        ) +
-        " GNF\n\n" +
-        "Statut : En attente de traitement."
-      );
-      chargerSoldeVendeur();
-    }catch(error){
-      console.error(
-        "Erreur demande retrait :",
-        error
-      );
-      continuer.disabled =
-        false;
-      continuer.textContent =
-        "💸 Continuer";
-      message.style.display =
-        "block";
-      message.style.background =
-        "#fff1f2";
-      message.style.color =
-        "#9f1239";
-      message.textContent =
-        "Impossible d'enregistrer la demande de retrait. " +
-        (
-          error.message ||
-          "Erreur Supabase inconnue."
-        );
-    }
-  };
 
-}catch(error){
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/payouts",
+      {
+        method:"POST",
+        headers:{
+          "Prefer":"return=representation"
+        },
+        body:JSON.stringify({
+          seller_id:utilisateurConnecte.id,
+          amount_gnf:montantRetrait,
+          provider:compte.provider,
+          payout_phone:compte.phone,
+          status:"pending"
+        })
+      }
+    );
 
-console.error(
-  "Erreur demande retrait :",
-  error
-);
-alert(
-  "❌ Impossible d'ouvrir la demande de retrait.\n\n" +
-  (
-    error.message ||
-    "Erreur Supabase inconnue."
-  )
-);
+    console.log("Retrait créé :",resultat);
 
+    alert(
+      "✅ Demande de retrait enregistrée !\n\n" +
+      "Montant : " +
+      montantRetrait.toLocaleString("fr-FR") +
+      " GNF\n\n" +
+      "Statut : En attente de traitement."
+    );
+
+    chargerSoldeVendeur();
+
+  }catch(error){
+
+    console.error(
+      "Erreur demande retrait :",
+      error
+    );
+
+    alert(
+      "❌ Impossible d'enregistrer la demande de retrait.\n\n" +
+      (error.message || "Erreur Supabase inconnue.")
+    );
+  }
 }
-
-}
-
+  
     chargerSoldeVendeur();
 
 
