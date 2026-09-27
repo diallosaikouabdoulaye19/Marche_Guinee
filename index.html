@@ -4284,9 +4284,7 @@ async function ouvrirDemandeRetrait(soldeDisponible){
       "Statut : En attente de traitement."
     );
 
-    chargerSoldeVendeur();
-
-  }catch(error){
+       }catch(error){
 
     console.error(
       "Erreur demande retrait :",
@@ -4298,32 +4296,6 @@ async function ouvrirDemandeRetrait(soldeDisponible){
       (error.message || "Erreur Supabase inconnue.")
     );
   }
-}
-  
-    chargerSoldeVendeur();
-
-
-  }catch(error){
-
-    console.error(
-      "Erreur demande retrait :",
-      error
-    );
-
-
-    alert(
-
-      "❌ Impossible d'enregistrer la demande de retrait.\n\n" +
-
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
-
-    );
-
-  }
-
 }
 
 /* =========================
