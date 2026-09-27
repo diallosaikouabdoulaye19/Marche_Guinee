@@ -2628,7 +2628,7 @@ async function chargerImages(listingId){
    SOLDE VENDEUR
 ========================= */
 
-async function chargerSoldeVendeur(){
+  async function chargerSoldeVendeur(){
 
   const soldeElement =
     document.getElementById(
@@ -2664,6 +2664,10 @@ async function chargerSoldeVendeur(){
 
   try{
 
+    /* =========================
+       VENTES TERMINÉES
+    ========================= */
+
     const commandes =
       await supabaseFetch(
 
@@ -2675,7 +2679,7 @@ async function chargerSoldeVendeur(){
         ) +
         "&status=eq.completed" +
         "&delivery_status=eq.delivered" +
-        "&select=price_gnf,commission_gnf,seller_amount_gnf"
+        "&select=id,price_gnf,commission_gnf,seller_amount_gnf"
 
       );
 
@@ -2688,7 +2692,7 @@ async function chargerSoldeVendeur(){
 
     let totalVentes = 0;
     let totalCommission = 0;
-    let solde = 0;
+    let soldeVentes = 0;
 
 
     ventes.forEach(
@@ -2704,7 +2708,7 @@ async function chargerSoldeVendeur(){
             commande.commission_gnf || 0
           );
 
-        solde +=
+        soldeVentes +=
           Number(
             commande.seller_amount_gnf || 0
           );
@@ -2713,8 +2717,62 @@ async function chargerSoldeVendeur(){
     );
 
 
+    /* =========================
+       RETRAITS DÉJÀ DEMANDÉS
+    ========================= */
+
+    const retraits =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payouts" +
+        "?seller_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&status=in.(pending,processing,paid)" +
+        "&select=amount_gnf"
+
+      );
+
+
+    const listeRetraits =
+      Array.isArray(retraits)
+        ? retraits
+        : [];
+
+
+    let totalRetraits = 0;
+
+
+    listeRetraits.forEach(
+      retrait => {
+
+        totalRetraits +=
+          Number(
+            retrait.amount_gnf || 0
+          );
+
+      }
+    );
+
+
+    /* =========================
+       SOLDE DISPONIBLE
+    ========================= */
+
+    const soldeDisponible =
+      Math.max(
+        0,
+        soldeVentes -
+        totalRetraits
+      );
+
+
     soldeElement.textContent =
-      solde.toLocaleString("fr-FR") +
+      soldeDisponible.toLocaleString(
+        "fr-FR"
+      ) +
       " GNF";
 
 
@@ -2728,20 +2786,388 @@ async function chargerSoldeVendeur(){
           : ""
       ) +
       " • " +
-      totalVentes.toLocaleString("fr-FR") +
+      totalVentes.toLocaleString(
+        "fr-FR"
+      ) +
       " GNF de ventes • Commission : " +
-      totalCommission.toLocaleString("fr-FR") +
+      totalCommission.toLocaleString(
+        "fr-FR"
+      ) +
       " GNF";
+
+
+    /* =========================
+       BOUTON RETRAIT
+    ========================= */
+
+    let boutonRetrait =
+      document.getElementById(
+        "boutonDemanderRetrait"
+      );
+
+
+    if(!boutonRetrait){
+
+      boutonRetrait =
+        document.createElement(
+          "button"
+        );
+
+      boutonRetrait.id =
+        "boutonDemanderRetrait";
+
+      boutonRetrait.className =
+        "btn-primary";
+
+      boutonRetrait.style.marginTop =
+        "12px";
+
+      boutonRetrait.textContent =
+        "💸 Demander un retrait";
+
+
+      boutonRetrait.onclick =
+        function(){
+
+          ouvrirDemandeRetrait(
+            soldeDisponible
+          );
+
+        };
+
+
+      const parent =
+        soldeElement.parentElement;
+
+
+      if(parent){
+
+        parent.appendChild(
+          boutonRetrait
+        );
+
+      }
+
+    }
+
+
+    if(
+      soldeDisponible > 0
+    ){
+
+      boutonRetrait.style.display =
+        "block";
+
+    }else{
+
+      boutonRetrait.style.display =
+        "none";
+
+    }
 
 
   }catch(error){
 
+    console.error(
+      "Erreur chargement solde vendeur :",
+      error
+    );
+
+
     soldeElement.textContent =
       "Erreur";
+
 
     detailsElement.textContent =
       error.message ||
       "Impossible de charger le solde.";
+
+  }
+
+}
+
+
+/* =========================
+   DEMANDE DE RETRAIT
+========================= */
+
+async function ouvrirDemandeRetrait(
+  soldeDisponible
+){
+
+  if(!utilisateurConnecte){
+
+    alert(
+      "Connecte-toi pour demander un retrait."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !Number.isFinite(
+      soldeDisponible
+    ) ||
+    soldeDisponible <= 0
+  ){
+
+    alert(
+      "Ton solde disponible est insuffisant."
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    /* =========================
+       COMPTE DE PAIEMENT
+    ========================= */
+
+    const comptes =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payout_accounts" +
+        "?user_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&status=eq.active" +
+        "&select=id,provider,phone,account_name" +
+        "&order=created_at.desc" +
+        "&limit=1"
+
+      );
+
+
+    if(
+      !Array.isArray(comptes) ||
+      !comptes.length
+    ){
+
+      alert(
+        "🏦 Aucun compte de paiement actif.\n\n" +
+        "Enregistre d'abord ton compte Orange Money ou Mobile Money."
+      );
+
+      ouvrirComptePaiement();
+
+      return;
+
+    }
+
+
+    const compte =
+      comptes[0];
+
+
+    const montant =
+      prompt(
+
+        "💸 Demande de retrait\n\n" +
+
+        "Solde disponible : " +
+        soldeDisponible.toLocaleString(
+          "fr-FR"
+        ) +
+        " GNF\n\n" +
+
+        "Compte : " +
+        (
+          compte.provider ===
+          "orange_money"
+            ? "Orange Money"
+            : "Mobile Money"
+        ) +
+        "\n" +
+
+        "Numéro : " +
+        compte.phone +
+        "\n\n" +
+
+        "Entre le montant à retirer en GNF :"
+
+      );
+
+
+    if(
+      montant === null
+    ){
+
+      return;
+
+    }
+
+
+    const montantNettoye =
+      montant
+        .replace(/\s/g,"")
+        .replace(/,/g,"")
+        .replace(/\./g,"");
+
+
+    const montantRetrait =
+      Number(
+        montantNettoye
+      );
+
+
+    if(
+      !Number.isInteger(
+        montantRetrait
+      ) ||
+      montantRetrait <= 0
+    ){
+
+      alert(
+        "Entre un montant valide en GNF."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      montantRetrait >
+      soldeDisponible
+    ){
+
+      alert(
+        "❌ Montant trop élevé.\n\n" +
+        "Solde disponible : " +
+        soldeDisponible.toLocaleString(
+          "fr-FR"
+        ) +
+        " GNF"
+      );
+
+      return;
+
+    }
+
+
+    const confirmation =
+      confirm(
+
+        "💸 Confirmer la demande de retrait\n\n" +
+
+        "Montant : " +
+        montantRetrait.toLocaleString(
+          "fr-FR"
+        ) +
+        " GNF\n\n" +
+
+        "Opérateur : " +
+        (
+          compte.provider ===
+          "orange_money"
+            ? "Orange Money"
+            : "Mobile Money"
+        ) +
+        "\n" +
+
+        "Numéro : " +
+        compte.phone +
+        "\n\n" +
+
+        "La demande sera envoyée à l'administration pour traitement."
+
+      );
+
+
+    if(!confirmation){
+
+      return;
+
+    }
+
+
+    /* =========================
+       CRÉATION DU RETRAIT
+    ========================= */
+
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payouts",
+
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              seller_id:
+                utilisateurConnecte.id,
+
+              amount_gnf:
+                montantRetrait,
+
+              provider:
+                compte.provider,
+
+              payout_phone:
+                compte.phone,
+
+              status:
+                "pending"
+
+            })
+
+        }
+
+      );
+
+
+    console.log(
+      "Retrait créé :",
+      resultat
+    );
+
+
+    alert(
+
+      "✅ Demande de retrait enregistrée !\n\n" +
+
+      "Montant : " +
+      montantRetrait.toLocaleString(
+        "fr-FR"
+      ) +
+      " GNF\n\n" +
+
+      "Statut : En attente de traitement."
+
+    );
+
+
+    chargerSoldeVendeur();
+
+
+  }catch(error){
+
+    console.error(
+      "Erreur demande retrait :",
+      error
+    );
+
+
+    alert(
+
+      "❌ Impossible d'enregistrer la demande de retrait.\n\n" +
+
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+
+    );
 
   }
 
