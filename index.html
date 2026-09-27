@@ -8667,6 +8667,43 @@ async function chargerTableauAdmin(){
 
       </div>
 
+      <div style="
+        margin-top:18px;
+        padding:18px;
+        background:#eff6ff;
+        border:1px solid #bfdbfe;
+        border-radius:16px;
+      ">
+
+        <h3 style="margin-top:0;">
+          💸 Retraits vendeurs
+        </h3>
+
+        <p style="
+          color:#555;
+          line-height:1.5;
+        ">
+          Consulte et traite les demandes de retrait
+          des vendeurs.
+        </p>
+
+        <button
+          onclick="ouvrirRetraitsAdmin()"
+          style="
+            width:100%;
+            margin-top:10px;
+            padding:14px;
+            border:none;
+            border-radius:12px;
+            background:#2563eb;
+            color:white;
+            font-size:16px;
+            font-weight:bold;
+          ">
+          💸 Gérer les retraits vendeurs
+        </button>
+
+      </div>
 
       <div style="
         margin-top:18px;
@@ -8796,6 +8833,722 @@ async function chargerTableauAdmin(){
 
 }
 
+  /* =========================
+   RETRAITS VENDEURS - ADMIN
+========================= */
+
+async function ouvrirRetraitsAdmin(){
+
+  const estAdmin =
+    await verifierAccesAdmin();
+
+  if(!estAdmin){
+
+    alert(
+      "Accès refusé.\n\n" +
+      "Cette section est réservée aux administrateurs."
+    );
+
+    return;
+
+  }
+
+  let modal =
+    document.getElementById(
+      "adminPayoutsModal"
+    );
+
+  if(!modal){
+
+    modal =
+      document.createElement(
+        "div"
+      );
+
+    modal.id =
+      "adminPayoutsModal";
+
+    modal.style.cssText =
+      "display:none;" +
+      "position:fixed;" +
+      "inset:0;" +
+      "background:rgba(0,0,0,.7);" +
+      "z-index:25000;" +
+      "padding:15px;" +
+      "box-sizing:border-box;" +
+      "overflow-y:auto;";
+
+    modal.innerHTML = `
+
+      <div style="
+        background:white;
+        width:100%;
+        max-width:650px;
+        margin:20px auto;
+        border-radius:20px;
+        padding:20px;
+        box-sizing:border-box;
+      ">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+        ">
+
+          <h2 style="margin:0;">
+            💸 Retraits vendeurs
+          </h2>
+
+          <button
+            onclick="fermerRetraitsAdmin()"
+            style="
+              border:none;
+              background:#eee;
+              border-radius:10px;
+              padding:9px 13px;
+              font-size:18px;
+            ">
+            ✕
+          </button>
+
+        </div>
+
+        <div
+          id="adminPayoutsContent"
+          style="margin-top:20px;">
+          Chargement...
+        </div>
+
+      </div>
+
+    `;
+
+    document.body.appendChild(
+      modal
+    );
+
+  }
+
+  modal.style.display =
+    "block";
+
+  chargerRetraitsAdmin();
+
+}
+
+
+function fermerRetraitsAdmin(){
+
+  const modal =
+    document.getElementById(
+      "adminPayoutsModal"
+    );
+
+  if(modal){
+
+    modal.style.display =
+      "none";
+
+  }
+
+}
+
+
+async function chargerRetraitsAdmin(){
+
+  const container =
+    document.getElementById(
+      "adminPayoutsContent"
+    );
+
+  if(!container) return;
+
+  container.innerHTML = `
+    <div style="
+      padding:20px;
+      text-align:center;
+      color:#666;
+    ">
+      ⏳ Chargement des demandes...
+    </div>
+  `;
+
+  try{
+
+    const estAdmin =
+      await verifierAccesAdmin();
+
+    if(!estAdmin){
+
+      container.innerHTML =
+        "<p>Accès refusé.</p>";
+
+      return;
+
+    }
+
+    const retraits =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payouts" +
+        "?select=id,order_id,seller_id,amount_gnf,provider,payout_phone,status,provider_reference,created_at,updated_at" +
+        "&order=created_at.desc"
+
+      );
+
+    const liste =
+      Array.isArray(retraits)
+        ? retraits
+        : [];
+
+    if(!liste.length){
+
+      container.innerHTML = `
+
+        <div style="
+          padding:20px;
+          text-align:center;
+          color:#777;
+          background:#f8fafc;
+          border-radius:14px;
+        ">
+          💸 Aucune demande de retrait.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    container.innerHTML = `
+
+      <div style="
+        margin-bottom:15px;
+        padding:12px;
+        background:#f8fafc;
+        border-radius:12px;
+        color:#555;
+        font-size:14px;
+      ">
+        ${liste.length}
+        demande${liste.length > 1 ? "s" : ""}
+        de retrait
+      </div>
+
+      ${
+        liste.map(
+          retrait => {
+
+            const statut =
+              retrait.status || "pending";
+
+            let statutTexte =
+              "⏳ En attente";
+
+            let statutBackground =
+              "#fff7ed";
+
+            let statutColor =
+              "#9a3412";
+
+            if(
+              statut === "processing"
+            ){
+
+              statutTexte =
+                "⚙️ En traitement";
+
+              statutBackground =
+                "#eff6ff";
+
+              statutColor =
+                "#1d4ed8";
+
+            }
+
+            if(
+              statut === "paid"
+            ){
+
+              statutTexte =
+                "✅ Payé";
+
+              statutBackground =
+                "#ecfdf5";
+
+              statutColor =
+                "#166534";
+
+            }
+
+            if(
+              statut === "failed"
+            ){
+
+              statutTexte =
+                "❌ Échec";
+
+              statutBackground =
+                "#fef2f2";
+
+              statutColor =
+                "#991b1b";
+
+            }
+
+            const operateur =
+              retrait.provider ===
+              "orange_money"
+                ? "🟠 Orange Money"
+                : "🔵 MTN MoMo";
+
+            const date =
+              retrait.created_at
+                ? new Date(
+                    retrait.created_at
+                  ).toLocaleString(
+                    "fr-FR"
+                  )
+                : "";
+
+            return `
+
+              <div style="
+                border:1px solid #ddd;
+                border-radius:16px;
+                padding:15px;
+                margin-bottom:12px;
+                background:white;
+              ">
+
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  gap:10px;
+                  align-items:flex-start;
+                ">
+
+                  <strong style="
+                    font-size:18px;
+                  ">
+                    ${Number(
+                      retrait.amount_gnf || 0
+                    ).toLocaleString(
+                      "fr-FR"
+                    )}
+                    GNF
+                  </strong>
+
+                  <span style="
+                    padding:6px 9px;
+                    border-radius:8px;
+                    background:${statutBackground};
+                    color:${statutColor};
+                    font-size:12px;
+                    font-weight:bold;
+                  ">
+                    ${statutTexte}
+                  </span>
+
+                </div>
+
+                <div style="
+                  margin-top:12px;
+                  line-height:1.7;
+                  font-size:14px;
+                  color:#444;
+                ">
+
+                  👤 Vendeur :
+                  <span style="
+                    font-size:12px;
+                    word-break:break-all;
+                  ">
+                    ${escapeHTML(
+                      retrait.seller_id || ""
+                    )}
+                  </span>
+
+                  <br>
+
+                  ${operateur}
+
+                  <br>
+
+                  📱 ${escapeHTML(
+                    retrait.payout_phone || ""
+                  )}
+
+                  <br>
+
+                  📅 ${escapeHTML(
+                    date
+                  )}
+
+                </div>
+
+                ${
+                  retrait.provider_reference
+                    ? `
+                      <div style="
+                        margin-top:8px;
+                        font-size:13px;
+                        color:#666;
+                      ">
+                        🔖 Référence :
+                        ${escapeHTML(
+                          retrait.provider_reference
+                        )}
+                      </div>
+                    `
+                    : ""
+                }
+
+                ${
+                  statut === "pending"
+                    ? `
+                      <button
+                        onclick="traiterRetraitAdmin('${retrait.id}')"
+                        style="
+                          width:100%;
+                          margin-top:14px;
+                          padding:12px;
+                          border:none;
+                          border-radius:10px;
+                          background:#2563eb;
+                          color:white;
+                          font-weight:bold;
+                          font-size:15px;
+                        ">
+                        ⚙️ Traiter le retrait
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  statut === "processing"
+                    ? `
+                      <div style="
+                        display:grid;
+                        grid-template-columns:
+                          1fr 1fr;
+                        gap:8px;
+                        margin-top:14px;
+                      ">
+
+                        <button
+                          onclick="marquerRetraitPaye('${retrait.id}')"
+                          style="
+                            padding:12px;
+                            border:none;
+                            border-radius:10px;
+                            background:#16a34a;
+                            color:white;
+                            font-weight:bold;
+                          ">
+                          ✅ Payé
+                        </button>
+
+                        <button
+                          onclick="marquerRetraitEchec('${retrait.id}')"
+                          style="
+                            padding:12px;
+                            border:none;
+                            border-radius:10px;
+                            background:#dc2626;
+                            color:white;
+                            font-weight:bold;
+                          ">
+                          ❌ Échec
+                        </button>
+
+                      </div>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            `;
+
+          }
+        ).join("")
+      }
+
+      <button
+        onclick="chargerRetraitsAdmin()"
+        style="
+          width:100%;
+          margin-top:5px;
+          padding:12px;
+          border:none;
+          border-radius:10px;
+          background:#eee;
+          font-weight:bold;
+        ">
+        🔄 Actualiser
+      </button>
+
+    `;
+
+  }catch(error){
+
+    console.error(
+      "Erreur retraits admin :",
+      error
+    );
+
+    container.innerHTML = `
+
+      <div style="
+        padding:15px;
+        background:#fee2e2;
+        color:#991b1b;
+        border-radius:12px;
+      ">
+
+        ❌ Impossible de charger les retraits.
+
+        <br><br>
+
+        ${escapeHTML(
+          error.message ||
+          "Erreur Supabase inconnue."
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   PASSER EN TRAITEMENT
+========================= */
+
+async function traiterRetraitAdmin(
+  payoutId
+){
+
+  const confirmation =
+    confirm(
+      "⚙️ Mettre cette demande en traitement ?"
+    );
+
+  if(!confirmation) return;
+
+  try{
+
+    await supabaseFetch(
+
+      SUPABASE_URL +
+      "/rest/v1/payouts" +
+      "?id=eq." +
+      encodeURIComponent(
+        payoutId
+      ),
+
+      {
+        method:"PATCH",
+
+        body:
+          JSON.stringify({
+
+            status:
+              "processing",
+
+            updated_at:
+              new Date().toISOString()
+
+          })
+
+      }
+
+    );
+
+    alert(
+      "⚙️ Retrait placé en traitement."
+    );
+
+    chargerRetraitsAdmin();
+
+  }catch(error){
+
+    console.error(
+      "Erreur traitement retrait :",
+      error
+    );
+
+    alert(
+      "Impossible de traiter le retrait.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================
+   MARQUER COMME PAYÉ
+========================= */
+
+async function marquerRetraitPaye(
+  payoutId
+){
+
+  const reference =
+    prompt(
+      "🔖 Entre la référence du paiement si tu en as une :"
+    );
+
+  if(reference === null) return;
+
+  const confirmation =
+    confirm(
+      "✅ Confirmer que ce retrait a été payé ?"
+    );
+
+  if(!confirmation) return;
+
+  try{
+
+    await supabaseFetch(
+
+      SUPABASE_URL +
+      "/rest/v1/payouts" +
+      "?id=eq." +
+      encodeURIComponent(
+        payoutId
+      ),
+
+      {
+        method:"PATCH",
+
+        body:
+          JSON.stringify({
+
+            status:
+              "paid",
+
+            provider_reference:
+              reference.trim() ||
+              null,
+
+            updated_at:
+              new Date().toISOString()
+
+          })
+
+      }
+
+    );
+
+    alert(
+      "✅ Retrait marqué comme payé."
+    );
+
+    chargerRetraitsAdmin();
+
+  }catch(error){
+
+    console.error(
+      "Erreur paiement retrait :",
+      error
+    );
+
+    alert(
+      "Impossible de marquer le retrait comme payé.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================
+   MARQUER EN ÉCHEC
+========================= */
+
+async function marquerRetraitEchec(
+  payoutId
+){
+
+  const confirmation =
+    confirm(
+      "❌ Marquer cette demande de retrait en échec ?"
+    );
+
+  if(!confirmation) return;
+
+  try{
+
+    await supabaseFetch(
+
+      SUPABASE_URL +
+      "/rest/v1/payouts" +
+      "?id=eq." +
+      encodeURIComponent(
+        payoutId
+      ),
+
+      {
+        method:"PATCH",
+
+        body:
+          JSON.stringify({
+
+            status:
+              "failed",
+
+            updated_at:
+              new Date().toISOString()
+
+          })
+
+      }
+
+    );
+
+    alert(
+      "❌ Retrait marqué en échec."
+    );
+
+    chargerRetraitsAdmin();
+
+  }catch(error){
+
+    console.error(
+      "Erreur retrait échec :",
+      error
+    );
+
+    alert(
+      "Impossible de modifier le retrait.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
 
 async function chargerAnnoncesAdmin(){
 
