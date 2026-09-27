@@ -1192,228 +1192,496 @@ footer{
 
 
 <!-- =========================
-     COMPTE
+     COMPTE — MARCHÉ GUINÉE
 ========================= -->
 
 <div id="accountModal" class="modal">
 
-  <div class="modal-box">
+  <div class="modal-box" style="
+    max-width:620px;
+    padding:0;
+    overflow:hidden;
+    border-radius:24px;
+    background:#f7f9f8;
+  ">
 
-    <span
-      class="close"
-      onclick="fermerModal('accountModal')">
-      ×
-    </span>
+    <!-- EN-TÊTE -->
 
-    <h2 id="accountTitle">
-      Mon compte
-    </h2>
+    <div style="
+      background:linear-gradient(135deg,#087f3f,#10a653);
+      color:white;
+      padding:22px 20px;
+      position:relative;
+    ">
 
-    <div id="accountMessage"></div>
+      <span
+        class="close"
+        onclick="fermerModal('accountModal')"
+        style="
+          color:white;
+          right:15px;
+          top:12px;
+          width:38px;
+          height:38px;
+          border-radius:50%;
+          background:rgba(255,255,255,.15);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:26px;
+        ">
+        ×
+      </span>
 
-    <div id="accountForms">
-
-      <div class="account-tabs">
-
-        <button
-          id="signupTab"
-          class="btn-primary"
-          onclick="afficherInscription()">
-          Créer un compte
-        </button>
-
-        <button
-          id="loginTab"
-          class="btn-light"
-          onclick="afficherConnexion()">
-          Se connecter
-        </button>
-
+      <div style="
+        font-size:12px;
+        font-weight:700;
+        opacity:.85;
+        margin-bottom:6px;
+      ">
+        🇬🇳 MARCHÉ GUINÉE
       </div>
 
-      <div id="signupForm">
+      <h2
+        id="accountTitle"
+        style="
+          margin:0;
+          font-size:25px;
+          font-weight:900;
+        ">
+        Mon compte
+      </h2>
 
-        <div class="form-group">
-
-          <label>Nom complet</label>
-
-          <input
-            id="signupName"
-            type="text"
-            placeholder="Ex : Saikou Abdoulaye Diallo">
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Numéro</label>
-
-          <input
-            id="signupPhone"
-            type="tel"
-            placeholder="Ex : 622000000">
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Mot de passe</label>
-
-          <input
-            id="signupPassword"
-            type="password"
-            placeholder="Mot de passe">
-
-        </div>
-
-        <button
-          class="btn-green"
-          onclick="creerCompte()">
-
-          Créer mon compte gratuitement
-
-        </button>
-
-      </div>
-
-      <div id="loginForm" class="hidden">
-
-        <div class="form-group">
-
-          <label>Numéro</label>
-
-          <input
-            id="loginPhone"
-            type="tel"
-            placeholder="Numéro">
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Mot de passe</label>
-
-          <input
-            id="loginPassword"
-            type="password"
-            placeholder="Mot de passe">
-
-        </div>
-
-        <button
-          class="btn-primary"
-          onclick="connecterCompte()">
-
-          Se connecter
-
-        </button>
-
-      </div>
+      <p style="
+        margin:7px 0 0;
+        font-size:13px;
+        opacity:.9;
+      ">
+        Gère tes achats, tes ventes et ton compte.
+      </p>
 
     </div>
 
-    <div id="accountConnected" class="hidden">
 
-      <div class="success">
-        Tu es connecté à ton compte Marché Guinée.
+    <!-- CONTENU -->
+
+    <div style="
+      padding:20px;
+    ">
+
+      <div id="accountMessage"></div>
+
+
+      <!-- FORMULAIRES -->
+
+      <div id="accountForms">
+
+        <div
+          class="account-tabs"
+          style="
+            background:#eef2ef;
+            padding:5px;
+            border-radius:14px;
+            gap:5px;
+          ">
+
+          <button
+            id="signupTab"
+            class="btn-primary"
+            onclick="afficherInscription()"
+            style="
+              flex:1;
+              border-radius:11px;
+            ">
+            Créer un compte
+          </button>
+
+          <button
+            id="loginTab"
+            class="btn-light"
+            onclick="afficherConnexion()"
+            style="
+              flex:1;
+              border-radius:11px;
+            ">
+            Se connecter
+          </button>
+
+        </div>
+
+
+        <!-- INSCRIPTION -->
+
+        <div id="signupForm">
+
+          <div class="form-group">
+
+            <label
+              for="signupName"
+              style="font-weight:800;">
+              Nom complet
+            </label>
+
+            <input
+              id="signupName"
+              type="text"
+              placeholder="Ex : Saikou Abdoulaye Diallo"
+              style="
+                background:white;
+                border:1px solid #dfe6e1;
+                border-radius:13px;
+                padding:13px;
+              ">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label
+              for="signupPhone"
+              style="font-weight:800;">
+              Numéro
+            </label>
+
+            <input
+              id="signupPhone"
+              type="tel"
+              placeholder="Ex : 622000000"
+              style="
+                background:white;
+                border:1px solid #dfe6e1;
+                border-radius:13px;
+                padding:13px;
+              ">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label
+              for="signupPassword"
+              style="font-weight:800;">
+              Mot de passe
+            </label>
+
+            <input
+              id="signupPassword"
+              type="password"
+              placeholder="Mot de passe"
+              style="
+                background:white;
+                border:1px solid #dfe6e1;
+                border-radius:13px;
+                padding:13px;
+              ">
+
+          </div>
+
+
+          <button
+            class="btn-green"
+            onclick="creerCompte()"
+            style="
+              width:100%;
+              padding:14px;
+              border-radius:13px;
+              font-size:15px;
+              font-weight:900;
+            ">
+            Créer mon compte gratuitement
+          </button>
+
+        </div>
+
+
+        <!-- CONNEXION -->
+
+        <div
+          id="loginForm"
+          class="hidden">
+
+          <div class="form-group">
+
+            <label
+              for="loginPhone"
+              style="font-weight:800;">
+              Numéro
+            </label>
+
+            <input
+              id="loginPhone"
+              type="tel"
+              placeholder="Numéro"
+              style="
+                background:white;
+                border:1px solid #dfe6e1;
+                border-radius:13px;
+                padding:13px;
+              ">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label
+              for="loginPassword"
+              style="font-weight:800;">
+              Mot de passe
+            </label>
+
+            <input
+              id="loginPassword"
+              type="password"
+              placeholder="Mot de passe"
+              style="
+                background:white;
+                border:1px solid #dfe6e1;
+                border-radius:13px;
+                padding:13px;
+              ">
+
+          </div>
+
+
+          <button
+            class="btn-primary"
+            onclick="connecterCompte()"
+            style="
+              width:100%;
+              padding:14px;
+              border-radius:13px;
+              font-size:15px;
+              font-weight:900;
+            ">
+            Se connecter
+          </button>
+
+        </div>
+
       </div>
 
-      <p>
-        <strong id="connectedName"></strong>
-      </p>
 
-      <p id="connectedPhone"></p>
+      <!-- COMPTE CONNECTÉ -->
 
       <div
-        id="soldeVendeurBox"
-        style="
-          margin:15px 0;
-          padding:18px;
-          background:#f0fdf4;
-          border:1px solid #bbf7d0;
-          border-radius:15px;
+        id="accountConnected"
+        class="hidden">
+
+
+        <div
+          class="success"
+          style="
+            border-radius:13px;
+            margin-bottom:15px;
+          ">
+          ✅ Tu es connecté à ton compte Marché Guinée.
+        </div>
+
+
+        <!-- PROFIL -->
+
+        <div style="
+          background:white;
+          border:1px solid #e5ebe7;
+          border-radius:17px;
+          padding:16px;
+          margin-bottom:14px;
         ">
 
-        <div
-          style="
-            font-size:14px;
-            color:#666;
-            margin-bottom:6px;
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:12px;
           ">
 
-          💰 Mon solde vendeur
+            <div style="
+              width:52px;
+              height:52px;
+              border-radius:50%;
+              background:#eaf7ef;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:25px;
+            ">
+              👤
+            </div>
+
+            <div>
+
+              <strong
+                id="connectedName"
+                style="
+                  display:block;
+                  font-size:17px;
+                ">
+              </strong>
+
+              <span
+                id="connectedPhone"
+                style="
+                  display:block;
+                  margin-top:3px;
+                  color:#77817c;
+                  font-size:13px;
+                ">
+              </span>
+
+            </div>
+
+          </div>
 
         </div>
 
+
+        <!-- SOLDE -->
+
         <div
-          id="soldeVendeur"
+          id="soldeVendeurBox"
           style="
-            font-size:26px;
-            font-weight:bold;
-            color:#16a34a;
+            margin:0 0 16px;
+            padding:18px;
+            background:linear-gradient(135deg,#effcf3,#e4f8eb);
+            border:1px solid #c7ead2;
+            border-radius:18px;
           ">
 
-          0 GNF
-
-        </div>
-
-        <div
-          id="detailsSoldeVendeur"
-          style="
-            margin-top:8px;
+          <div style="
             font-size:13px;
-            color:#666;
+            color:#587061;
+            margin-bottom:6px;
+            font-weight:700;
           ">
+            💰 Mon solde vendeur
+          </div>
 
-          Chargement...
+          <div
+            id="soldeVendeur"
+            style="
+              font-size:28px;
+              font-weight:900;
+              color:#087f3f;
+            ">
+            0 GNF
+          </div>
+
+          <div
+            id="detailsSoldeVendeur"
+            style="
+              margin-top:7px;
+              font-size:12px;
+              color:#65736b;
+            ">
+            Chargement...
+          </div>
 
         </div>
 
-      </div>
 
-      <div class="form-actions">
+        <!-- ACTIONS -->
 
-        <button
-          class="btn-primary"
-          onclick="ouvrirSignalement()">
-         ⚠️ Signaler un problème
-       </button>
+        <div
+          class="form-actions"
+          style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+          ">
 
-       <button
-         class="btn-primary"
-         onclick="ouvrirMesAchats()">
-         🛒 Mes achats
-       </button>
 
-       <button
-         class="btn-primary"
-         onclick="ouvrirComptePaiement()">
-         🏦 Mon compte de paiement
-      </button>
+          <button
+            class="btn-primary"
+            onclick="ouvrirSignalement()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            ⚠️
+            <br>
+            <small>Signaler un problème</small>
+          </button>
 
-      <button
-       class="btn-primary"
-       onclick="ouvrirMesVentes()">
-       📦 Mes ventes
-     </button>
 
-     <button
-          class="btn-primary"
-          onclick="ouvrirMessages()">
-          💬 Mes messages
-        </button>
+          <button
+            class="btn-primary"
+            onclick="ouvrirMesAchats()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            🛒
+            <br>
+            <small>Mes achats</small>
+          </button>
 
-        <button
-          class="btn-green"
-          onclick="fermerModal('accountModal');ouvrirVente()">
-          + Publier une annonce
-        </button>
 
-        <button
-          class="btn-danger"
-          onclick="deconnecter()">
-          Se déconnecter
-        </button>
+          <button
+            class="btn-primary"
+            onclick="ouvrirComptePaiement()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            🏦
+            <br>
+            <small>Compte de paiement</small>
+          </button>
+
+
+          <button
+            class="btn-primary"
+            onclick="ouvrirMesVentes()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            📦
+            <br>
+            <small>Mes ventes</small>
+          </button>
+
+
+          <button
+            class="btn-primary"
+            onclick="ouvrirMessages()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            💬
+            <br>
+            <small>Mes messages</small>
+          </button>
+
+
+          <button
+            class="btn-green"
+            onclick="fermerModal('accountModal');ouvrirVente()"
+            style="
+              padding:14px 10px;
+              border-radius:14px;
+            ">
+            ➕
+            <br>
+            <small>Publier une annonce</small>
+          </button>
+
+
+          <button
+            class="btn-danger"
+            onclick="deconnecter()"
+            style="
+              grid-column:1 / -1;
+              padding:14px;
+              border-radius:14px;
+            ">
+            🚪 Se déconnecter
+          </button>
+
+        </div>
 
       </div>
 
@@ -1423,7 +1691,7 @@ footer{
 
 </div>
 
-<!-- =========================
+  <!-- =========================
      PUBLICATION — MARCHÉ GUINÉE
 ========================= -->
 
