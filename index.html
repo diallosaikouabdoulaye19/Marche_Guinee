@@ -5033,7 +5033,6 @@ async function chargerComptePaiement(){
 
 }
 
-
 async function enregistrerComptePaiement(){
 
   if(!utilisateurConnecte){
@@ -5086,7 +5085,8 @@ async function enregistrerComptePaiement(){
   if(!/^\d{9}$/.test(phone)){
 
     alert(
-      "Le numéro doit contenir exactement 9 chiffres.\n\nExemple : 621222324"
+      "Le numéro doit contenir exactement 9 chiffres.\n\n" +
+      "Exemple : 621222324"
     );
 
     return;
@@ -5122,9 +5122,173 @@ async function enregistrerComptePaiement(){
         "#9a3412";
 
       message.textContent =
-        "⏳ Enregistrement en cours...";
+        "⏳ Vérification du compte...";
 
     }
+
+    /* =========================
+       RECHERCHER LE COMPTE EXISTANT
+    ========================= */
+
+    const comptesExistants =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payout_accounts" +
+        "?user_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&provider=eq." +
+        encodeURIComponent(
+          provider
+        ) +
+        "&phone=eq." +
+        encodeURIComponent(
+          phone
+        ) +
+        "&select=id,status"
+
+      );
+
+    /* =========================
+       SI LE COMPTE EXISTE DÉJÀ
+    ========================= */
+
+    if(
+      Array.isArray(
+        comptesExistants
+      ) &&
+      comptesExistants.length
+    ){
+
+      const compteExistant =
+        comptesExistants[0];
+
+      /* Réactiver / mettre à jour */
+
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/payout_accounts" +
+        "?id=eq." +
+        encodeURIComponent(
+          compteExistant.id
+        ),
+
+        {
+          method:"PATCH",
+
+          body:
+            JSON.stringify({
+
+              account_name:
+                accountName,
+
+              status:
+                "active",
+
+              updated_at:
+                new Date().toISOString()
+
+            })
+
+        }
+
+      );
+
+      /* Désactiver les autres comptes actifs */
+
+      const autresComptes =
+        await supabaseFetch(
+
+          SUPABASE_URL +
+          "/rest/v1/payout_accounts" +
+          "?user_id=eq." +
+          encodeURIComponent(
+            utilisateurConnecte.id
+          ) +
+          "&status=eq.active" +
+          "&select=id"
+
+        );
+
+      if(
+        Array.isArray(
+          autresComptes
+        )
+      ){
+
+        for(
+          const autre
+          of autresComptes
+        ){
+
+          if(
+            autre.id !==
+            compteExistant.id
+          ){
+
+            await supabaseFetch(
+
+              SUPABASE_URL +
+              "/rest/v1/payout_accounts" +
+              "?id=eq." +
+              encodeURIComponent(
+                autre.id
+              ),
+
+              {
+                method:"PATCH",
+
+                body:
+                  JSON.stringify({
+
+                    status:
+                      "inactive",
+
+                    updated_at:
+                      new Date().toISOString()
+
+                  })
+
+              }
+
+            );
+
+          }
+
+        }
+
+      }
+
+      if(message){
+
+        message.style.background =
+          "#ecfdf5";
+
+        message.style.color =
+          "#166534";
+
+        message.textContent =
+          "✅ Ton compte de paiement existe déjà et est maintenant actif.";
+
+      }
+
+      alert(
+
+        "✅ Ton compte de paiement est déjà enregistré.\n\n" +
+        "Il est maintenant actif pour recevoir tes paiements."
+
+      );
+
+      return;
+
+    }
+
+    /* =========================
+       DÉSACTIVER LES AUTRES COMPTES
+    ========================= */
 
     const anciens =
       await supabaseFetch(
@@ -5141,12 +5305,14 @@ async function enregistrerComptePaiement(){
       );
 
     if(
-      Array.isArray(anciens) &&
-      anciens.length
+      Array.isArray(
+        anciens
+      )
     ){
 
       for(
-        const ancien of anciens
+        const ancien
+        of anciens
       ){
 
         await supabaseFetch(
@@ -5164,7 +5330,8 @@ async function enregistrerComptePaiement(){
             body:
               JSON.stringify({
 
-                status:"inactive",
+                status:
+                  "inactive",
 
                 updated_at:
                   new Date().toISOString()
@@ -5179,6 +5346,9 @@ async function enregistrerComptePaiement(){
 
     }
 
+    /* =========================
+       CRÉER LE NOUVEAU COMPTE
+    ========================= */
 
     await supabaseFetch(
 
@@ -5211,7 +5381,6 @@ async function enregistrerComptePaiement(){
       }
 
     );
-
 
     if(message){
 
@@ -5251,18 +5420,19 @@ async function enregistrerComptePaiement(){
     }
 
     alert(
+
       "Impossible d'enregistrer le compte de paiement.\n\n" +
+
       (
         error.message ||
         "Erreur Supabase inconnue."
       )
+
     );
 
   }
 
 }
-
-
 
 /* =========================
    MES VENTES
