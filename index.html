@@ -2175,54 +2175,45 @@ footer{
 ========================= -->
 
 <div id="messagesModal" class="modal">
-
-  <div class="modal-box">
-
-    <span
-      class="close"
-      onclick="fermerModal('messagesModal')">
-      ×
-    </span>
-
-    <h2>💬 Messagerie</h2>
-
-    <div id="messagesList"></div>
-
-    <div id="chatContainer" class="hidden">
-
-      <button
-        class="btn-light"
-        onclick="retourConversations()">
-        ← Retour
-      </button>
-
-      <h3 id="chatTitle">
-        Conversation
-      </h3>
-
-      <div id="chatBox" class="chat-box"></div>
-
-      <div class="chat-input">
-
+  <div class="modal-box" style="max-width:520px;width:calc(100% - 24px);padding:0;overflow:hidden;border-radius:24px;background:#fff;box-shadow:0 18px 50px rgba(0,0,0,.18);">
+    <div style="padding:18px;background:linear-gradient(135deg,#07883f,#12a85a);color:#fff;position:relative;">
+      <button onclick="fermerModal('messagesModal')" aria-label="Fermer" style="position:absolute;right:14px;top:12px;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:25px;cursor:pointer;">×</button>
+      <div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:5px;">🇬🇳 Marché Guinée</div>
+      <h2 style="margin:0;font-size:24px;font-weight:900;">💬 Messagerie</h2>
+      <p style="margin:6px 0 0;font-size:13px;opacity:.9;">
+        Discute directement avec les acheteurs et vendeurs.
+      </p>
+    </div>
+    <div id="messagesList" style="padding:16px;max-height:65vh;overflow-y:auto;background:#f7f9f8;"></div>
+    <div id="chatContainer" class="hidden" style="background:#f7f9f8;min-height:420px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-bottom:1px solid #e8ecea;">
+        <button class="btn-light" onclick="retourConversations()" style="border:0;border-radius:12px;padding:9px 12px;font-weight:800;cursor:pointer;background:#eef3f0;color:#166b3b;">
+          ←
+        </button>
+        <div style="min-width:0;">
+          <div style="font-size:11px;color:#7a847f;font-weight:700;margin-bottom:2px;">
+            CONVERSATION
+          </div>
+          <h3 id="chatTitle" style="margin:0;font-size:17px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            Conversation
+          </h3>
+        </div>
+      </div>
+      <div id="chatBox" class="chat-box" style="padding:16px;min-height:300px;max-height:52vh;overflow-y:auto;background:#f4f7f5;"></div>
+      <div class="chat-input" style="display:flex;gap:8px;padding:12px;background:#fff;border-top:1px solid #e7ebe9;">
         <input
           id="messageInput"
           type="text"
           placeholder="Écrire un message..."
           onkeydown="gererToucheMessage(event)"
+          style="flex:1;min-width:0;height:46px;border:1px solid #dce3df;border-radius:15px;padding:0 14px;font-size:14px;outline:none;background:#f8faf9;"
         >
-
-        <button
-          class="btn-primary"
-          onclick="envoyerMessage()">
+        <button class="btn-primary" onclick="envoyerMessage()" style="min-width:82px;height:46px;border:0;border-radius:15px;background:#07883f;color:#fff;font-weight:800;cursor:pointer;padding:0 14px;">
           Envoyer
         </button>
-
       </div>
-
     </div>
-
   </div>
-
 </div>
 
 
