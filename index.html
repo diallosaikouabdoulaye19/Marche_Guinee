@@ -6605,19 +6605,15 @@ async function chargerAnnonces(){
 
 }
 
-
 async function afficherAnnonces(){
 
   const container =
-    document.getElementById(
-      "annonces"
-    );
+    document.getElementById("annonces");
 
 
   const recherche =
-    document.getElementById(
-      "searchInput"
-    ).value
+    document.getElementById("searchInput")
+      .value
       .trim()
       .toLowerCase();
 
@@ -6627,7 +6623,6 @@ async function afficherAnnonces(){
       a => {
 
         const texte =
-
           (
             (a.title || "") +
             " " +
@@ -6636,8 +6631,7 @@ async function afficherAnnonces(){
             (a.city || "") +
             " " +
             (a.neighborhood || "")
-          )
-          .toLowerCase();
+          ).toLowerCase();
 
 
         const matchRecherche =
@@ -6647,9 +6641,8 @@ async function afficherAnnonces(){
 
         const matchCategorie =
           categorieActuelle === "Toutes" ||
-          String(
-            a.category || ""
-          ).toLowerCase() ===
+          String(a.category || "")
+            .toLowerCase() ===
           categorieActuelle.toLowerCase();
 
 
@@ -6665,7 +6658,6 @@ async function afficherAnnonces(){
   document.getElementById(
     "nombreAnnonces"
   ).textContent =
-
     annonces.length +
     " annonce" +
     (
@@ -6677,8 +6669,11 @@ async function afficherAnnonces(){
 
   if(!annonces.length){
 
-    container.innerHTML =
-      '<div class="empty">Aucune annonce trouvée.</div>';
+    container.innerHTML = `
+      <div class="empty">
+        Aucune annonce trouvée.
+      </div>
+    `;
 
     return;
 
@@ -6699,37 +6694,81 @@ async function afficherAnnonces(){
     card.className = "card";
 
 
+    card.style.cursor = "pointer";
+
+
     card.innerHTML = `
 
       <div
         class="card-img"
         style="
+          position:relative;
+          width:100%;
+          height:190px;
+          background:#f3f5f4;
           display:flex;
           align-items:center;
           justify-content:center;
-          font-size:50px;
-        ">
-        📦
+          overflow:hidden;
+        "
+      >
+
+        <div
+          class="image-placeholder"
+          style="
+            font-size:48px;
+            opacity:0.65;
+          "
+        >
+          📦
+        </div>
+
       </div>
+
 
       <div class="card-body">
 
-        <div class="card-title">
+        <div
+          class="card-title"
+          style="
+            font-weight:700;
+            font-size:16px;
+            line-height:1.3;
+            margin-bottom:8px;
+          "
+        >
           ${escapeHTML(
-            annonce.title || ""
+            annonce.title || "Sans titre"
           )}
         </div>
 
-        <div class="price">
+
+        <div
+          class="price"
+          style="
+            font-size:19px;
+            font-weight:800;
+            margin-bottom:8px;
+          "
+        >
           ${formatPrix(
             annonce.price_gnf
           )}
         </div>
 
-        <div class="meta">
-          📍 ${escapeHTML(
-            annonce.city || ""
+
+        <div
+          class="meta"
+          style="
+            font-size:13px;
+            margin-bottom:8px;
+          "
+        >
+          📍
+          ${escapeHTML(
+            annonce.city || "Guinée"
           )}
+
           ${
             annonce.neighborhood
               ? " · " +
@@ -6740,11 +6779,29 @@ async function afficherAnnonces(){
           }
         </div>
 
-        <div class="condition">
-          ${escapeHTML(
-            annonce.condition || ""
-          )}
-        </div>
+
+        ${
+          annonce.condition
+            ? `
+              <div
+                class="condition"
+                style="
+                  display:inline-block;
+                  padding:5px 9px;
+                  border-radius:20px;
+                  font-size:12px;
+                  font-weight:600;
+                  background:#eef8f1;
+                  color:#168a45;
+                "
+              >
+                ${escapeHTML(
+                  annonce.condition
+                )}
+              </div>
+            `
+            : ""
+        }
 
       </div>
 
@@ -6770,28 +6827,53 @@ async function afficherAnnonces(){
         if(!image) return;
 
 
-        const img =
-          document.createElement("img");
-
-
-        img.className = "card-img";
-
-        img.src = image;
-
-        img.alt = "";
-
-
-        const ancienneImage =
+        const imageContainer =
           card.querySelector(
             ".card-img"
           );
 
 
-        if(ancienneImage){
+        if(!imageContainer) return;
 
-          ancienneImage.replaceWith(img);
 
-        }
+        const img =
+          document.createElement("img");
+
+
+        img.className =
+          "card-img";
+
+
+        img.src = image;
+
+
+        img.alt =
+          annonce.title || "Annonce";
+
+
+        img.loading = "lazy";
+
+
+        img.style.width = "100%";
+        img.style.height = "190px";
+        img.style.objectFit = "cover";
+        img.style.display = "block";
+
+
+        imageContainer.replaceWith(
+          img
+        );
+
+      }
+    )
+    .catch(
+      error => {
+
+        console.log(
+          "Erreur image annonce :",
+          annonce.id,
+          error
+        );
 
       }
     );
@@ -6799,6 +6881,7 @@ async function afficherAnnonces(){
   }
 
 }
+
 
 
 function filtrerAnnonces(){
