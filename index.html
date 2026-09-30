@@ -7963,10 +7963,12 @@ async function continuerPaiement(listingId){
 
     const user = utilisateurConnecte;
 
-if(!user || !user.id){
-  alert("Impossible de récupérer ton compte.");
-  return;
-}
+    if(!user || !user.id){
+      alert("Impossible de récupérer ton compte.");
+      return;
+    }
+
+
     /* =========================
        EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
     ========================= */
@@ -7978,6 +7980,7 @@ if(!user || !user.id){
       alert("Tu ne peux pas acheter ta propre annonce.");
       return;
     }
+
 
     /* =========================
        CALCUL DES MONTANTS
@@ -7997,32 +8000,35 @@ if(!user || !user.id){
     const montantVendeur =
       prix - commission;
 
+
     /* =========================
        NUMÉRO DE COMMANDE
        MG 000001, MG 000002...
     ========================= */
 
     const reponseNumero =
-  await fetch(
-    `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
-    {
-      method:"POST",
-      headers:headers(),
-      body:JSON.stringify({})
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
+        {
+          method:"POST",
+          headers:headers(),
+          body:JSON.stringify({})
+        }
+      );
+
+    if(!reponseNumero.ok){
+      throw new Error(
+        "Impossible de générer le numéro de commande."
+      );
     }
-  );
 
-if(!reponseNumero.ok){
-  throw new Error(
-    "Impossible de générer le numéro de commande."
-  );
-}
+    const orderNumber =
+      await reponseNumero.json();
 
-const orderNumber =
-  await reponseNumero.json();
+
     /* =========================
        CODE UNIQUE DE LIVRAISON
-       ========================= */
+    ========================= */
 
     const deliveryCode =
       String(
@@ -8032,9 +8038,10 @@ const orderNumber =
         )
       );
 
+
     /* =========================
        CRÉER LA COMMANDE
-       ========================= */
+    ========================= */
 
     const commande = {
 
@@ -8063,7 +8070,7 @@ const orderNumber =
         deliveryCode,
 
       status:
-      "payment_pending",
+        "payment_pending",
 
       product_title:
         annonce.title,
@@ -8075,23 +8082,26 @@ const orderNumber =
         "pending"
     };
 
+
     const reponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/orders`,
         {
           method:"POST",
 
-  headers:headers({
-  "Prefer":"return=representation"
-}),
+          headers:headers({
+            "Prefer":"return=representation"
+          }),
 
           body:
             JSON.stringify(commande)
         }
       );
 
+
     const resultat =
       await reponse.json();
+
 
     if(!reponse.ok){
 
@@ -8113,8 +8123,105 @@ const orderNumber =
       return;
     }
 
+
     /* =========================
-       AFFICHER LA COMMANDE
+       RÉCUPÉRER L'ID DE LA COMMANDE
+    ========================= */
+
+    const commandeCreee =
+      Array.isArray(resultat)
+        ? resultat[0]
+        : resultat;
+
+    const orderId =
+      commandeCreee?.id;
+
+
+    if(!orderId){
+
+      console.error(
+        "Commande créée mais ID introuvable :",
+        resultat
+      );
+
+      alert(
+        "La commande a été créée mais son identifiant est introuvable."
+      );
+
+      return;
+    }
+
+
+    /* =========================
+       CRÉER LE PAIEMENT
+       STATUS = pending
+    ========================= */
+
+    const paiement = {
+
+      order_id:
+        orderId,
+
+      buyer_id:
+        user.id,
+
+      amount_gnf:
+        prix,
+
+      provider:
+        "pending",
+
+      provider_reference:
+        null,
+
+      status:
+        "pending"
+    };
+
+
+    const reponsePaiement =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/payments`,
+        {
+          method:"POST",
+
+          headers:headers({
+            "Prefer":"return=representation"
+          }),
+
+          body:
+            JSON.stringify(paiement)
+        }
+      );
+
+
+    const resultatPaiement =
+      await reponsePaiement.json();
+
+
+    if(!reponsePaiement.ok){
+
+      console.error(
+        "Erreur création paiement :",
+        resultatPaiement
+      );
+
+      alert(
+        "La commande a été créée, mais impossible de créer le paiement : " +
+        (
+          resultatPaiement.message ||
+          resultatPaiement.error_description ||
+          resultatPaiement.hint ||
+          "erreur Supabase"
+        )
+      );
+
+      return;
+    }
+
+
+    /* =========================
+       AFFICHER L'ÉTAT DU PAIEMENT
     ========================= */
 
     document.getElementById(
@@ -8122,7 +8229,7 @@ const orderNumber =
     ).innerHTML = `
 
       <h3>
-        Commande créée ✅
+        Commande enregistrée ✅
       </h3>
 
       <p>
@@ -8155,11 +8262,31 @@ const orderNumber =
       </p>
 
       <p>
-        Montant vendeur :
+        Montant vendeur après commission :
         <strong>
           ${formatPrix(montantVendeur)}
         </strong>
       </p>
+
+      <div class="success">
+
+        <strong>
+          Paiement en attente
+        </strong>
+
+        <br><br>
+
+        Le paiement n'est pas encore confirmé.
+
+        <br><br>
+
+        Le système de paiement
+        <strong>
+          Orange Money / Mobile Money
+        </strong>
+        sera connecté à cette commande.
+
+      </div>
 
       <div class="success">
 
@@ -8179,33 +8306,51 @@ const orderNumber =
 
         <br><br>
 
-        Ce code devra être comparé lors de la remise du colis.
+        Ce code devra être comparé
+        lors de la remise du colis.
 
       </div>
 
       <p>
-        La commande est maintenant enregistrée dans Marché Guinée.
+        La commande est enregistrée dans Marché Guinée.
       </p>
 
       <button
         class="btn-green"
         onclick="fermerModal('paymentModal')">
+
         Fermer
+
       </button>
 
     `;
 
+
+    console.log(
+      "Commande créée :",
+      commandeCreee
+    );
+
+    console.log(
+      "Paiement créé :",
+      resultatPaiement
+    );
+
+
   }catch(erreur){
 
-  console.error(
-    "Erreur commande :",
-    erreur
-  );
+    console.error(
+      "Erreur commande/paiement :",
+      erreur
+    );
 
-  alert(
-    "ERREUR : " +
-    (erreur?.message || JSON.stringify(erreur))
-  );
+    alert(
+      "ERREUR : " +
+      (
+        erreur?.message ||
+        JSON.stringify(erreur)
+      )
+    );
 
   }
 }
