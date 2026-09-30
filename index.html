@@ -8003,7 +8003,6 @@ async function continuerPaiement(listingId){
 
     /* =========================
        NUMÉRO DE COMMANDE
-       MG 000001, MG 000002...
     ========================= */
 
     const reponseNumero =
@@ -8153,8 +8152,147 @@ async function continuerPaiement(listingId){
 
 
     /* =========================
+       CHOIX DU MOYEN DE PAIEMENT
+    ========================= */
+
+    document.getElementById(
+      "paymentContent"
+    ).innerHTML = `
+
+      <h3>
+        Choisir le moyen de paiement
+      </h3>
+
+      <p>
+        Article :
+        <strong>
+          ${escapeHTML(annonce.title)}
+        </strong>
+      </p>
+
+      <p>
+        Numéro de commande :
+        <strong>
+          ${escapeHTML(orderNumber)}
+        </strong>
+      </p>
+
+      <p>
+        Montant à payer :
+        <strong>
+          ${formatPrix(prix)}
+        </strong>
+      </p>
+
+      <div class="success">
+
+        Commission Marché Guinée :
+        <strong>
+          ${formatPrix(commission)}
+        </strong>
+        (3 %)
+
+        <br><br>
+
+        Montant vendeur après commission :
+        <strong>
+          ${formatPrix(montantVendeur)}
+        </strong>
+
+      </div>
+
+      <p>
+        Choisis ton moyen de paiement :
+      </p>
+
+      <button
+        class="btn-green"
+        onclick="creerPaiement('${orderId}', 'orange_money', '${escapeHTML(orderNumber)}', '${escapeHTML(annonce.title)}', ${prix}, ${commission}, ${montantVendeur}, '${deliveryCode}')">
+
+        🟠 Orange Money
+
+      </button>
+
+      <br><br>
+
+      <button
+        class="btn-primary"
+        onclick="creerPaiement('${orderId}', 'mtn_momo', '${escapeHTML(orderNumber)}', '${escapeHTML(annonce.title)}', ${prix}, ${commission}, ${montantVendeur}, '${deliveryCode}')">
+
+        🟡 MTN Mobile Money
+
+      </button>
+
+    `;
+
+
+    console.log(
+      "Commande créée :",
+      commandeCreee
+    );
+
+
+  }catch(erreur){
+
+    console.error(
+      "Erreur création commande :",
+      erreur
+    );
+
+    alert(
+      "ERREUR : " +
+      (
+        erreur?.message ||
+        JSON.stringify(erreur)
+      )
+    );
+
+  }
+}
+
+
+/* =========================
+   CRÉER LE PAIEMENT
+========================= */
+
+async function creerPaiement(
+  orderId,
+  provider,
+  orderNumber,
+  productTitle,
+  prix,
+  commission,
+  montantVendeur,
+  deliveryCode
+){
+
+  if(!utilisateurConnecte || !utilisateurConnecte.id){
+    alert("Connecte-toi pour continuer.");
+    return;
+  }
+
+  try{
+
+    /* =========================
+       VÉRIFIER LE FOURNISSEUR
+    ========================= */
+
+    if(
+      provider !== "orange_money" &&
+      provider !== "mtn_momo"
+    ){
+
+      alert(
+        "Moyen de paiement invalide."
+      );
+
+      return;
+    }
+
+
+    /* =========================
        CRÉER LE PAIEMENT
-       STATUS = pending
+       STATUS = PENDING
     ========================= */
 
     const paiement = {
@@ -8163,13 +8301,13 @@ async function continuerPaiement(listingId){
         orderId,
 
       buyer_id:
-        user.id,
+        utilisateurConnecte.id,
 
       amount_gnf:
         prix,
 
       provider:
-        "pending",
+        provider,
 
       provider_reference:
         null,
@@ -8207,7 +8345,7 @@ async function continuerPaiement(listingId){
       );
 
       alert(
-        "La commande a été créée, mais impossible de créer le paiement : " +
+        "Impossible de créer le paiement : " +
         (
           resultatPaiement.message ||
           resultatPaiement.error_description ||
@@ -8221,21 +8359,27 @@ async function continuerPaiement(listingId){
 
 
     /* =========================
-       AFFICHER L'ÉTAT DU PAIEMENT
+       AFFICHER LE PAIEMENT EN ATTENTE
     ========================= */
+
+    const nomProvider =
+      provider === "orange_money"
+        ? "Orange Money"
+        : "MTN Mobile Money";
+
 
     document.getElementById(
       "paymentContent"
     ).innerHTML = `
 
       <h3>
-        Commande enregistrée ✅
+        Paiement enregistré ✅
       </h3>
 
       <p>
         Article :
         <strong>
-          ${escapeHTML(annonce.title)}
+          ${escapeHTML(productTitle)}
         </strong>
       </p>
 
@@ -8247,24 +8391,16 @@ async function continuerPaiement(listingId){
       </p>
 
       <p>
-        Prix :
+        Moyen de paiement :
+        <strong>
+          ${nomProvider}
+        </strong>
+      </p>
+
+      <p>
+        Montant :
         <strong>
           ${formatPrix(prix)}
-        </strong>
-      </p>
-
-      <p>
-        Commission Marché Guinée :
-        <strong>
-          ${formatPrix(commission)}
-        </strong>
-        (3 %)
-      </p>
-
-      <p>
-        Montant vendeur après commission :
-        <strong>
-          ${formatPrix(montantVendeur)}
         </strong>
       </p>
 
@@ -8280,11 +8416,8 @@ async function continuerPaiement(listingId){
 
         <br><br>
 
-        Le système de paiement
-        <strong>
-          Orange Money / Mobile Money
-        </strong>
-        sera connecté à cette commande.
+        ${nomProvider} sera utilisé
+        pour effectuer le paiement réel.
 
       </div>
 
@@ -8312,7 +8445,8 @@ async function continuerPaiement(listingId){
       </div>
 
       <p>
-        La commande est enregistrée dans Marché Guinée.
+        La commande est enregistrée
+        dans Marché Guinée.
       </p>
 
       <button
@@ -8327,11 +8461,6 @@ async function continuerPaiement(listingId){
 
 
     console.log(
-      "Commande créée :",
-      commandeCreee
-    );
-
-    console.log(
       "Paiement créé :",
       resultatPaiement
     );
@@ -8340,12 +8469,12 @@ async function continuerPaiement(listingId){
   }catch(erreur){
 
     console.error(
-      "Erreur commande/paiement :",
+      "Erreur paiement :",
       erreur
     );
 
     alert(
-      "ERREUR : " +
+      "ERREUR PAIEMENT : " +
       (
         erreur?.message ||
         JSON.stringify(erreur)
