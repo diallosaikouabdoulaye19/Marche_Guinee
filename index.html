@@ -12080,8 +12080,20 @@ let intervalNotifications = null;
 --------------------------------------------------------- */
 async function chargerNotifications() {
 
+  const liste = document.getElementById("notificationsList");
+
   if (!utilisateurConnecte || !utilisateurConnecte.id) {
+
     mettreAJourBadgeNotifications(0);
+
+    if (liste) {
+      liste.innerHTML = `
+        <div class="notifications-vide">
+          🔐 Connectez-vous pour voir vos notifications.
+        </div>
+      `;
+    }
+
     return;
   }
 
@@ -12092,28 +12104,51 @@ async function chargerNotifications() {
       "/rest/v1/Notifications" +
       "?user_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=*" +
+      "&select=id,user_id,title,message,type,is_read,created_at" +
       "&order=created_at.desc";
 
     const response = await supabaseFetch(url);
 
     if (!response.ok) {
+
+      const erreur = await response.text();
+
       console.log(
         "Erreur chargement notifications :",
-        await response.text()
+        response.status,
+        erreur
       );
+
+      if (liste) {
+        liste.innerHTML = `
+          <div class="notifications-vide">
+            ⚠️ Impossible de charger les notifications.
+          </div>
+        `;
+      }
+
+      mettreAJourBadgeNotifications(0);
+
       return;
     }
 
     const notifications = await response.json();
 
+    console.log(
+      "Notifications chargées :",
+      notifications
+    );
+
     afficherNotifications(notifications);
 
     const nonLues = notifications.filter(
-      notification => notification.is_read === false
+      notification =>
+        notification.is_read === false
     );
 
-    mettreAJourBadgeNotifications(nonLues.length);
+    mettreAJourBadgeNotifications(
+      nonLues.length
+    );
 
   } catch (erreur) {
 
@@ -12122,10 +12157,18 @@ async function chargerNotifications() {
       erreur
     );
 
+    if (liste) {
+      liste.innerHTML = `
+        <div class="notifications-vide">
+          ⚠️ Une erreur est survenue pendant le chargement.
+        </div>
+      `;
+    }
+
+    mettreAJourBadgeNotifications(0);
   }
 
 }
-
 
 /* ---------------------------------------------------------
    Afficher les notifications
