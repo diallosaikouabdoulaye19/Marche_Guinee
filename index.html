@@ -7937,37 +7937,29 @@ function ouvrirPaiement(listingId){
 // BOUTON « CONTINUER »
 // =========================
 async function continuerPaiement(listingId){
-
   const annonce =
     toutesLesAnnonces.find(
       a => a.id === listingId
     );
-
   if(!annonce){
     alert("Annonce introuvable.");
     return;
   }
-
   if(!utilisateurConnecte){
     fermerModal("paymentModal");
     alert("Connecte-toi pour continuer.");
     ouvrirCompte();
     return;
   }
-
   try{
-
     const user = utilisateurConnecte;
-
     if(!user || !user.id){
       alert("Impossible de récupérer ton compte.");
       return;
     }
-
     /* =========================
        EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
     ========================= */
-
     if(
       annonce.seller_id &&
       annonce.seller_id === user.id
@@ -7975,29 +7967,57 @@ async function continuerPaiement(listingId){
       alert("Tu ne peux pas acheter ta propre annonce.");
       return;
     }
-
+    /* =========================
+       RÉCUPÉRER LA LOCALISATION
+       DE L'ACHETEUR
+    ========================= */
+    let villeAcheteur = "";
+    let quartierAcheteur = "";
+    try{
+      const profilAcheteur =
+        await supabaseFetch(
+          `${SUPABASE_URL}/rest/v1/Users?id=eq.${encodeURIComponent(user.id)}&select=City,neighborhood`
+        );
+      console.log(
+        "Profil acheteur :",
+        profilAcheteur
+      );
+      const profil =
+        Array.isArray(profilAcheteur)
+          ? profilAcheteur[0]
+          : profilAcheteur;
+      if(profil){
+        villeAcheteur =
+          profil.City ||
+          profil.city ||
+          "";
+        quartierAcheteur =
+          profil.neighborhood ||
+          profil.Neighborhood ||
+          "";
+      }
+    }catch(erreurProfil){
+      console.error(
+        "⚠️ Impossible de récupérer la localisation de l'acheteur :",
+        erreurProfil
+      );
+    }
     /* =========================
        CALCUL DES MONTANTS
     ========================= */
-
     const prix =
       Number(annonce.price_gnf) || 0;
-
     if(prix <= 0){
       alert("Le prix de cette annonce est invalide.");
       return;
     }
-
     const commission =
       Math.round(prix * 0.03);
-
     const montantVendeur =
       prix - commission;
-
     /* =========================
        NUMÉRO DE COMMANDE
     ========================= */
-
     const reponseNumero =
       await fetch(
         `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
@@ -8007,20 +8027,16 @@ async function continuerPaiement(listingId){
           body:JSON.stringify({})
         }
       );
-
     if(!reponseNumero.ok){
       throw new Error(
         "Impossible de générer le numéro de commande."
       );
     }
-
     const orderNumber =
       await reponseNumero.json();
-
     /* =========================
        CODE UNIQUE DE LIVRAISON
     ========================= */
-
     const deliveryCode =
       String(
         Math.floor(
@@ -8028,75 +8044,54 @@ async function continuerPaiement(listingId){
           Math.random() * 900000
         )
       );
-
     /* =========================
        CRÉER LA COMMANDE
     ========================= */
-
     const commande = {
-
       order_number:
         orderNumber,
-
       buyer_id:
         user.id,
-
       seller_id:
         annonce.seller_id,
-
       listing_id:
         annonce.id,
-
       price_gnf:
         prix,
-
       commission_gnf:
         commission,
-
       seller_amount_gnf:
         montantVendeur,
-
       delivery_code:
         deliveryCode,
-
       status:
         "payment_pending",
-
       product_title:
         annonce.title,
-
       problem_reported:
         false,
-
       delivery_status:
         "pending"
     };
-
     const reponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/orders`,
         {
           method:"POST",
-
           headers:headers({
             "Prefer":"return=representation"
           }),
-
           body:
             JSON.stringify(commande)
         }
       );
-
     const resultat =
       await reponse.json();
-
     if(!reponse.ok){
-
       console.error(
         "Erreur création commande :",
         resultat
       );
-
       alert(
         "Impossible de créer la commande : " +
         (
@@ -8106,203 +8101,169 @@ async function continuerPaiement(listingId){
           "erreur Supabase"
         )
       );
-
       return;
     }
-
     /* =========================
        RÉCUPÉRER L'ID DE LA COMMANDE
     ========================= */
-
     const commandeCreee =
       Array.isArray(resultat)
         ? resultat[0]
         : resultat;
-
     const orderId =
       commandeCreee?.id;
-
     if(!orderId){
-
       console.error(
         "Commande créée mais ID introuvable :",
         resultat
       );
-
       alert(
         "La commande a été créée mais son identifiant est introuvable."
       );
-
       return;
     }
-
     /* =========================
        NOTIFICATION DU VENDEUR
+       AVEC LOCALISATION CLIENT
     ========================= */
-
     try{
-
+      let localisationAcheteur =
+        "Localisation non renseignée";
+      if(villeAcheteur && quartierAcheteur){
+        localisationAcheteur =
+          villeAcheteur +
+          " - " +
+          quartierAcheteur;
+      }else if(villeAcheteur){
+        localisationAcheteur =
+          villeAcheteur;
+      }else if(quartierAcheteur){
+        localisationAcheteur =
+          quartierAcheteur;
+      }
       const notificationMessage =
         "Vous avez reçu une nouvelle commande pour « " +
         annonce.title +
-        " ». Commande " +
+        " ». " +
+        "Commande " +
         orderNumber +
-        ". Montant : " +
+        ". " +
+        "Montant : " +
         Number(prix).toLocaleString("fr-FR") +
-        " GNF.";
-
+        " GNF. " +
+        "📍 Localisation du client : " +
+        localisationAcheteur +
+        ".";
       await supabaseFetch(
         `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
         {
           method:"POST",
-
           headers:headers({
             "Content-Type":"application/json"
           }),
-
           body:JSON.stringify({
-
             p_user_id:
               annonce.seller_id,
-
             p_title:
               "🛒 Nouvelle commande",
-
             p_message:
               notificationMessage,
-
             p_type:
               "new_order"
-
           })
         }
       );
-
       console.log(
-        "✅ Notification nouvelle commande envoyée au vendeur"
+        "✅ Notification nouvelle commande envoyée au vendeur avec localisation"
       );
-
     }catch(erreurNotification){
-
       console.error(
         "⚠️ Notification vendeur non envoyée :",
         erreurNotification
       );
-
     }
-
     /* =========================
        NOTIFICATION DU CODE
        À L'ACHETEUR
     ========================= */
-
     try{
-
       await notifierCodeLivraisonAutomatique(
         user.id,
         orderNumber,
         deliveryCode
       );
-
       console.log(
         "✅ Notification code de livraison envoyée à l'acheteur"
       );
-
     }catch(erreurCode){
-
       console.error(
         "⚠️ Notification code de livraison non envoyée :",
         erreurCode
       );
-
     }
-
     /* =========================
        CHOIX DU MOYEN DE PAIEMENT
     ========================= */
-
     document.getElementById(
       "paymentContent"
     ).innerHTML = `
-
       <h3>
         Choisir le moyen de paiement
       </h3>
-
       <p>
         Article :
         <strong>
           ${escapeHTML(annonce.title)}
         </strong>
       </p>
-
       <p>
         Numéro de commande :
         <strong>
           ${escapeHTML(orderNumber)}
         </strong>
       </p>
-
       <p>
         Montant à payer :
         <strong>
           ${formatPrix(prix)}
         </strong>
       </p>
-
       <div class="success">
-
         Commission Marché Guinée :
         <strong>
           ${formatPrix(commission)}
         </strong>
         (3 %)
-
         <br><br>
-
         Montant vendeur après commission :
         <strong>
           ${formatPrix(montantVendeur)}
         </strong>
-
       </div>
-
       <p>
         Choisis ton moyen de paiement :
       </p>
-
       <button
         class="btn-green"
         onclick="creerPaiement('${orderId}', 'orange_money', '${escapeHTML(orderNumber)}', '${escapeHTML(annonce.title)}', ${prix}, ${commission}, ${montantVendeur}, '${deliveryCode}')">
-
         🟠 Orange Money
-
       </button>
-
       <br><br>
-
       <button
         class="btn-primary"
         onclick="creerPaiement('${orderId}', 'mtn_momo', '${escapeHTML(orderNumber)}', '${escapeHTML(annonce.title)}', ${prix}, ${commission}, ${montantVendeur}, '${deliveryCode}')">
-
         🟡 MTN Mobile Money
-
       </button>
-
     `;
-
     console.log(
       "Commande créée :",
       commandeCreee
     );
-
   }catch(erreur){
-
     console.error(
       "Erreur création commande :",
       erreur
     );
-
     alert(
       "ERREUR : " +
       (
@@ -8310,7 +8271,6 @@ async function continuerPaiement(listingId){
         JSON.stringify(erreur)
       )
     );
-
   }
 }
   
