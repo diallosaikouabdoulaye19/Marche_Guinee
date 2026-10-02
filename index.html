@@ -2909,204 +2909,177 @@ function emailTechnique(numero){
 
 
 async function creerCompte(){
-
   const fullName =
     document.getElementById(
       "signupName"
     ).value.trim();
-
   const phone =
     document.getElementById(
       "signupPhone"
     ).value.trim();
-
+  const city =
+    document.getElementById(
+      "signupCity"
+    ).value.trim();
+  const neighborhood =
+    document.getElementById(
+      "signupNeighborhood"
+    ).value.trim();
   const password =
     document.getElementById(
       "signupPassword"
     ).value;
-
   const box =
     document.getElementById(
       "accountMessage"
     );
-
-
+  /* =========================
+     VÉRIFICATION DES CHAMPS
+  ========================= */
   if(
     !fullName ||
     !phone ||
+    !city ||
+    !neighborhood ||
     !password
   ){
-
     box.innerHTML =
       '<div class="error">' +
       'Remplis tous les champs.' +
       '</div>';
-
     return;
-
   }
-
-
   if(password.length < 6){
-
     box.innerHTML =
       '<div class="error">' +
       'Le mot de passe doit contenir au moins 6 caractères.' +
       '</div>';
-
     return;
-
   }
-
-
   box.innerHTML =
     '<div class="success">' +
     'Création du compte...' +
     '</div>';
-
-
   try{
-
+    /* =========================
+       CRÉATION DU COMPTE AUTH
+    ========================= */
     const auth =
       await fetch(
         SUPABASE_URL +
         "/auth/v1/signup",
         {
           method:"POST",
-
           headers:{
             "apikey":SUPABASE_KEY,
             "Content-Type":"application/json"
           },
-
           body:JSON.stringify({
-
             email:
               emailTechnique(phone),
-
             password:
               password,
-
             data:{
               full_name:
                 fullName,
-
               phone:
-                phone
+                phone,
+              city:
+                city,
+              neighborhood:
+                neighborhood
             }
-
           })
-
         }
       );
-
-
     const authText =
       await auth.text();
-
-
     let authData;
-
-
     try{
       authData =
         JSON.parse(authText);
     }catch(e){
       authData = {};
     }
-
-
     if(!auth.ok){
-
       throw new Error(
-
         authData.msg ||
         authData.message ||
         authData.error_description ||
         "Impossible de créer le compte."
-
       );
-
     }
-
-
     const userId =
-
       authData.user &&
       authData.user.id
         ? authData.user.id
         : null;
-
-
     if(!userId){
-
       box.innerHTML =
         '<div class="success">' +
         'Compte créé. Tu peux maintenant te connecter.' +
         '</div>';
-
       afficherConnexion();
-
       return;
-
     }
-
-
-    await fetch(
-
-      SUPABASE_URL +
-      "/rest/v1/users?on_conflict=id",
-
-      {
-        method:"POST",
-
-        headers:{
-          ...headers(),
-          "Prefer":
-            "resolution=merge-duplicates,return=minimal"
-        },
-
-        body:JSON.stringify({
-
-          id:userId,
-
-          full_name:
-            fullName,
-
-          phone:
-            phone
-
-        })
-
-      }
-
-    );
-
-
+    /* =========================
+       ENREGISTRER LE PROFIL
+       DANS USERS
+    ========================= */
+    const profilResponse =
+      await fetch(
+        SUPABASE_URL +
+        "/rest/v1/users?on_conflict=id",
+        {
+          method:"POST",
+          headers:{
+            ...headers(),
+            "Prefer":
+              "resolution=merge-duplicates,return=minimal"
+          },
+          body:JSON.stringify({
+            id:
+              userId,
+            full_name:
+              fullName,
+            phone:
+              phone,
+            City:
+              city,
+            neighborhood:
+              neighborhood
+          })
+        }
+      );
+    if(!profilResponse.ok){
+      const profilText =
+        await profilResponse.text();
+      console.error(
+        "Erreur création profil Users :",
+        profilText
+      );
+      throw new Error(
+        "Compte créé mais impossible d'enregistrer la ville et le quartier."
+      );
+    }
+    /* =========================
+       SUCCÈS
+    ========================= */
     box.innerHTML =
       '<div class="success">' +
       'Compte créé avec succès. Tu peux maintenant te connecter.' +
       '</div>';
-
-
     afficherConnexion();
-
-
   }catch(error){
-
     console.error(error);
-
     box.innerHTML =
       '<div class="error">' +
       escapeHTML(
         error.message
       ) +
       '</div>';
-
   }
-
 }
-
 
 async function connecterCompte(){
 
