@@ -11920,5 +11920,785 @@ document.addEventListener(
 
 </script>
 
+  <!-- =========================================================
+     🔔 NOTIFICATIONS — MARCHÉ GUINÉE
+     À COLLER JUSTE AVANT </body>
+========================================================= -->
+
+<style>
+.notification-header-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: #e53935;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#notificationsModal .modal-box {
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.notifications-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.notifications-top h2 {
+  margin: 0;
+}
+
+.notifications-actions button {
+  border: none;
+  background: transparent;
+  color: #1877f2;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.notification-item {
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: #f5f5f5;
+  border-left: 4px solid #1877f2;
+  cursor: pointer;
+}
+
+.notification-item.non-lue {
+  background: #eaf3ff;
+}
+
+.notification-item h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.notification-item p {
+  margin: 0 0 7px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notification-date {
+  font-size: 11px;
+  color: #777;
+}
+
+.notifications-vide {
+  text-align: center;
+  padding: 30px 15px;
+  color: #777;
+}
+</style>
+
+
+<!-- 🔔 BOUTON NOTIFICATIONS -->
+<button
+  id="notificationHeaderButton"
+  class="notification-header-btn"
+  onclick="ouvrirNotifications()"
+  title="Notifications"
+  type="button"
+>
+  🔔
+  <span id="notificationBadge" class="notification-badge">0</span>
+</button>
+
+
+<!-- 🔔 MODAL NOTIFICATIONS -->
+<div id="notificationsModal" class="modal">
+  <div class="modal-box">
+
+    <span
+      class="close"
+      onclick="fermerModal('notificationsModal')"
+    >×</span>
+
+    <div class="notifications-top">
+
+      <h2>🔔 Notifications</h2>
+
+      <div class="notifications-actions">
+        <button
+          type="button"
+          onclick="marquerToutesNotificationsLues()"
+        >
+          Tout lire
+        </button>
+      </div>
+
+    </div>
+
+    <div id="notificationsList">
+      <div class="notifications-vide">
+        Chargement des notifications...
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+/* =========================================================
+   🔔 SYSTÈME DE NOTIFICATIONS
+========================================================= */
+
+let intervalNotifications = null;
+
+
+/* ---------------------------------------------------------
+   Charger les notifications
+--------------------------------------------------------- */
+async function chargerNotifications() {
+
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    mettreAJourBadgeNotifications(0);
+    return;
+  }
+
+  try {
+
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/Notifications" +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*" +
+      "&order=created_at.desc";
+
+    const response = await supabaseFetch(url);
+
+    if (!response.ok) {
+      console.log(
+        "Erreur chargement notifications :",
+        await response.text()
+      );
+      return;
+    }
+
+    const notifications = await response.json();
+
+    afficherNotifications(notifications);
+
+    const nonLues = notifications.filter(
+      notification => notification.is_read === false
+    );
+
+    mettreAJourBadgeNotifications(nonLues.length);
+
+  } catch (erreur) {
+
+    console.log(
+      "Erreur notifications :",
+      erreur
+    );
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Afficher les notifications
+--------------------------------------------------------- */
+function afficherNotifications(notifications) {
+
+  const liste =
+    document.getElementById("notificationsList");
+
+  if (!liste) return;
+
+  if (!notifications || notifications.length === 0) {
+
+    liste.innerHTML = `
+      <div class="notifications-vide">
+        🔕 Aucune notification pour le moment.
+      </div>
+    `;
+
+    return;
+  }
+
+  liste.innerHTML = notifications.map(notification => {
+
+    const classe =
+      notification.is_read
+        ? "notification-item"
+        : "notification-item non-lue";
+
+    return `
+      <div
+        class="${classe}"
+        onclick="marquerNotificationLue('${notification.id}')"
+      >
+
+        <h3>
+          ${escapeHTML(notification.title || "Notification")}
+        </h3>
+
+        <p>
+          ${escapeHTML(notification.message || "")}
+        </p>
+
+        <div class="notification-date">
+          ${formatDate(notification.created_at)}
+        </div>
+
+      </div>
+    `;
+
+  }).join("");
+
+}
+
+
+/* ---------------------------------------------------------
+   Badge rouge
+--------------------------------------------------------- */
+function mettreAJourBadgeNotifications(nombre) {
+
+  const badge =
+    document.getElementById("notificationBadge");
+
+  if (!badge) return;
+
+  if (nombre > 0) {
+
+    badge.textContent =
+      nombre > 99 ? "99+" : nombre;
+
+    badge.style.display = "flex";
+
+  } else {
+
+    badge.style.display = "none";
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Ouvrir notifications
+--------------------------------------------------------- */
+async function ouvrirNotifications() {
+
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+
+    alert(
+      "Connectez-vous à votre compte pour voir vos notifications."
+    );
+
+    return;
+  }
+
+  const modal =
+    document.getElementById("notificationsModal");
+
+  if (modal) {
+    modal.style.display = "flex";
+  }
+
+  await chargerNotifications();
+
+}
+
+
+/* ---------------------------------------------------------
+   Marquer UNE notification comme lue
+--------------------------------------------------------- */
+async function marquerNotificationLue(notificationId) {
+
+  try {
+
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/Notifications" +
+      "?id=eq." +
+      encodeURIComponent(notificationId);
+
+    const response = await supabaseFetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        is_read: true
+      })
+    });
+
+    if (!response.ok) {
+
+      console.log(
+        "Erreur lecture notification :",
+        await response.text()
+      );
+
+      return;
+    }
+
+    await chargerNotifications();
+
+  } catch (erreur) {
+
+    console.log(
+      "Erreur marquer notification lue :",
+      erreur
+    );
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Marquer TOUTES les notifications comme lues
+--------------------------------------------------------- */
+async function marquerToutesNotificationsLues() {
+
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    return;
+  }
+
+  try {
+
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/Notifications" +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&is_read=eq.false";
+
+    const response = await supabaseFetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        is_read: true
+      })
+    });
+
+    if (!response.ok) {
+
+      console.log(
+        "Erreur marquage notifications :",
+        await response.text()
+      );
+
+      return;
+    }
+
+    await chargerNotifications();
+
+  } catch (erreur) {
+
+    console.log(
+      "Erreur notifications :",
+      erreur
+    );
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Créer une notification
+--------------------------------------------------------- */
+async function creerNotification(
+  userId,
+  title,
+  message,
+  type
+) {
+
+  if (!userId) {
+    console.log(
+      "Notification ignorée : utilisateur absent."
+    );
+    return false;
+  }
+
+  try {
+
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/Notifications";
+
+    const response = await supabaseFetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        title: title,
+        message: message,
+        type: type || "general",
+        is_read: false
+      })
+    });
+
+    if (!response.ok) {
+
+      console.log(
+        "Erreur création notification :",
+        await response.text()
+      );
+
+      return false;
+    }
+
+    return true;
+
+  } catch (erreur) {
+
+    console.log(
+      "Erreur création notification :",
+      erreur
+    );
+
+    return false;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Notifications acheteur
+--------------------------------------------------------- */
+
+async function notifierNouvelleCommande(
+  buyerId,
+  sellerId,
+  orderNumber,
+  productTitle
+) {
+
+  await creerNotification(
+    buyerId,
+    "🛒 Nouvelle commande",
+    "Votre commande " +
+      orderNumber +
+      " pour « " +
+      productTitle +
+      " » a été créée.",
+    "order_created"
+  );
+
+  await creerNotification(
+    sellerId,
+    "📦 Nouvelle vente",
+    "Vous avez reçu une nouvelle commande " +
+      orderNumber +
+      " pour « " +
+      productTitle +
+      " ».",
+    "new_sale"
+  );
+
+}
+
+
+async function notifierPaiementEnregistre(
+  buyerId,
+  sellerId,
+  orderNumber
+) {
+
+  await creerNotification(
+    buyerId,
+    "💳 Paiement enregistré",
+    "Le paiement de la commande " +
+      orderNumber +
+      " a été enregistré.",
+    "payment_registered"
+  );
+
+  await creerNotification(
+    sellerId,
+    "💰 Paiement reçu",
+    "Le paiement de la commande " +
+      orderNumber +
+      " a été enregistré.",
+    "payment_received"
+  );
+
+}
+
+
+async function notifierCodeLivraison(
+  buyerId,
+  sellerId,
+  orderNumber
+) {
+
+  await creerNotification(
+    buyerId,
+    "🔐 Code de livraison disponible",
+    "Votre code de livraison est disponible. Présentez-le au livreur lors de la remise du colis.",
+    "delivery_code"
+  );
+
+  await creerNotification(
+    sellerId,
+    "📦 Livraison à effectuer",
+    "Livraison à effectuer pour la commande " +
+      orderNumber +
+      ". L’acheteur devra présenter son code de vérification.",
+    "delivery_pending"
+  );
+
+}
+
+
+async function notifierLivraisonVerifiee(
+  buyerId,
+  sellerId,
+  orderNumber
+) {
+
+  await creerNotification(
+    buyerId,
+    "✅ Livraison vérifiée",
+    "Le code de livraison de la commande " +
+      orderNumber +
+      " a été vérifié avec succès.",
+    "delivery_verified"
+  );
+
+  await creerNotification(
+    sellerId,
+    "✅ Livraison vérifiée",
+    "Le code de livraison de la commande " +
+      orderNumber +
+      " a été vérifié avec succès.",
+    "delivery_verified"
+  );
+
+}
+
+
+async function notifierReceptionConfirmee(
+  buyerId,
+  sellerId,
+  orderNumber
+) {
+
+  await creerNotification(
+    buyerId,
+    "📦 Colis remis",
+    "La réception de la commande " +
+      orderNumber +
+      " a été confirmée.",
+    "parcel_received"
+  );
+
+  await creerNotification(
+    sellerId,
+    "🎉 Vente finalisée",
+    "La commande " +
+      orderNumber +
+      " est maintenant terminée.",
+    "sale_completed"
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   Notification solde vendeur
+--------------------------------------------------------- */
+
+async function notifierSoldeCredite(
+  sellerId,
+  orderNumber,
+  montant
+) {
+
+  await creerNotification(
+    sellerId,
+    "💰 Solde vendeur crédité",
+    "Votre solde a été crédité de " +
+      formatPrix(montant) +
+      " GNF pour la commande " +
+      orderNumber +
+      " après déduction de la commission.",
+    "seller_balance"
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   Notifications retrait
+--------------------------------------------------------- */
+
+async function notifierDemandeRetrait(
+  sellerId,
+  montant
+) {
+
+  await creerNotification(
+    sellerId,
+    "💸 Demande de retrait enregistrée",
+    "Votre demande de retrait de " +
+      formatPrix(montant) +
+      " GNF a été enregistrée.",
+    "withdrawal_requested"
+  );
+
+}
+
+
+async function notifierRetraitEnTraitement(
+  sellerId,
+  montant
+) {
+
+  await creerNotification(
+    sellerId,
+    "⏳ Retrait en traitement",
+    "Votre retrait de " +
+      formatPrix(montant) +
+      " GNF est en cours de traitement.",
+    "withdrawal_processing"
+  );
+
+}
+
+
+async function notifierRetraitEffectue(
+  sellerId,
+  montant
+) {
+
+  await creerNotification(
+    sellerId,
+    "✅ Retrait effectué",
+    "Votre retrait de " +
+      formatPrix(montant) +
+      " GNF a été effectué.",
+    "withdrawal_completed"
+  );
+
+}
+
+
+async function notifierRetraitRefuse(
+  sellerId,
+  montant
+) {
+
+  await creerNotification(
+    sellerId,
+    "❌ Retrait refusé",
+    "Votre demande de retrait de " +
+      formatPrix(montant) +
+      " GNF a été refusée.",
+    "withdrawal_refused"
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   Démarrage automatique
+--------------------------------------------------------- */
+
+async function initialiserNotifications() {
+
+  if (
+    utilisateurConnecte &&
+    utilisateurConnecte.id
+  ) {
+
+    await chargerNotifications();
+
+    if (!intervalNotifications) {
+
+      intervalNotifications =
+        setInterval(
+          chargerNotifications,
+          30000
+        );
+
+    }
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Vérification après connexion
+--------------------------------------------------------- */
+
+const ancienneRestaurerSessionNotifications =
+  window.restaurerSession;
+
+window.restaurerSession =
+  async function() {
+
+    if (
+      typeof ancienneRestaurerSessionNotifications ===
+      "function"
+    ) {
+
+      await ancienneRestaurerSessionNotifications();
+
+    }
+
+    setTimeout(
+      initialiserNotifications,
+      500
+    );
+
+  };
+
+
+/* ---------------------------------------------------------
+   Si la session existe déjà
+--------------------------------------------------------- */
+
+setTimeout(
+  initialiserNotifications,
+  1000
+);
+
+</script>
+
+<!-- FIN DU BLOC NOTIFICATIONS -->
 </body>
 </html>
