@@ -7957,17 +7957,12 @@ async function continuerPaiement(listingId){
 
   try{
 
-    /* =========================
-       RÉCUPÉRER L'UTILISATEUR
-    ========================= */
-
     const user = utilisateurConnecte;
 
     if(!user || !user.id){
       alert("Impossible de récupérer ton compte.");
       return;
     }
-
 
     /* =========================
        EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
@@ -7980,7 +7975,6 @@ async function continuerPaiement(listingId){
       alert("Tu ne peux pas acheter ta propre annonce.");
       return;
     }
-
 
     /* =========================
        CALCUL DES MONTANTS
@@ -7999,7 +7993,6 @@ async function continuerPaiement(listingId){
 
     const montantVendeur =
       prix - commission;
-
 
     /* =========================
        NUMÉRO DE COMMANDE
@@ -8024,7 +8017,6 @@ async function continuerPaiement(listingId){
     const orderNumber =
       await reponseNumero.json();
 
-
     /* =========================
        CODE UNIQUE DE LIVRAISON
     ========================= */
@@ -8036,7 +8028,6 @@ async function continuerPaiement(listingId){
           Math.random() * 900000
         )
       );
-
 
     /* =========================
        CRÉER LA COMMANDE
@@ -8081,7 +8072,6 @@ async function continuerPaiement(listingId){
         "pending"
     };
 
-
     const reponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/orders`,
@@ -8097,10 +8087,8 @@ async function continuerPaiement(listingId){
         }
       );
 
-
     const resultat =
       await reponse.json();
-
 
     if(!reponse.ok){
 
@@ -8122,7 +8110,6 @@ async function continuerPaiement(listingId){
       return;
     }
 
-
     /* =========================
        RÉCUPÉRER L'ID DE LA COMMANDE
     ========================= */
@@ -8134,7 +8121,6 @@ async function continuerPaiement(listingId){
 
     const orderId =
       commandeCreee?.id;
-
 
     if(!orderId){
 
@@ -8150,6 +8136,60 @@ async function continuerPaiement(listingId){
       return;
     }
 
+    /* =========================
+       NOTIFICATION DU VENDEUR
+    ========================= */
+
+    try{
+
+      const notificationMessage =
+        "Vous avez reçu une nouvelle commande pour « " +
+        annonce.title +
+        " ». Commande " +
+        orderNumber +
+        ". Montant : " +
+        Number(prix).toLocaleString("fr-FR") +
+        " GNF.";
+
+      const notificationResponse =
+        await supabaseFetch(
+          `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
+          {
+            method:"POST",
+
+            headers:headers({
+              "Content-Type":"application/json"
+            }),
+
+            body:JSON.stringify({
+              p_user_id:
+                annonce.seller_id,
+
+              p_title:
+                "🛒 Nouvelle commande",
+
+              p_message:
+                notificationMessage,
+
+              p_type:
+                "new_order"
+            })
+          }
+        );
+
+      console.log(
+        "✅ Notification nouvelle commande créée :",
+        notificationResponse
+      );
+
+    }catch(erreurNotification){
+
+      console.error(
+        "⚠️ La commande est créée mais la notification vendeur a échoué :",
+        erreurNotification
+      );
+
+    }
 
     /* =========================
        CHOIX DU MOYEN DE PAIEMENT
@@ -8225,12 +8265,10 @@ async function continuerPaiement(listingId){
 
     `;
 
-
     console.log(
       "Commande créée :",
       commandeCreee
     );
-
 
   }catch(erreur){
 
@@ -8249,7 +8287,6 @@ async function continuerPaiement(listingId){
 
   }
 }
-
 
 /* =========================
    CRÉER LE PAIEMENT
