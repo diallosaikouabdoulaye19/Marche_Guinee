@@ -12101,7 +12101,7 @@ async function chargerNotifications() {
 
     const url =
       SUPABASE_URL +
-      "/rest/v1/Notifications" +
+      "/rest/v1/notifications" +
       "?user_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
       "&select=id,user_id,title,message,type,is_read,created_at" +
@@ -12290,7 +12290,7 @@ async function marquerNotificationLue(notificationId) {
 
     const url =
       SUPABASE_URL +
-      "/rest/v1/Notifications" +
+     "/rest/v1/notifications" +
       "?id=eq." +
       encodeURIComponent(notificationId);
 
@@ -12341,7 +12341,7 @@ async function marquerToutesNotificationsLues() {
 
     const url =
       SUPABASE_URL +
-      "/rest/v1/Notifications" +
+      "/rest/v1/notifications" +
       "?user_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
       "&is_read=eq.false";
@@ -12401,7 +12401,7 @@ async function creerNotification(
 
     const url =
       SUPABASE_URL +
-      "/rest/v1/Notifications";
+     "/rest/v1/notifications"  ;
 
     const response = await supabaseFetch(url, {
       method: "POST",
