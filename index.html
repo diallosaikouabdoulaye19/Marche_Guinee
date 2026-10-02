@@ -8151,42 +8151,68 @@ async function continuerPaiement(listingId){
         Number(prix).toLocaleString("fr-FR") +
         " GNF.";
 
-      const notificationResponse =
-        await supabaseFetch(
-          `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
-          {
-            method:"POST",
+      await supabaseFetch(
+        `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
+        {
+          method:"POST",
 
-            headers:headers({
-              "Content-Type":"application/json"
-            }),
+          headers:headers({
+            "Content-Type":"application/json"
+          }),
 
-            body:JSON.stringify({
-              p_user_id:
-                annonce.seller_id,
+          body:JSON.stringify({
 
-              p_title:
-                "🛒 Nouvelle commande",
+            p_user_id:
+              annonce.seller_id,
 
-              p_message:
-                notificationMessage,
+            p_title:
+              "🛒 Nouvelle commande",
 
-              p_type:
-                "new_order"
-            })
-          }
-        );
+            p_message:
+              notificationMessage,
+
+            p_type:
+              "new_order"
+
+          })
+        }
+      );
 
       console.log(
-        "✅ Notification nouvelle commande créée :",
-        notificationResponse
+        "✅ Notification nouvelle commande envoyée au vendeur"
       );
 
     }catch(erreurNotification){
 
       console.error(
-        "⚠️ La commande est créée mais la notification vendeur a échoué :",
+        "⚠️ Notification vendeur non envoyée :",
         erreurNotification
+      );
+
+    }
+
+    /* =========================
+       NOTIFICATION DU CODE
+       À L'ACHETEUR
+    ========================= */
+
+    try{
+
+      await notifierCodeLivraisonAutomatique(
+        user.id,
+        orderNumber,
+        deliveryCode
+      );
+
+      console.log(
+        "✅ Notification code de livraison envoyée à l'acheteur"
+      );
+
+    }catch(erreurCode){
+
+      console.error(
+        "⚠️ Notification code de livraison non envoyée :",
+        erreurCode
       );
 
     }
@@ -8287,7 +8313,7 @@ async function continuerPaiement(listingId){
 
   }
 }
-
+  
 /* =========================
    CRÉER LE PAIEMENT
 ========================= */
@@ -12859,6 +12885,77 @@ async function notifierNouvelleCommandeAutomatique(
 
     console.log(
       "⚠️ Erreur notification nouvelle commande :",
+      erreur
+    );
+
+  }
+
+}
+</script>
+<script>
+/* =========================================================
+   NOTIFICATION — CODE DE LIVRAISON DISPONIBLE
+   ========================================================= */
+
+async function notifierCodeLivraisonAutomatique(
+  buyerId,
+  orderNumber,
+  deliveryCode
+) {
+
+  if (!buyerId || !orderNumber || !deliveryCode) {
+    console.log(
+      "⚠️ Notification code livraison : données manquantes"
+    );
+    return;
+  }
+
+  try {
+
+    const message =
+      "Votre code de livraison pour la commande " +
+      orderNumber +
+      " est : " +
+      deliveryCode +
+      ". Présentez ce code au livreur lors de la remise du colis.";
+
+    const response =
+      await supabaseFetch(
+        `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
+        {
+          method: "POST",
+
+          headers: headers({
+            "Content-Type": "application/json"
+          }),
+
+          body: JSON.stringify({
+
+            p_user_id:
+              buyerId,
+
+            p_title:
+              "🔐 Code de livraison disponible",
+
+            p_message:
+              message,
+
+            p_type:
+              "delivery_code"
+
+          })
+        }
+      );
+
+    console.log(
+      "✅ Notification code de livraison créée :",
+      response
+    );
+
+  } catch (erreur) {
+
+    console.error(
+      "⚠️ Erreur notification code de livraison :",
       erreur
     );
 
