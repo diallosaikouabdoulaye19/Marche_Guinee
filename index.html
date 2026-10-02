@@ -12109,31 +12109,60 @@ async function chargerNotifications() {
 
     const response = await supabaseFetch(url);
 
-    if (!response.ok) {
+    console.log("Réponse notifications :", response);
 
-      const erreurTexte = await response.text();
-
-      console.log(
-        "Erreur chargement notifications :",
-        response.status,
-        erreurTexte
-      );
+    if (!response) {
 
       if (liste) {
         liste.innerHTML = `
           <div class="notifications-vide">
-            ⚠️ Erreur Supabase :<br><br>
-            ${escapeHTML(erreurTexte)}
+            ⚠️ Aucune réponse de Supabase.
           </div>
         `;
       }
 
       mettreAJourBadgeNotifications(0);
-
       return;
     }
 
-    const notifications = await response.json();
+    /*
+      supabaseFetch() peut déjà retourner directement
+      les données JSON.
+    */
+
+    let notifications = response;
+
+    /*
+      Si jamais la réponse contient encore un objet
+      avec une propriété data, on la récupère.
+    */
+
+    if (response.data && Array.isArray(response.data)) {
+      notifications = response.data;
+    }
+
+    /*
+      Vérification que nous avons bien un tableau.
+    */
+
+    if (!Array.isArray(notifications)) {
+
+      console.log(
+        "Format inattendu des notifications :",
+        response
+      );
+
+      if (liste) {
+        liste.innerHTML = `
+          <div class="notifications-vide">
+            ⚠️ Impossible de lire les notifications.
+          </div>
+        `;
+      }
+
+      mettreAJourBadgeNotifications(0);
+      return;
+    }
 
     console.log(
       "Notifications chargées :",
@@ -12175,6 +12204,7 @@ async function chargerNotifications() {
   }
 
 }
+
 /* ---------------------------------------------------------
    Afficher les notifications
 --------------------------------------------------------- */
