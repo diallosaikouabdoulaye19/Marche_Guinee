@@ -12111,18 +12111,19 @@ async function chargerNotifications() {
 
     if (!response.ok) {
 
-      const erreur = await response.text();
+      const erreurTexte = await response.text();
 
       console.log(
         "Erreur chargement notifications :",
         response.status,
-        erreur
+        erreurTexte
       );
 
       if (liste) {
         liste.innerHTML = `
           <div class="notifications-vide">
-            ⚠️ Impossible de charger les notifications.
+            ⚠️ Erreur Supabase :<br><br>
+            ${escapeHTML(erreurTexte)}
           </div>
         `;
       }
@@ -12160,7 +12161,12 @@ async function chargerNotifications() {
     if (liste) {
       liste.innerHTML = `
         <div class="notifications-vide">
-          ⚠️ Une erreur est survenue pendant le chargement.
+          ⚠️ Erreur notifications :<br><br>
+          ${escapeHTML(
+            erreur && erreur.message
+              ? erreur.message
+              : String(erreur)
+          )}
         </div>
       `;
     }
@@ -12169,7 +12175,6 @@ async function chargerNotifications() {
   }
 
 }
-
 /* ---------------------------------------------------------
    Afficher les notifications
 --------------------------------------------------------- */
