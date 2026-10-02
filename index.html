@@ -3052,16 +3052,20 @@ async function creerCompte(){
         }
       );
     if(!profilResponse.ok){
-      const profilText =
-        await profilResponse.text();
-      console.error(
-        "Erreur création profil Users :",
-        profilText
-      );
-      throw new Error(
-        "Compte créé mais impossible d'enregistrer la ville et le quartier."
-      );
-    }
+
+  const profilText =
+    await profilResponse.text();
+
+  console.error(
+    "ERREUR USERS :",
+    profilText
+  );
+
+  throw new Error(
+    "Erreur Users : " + profilText
+  );
+
+}
     /* =========================
        SUCCÈS
     ========================= */
