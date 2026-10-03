@@ -3112,7 +3112,7 @@ async function creerCompte(){
       await fetch(
 
         SUPABASE_URL +
-        "/rest/v1/users?on_conflict=id",
+          "/rest/v1/users",
 
         {
 
@@ -3131,8 +3131,7 @@ async function creerCompte(){
               "application/json",
 
             "Prefer":
-              "resolution=merge-duplicates,return=minimal"
-
+              "return=minimal"
           },
 
           body:JSON.stringify({
