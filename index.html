@@ -8911,56 +8911,109 @@ async function ouvrirMessageVendeur(
 
 
 async function afficherChat(){
-
   document.getElementById(
     "messagesList"
   ).classList.add(
     "hidden"
   );
-
-
   document.getElementById(
     "chatContainer"
   ).classList.remove(
     "hidden"
   );
-
-
   document.getElementById(
     "chatTitle"
   ).textContent =
-
     annonceConversationActuelle
       ? "💬 " +
         annonceConversationActuelle.title
       : "💬 Conversation";
-
-
+  /* =========================
+     ZONE PROPOSITION DE PRIX
+  ========================= */
+  const chatContainer =
+    document.getElementById(
+      "chatContainer"
+    );
+  if(chatContainer){
+    let zonePrix =
+      document.getElementById(
+        "zonePropositionPrix"
+      );
+    if(!zonePrix){
+      zonePrix =
+        document.createElement(
+          "div"
+        );
+      zonePrix.id =
+        "zonePropositionPrix";
+      zonePrix.style.margin =
+        "10px 0";
+      chatContainer.insertBefore(
+        zonePrix,
+        chatContainer.firstChild
+      );
+    }
+    zonePrix.innerHTML = "";
+    /*
+      Le bouton n'est affiché que
+      lorsque l'utilisateur connecté
+      est le vendeur de l'annonce.
+    */
+    if(
+      utilisateurConnecte &&
+      annonceConversationActuelle &&
+      annonceConversationActuelle.seller_id ===
+        utilisateurConnecte.id
+    ){
+      const bouton =
+        document.createElement(
+          "button"
+        );
+      bouton.type =
+        "button";
+      bouton.className =
+        "btn-green";
+      bouton.style.width =
+        "100%";
+      bouton.style.marginBottom =
+        "8px";
+      bouton.innerHTML =
+        "💰 Proposer un prix";
+      bouton.onclick =
+        function(){
+          proposerPrixPrive();
+        };
+      zonePrix.appendChild(
+        bouton
+      );
+    }
+  }
+  /* =========================
+     CHARGER LES MESSAGES
+  ========================= */
   await chargerMessages();
-
-
-  document.getElementById(
-    "messageInput"
-  ).focus();
-
-
+  const input =
+    document.getElementById(
+      "messageInput"
+    );
+  if(input){
+    input.focus();
+  }
+  /* =========================
+     RAFRAÎCHISSEMENT AUTOMATIQUE
+  ========================= */
   if(intervalMessages){
-
     clearInterval(
       intervalMessages
     );
-
   }
-
-
   intervalMessages =
     setInterval(
       chargerMessages,
       3000
     );
-
 }
-
 
 async function chargerMessages(){
 
