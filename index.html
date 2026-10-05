@@ -13308,7 +13308,6 @@ async function notifierCodeLivraisonAutomatique(
 --------------------------------------------------------- */
 
 async function recupererPrixNegocie(listingId){
-
   if(
     !utilisateurConnecte ||
     !utilisateurConnecte.id ||
@@ -13316,49 +13315,49 @@ async function recupererPrixNegocie(listingId){
   ){
     return null;
   }
-
   try{
-
     const resultat =
       await supabaseFetch(
         SUPABASE_URL +
         "/rest/v1/rpc/get_accepted_price_offer",
         {
           method:"POST",
-
           headers:headers({
             "Content-Type":
               "application/json"
           }),
-
           body:JSON.stringify({
             p_listing_id:
               listingId
           })
         }
       );
-
     if(
       !resultat ||
-      !resultat.proposed_price_gnf
+      resultat.proposed_price_gnf === null ||
+      resultat.proposed_price_gnf === undefined
     ){
       return null;
     }
-
-    return resultat;
-
+    const prix =
+      Number(
+        resultat.proposed_price_gnf
+      );
+    if(
+      !Number.isFinite(prix) ||
+      prix <= 0
+    ){
+      return null;
+    }
+    return prix;
   }catch(error){
-
     console.log(
       "Aucune offre acceptée :",
       error
     );
-
     return null;
   }
-
 }
-
 
 /* ---------------------------------------------------------
    Afficher les propositions dans la conversation
