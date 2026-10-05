@@ -13134,6 +13134,1711 @@ async function notifierCodeLivraisonAutomatique(
 
 }
 </script>
+
+<!-- =========================================================
+     💰 NÉGOCIATION PRIVÉE — MARCHÉ GUINÉE
+     VENDEUR → ACHETEUR
+========================================================= -->
+
+<style>
+
+.price-offer-panel{
+  margin:10px 12px;
+  padding:14px;
+  border-radius:15px;
+  background:#fff;
+  border:1px solid #dfe8e2;
+  box-shadow:0 3px 12px rgba(0,0,0,.05);
+}
+
+.price-offer-title{
+  font-weight:900;
+  font-size:15px;
+  margin-bottom:7px;
+}
+
+.price-offer-text{
+  font-size:13px;
+  color:#66716b;
+  line-height:1.45;
+}
+
+.price-offer-price{
+  font-size:21px;
+  font-weight:900;
+  color:#087f3f;
+  margin:8px 0;
+}
+
+.price-offer-actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.price-offer-actions button{
+  flex:1;
+  min-height:44px;
+  border-radius:12px;
+  font-weight:900;
+}
+
+.price-offer-btn{
+  width:100%;
+  margin:0 12px 10px;
+  width:calc(100% - 24px);
+  background:#f0c808;
+  color:#111;
+}
+
+.price-offer-accept{
+  background:#087f3f;
+  color:#fff;
+}
+
+.price-offer-reject{
+  background:#c62828;
+  color:#fff;
+}
+
+.price-offer-original{
+  color:#777;
+  text-decoration:line-through;
+  font-size:13px;
+}
+
+.price-offer-badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#eaf7ef;
+  color:#087f3f;
+  font-size:11px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+</style>
+
+<script>
+/* =========================================================
+   💰 NÉGOCIATION PRIVÉE
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   Récupérer une offre acceptée pour l'acheteur connecté
+--------------------------------------------------------- */
+
+async function recupererPrixNegocie(listingId){
+
+  if(
+    !utilisateurConnecte ||
+    !utilisateurConnecte.id ||
+    !listingId
+  ){
+    return null;
+  }
+
+  try{
+
+    const resultat =
+      await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/rpc/get_accepted_price_offer",
+        {
+          method:"POST",
+
+          headers:headers({
+            "Content-Type":
+              "application/json"
+          }),
+
+          body:JSON.stringify({
+            p_listing_id:
+              listingId
+          })
+        }
+      );
+
+    if(
+      !resultat ||
+      !resultat.proposed_price_gnf
+    ){
+      return null;
+    }
+
+    return resultat;
+
+  }catch(error){
+
+    console.log(
+      "Aucune offre acceptée :",
+      error
+    );
+
+    return null;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Afficher les propositions dans la conversation
+--------------------------------------------------------- */
+
+async function chargerPropositionsPrix(){
+
+  if(
+    !utilisateurConnecte ||
+    !utilisateurConnecte.id ||
+    !conversationActuelle ||
+    !annonceConversationActuelle
+  ){
+    return;
+  }
+
+  const ancien =
+    document.getElementById(
+      "priceOfferPanel"
+    );
+
+  if(ancien){
+    ancien.remove();
+  }
+
+  const chatContainer =
+    document.getElementById(
+      "chatContainer"
+    );
+
+  if(!chatContainer) return;
+
+  const listingId =
+    conversationActuelle.listing_id ||
+    annonceConversationActuelle.id;
+
+  if(!listingId) return;
+
+  const estVendeur =
+    conversationActuelle.seller_id ===
+    utilisateurConnecte.id;
+
+  const estAcheteur =
+    conversationActuelle.buyer_id ===
+    utilisateurConnecte.id;
+
+
+  const panel =
+    document.createElement("div");
+
+  panel.id =
+    "priceOfferPanel";
+
+  panel.className =
+    "price-offer-panel";
+
+
+  /* =======================================================
+     VENDEUR
+  ======================================================= */
+
+  if(estVendeur){
+
+    const buyerId =
+      conversationActuelle.buyer_id;
+
+    panel.innerHTML = `
+
+      <div class="price-offer-title">
+        💰 Proposer un prix
+      </div>
+
+      <div class="price-offer-text">
+        Tu peux proposer un prix privé à cet acheteur.
+        Le prix public de l'annonce restera inchangé.
+      </div>
+
+      <button
+        type="button"
+        class="price-offer-btn"
+        onclick="proposerPrixPrive()"
+      >
+        💰 Proposer un prix à cet acheteur
+      </button>
+
+    `;
+
+    const chatBox =
+      document.getElementById(
+        "chatBox"
+      );
+
+    if(chatBox){
+      chatContainer.insertBefore(
+        panel,
+        chatBox
+      );
+    }
+
+    return;
+  }
+
+
+  /* =======================================================
+     ACHETEUR
+  ======================================================= */
+
+  if(estAcheteur){
+
+    try{
+
+      const offres =
+        await supabaseFetch(
+
+          SUPABASE_URL +
+          "/rest/v1/rpc/get_buyer_price_offers",
+
+          {
+            method:"POST",
+
+            headers:headers({
+              "Content-Type":
+                "application/json"
+            }),
+
+            body:JSON.stringify({
+              p_listing_id:
+                listingId
+            })
+          }
+
+        );
+
+      const liste =
+        Array.isArray(offres)
+          ? offres
+          : [];
+
+      const offreEnAttente =
+        liste.find(
+          offre =>
+            offre.status === "pending"
+        );
+
+      const offreAcceptee =
+        liste.find(
+          offre =>
+            offre.status === "accepted"
+        );
+
+
+      /* Offre acceptée */
+
+      if(offreAcceptee){
+
+        panel.innerHTML = `
+
+          <div class="price-offer-title">
+            ✅ Prix négocié accepté
+          </div>
+
+          <div class="price-offer-text">
+            Le vendeur t'a proposé un prix privé.
+          </div>
+
+          <div class="price-offer-original">
+            Prix public :
+            ${formatPrix(
+              offreAcceptee.original_price_gnf
+            )} GNF
+          </div>
+
+          <div class="price-offer-price">
+            ${formatPrix(
+              offreAcceptee.proposed_price_gnf
+            )} GNF
+          </div>
+
+          <span class="price-offer-badge">
+            Tu peux acheter à ce prix
+          </span>
+
+        `;
+
+        const chatBox =
+          document.getElementById(
+            "chatBox"
+          );
+
+        if(chatBox){
+          chatContainer.insertBefore(
+            panel,
+            chatBox
+          );
+        }
+
+        return;
+      }
+
+
+      /* Offre en attente */
+
+      if(offreEnAttente){
+
+        panel.innerHTML = `
+
+          <div class="price-offer-title">
+            💰 Nouvelle proposition de prix
+          </div>
+
+          <div class="price-offer-text">
+            Le vendeur te propose :
+          </div>
+
+          <div class="price-offer-price">
+            ${formatPrix(
+              offreEnAttente.proposed_price_gnf
+            )} GNF
+          </div>
+
+          <div class="price-offer-original">
+            Prix public :
+            ${formatPrix(
+              offreEnAttente.original_price_gnf
+            )} GNF
+          </div>
+
+          <div class="price-offer-actions">
+
+            <button
+              type="button"
+              class="price-offer-accept"
+              onclick="repondrePropositionPrix(
+                '${offreEnAttente.id}',
+                'accepted'
+              )"
+            >
+              ✅ Accepter
+            </button>
+
+            <button
+              type="button"
+              class="price-offer-reject"
+              onclick="repondrePropositionPrix(
+                '${offreEnAttente.id}',
+                'rejected'
+              )"
+            >
+              ❌ Refuser
+            </button>
+
+          </div>
+
+        `;
+
+        const chatBox =
+          document.getElementById(
+            "chatBox"
+          );
+
+        if(chatBox){
+          chatContainer.insertBefore(
+            panel,
+            chatBox
+          );
+        }
+
+        return;
+      }
+
+    }catch(error){
+
+      console.log(
+        "Erreur propositions prix :",
+        error
+      );
+
+    }
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Le vendeur propose un prix
+--------------------------------------------------------- */
+
+async function proposerPrixPrive(){
+
+  if(
+    !utilisateurConnecte ||
+    !conversationActuelle
+  ){
+    alert(
+      "Connecte-toi pour continuer."
+    );
+
+    return;
+  }
+
+  if(
+    conversationActuelle.seller_id !==
+    utilisateurConnecte.id
+  ){
+    alert(
+      "Seul le vendeur peut proposer un prix."
+    );
+
+    return;
+  }
+
+
+  const annonce =
+    annonceConversationActuelle;
+
+  if(!annonce){
+
+    alert(
+      "Annonce introuvable."
+    );
+
+    return;
+  }
+
+
+  const prixPublic =
+    Number(
+      annonce.price_gnf || 0
+    );
+
+
+  const saisie =
+    prompt(
+      "💰 Prix privé à proposer à cet acheteur :\n\n" +
+      "Prix public : " +
+      formatPrix(prixPublic) +
+      " GNF"
+    );
+
+
+  if(saisie === null){
+    return;
+  }
+
+
+  const prix =
+    Number(
+      String(saisie)
+        .replace(/\s/g,"")
+        .replace(/,/g,"")
+        .replace(/\./g,"")
+    );
+
+
+  if(
+    !Number.isFinite(prix) ||
+    prix <= 0
+  ){
+
+    alert(
+      "❌ Prix invalide."
+    );
+
+    return;
+  }
+
+
+  if(prixPublic <= 0){
+
+    alert(
+      "Le prix public de l'annonce est invalide."
+    );
+
+    return;
+  }
+
+
+  try{
+
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/rpc/create_price_offer",
+
+        {
+          method:"POST",
+
+          headers:headers({
+            "Content-Type":
+              "application/json"
+          }),
+
+          body:JSON.stringify({
+
+            p_listing_id:
+              annonce.id,
+
+            p_buyer_id:
+              conversationActuelle.buyer_id,
+
+            p_proposed_price_gnf:
+              Math.round(prix)
+
+          })
+
+        }
+
+      );
+
+
+    if(!resultat){
+
+      throw new Error(
+        "La proposition n'a pas été créée."
+      );
+
+    }
+
+
+    /* Notification de l'acheteur */
+
+    try{
+
+      await creerNotification(
+
+        conversationActuelle.buyer_id,
+
+        "💰 Nouvelle proposition de prix",
+
+        "Le vendeur vous propose " +
+        formatPrix(prix) +
+        " GNF pour « " +
+        annonce.title +
+        " ». Ouvrez la conversation pour accepter ou refuser.",
+
+        "price_offer"
+
+      );
+
+    }catch(notificationError){
+
+      console.log(
+        "Notification proposition non envoyée :",
+        notificationError
+      );
+
+    }
+
+
+    alert(
+      "✅ Proposition de " +
+      formatPrix(prix) +
+      " GNF envoyée à cet acheteur."
+    );
+
+
+    await chargerPropositionsPrix();
+
+  }catch(error){
+
+    console.error(
+      "Erreur proposition prix :",
+      error
+    );
+
+    alert(
+      "Impossible d'envoyer la proposition.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   L'acheteur accepte ou refuse
+--------------------------------------------------------- */
+
+async function repondrePropositionPrix(
+  offerId,
+  action
+){
+
+  if(
+    !utilisateurConnecte ||
+    !utilisateurConnecte.id
+  ){
+    alert(
+      "Connecte-toi pour continuer."
+    );
+
+    return;
+  }
+
+
+  const texte =
+    action === "accepted"
+      ? "Accepter cette proposition de prix ?"
+      : "Refuser cette proposition de prix ?";
+
+
+  if(!confirm(texte)){
+    return;
+  }
+
+
+  try{
+
+    const resultat =
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/rpc/respond_price_offer",
+
+        {
+          method:"POST",
+
+          headers:headers({
+            "Content-Type":
+              "application/json"
+          }),
+
+          body:JSON.stringify({
+
+            p_offer_id:
+              offerId,
+
+            p_action:
+              action
+
+          })
+
+        }
+
+      );
+
+
+    if(!resultat){
+
+      throw new Error(
+        "La réponse n'a pas été enregistrée."
+      );
+
+    }
+
+
+    if(action === "accepted"){
+
+      alert(
+        "✅ Proposition acceptée !\n\n" +
+        "Tu peux maintenant acheter l'article au prix négocié."
+      );
+
+    }else{
+
+      alert(
+        "❌ Proposition refusée."
+      );
+
+    }
+
+
+    await chargerPropositionsPrix();
+
+  }catch(error){
+
+    console.error(
+      "Erreur réponse proposition :",
+      error
+    );
+
+    alert(
+      "Impossible de répondre à la proposition.\n\n" +
+      (
+        error.message ||
+        "Erreur Supabase inconnue."
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MESSAGERIE — VERSION AVEC PROPOSITIONS
+========================================================= */
+
+const ancienneAfficherChatPrix =
+  window.afficherChat;
+
+window.afficherChat =
+  async function(){
+
+    if(
+      typeof ancienneAfficherChatPrix ===
+      "function"
+    ){
+
+      await ancienneAfficherChatPrix();
+
+    }
+
+
+    await chargerPropositionsPrix();
+
+  };
+
+
+/* =========================================================
+   PAIEMENT — PRIX PUBLIC OU PRIX NÉGOCIÉ
+========================================================= */
+
+window.ouvrirPaiement =
+  async function(listingId){
+
+    const annonce =
+      toutesLesAnnonces.find(
+        a => a.id === listingId
+      );
+
+    if(!annonce){
+
+      alert(
+        "Annonce introuvable."
+      );
+
+      return;
+    }
+
+
+    if(!utilisateurConnecte){
+
+      fermerModal(
+        "detailModal"
+      );
+
+      alert(
+        "Connecte-toi pour acheter."
+      );
+
+      ouvrirCompte();
+
+      return;
+    }
+
+
+    let offre = null;
+
+    try{
+
+      offre =
+        await recupererPrixNegocie(
+          listingId
+        );
+
+    }catch(error){
+
+      console.log(
+        "Recherche offre acceptée :",
+        error
+      );
+
+    }
+
+
+    const prix =
+      offre &&
+      Number(
+        offre.proposed_price_gnf
+      ) > 0
+
+        ? Number(
+            offre.proposed_price_gnf
+          )
+
+        : Number(
+            annonce.price_gnf
+          ) || 0;
+
+
+    if(prix <= 0){
+
+      alert(
+        "Le prix de cette annonce est invalide."
+      );
+
+      return;
+    }
+
+
+    const commission =
+      Math.round(
+        prix * 0.03
+      );
+
+
+    const montantVendeur =
+      prix - commission;
+
+
+    const estNegocie =
+      !!offre;
+
+
+    document.getElementById(
+      "paymentContent"
+    ).innerHTML = `
+
+      <h3>
+        ${escapeHTML(
+          annonce.title
+        )}
+      </h3>
+
+      ${
+        estNegocie
+
+          ? `
+
+            <div style="
+              padding:13px;
+              margin:10px 0;
+              border-radius:13px;
+              background:#ecfdf5;
+              border:1px solid #bbf7d0;
+            ">
+
+              <strong>
+                💰 Prix négocié privé
+              </strong>
+
+              <div style="
+                margin-top:7px;
+                color:#777;
+                text-decoration:line-through;
+                font-size:13px;
+              ">
+                Prix public :
+                ${formatPrix(
+                  annonce.price_gnf
+                )} GNF
+              </div>
+
+              <div style="
+                margin-top:5px;
+                color:#087f3f;
+                font-size:23px;
+                font-weight:900;
+              ">
+                ${formatPrix(
+                  prix
+                )} GNF
+              </div>
+
+              <div style="
+                margin-top:5px;
+                font-size:12px;
+                color:#555;
+              ">
+                Ce prix est réservé à ton compte.
+              </div>
+
+            </div>
+
+          `
+
+          : `
+
+            <p>
+              Prix :
+              <strong>
+                ${formatPrix(prix)}
+              </strong>
+            </p>
+
+          `
+      }
+
+      <p>
+        Commission Marché Guinée :
+        <strong>
+          ${formatPrix(
+            commission
+          )}
+        </strong>
+        (3 %)
+      </p>
+
+      <p>
+        Montant vendeur après commission :
+        <strong>
+          ${formatPrix(
+            montantVendeur
+          )}
+        </strong>
+      </p>
+
+      <p>
+        L'achat sera finalisé après
+        connexion au système de paiement
+        de Marché Guinée.
+      </p>
+
+      <button
+        class="btn-green"
+        onclick="continuerPaiement(
+          '${annonce.id}'
+        )"
+      >
+        Continuer
+      </button>
+
+    `;
+
+
+    fermerModal(
+      "detailModal"
+    );
+
+
+    document.getElementById(
+      "paymentModal"
+    ).style.display =
+      "block";
+
+  };
+
+
+/* =========================================================
+   CONTINUER PAIEMENT — PRIX NÉGOCIÉ
+========================================================= */
+
+window.continuerPaiement =
+  async function(listingId){
+
+    const annonce =
+      toutesLesAnnonces.find(
+        a => a.id === listingId
+      );
+
+
+    if(!annonce){
+
+      alert(
+        "Annonce introuvable."
+      );
+
+      return;
+    }
+
+
+    if(!utilisateurConnecte){
+
+      fermerModal(
+        "paymentModal"
+      );
+
+      alert(
+        "Connecte-toi pour continuer."
+      );
+
+      ouvrirCompte();
+
+      return;
+    }
+
+
+    try{
+
+      const user =
+        utilisateurConnecte;
+
+
+      if(
+        !user ||
+        !user.id
+      ){
+
+        alert(
+          "Impossible de récupérer ton compte."
+        );
+
+        return;
+      }
+
+
+      if(
+        annonce.seller_id &&
+        annonce.seller_id ===
+        user.id
+      ){
+
+        alert(
+          "Tu ne peux pas acheter ta propre annonce."
+        );
+
+        return;
+      }
+
+
+      /* ============================================
+         RECHERCHER UNE OFFRE ACCEPTÉE
+      ============================================ */
+
+      const offre =
+        await recupererPrixNegocie(
+          listingId
+        );
+
+
+      const prix =
+        offre &&
+        Number(
+          offre.proposed_price_gnf
+        ) > 0
+
+          ? Number(
+              offre.proposed_price_gnf
+            )
+
+          : Number(
+              annonce.price_gnf
+            ) || 0;
+
+
+      if(prix <= 0){
+
+        alert(
+          "Le prix de cette annonce est invalide."
+        );
+
+        return;
+      }
+
+
+      /* ============================================
+         COMMISSION 3 %
+      ============================================ */
+
+      const commission =
+        Math.round(
+          prix * 0.03
+        );
+
+
+      const montantVendeur =
+        prix - commission;
+
+
+      /* ============================================
+         NOM CLIENT
+      ============================================ */
+
+      const nomClient =
+        user.full_name ||
+        user.fullName ||
+        user.name ||
+        "Client";
+
+
+      /* ============================================
+         NUMÉRO DE COMMANDE
+      ============================================ */
+
+      const reponseNumero =
+        await fetch(
+
+          `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
+
+          {
+            method:"POST",
+
+            headers:
+              headers(),
+
+            body:
+              JSON.stringify({})
+          }
+
+        );
+
+
+      if(!reponseNumero.ok){
+
+        throw new Error(
+          "Impossible de générer le numéro de commande."
+        );
+
+      }
+
+
+      const orderNumber =
+        await reponseNumero.json();
+
+
+      /* ============================================
+         CODE UNIQUE DE LIVRAISON
+      ============================================ */
+
+      const deliveryCode =
+        String(
+          Math.floor(
+            100000 +
+            Math.random() *
+            900000
+          )
+        );
+
+
+      /* ============================================
+         CRÉER LA COMMANDE
+      ============================================ */
+
+      const commande = {
+
+        order_number:
+          orderNumber,
+
+        buyer_id:
+          user.id,
+
+        seller_id:
+          annonce.seller_id,
+
+        listing_id:
+          annonce.id,
+
+        price_gnf:
+          prix,
+
+        commission_gnf:
+          commission,
+
+        seller_amount_gnf:
+          montantVendeur,
+
+        delivery_code:
+          deliveryCode,
+
+        status:
+          "payment_pending",
+
+        product_title:
+          annonce.title,
+
+        problem_reported:
+          false,
+
+        delivery_status:
+          "pending"
+
+      };
+
+
+      const reponse =
+        await fetch(
+
+          `${SUPABASE_URL}/rest/v1/orders`,
+
+          {
+            method:"POST",
+
+            headers:
+              headers({
+                "Prefer":
+                  "return=representation"
+              }),
+
+            body:
+              JSON.stringify(
+                commande
+              )
+
+          }
+
+        );
+
+
+      const resultat =
+        await reponse.json();
+
+
+      if(!reponse.ok){
+
+        console.error(
+          "Erreur création commande :",
+          resultat
+        );
+
+        alert(
+          "Impossible de créer la commande : " +
+          (
+            resultat.message ||
+            resultat.error_description ||
+            resultat.hint ||
+            "erreur Supabase"
+          )
+        );
+
+        return;
+      }
+
+
+      const commandeCreee =
+        Array.isArray(
+          resultat
+        )
+          ? resultat[0]
+          : resultat;
+
+
+      const orderId =
+        commandeCreee?.id;
+
+
+      if(!orderId){
+
+        alert(
+          "La commande a été créée mais son identifiant est introuvable."
+        );
+
+        return;
+      }
+
+
+      /* ============================================
+         NOTIFICATION VENDEUR
+         SANS CODE DE LIVRAISON
+      ============================================ */
+
+      try{
+
+        await creerNotification(
+
+          annonce.seller_id,
+
+          "🛒 Nouvelle commande",
+
+          "👤 Client : " +
+          nomClient +
+          ". 📦 Produit : « " +
+          annonce.title +
+          " ». 💰 Montant : " +
+          Number(
+            prix
+          ).toLocaleString(
+            "fr-FR"
+          ) +
+          " GNF. 🔢 Commande : " +
+          orderNumber +
+          ".",
+
+          "new_order"
+
+        );
+
+      }catch(notificationError){
+
+        console.log(
+          "Notification vendeur non envoyée :",
+          notificationError
+        );
+
+      }
+
+
+      /* ============================================
+         NOTIFICATION CODE
+         UNIQUEMENT DANS LA SECTION LIVRAISON
+      ============================================ */
+
+      try{
+
+        await notifierCodeLivraisonAutomatique(
+
+          user.id,
+
+          orderNumber,
+
+          deliveryCode
+
+        );
+
+      }catch(codeError){
+
+        console.log(
+          "Notification code non envoyée :",
+          codeError
+        );
+
+      }
+
+
+      /* ============================================
+         CHOIX DU PAIEMENT
+      ============================================ */
+
+      document.getElementById(
+        "paymentContent"
+      ).innerHTML = `
+
+        <h3>
+          Choisir le moyen de paiement
+        </h3>
+
+        <p>
+          Article :
+          <strong>
+            ${escapeHTML(
+              annonce.title
+            )}
+          </strong>
+        </p>
+
+        <p>
+          Numéro de commande :
+          <strong>
+            ${escapeHTML(
+              orderNumber
+            )}
+          </strong>
+        </p>
+
+        ${
+          offre
+
+            ? `
+
+              <div style="
+                padding:13px;
+                margin:10px 0;
+                border-radius:13px;
+                background:#ecfdf5;
+                border:1px solid #bbf7d0;
+              ">
+
+                <strong>
+                  💰 Prix négocié
+                </strong>
+
+                <br><br>
+
+                Prix public :
+                <span style="
+                  text-decoration:line-through;
+                  color:#777;
+                ">
+                  ${formatPrix(
+                    annonce.price_gnf
+                  )} GNF
+                </span>
+
+                <br>
+
+                Prix payé :
+                <strong style="
+                  color:#087f3f;
+                  font-size:20px;
+                ">
+                  ${formatPrix(
+                    prix
+                  )} GNF
+                </strong>
+
+              </div>
+
+            `
+
+            : `
+
+              <p>
+                Montant à payer :
+                <strong>
+                  ${formatPrix(
+                    prix
+                  )} GNF
+                </strong>
+              </p>
+
+            `
+        }
+
+        <div class="success">
+
+          Commission Marché Guinée :
+          <strong>
+            ${formatPrix(
+              commission
+            )}
+          </strong>
+          (3 %)
+
+          <br><br>
+
+          Montant vendeur après commission :
+          <strong>
+            ${formatPrix(
+              montantVendeur
+            )}
+          </strong>
+
+        </div>
+
+        <p>
+          Choisis ton moyen de paiement :
+        </p>
+
+        <button
+          class="btn-green"
+          onclick="creerPaiement(
+            '${orderId}',
+            'orange_money',
+            '${escapeHTML(orderNumber)}',
+            '${escapeHTML(annonce.title)}',
+            ${prix},
+            ${commission},
+            ${montantVendeur},
+            '${deliveryCode}'
+          )"
+        >
+          🟠 Orange Money
+        </button>
+
+        <br><br>
+
+        <button
+          class="btn-primary"
+          onclick="creerPaiement(
+            '${orderId}',
+            'mtn_momo',
+            '${escapeHTML(orderNumber)}',
+            '${escapeHTML(annonce.title)}',
+            ${prix},
+            ${commission},
+            ${montantVendeur},
+            '${deliveryCode}'
+          )"
+        >
+          🟡 MTN Mobile Money
+        </button>
+
+      `;
+
+
+    }catch(error){
+
+      console.error(
+        "Erreur création commande :",
+        error
+      );
+
+      alert(
+        "ERREUR : " +
+        (
+          error?.message ||
+          JSON.stringify(error)
+        )
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   🔔 NOTIFICATIONS — CORRECTION supabaseFetch()
+========================================================= */
+
+window.creerNotification =
+  async function(
+    userId,
+    title,
+    message,
+    type
+  ){
+
+    if(!userId){
+      return false;
+    }
+
+    try{
+
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/notifications",
+
+        {
+          method:"POST",
+
+          headers:headers({
+            "Content-Type":
+              "application/json",
+
+            "Prefer":
+              "return=minimal"
+          }),
+
+          body:JSON.stringify({
+
+            user_id:
+              userId,
+
+            title:
+              title,
+
+            message:
+              message,
+
+            type:
+              type || "general",
+
+            is_read:
+              false
+
+          })
+
+        }
+
+      );
+
+      return true;
+
+    }catch(error){
+
+      console.error(
+        "Erreur création notification :",
+        error
+      );
+
+      return false;
+
+    }
+
+  };
+
+
+/* ---------------------------------------------------------
+   Marquer UNE notification comme lue
+--------------------------------------------------------- */
+
+window.marquerNotificationLue =
+  async function(notificationId){
+
+    if(!notificationId){
+      return;
+    }
+
+    try{
+
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/notifications" +
+        "?id=eq." +
+        encodeURIComponent(
+          notificationId
+        ),
+
+        {
+          method:"PATCH",
+
+          headers:headers({
+            "Content-Type":
+              "application/json"
+          }),
+
+          body:JSON.stringify({
+            is_read:true
+          })
+
+        }
+
+      );
+
+      await chargerNotifications();
+
+    }catch(error){
+
+      console.error(
+        "Erreur notification lue :",
+        error
+      );
+
+    }
+
+  };
+
+
+/* ---------------------------------------------------------
+   Marquer toutes les notifications comme lues
+--------------------------------------------------------- */
+
+window.marquerToutesNotificationsLues =
+  async function(){
+
+    if(
+      !utilisateurConnecte ||
+      !utilisateurConnecte.id
+    ){
+      return;
+    }
+
+    try{
+
+      await supabaseFetch(
+
+        SUPABASE_URL +
+        "/rest/v1/notifications" +
+        "?user_id=eq." +
+        encodeURIComponent(
+          utilisateurConnecte.id
+        ) +
+        "&is_read=eq.false",
+
+        {
+          method:"PATCH",
+
+          headers:headers({
+            "Content-Type":
+              "application/json"
+          }),
+
+          body:JSON.stringify({
+            is_read:true
+          })
+
+        }
+
+      );
+
+      await chargerNotifications();
+
+    }catch(error){
+
+      console.error(
+        "Erreur notifications :",
+        error
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   FIN NÉGOCIATION PRIVÉE
+========================================================= */
+
+</script>
   
 </body>
 </html>
