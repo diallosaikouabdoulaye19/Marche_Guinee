@@ -7935,232 +7935,288 @@ async function enregistrerVue(annonce){
 /* =========================
    PAIEMENT
 ========================= */
-
 function ouvrirPaiement(listingId){
-
   const annonce =
     toutesLesAnnonces.find(
       a => a.id === listingId
     );
-
   if(!annonce){
     alert("Annonce introuvable.");
     return;
   }
-
-
   // Vérifier que l'utilisateur est connecté
   if(!utilisateurConnecte){
-
     fermerModal("detailModal");
-
     alert(
       "Connecte-toi pour acheter."
     );
-
     ouvrirCompte();
-
     return;
   }
-
-
-  // Calcul de la commission de 3 %
-  const prix =
-    Number(annonce.price_gnf) || 0;
-
-  const commission =
-    Math.round(prix * 0.03);
-
-  const montantVendeur =
-    prix - commission;
-
-
-  // Afficher la fenêtre d'achat
-  document.getElementById(
-    "paymentContent"
-  ).innerHTML = `
-
-    <h3>
-      ${escapeHTML(
-        annonce.title
-      )}
-    </h3>
-
-    <p>
-      Prix :
-      <strong>
-        ${formatPrix(prix)}
-      </strong>
-    </p>
-
-    <p>
-      Commission Marché Guinée :
-      <strong>
-        ${formatPrix(commission)}
-      </strong>
-      (3 %)
-    </p>
-
-    <p>
-      Montant vendeur après commission :
-      <strong>
-        ${formatPrix(montantVendeur)}
-      </strong>
-    </p>
-
-    <p>
-      L'achat sera finalisé après
-      connexion au système de paiement
-      de Marché Guinée.
-    </p>
-
-    <button
-      class="btn-green"
-      onclick="continuerPaiement('${annonce.id}')">
-
-      Continuer
-
-    </button>
-
-  `;
-
-
-  // Fermer la fenêtre de l'annonce
-  fermerModal(
-    "detailModal"
-  );
-
-
-  // Ouvrir la fenêtre de paiement
-  document.getElementById(
-    "paymentModal"
-  ).style.display = "block";
-
+  // Empêcher l'achat de sa propre annonce
+  if(
+    annonce.seller_id &&
+    annonce.seller_id === utilisateurConnecte.id
+  ){
+    alert(
+      "Tu ne peux pas acheter ta propre annonce."
+    );
+    return;
+  }
+  /*
+    PRIX À UTILISER
+    Si l'acheteur possède une proposition
+    acceptée pour cette annonce, on utilise
+    le prix négocié.
+    Sinon, on utilise le prix public.
+  */
+  recupererPrixNegocie(annonce.id)
+    .then(prixNegocie => {
+      const prix =
+        Number(
+          prixNegocie ||
+          annonce.price_gnf
+        ) || 0;
+      if(prix <= 0){
+        alert(
+          "Le prix de cette annonce est invalide."
+        );
+        return;
+      }
+      const prixPublic =
+        Number(
+          annonce.price_gnf
+        ) || 0;
+      const utilisePrixNegocie =
+        prixNegocie &&
+        Number(prixNegocie) !== prixPublic;
+      // Commission fixe de 3 %
+      const commission =
+        Math.round(
+          prix * 0.03
+        );
+      const montantVendeur =
+        prix - commission;
+      /*
+        AFFICHAGE
+      */
+      document.getElementById(
+        "paymentContent"
+      ).innerHTML = `
+        <h3>
+          ${escapeHTML(
+            annonce.title
+          )}
+        </h3>
+        ${
+          utilisePrixNegocie
+          ? `
+            <div style="
+              background:#eaf8ef;
+              border:1px solid #bde8ca;
+              color:#087f3f;
+              padding:12px;
+              border-radius:12px;
+              margin-bottom:15px;
+              font-weight:700;
+            ">
+              💰 Prix négocié accepté
+            </div>
+            <p>
+              Prix public :
+              <span style="
+                text-decoration:line-through;
+                color:#777;
+              ">
+                ${formatPrix(prixPublic)}
+              </span>
+            </p>
+            <p>
+              Prix négocié :
+              <strong style="
+                color:#087f3f;
+                font-size:20px;
+              ">
+                ${formatPrix(prix)}
+              </strong>
+            </p>
+          `
+          : `
+            <p>
+              Prix :
+              <strong>
+                ${formatPrix(prix)}
+              </strong>
+            </p>
+          `
+        }
+        <p>
+          Commission Marché Guinée :
+          <strong>
+            ${formatPrix(commission)}
+          </strong>
+          (3 %)
+        </p>
+        <p>
+          Montant vendeur après commission :
+          <strong>
+            ${formatPrix(montantVendeur)}
+          </strong>
+        </p>
+        <p style="
+          font-size:13px;
+          color:#666;
+          line-height:1.5;
+        ">
+          L'achat sera finalisé après
+          connexion au système de paiement
+          de Marché Guinée.
+        </p>
+        <button
+          class="btn-green"
+          onclick="continuerPaiement('${annonce.id}')"
+        >
+          Continuer
+        </button>
+      `;
+      // Fermer la fenêtre de l'annonce
+      fermerModal(
+        "detailModal"
+      );
+      // Ouvrir la fenêtre de paiement
+      document.getElementById(
+        "paymentModal"
+      ).style.display = "block";
+    })
+    .catch(erreur => {
+      console.error(
+        "Erreur récupération prix négocié :",
+        erreur
+      );
+      alert(
+        "Impossible de récupérer le prix négocié."
+      );
+    });
 }
-
 
 // =========================
 // BOUTON « CONTINUER »
 // =========================
 async function continuerPaiement(listingId){
-
   const annonce =
     toutesLesAnnonces.find(
       a => a.id === listingId
     );
-
   if(!annonce){
-
-    alert("Annonce introuvable.");
-
+    alert(
+      "Annonce introuvable."
+    );
     return;
   }
-
   if(!utilisateurConnecte){
-
     fermerModal("paymentModal");
-
-    alert("Connecte-toi pour continuer.");
-
+    alert(
+      "Connecte-toi pour continuer."
+    );
     ouvrirCompte();
-
     return;
   }
-
   try{
-
     const user =
       utilisateurConnecte;
-
     if(!user || !user.id){
-
       alert(
         "Impossible de récupérer ton compte."
       );
-
       return;
     }
-
     /* =========================
        EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
     ========================= */
-
     if(
       annonce.seller_id &&
       annonce.seller_id === user.id
     ){
-
       alert(
         "Tu ne peux pas acheter ta propre annonce."
       );
-
       return;
     }
-
     /* =========================
        NOM DU CLIENT
     ========================= */
-
     const nomClient =
       user.full_name ||
       user.fullName ||
       user.name ||
       "Client";
-
     /* =========================
-       CALCUL DES MONTANTS
+       RÉCUPÉRER LE PRIX NÉGOCIÉ
     ========================= */
-
+    let prixNegocie = null;
+    try{
+      prixNegocie =
+        await recupererPrixNegocie(
+          annonce.id
+        );
+    }catch(erreurPrix){
+      console.log(
+        "Aucun prix négocié récupéré :",
+        erreurPrix
+      );
+      prixNegocie = null;
+    }
+    /* =========================
+       PRIX FINAL
+    ========================= */
+    const prixPublic =
+      Number(
+        annonce.price_gnf
+      ) || 0;
     const prix =
-      Number(annonce.price_gnf) || 0;
-
+      Number(
+        prixNegocie || prixPublic
+      ) || 0;
     if(prix <= 0){
-
       alert(
         "Le prix de cette annonce est invalide."
       );
-
       return;
     }
-
+    /* =========================
+       COMMISSION MARCHÉ GUINÉE
+       TOUJOURS 3 %
+    ========================= */
     const commission =
-      Math.round(prix * 0.03);
-
+      Math.round(
+        prix * 0.03
+      );
     const montantVendeur =
       prix - commission;
-
     /* =========================
        NUMÉRO DE COMMANDE
     ========================= */
-
     const reponseNumero =
       await fetch(
         `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
         {
           method:"POST",
-
           headers:
             headers(),
-
           body:
             JSON.stringify({})
         }
       );
-
     if(!reponseNumero.ok){
-
       throw new Error(
         "Impossible de générer le numéro de commande."
       );
     }
-
     const orderNumber =
       await reponseNumero.json();
-
     /* =========================
        CODE UNIQUE DE LIVRAISON
     ========================= */
-
     const deliveryCode =
       String(
         Math.floor(
@@ -8168,78 +8224,63 @@ async function continuerPaiement(listingId){
           Math.random() * 900000
         )
       );
-
     /* =========================
        CRÉER LA COMMANDE
     ========================= */
-
     const commande = {
-
       order_number:
         orderNumber,
-
       buyer_id:
         user.id,
-
       seller_id:
         annonce.seller_id,
-
       listing_id:
         annonce.id,
-
+      /*
+        IMPORTANT :
+        ici on enregistre le prix
+        négocié s'il existe.
+      */
       price_gnf:
         prix,
-
       commission_gnf:
         commission,
-
       seller_amount_gnf:
         montantVendeur,
-
       delivery_code:
         deliveryCode,
-
       status:
         "payment_pending",
-
       product_title:
         annonce.title,
-
       problem_reported:
         false,
-
       delivery_status:
         "pending"
-
     };
-
     const reponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/orders`,
         {
           method:"POST",
-
           headers:
             headers({
               "Prefer":
                 "return=representation"
             }),
-
           body:
-            JSON.stringify(commande)
+            JSON.stringify(
+              commande
+            )
         }
       );
-
     const resultat =
       await reponse.json();
-
     if(!reponse.ok){
-
       console.error(
         "Erreur création commande :",
         resultat
       );
-
       alert(
         "Impossible de créer la commande : " +
         (
@@ -8249,45 +8290,32 @@ async function continuerPaiement(listingId){
           "erreur Supabase"
         )
       );
-
       return;
     }
-
     /* =========================
        RÉCUPÉRER L'ID DE LA COMMANDE
     ========================= */
-
     const commandeCreee =
       Array.isArray(resultat)
         ? resultat[0]
         : resultat;
-
     const orderId =
       commandeCreee?.id;
-
     if(!orderId){
-
       console.error(
         "Commande créée mais ID introuvable :",
         resultat
       );
-
       alert(
         "La commande a été créée mais son identifiant est introuvable."
       );
-
       return;
     }
-
     /* =========================
        NOTIFICATION DU VENDEUR
-       SANS TÉLÉPHONE
        SANS CODE DE LIVRAISON
-       SANS LOCALISATION
     ========================= */
-
     try{
-
       const notificationMessage =
         "👤 Client : " +
         nomClient +
@@ -8301,130 +8329,135 @@ async function continuerPaiement(listingId){
         "🔢 Commande : " +
         orderNumber +
         ".";
-
       await supabaseFetch(
         `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
         {
           method:"POST",
-
           headers:
             headers({
               "Content-Type":
                 "application/json"
             }),
-
           body:
             JSON.stringify({
-
               p_user_id:
                 annonce.seller_id,
-
               p_title:
                 "🛒 Nouvelle commande",
-
               p_message:
                 notificationMessage,
-
               p_type:
                 "new_order"
-
             })
         }
       );
-
       console.log(
         "✅ Notification nouvelle commande envoyée au vendeur"
       );
-
     }catch(erreurNotification){
-
       console.error(
         "⚠️ Notification vendeur non envoyée :",
         erreurNotification
       );
-
     }
-
     /* =========================
        NOTIFICATION DU CODE
        À L'ACHETEUR
     ========================= */
-
     try{
-
       await notifierCodeLivraisonAutomatique(
         user.id,
         orderNumber,
         deliveryCode
       );
-
       console.log(
         "✅ Notification code de livraison envoyée à l'acheteur"
       );
-
     }catch(erreurCode){
-
       console.error(
         "⚠️ Notification code de livraison non envoyée :",
         erreurCode
       );
-
     }
-
     /* =========================
        CHOIX DU MOYEN DE PAIEMENT
     ========================= */
-
     document.getElementById(
       "paymentContent"
     ).innerHTML = `
-
       <h3>
         Choisir le moyen de paiement
       </h3>
-
       <p>
         Article :
         <strong>
-          ${escapeHTML(annonce.title)}
+          ${escapeHTML(
+            annonce.title
+          )}
         </strong>
       </p>
-
       <p>
         Numéro de commande :
         <strong>
-          ${escapeHTML(orderNumber)}
+          ${escapeHTML(
+            orderNumber
+          )}
         </strong>
       </p>
-
+      ${
+        Number(prixNegocie) > 0 &&
+        Number(prixNegocie) !== prixPublic
+        ? `
+          <div style="
+            background:#eaf8ef;
+            border:1px solid #bde8ca;
+            color:#087f3f;
+            padding:12px;
+            border-radius:12px;
+            margin:12px 0;
+          ">
+            💰
+            <strong>
+              Prix négocié accepté
+            </strong>
+            <br><br>
+            Prix public :
+            <span style="
+              text-decoration:line-through;
+              color:#777;
+            ">
+              ${formatPrix(prixPublic)}
+            </span>
+            <br>
+            Prix payé :
+            <strong>
+              ${formatPrix(prix)}
+            </strong>
+          </div>
+        `
+        : ""
+      }
       <p>
         Montant à payer :
         <strong>
           ${formatPrix(prix)}
         </strong>
       </p>
-
       <div class="success">
-
         Commission Marché Guinée :
         <strong>
           ${formatPrix(commission)}
         </strong>
         (3 %)
-
         <br><br>
-
         Montant vendeur après commission :
         <strong>
           ${formatPrix(montantVendeur)}
         </strong>
-
       </div>
-
       <p>
         Choisis ton moyen de paiement :
       </p>
-
       <button
         class="btn-green"
         onclick="creerPaiement(
@@ -8440,9 +8473,7 @@ async function continuerPaiement(listingId){
       >
         🟠 Orange Money
       </button>
-
       <br><br>
-
       <button
         class="btn-primary"
         onclick="creerPaiement(
@@ -8458,21 +8489,16 @@ async function continuerPaiement(listingId){
       >
         🟡 MTN Mobile Money
       </button>
-
     `;
-
     console.log(
       "Commande créée :",
       commandeCreee
     );
-
   }catch(erreur){
-
     console.error(
       "Erreur création commande :",
       erreur
     );
-
     alert(
       "ERREUR : " +
       (
@@ -8480,9 +8506,7 @@ async function continuerPaiement(listingId){
         JSON.stringify(erreur)
       )
     );
-
   }
-
 }
   
 /* =========================
