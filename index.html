@@ -8993,6 +8993,8 @@ async function afficherChat(){
      CHARGER LES MESSAGES
   ========================= */
   await chargerMessages();
+  await chargerPropositionsPrix();
+  
   const input =
     document.getElementById(
       "messageInput"
