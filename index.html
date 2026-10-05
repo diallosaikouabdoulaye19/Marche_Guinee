@@ -13308,8 +13308,8 @@ async function notifierCodeLivraisonAutomatique(
 /* ---------------------------------------------------------
    Récupérer une offre acceptée pour l'acheteur connecté
 --------------------------------------------------------- */
-
 async function recupererPrixNegocie(listingId){
+
   if(
     !utilisateurConnecte ||
     !utilisateurConnecte.id ||
@@ -13317,7 +13317,9 @@ async function recupererPrixNegocie(listingId){
   ){
     return null;
   }
+
   try{
+
     const resultat =
       await supabaseFetch(
         SUPABASE_URL +
@@ -13325,38 +13327,56 @@ async function recupererPrixNegocie(listingId){
         {
           method:"POST",
           headers:headers({
-            "Content-Type":
-              "application/json"
+            "Content-Type":"application/json"
           }),
           body:JSON.stringify({
-            p_listing_id:
-              listingId
+            p_listing_id:listingId
           })
         }
       );
+
+    console.log(
+      "Résultat offre acceptée :",
+      resultat
+    );
+
+    let offre = resultat;
+
+    /* Supabase peut renvoyer une ligne
+       directement OU dans un tableau */
+    if(Array.isArray(resultat)){
+      offre = resultat[0] || null;
+    }
+
     if(
-      !resultat ||
-      resultat.proposed_price_gnf === null ||
-      resultat.proposed_price_gnf === undefined
+      !offre ||
+      offre.proposed_price_gnf === null ||
+      offre.proposed_price_gnf === undefined
     ){
       return null;
     }
+
     const prix =
       Number(
-        resultat.proposed_price_gnf
+        offre.proposed_price_gnf
       );
+
     if(
       !Number.isFinite(prix) ||
       prix <= 0
     ){
       return null;
     }
+
     return prix;
+
   }catch(error){
+
     console.log(
-      "Aucune offre acceptée :",
+      "Erreur récupération prix négocié :",
       error
     );
+
     return null;
   }
 }
