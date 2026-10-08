@@ -14052,27 +14052,21 @@ window.ouvrirPaiement =
 
 
     const prix =
-      offre &&
-      Number(
-        offre.proposed_price_gnf
-      ) > 0
-
-        ? Number(
-            offre.proposed_price_gnf
-          )
-
-        : Number(
-            annonce.price_gnf
-          ) || 0;
+  offre !== null &&
+  Number.isFinite(Number(offre)) &&
+  Number(offre) > 0
+    ? Number(offre)
+    : Number(annonce.price_gnf) || 0;
 
 
-    if(prix <= 0){
+if(prix <= 0){
 
-      alert(
-        "Le prix de cette annonce est invalide."
-      );
+  alert(
+    "Le prix de cette annonce est invalide."
+  );
 
-      return;
+  return;
+}
     }
 
 
@@ -14291,35 +14285,31 @@ window.continuerPaiement =
       ============================================ */
 
       const offre =
-        await recupererPrixNegocie(
-          listingId
-        );
+  await recupererPrixNegocie(
+    listingId
+  );
 
 
-      const prix =
-        offre &&
-        Number(
-          offre.proposed_price_gnf
-        ) > 0
+const prix =
+  offre !== null &&
+  Number.isFinite(Number(offre)) &&
+  Number(offre) > 0
 
-          ? Number(
-              offre.proposed_price_gnf
-            )
+    ? Number(offre)
 
-          : Number(
-              annonce.price_gnf
-            ) || 0;
+    : Number(
+        annonce.price_gnf
+      ) || 0;
 
 
-      if(prix <= 0){
+if(prix <= 0){
 
-        alert(
-          "Le prix de cette annonce est invalide."
-        );
+  alert(
+    "Le prix de cette annonce est invalide."
+  );
 
-        return;
-      }
-
+  return;
+}
 
       /* ============================================
          COMMISSION 3 %
@@ -14671,21 +14661,21 @@ window.continuerPaiement =
         <div class="success">
 
           Commission Marché Guinée :
-          <strong>
-            ${formatPrix(
-              commission
-            )}
-          </strong>
-          (3 %)
+<strong>
+  ${formatPrix(
+    commission
+  )} GNF
+</strong>
+(3 %)
 
-          <br><br>
+<br><br>
 
-          Montant vendeur après commission :
-          <strong>
-            ${formatPrix(
-              montantVendeur
-            )}
-          </strong>
+Montant vendeur après commission :
+<strong>
+  ${formatPrix(
+    montantVendeur
+  )} GNF
+</strong>
 
         </div>
 
