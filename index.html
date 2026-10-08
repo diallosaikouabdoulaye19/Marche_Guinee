@@ -2881,7 +2881,6 @@ function emailTechnique(numero){
 
 }
 
-
 async function creerCompte(){
 
   const fullName =
@@ -2892,16 +2891,6 @@ async function creerCompte(){
   const phone =
     document.getElementById(
       "signupPhone"
-    ).value.trim();
-
-  const city =
-    document.getElementById(
-      "signupCity"
-    ).value.trim();
-
-  const neighborhood =
-    document.getElementById(
-      "signupNeighborhood"
     ).value.trim();
 
   const password =
@@ -2921,8 +2910,6 @@ async function creerCompte(){
   if(
     !fullName ||
     !phone ||
-    !city ||
-    !neighborhood ||
     !password
   ){
 
@@ -2984,13 +2971,7 @@ async function creerCompte(){
                 fullName,
 
               phone:
-                phone,
-
-              city:
-                city,
-
-              neighborhood:
-                neighborhood
+                phone
 
             }
 
@@ -3117,13 +3098,7 @@ async function creerCompte(){
               fullName,
 
             phone:
-              phone,
-
-            city:
-              city,
-
-            neighborhood:
-              neighborhood
+              phone
 
           })
 
@@ -3173,6 +3148,7 @@ async function creerCompte(){
   }
 
 }
+
 async function connecterCompte(){
 
   const phone =
