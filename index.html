@@ -6915,13 +6915,22 @@ async function chargerMesVentes(){
           ) +
           "</div>" +
 
-          "<div>🚚 Livraison : " +
-          escapeHTML(
-            livraisonTexte(
-              vente.delivery_status
-            )
-          ) +
-          "</div>" +
+         "<div>🚚 Livraison : " +
+escapeHTML(
+  livraisonTexte(
+    vente.delivery_status
+  )
+) +
+"</div>" +
+
+"<div style='margin-top:6px;padding:10px;border-radius:10px;background:#f3f4f6;'>" +
+"🔐 Code de vérification : " +
+"<strong style='font-size:18px;letter-spacing:2px;'>" +
+escapeHTML(
+  vente.delivery_code || "Non disponible"
+) +
+"</strong>" +
+"</div>" +
 
           "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
           escapeHTML(
