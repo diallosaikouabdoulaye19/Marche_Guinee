@@ -11983,167 +11983,188 @@ async function chargerUtilisateursAdmin(){
    RETRAIT ADMIN
 ========================= */
 
-async function ouvrirDemandeRetraitAdmin(){
+async function ouvrirDemandeRetraitAdmin() {
 
-  const estAdmin =
-    await verifierAccesAdmin();
+  const estAdmin = await verifierAccesAdmin();
 
-
-  if(!estAdmin){
-
-    alert(
-      "Accès réservé à l'administrateur."
-    );
-
+  if (!estAdmin) {
+    alert("Accès réservé à l'administrateur.");
     return;
-
   }
 
+  try {
 
-  const montant =
-    prompt(
+    // 1. Charger les commissions des ventes terminées
+    const reponseCommandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders?select=id,status,delivery_status,commission_gnf&status=eq.completed&delivery_status=eq.delivered"
+    );
+
+    if (!Array.isArray(reponseCommandes)) {
+      throw new Error(
+        "Impossible de vérifier les commissions."
+      );
+    }
+
+    const totalCommission = reponseCommandes.reduce(
+      (total, commande) =>
+        total + Number(commande.commission_gnf || 0),
+      0
+    );
+
+    // 2. Charger les retraits administrateur
+    const listeRetraits = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/admin_withdrawals?select=amount_gnf,status"
+    );
+
+    if (!Array.isArray(listeRetraits)) {
+      throw new Error(
+        "Impossible de vérifier les retraits existants."
+      );
+    }
+
+    // 3. Calculer les retraits déjà terminés
+    const totalRetraitsTermines = listeRetraits
+      .filter(r => r.status === "completed")
+      .reduce(
+        (total, r) =>
+          total + Number(r.amount_gnf || 0),
+        0
+      );
+
+    // 4. Réserver les retraits encore en attente
+    const totalRetraitsEnAttente = listeRetraits
+      .filter(r => r.status === "pending")
+      .reduce(
+        (total, r) =>
+          total + Number(r.amount_gnf || 0),
+        0
+      );
+
+    // 5. Calculer le solde disponible
+    const soldeDisponible = Math.max(
+      0,
+      totalCommission -
+      totalRetraitsTermines -
+      totalRetraitsEnAttente
+    );
+
+    if (soldeDisponible <= 0) {
+      alert(
+        "Aucun solde disponible pour un nouveau retrait.\n\n" +
+        "Les retraits en attente sont déjà réservés."
+      );
+      return;
+    }
+
+    // 6. Demander le montant
+    const montant = prompt(
+      "Solde disponible : " +
+      soldeDisponible.toLocaleString("fr-FR") +
+      " GNF\n\n" +
       "Montant du retrait en GNF :"
     );
 
+    if (montant === null || !montant.trim()) {
+      return;
+    }
 
-  if(!montant) return;
-
-
-  const montantNumber =
-    Number(
-      String(montant)
-        .replace(/\s/g,"")
-        .replace(/,/g,"")
+    const montantNumber = Number(
+      montant
+        .replace(/\s/g, "")
+        .replace(/,/g, "")
     );
 
+    if (
+      !Number.isSafeInteger(montantNumber) ||
+      montantNumber <= 0
+    ) {
+      alert(
+        "Montant invalide. Saisis un nombre entier positif."
+      );
+      return;
+    }
 
-  if(
-    !Number.isFinite(montantNumber) ||
-    montantNumber <= 0
-  ){
+    if (montantNumber > soldeDisponible) {
+      alert(
+        "Montant trop élevé.\n\n" +
+        "Solde disponible : " +
+        soldeDisponible.toLocaleString("fr-FR") +
+        " GNF"
+      );
+      return;
+    }
 
-    alert(
-      "Montant invalide."
-    );
-
-    return;
-
-  }
-
-
-  const choix =
-    prompt(
+    // 7. Choisir le moyen de retrait
+    const choix = prompt(
       "Méthode de retrait :\n\n" +
       "1 = MTN MoMo\n" +
       "2 = Orange Money"
     );
 
+    let method = "";
 
-  let method = "";
+    if (choix === "1") {
+      method = "MTN_MOMO";
+    } else if (choix === "2") {
+      method = "ORANGE_MONEY";
+    }
 
+    if (!method) {
+      alert("Méthode invalide.");
+      return;
+    }
 
-  if(choix === "1"){
-    method = "MTN_MOMO";
-  }
-
-
-  if(choix === "2"){
-    method = "ORANGE_MONEY";
-  }
-
-
-  if(!method){
-
-    alert(
-      "Méthode invalide."
-    );
-
-    return;
-
-  }
-
-
-  const phone =
-    prompt(
+    // 8. Demander le numéro bénéficiaire
+    const phone = prompt(
       "Numéro qui recevra le retrait :"
     );
 
+    if (phone === null || !phone.trim()) {
+      alert("Numéro obligatoire.");
+      return;
+    }
 
-  if(!phone){
-
-    alert(
-      "Numéro obligatoire."
-    );
-
-    return;
-
-  }
-
-
-  try{
-
+    // 9. Enregistrer la demande en attente
     await supabaseFetch(
-
       SUPABASE_URL +
       "/rest/v1/admin_withdrawals",
-
       {
-        method:"POST",
-
-        headers:{
-          "Prefer":
-            "return=representation"
+        method: "POST",
+        headers: {
+          "Prefer": "return=representation"
         },
-
-        body:JSON.stringify({
-
-          admin_id:
-            utilisateurConnecte.id,
-
-          amount_gnf:
-            Math.round(
-              montantNumber
-            ),
-
-          method:
-            method,
-
-          phone:
-            phone.trim(),
-
-          status:
-            "pending"
-
+        body: JSON.stringify({
+          admin_id: utilisateurConnecte.id,
+          amount_gnf: montantNumber,
+          method: method,
+          phone: phone.trim(),
+          status: "pending"
         })
-
       }
-
     );
-
 
     alert(
       "✅ Demande de retrait enregistrée.\n\n" +
-      "Elle est actuellement en attente."
+      "Montant : " +
+      montantNumber.toLocaleString("fr-FR") +
+      " GNF\n" +
+      "Statut : En attente\n\n" +
+      "Le solde disponible sera recalculé."
     );
 
+    await chargerTableauAdmin();
 
-    chargerTableauAdmin();
-
-
-  }catch(error){
+  } catch (error) {
 
     alert(
-      "Impossible d'enregistrer le retrait.\n\n" +
-      (
-        error.message ||
-        "Erreur inconnue."
-      )
+      "Impossible de traiter le retrait.\n\n" +
+      (error.message || "Erreur inconnue.")
     );
 
   }
-
 }
-
 
 /* =========================
    ADMIN APRÈS CONNEXION
