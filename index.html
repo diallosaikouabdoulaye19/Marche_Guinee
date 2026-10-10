@@ -10552,12 +10552,20 @@ async function chargerTableauAdmin(){
     );
 
 
-    const soldeDisponible =
-      Math.max(
-        0,
-        totalCommission -
-        totalRetraitsTermines
-      );
+   const totalRetraitsEnAttente =
+  (listeRetraits || [])
+    .filter(r => r.status === "pending")
+    .reduce(
+      (total, r) => total + Number(r.amount_gnf || 0),
+      0
+    );
+
+const soldeDisponible = Math.max(
+  0,
+  totalCommission -
+  totalRetraitsTermines -
+  totalRetraitsEnAttente
+);
 
 
     const litiges =
