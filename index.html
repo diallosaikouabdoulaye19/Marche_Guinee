@@ -14320,22 +14320,22 @@ if(prix <= 0){
 
       }
 
-     /* ============================================
-         NOTIFICATION CODE
-         UNIQUEMENT DANS LA SECTION LIVRAISON
-      ============================================ */
-      try{
-        await notifierCodeLivraisonAutomatique(
-          user.id,
-          orderNumber,
-          deliveryCode
-        );
-      }catch(codeError){
-        console.log(
-          "Notification code non envoyée :",
-          codeError
-        );
-      }
+ /* ============================================
+   NOTIFICATION CODE
+   UNIQUEMENT DANS LA SECTION LIVRAISON
+============================================ */
+try{
+  await notifierCodeLivraisonAutomatique(
+    user.id,
+    orderNumber,
+    deliveryCode
+  );
+}catch(codeError){
+  console.log(
+    "Notification code non envoyée :",
+    codeError
+  );
+}
 
 
       /* ============================================
