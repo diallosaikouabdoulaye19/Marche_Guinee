@@ -8386,7 +8386,6 @@ async function continuerPaiement(listingId){
 /* =========================
    CRÉER LE PAIEMENT
 ========================= */
-
 async function creerPaiement(
   orderId,
   provider,
@@ -8394,88 +8393,60 @@ async function creerPaiement(
   productTitle,
   prix,
   commission,
-  montantVendeur,
-  deliveryCode
+  montantVendeur
 ){
-
   if(!utilisateurConnecte || !utilisateurConnecte.id){
     alert("Connecte-toi pour continuer.");
     return;
   }
-
   try{
-
     /* =========================
        VÉRIFIER LE FOURNISSEUR
     ========================= */
-
     if(
       provider !== "orange_money" &&
       provider !== "mtn_momo"
     ){
-
-      alert(
-        "Moyen de paiement invalide."
-      );
-
+      alert("Moyen de paiement invalide.");
       return;
     }
-
-
     /* =========================
        CRÉER LE PAIEMENT
        STATUS = PENDING
     ========================= */
-
     const paiement = {
-
       order_id:
         orderId,
-
       buyer_id:
         utilisateurConnecte.id,
-
       amount_gnf:
         prix,
-
       provider:
         provider,
-
       provider_reference:
         null,
-
       status:
         "pending"
     };
-
-
     const reponsePaiement =
       await fetch(
         `${SUPABASE_URL}/rest/v1/payments`,
         {
           method:"POST",
-
           headers:headers({
             "Prefer":"return=representation"
           }),
-
           body:
             JSON.stringify(paiement)
         }
       );
-
-
     const resultatPaiement =
       await reponsePaiement.json();
-
-
     if(!reponsePaiement.ok){
-
       console.error(
         "Erreur création paiement :",
         resultatPaiement
       );
-
       alert(
         "Impossible de créer le paiement : " +
         (
@@ -8485,125 +8456,86 @@ async function creerPaiement(
           "erreur Supabase"
         )
       );
-
       return;
     }
-
     /* =========================
-       AFFICHER LE PAIEMENT EN ATTENTE
+       AFFICHER LE PAIEMENT
+       EN ATTENTE
     ========================= */
-
     const nomProvider =
       provider === "orange_money"
         ? "Orange Money"
         : "MTN Mobile Money";
-
-
     document.getElementById(
       "paymentContent"
     ).innerHTML = `
-
       <h3>
         Paiement enregistré ✅
       </h3>
-
       <p>
         Article :
         <strong>
           ${escapeHTML(productTitle)}
         </strong>
       </p>
-
       <p>
         Numéro de commande :
         <strong>
           ${escapeHTML(orderNumber)}
         </strong>
       </p>
-
       <p>
         Moyen de paiement :
         <strong>
           ${nomProvider}
         </strong>
       </p>
-
       <p>
         Montant :
         <strong>
           ${formatPrix(prix)}
         </strong>
       </p>
-
       <div class="success">
-
         <strong>
           Paiement en attente
         </strong>
-
         <br><br>
-
         Le paiement n'est pas encore confirmé.
-
         <br><br>
-
         ${nomProvider} sera utilisé
         pour effectuer le paiement réel.
-
       </div>
-
       <div class="success">
-
         <strong>
-          Code de livraison
+          🔐 Codes de livraison sécurisés
         </strong>
-
         <br><br>
-
-        <span style="
-          font-size:28px;
-          font-weight:bold;
-          letter-spacing:5px;
-        ">
-          ${deliveryCode}
-        </span>
-
+        Les codes de livraison sont gérés
+        séparément par le système de livraison.
         <br><br>
-
-        Ce code devra être comparé
-        lors de la remise du colis.
-
+        Consulte la section Livraison
+        pour retrouver ton code acheteur.
       </div>
-
       <p>
         La commande est enregistrée
         dans Marché Guinée.
       </p>
-
       <button
         class="btn-green"
         onclick="fermerModal('paymentModal')">
-
         Fermer
-
       </button>
-
     `;
-
-
     console.log(
       "Paiement créé :",
       resultatPaiement
     );
-
-
   }catch(erreur){
-
     console.error(
       "Erreur paiement :",
       erreur
     );
-
     alert(
       "ERREUR PAIEMENT : " +
       (
@@ -8611,7 +8543,6 @@ async function creerPaiement(
         JSON.stringify(erreur)
       )
     );
-
   }
 }
 /* =========================
