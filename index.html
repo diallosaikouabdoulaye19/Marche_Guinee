@@ -8223,25 +8223,6 @@ async function continuerPaiement(listingId){
       );
     }
     /* =========================
-       NOTIFICATION DU CODE
-       À L'ACHETEUR
-    ========================= */
-    try{
-      await notifierCodeLivraisonAutomatique(
-        user.id,
-        orderNumber,
-        deliveryCode
-      );
-      console.log(
-        "✅ Notification code de livraison envoyée à l'acheteur"
-      );
-    }catch(erreurCode){
-      console.error(
-        "⚠️ Notification code de livraison non envoyée :",
-        erreurCode
-      );
-    }
-    /* =========================
        CHOIX DU MOYEN DE PAIEMENT
     ========================= */
     document.getElementById(
