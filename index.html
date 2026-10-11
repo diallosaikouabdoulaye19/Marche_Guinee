@@ -14272,100 +14272,56 @@ if(prix <= 0){
         await reponseNumero.json();
 
 
-      /* ============================================
-         CODE UNIQUE DE LIVRAISON
-      ============================================ */
-
-      const deliveryCode =
-        String(
-          Math.floor(
-            100000 +
-            Math.random() *
-            900000
-          )
-        );
-
-
-      /* ============================================
+            /* ============================================
          CRÉER LA COMMANDE
       ============================================ */
-
       const commande = {
-
         order_number:
           orderNumber,
-
         buyer_id:
           user.id,
-
         seller_id:
           annonce.seller_id,
-
         listing_id:
           annonce.id,
-
         price_gnf:
           prix,
-
         commission_gnf:
           commission,
-
         seller_amount_gnf:
           montantVendeur,
-
-        delivery_code:
-          deliveryCode,
-
         status:
           "payment_pending",
-
         product_title:
           annonce.title,
-
         problem_reported:
           false,
-
         delivery_status:
           "pending"
-
       };
-
-
       const reponse =
         await fetch(
-
           `${SUPABASE_URL}/rest/v1/orders`,
-
           {
             method:"POST",
-
             headers:
               headers({
                 "Prefer":
                   "return=representation"
               }),
-
             body:
               JSON.stringify(
                 commande
               )
-
           }
-
         );
-
-
       const resultat =
         await reponse.json();
-
-
       if(!reponse.ok){
-
         console.error(
           "Erreur création commande :",
           resultat
         );
-
         alert(
           "Impossible de créer la commande : " +
           (
@@ -14375,29 +14331,20 @@ if(prix <= 0){
             "erreur Supabase"
           )
         );
-
         return;
       }
-
-
       const commandeCreee =
         Array.isArray(
           resultat
         )
           ? resultat[0]
           : resultat;
-
-
       const orderId =
         commandeCreee?.id;
-
-
       if(!orderId){
-
         alert(
           "La commande a été créée mais son identifiant est introuvable."
         );
-
         return;
       }
 
