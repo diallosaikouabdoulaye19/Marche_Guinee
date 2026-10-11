@@ -6944,161 +6944,63 @@ async function chargerMesVentes(){
 
 }
 
- async function verifierCodeLivraison(
-  orderId
-){
-
+ async function verifierCodeLivraison(orderId){
   if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
+    alert("Connecte-toi pour continuer.");
     return;
-
   }
-
-  const code =
-    prompt(
-      "🔐 Entre le code de livraison présenté par l'acheteur :"
-    );
-
+  const code = prompt(
+    "🔐 Entre le code vendeur à 6 chiffres :"
+  );
   if(code === null) return;
-
-  const codeSaisi =
-    code.trim();
-
+  const codeSaisi = code.trim();
   if(!/^\d{6}$/.test(codeSaisi)){
-
-    alert(
-      "Le code doit contenir exactement 6 chiffres."
-    );
-
+    alert("Le code doit contenir exactement 6 chiffres.");
     return;
-
   }
-
   try{
-
-    const commandes =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?id=eq." +
-        encodeURIComponent(
-          orderId
-        ) +
-        "&seller_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=id,order_number,delivery_code,status,delivery_status"
-
-      );
-
-    if(
-      !Array.isArray(commandes) ||
-      !commandes.length
-    ){
-
-      alert(
-        "Commande introuvable."
-      );
-
-      return;
-
-    }
-
-    const commande =
-      commandes[0];
-
-
-    const resultat =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/rpc/confirm_delivery",
-
-        {
-          method:"POST",
-
-          body:
-            JSON.stringify({
-
-              p_order_id:
-                commande.id,
-
-              p_delivery_code:
-                codeSaisi
-
-            })
-
-        }
-
-      );
-
-
-    if(
-      !resultat ||
-      resultat.success !== true
-    ){
-
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/validate_seller_delivery_code",
+      {
+        method: "POST",
+        headers: headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify({
+          p_order_id: orderId,
+          p_code: codeSaisi
+        })
+      }
+    );
+    if(!resultat || resultat.success !== true){
       alert(
         resultat?.message ||
-        "Code de livraison incorrect."
+        "Impossible de valider le code vendeur."
       );
-
       return;
-
     }
-
-
     alert(
-      "✅ Code vérifié avec succès !\n\n" +
-      "La livraison est maintenant enregistrée.\n\n" +
-      "L'acheteur peut maintenant confirmer la réception de son colis."
+      "✅ Code vendeur validé !\n\n" +
+      "La remise du colis est enregistrée.\n\n" +
+      "L'acheteur doit maintenant confirmer la réception avec son propre code."
     );
-
-
-    if(
-      typeof chargerMesVentes ===
-      "function"
-    ){
-
-      chargerMesVentes();
-
+    if(typeof chargerMesVentes === "function"){
+      await chargerMesVentes();
     }
-
-
-    if(
-      typeof chargerAnnonces ===
-      "function"
-    ){
-
-      chargerAnnonces();
-
+    if(typeof chargerAnnonces === "function"){
+      await chargerAnnonces();
     }
-
   }catch(error){
-
     console.error(
-      "Erreur vérification livraison :",
+      "Erreur de validation du code vendeur :",
       error
     );
-
     alert(
-      "Impossible de vérifier la livraison.\n\n" +
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
+      "Impossible de vérifier le code vendeur.\n\n" +
+      (error.message || "Erreur Supabase inconnue.")
     );
-
   }
-
 }
-
 /* =========================
    CHARGEMENT ANNONCES
 ========================= */
