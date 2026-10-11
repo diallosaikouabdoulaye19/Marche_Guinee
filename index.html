@@ -6745,46 +6745,29 @@ function livraisonTexte(status){
 
 }
 
-
 async function chargerMesVentes(){
 
-  const container =
-    document.getElementById(
-      "listeMesVentes"
-    );
-
+  const container = document.getElementById("listeMesVentes");
 
   if(!container) return;
-
 
   container.innerHTML =
     '<div style="padding:15px;text-align:center;color:#666;">' +
     'Chargement des ventes...' +
     '</div>';
 
-
   try{
 
-    const commandes =
-      await supabaseFetch(
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&order=created_at.desc"
+    );
 
-        SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?seller_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=id,order_number,product_title,price_gnf,status,delivery_status,delivery_code,commission_gnf,seller_amount_gnf,created_at" +
-        "&order=created_at.desc"
-
-      );
-
-
-    const ventes =
-      Array.isArray(commandes)
-        ? commandes
-        : [];
-
+    const ventes = Array.isArray(commandes) ? commandes : [];
 
     if(!ventes.length){
 
@@ -6796,105 +6779,72 @@ async function chargerMesVentes(){
         '</div>';
 
       return;
-
     }
-
 
     container.innerHTML = "";
 
+    for(const vente of ventes){
 
-    ventes.forEach(
-      vente => {
+      const prix = Number(vente.price_gnf || 0);
+      const commission = Number(vente.commission_gnf || 0);
+      const montantVendeur = Number(vente.seller_amount_gnf || 0);
 
-        const prix =
-          Number(
-            vente.price_gnf || 0
-          );
+      let codeVendeur = "Non disponible";
 
-        const commission =
-          Number(
-            vente.commission_gnf || 0
-          );
+      // Le vendeur récupère uniquement son propre code.
+      try{
 
-        const montantVendeur =
-          Number(
-            vente.seller_amount_gnf || 0
-          );
+        const resultatCode = await supabaseFetch(
+          SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
+          {
+            method: "POST",
+            headers: headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_order_id: vente.id
+            })
+          }
+        );
 
+        if(
+          resultatCode &&
+          resultatCode.success === true &&
+          resultatCode.role === "seller" &&
+          /^[0-9]{6}$/.test(String(resultatCode.code || ""))
+        ){
 
-        const div =
-          document.createElement("div");
+          codeVendeur = String(resultatCode.code);
 
+        }
 
-        div.style.cssText =
-          "border:1px solid #ddd;" +
-          "border-radius:14px;" +
-          "padding:15px;" +
-          "margin-bottom:12px;" +
-          "background:#fafafa;";
+      }catch(erreurCode){
 
+        console.error(
+          "Impossible de récupérer le code vendeur :",
+          erreurCode
+        );
 
-        div.innerHTML =
+      }
 
-          "<strong>" +
-          escapeHTML(
-            vente.product_title ||
-            "Produit"
-          ) +
-          "</strong>" +
+      const div = document.createElement("div");
 
-          "<div style='margin-top:8px;'>" +
-          "🧾 Commande : " +
-          escapeHTML(
-            vente.order_number || ""
-          ) +
-          "</div>" +
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:14px;" +
+        "padding:15px;" +
+        "margin-bottom:12px;" +
+        "background:#fafafa;";
 
-          "<div>💰 Prix : " +
-          prix.toLocaleString("fr-FR") +
-          " GNF</div>" +
+      let boutonLivraison = "";
 
-          "<div>🏦 Commission Marché Guinée : " +
-          commission.toLocaleString("fr-FR") +
-          " GNF</div>" +
+      if([
+        "handed_to_courier",
+        "in_delivery",
+        "awaiting_receipt"
+      ].includes(vente.status)){
 
-          "<div>💵 Montant vendeur : " +
-          montantVendeur.toLocaleString("fr-FR") +
-          " GNF</div>" +
-
-          "<div style='margin-top:8px;'>📦 Statut : " +
-          escapeHTML(
-            statutCommandeTexte(
-              vente.status
-            )
-          ) +
-          "</div>" +
-
-         "<div>🚚 Livraison : " +
-escapeHTML(
-  livraisonTexte(
-    vente.delivery_status
-  )
-) +
-"</div>" +
-
-"<div style='margin-top:6px;padding:10px;border-radius:10px;background:#f3f4f6;'>" +
-"🔐 Code de vérification : " +
-"<strong style='font-size:18px;letter-spacing:2px;'>" +
-escapeHTML(
-  vente.delivery_code || "Non disponible"
-) +
-"</strong>" +
-"</div>" +
-
-          "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
-          escapeHTML(
-            formatDate(
-              vente.created_at
-            )
-          ) +
-          "</div>" +
-
+        boutonLivraison =
           "<button" +
           " onclick=\"verifierCodeLivraison('" +
           escapeHTML(vente.id) +
@@ -6910,15 +6860,73 @@ escapeHTML(
           "font-weight:bold;" +
           "cursor:pointer;" +
           "'>" +
-          "🔐 Vérifier le code de livraison" +
+          "🔐 Vérifier le code vendeur" +
           "</button>";
 
-
-        container.appendChild(div);
-
       }
-    );
 
+      div.innerHTML =
+
+        "<strong>" +
+        escapeHTML(vente.product_title || "Produit") +
+        "</strong>" +
+
+        "<div style='margin-top:8px;'>" +
+        "🧾 Commande : " +
+        escapeHTML(vente.order_number || "") +
+        "</div>" +
+
+        "<div>💰 Prix : " +
+        prix.toLocaleString("fr-FR") +
+        " GNF</div>" +
+
+        "<div>🏦 Commission Marché Guinée : " +
+        commission.toLocaleString("fr-FR") +
+        " GNF</div>" +
+
+        "<div>💵 Montant vendeur : " +
+        montantVendeur.toLocaleString("fr-FR") +
+        " GNF</div>" +
+
+        "<div style='margin-top:8px;'>📦 Statut : " +
+        escapeHTML(
+          statutCommandeTexte(vente.status)
+        ) +
+        "</div>" +
+
+        "<div>🚚 Livraison : " +
+        escapeHTML(
+          livraisonTexte(vente.delivery_status)
+        ) +
+        "</div>" +
+
+        "<div style='margin-top:10px;padding:12px;border-radius:10px;background:#e8f5e9;'>" +
+
+        "<div style='font-size:13px;color:#166534;'>" +
+        "🔐 TON CODE VENDEUR" +
+        "</div>" +
+
+        "<strong style='display:block;margin-top:5px;font-size:22px;letter-spacing:3px;color:#166534;'>" +
+        escapeHTML(codeVendeur) +
+        "</strong>" +
+
+        "<small style='display:block;margin-top:6px;color:#555;'>" +
+        "Ce code est destiné à la validation de la remise du colis." +
+        "</small>" +
+
+        "</div>" +
+
+        "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
+        escapeHTML(
+          formatDate(vente.created_at)
+        ) +
+        "</div>" +
+
+        boutonLivraison;
+
+      container.appendChild(div);
+
+    }
 
   }catch(error){
 
