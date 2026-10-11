@@ -8332,37 +8332,36 @@ async function continuerPaiement(listingId){
       <p>
         Choisis ton moyen de paiement :
       </p>
-      <button
-        class="btn-green"
-        onclick="creerPaiement(
-          '${orderId}',
-          'orange_money',
-          '${escapeHTML(orderNumber)}',
-          '${escapeHTML(annonce.title)}',
-          ${prix},
-          ${commission},
-          ${montantVendeur},
-          '${deliveryCode}'
-        )"
-      >
-        🟠 Orange Money
-      </button>
-      <br><br>
-      <button
-        class="btn-primary"
-        onclick="creerPaiement(
-          '${orderId}',
-          'mtn_momo',
-          '${escapeHTML(orderNumber)}',
-          '${escapeHTML(annonce.title)}',
-          ${prix},
-          ${commission},
-          ${montantVendeur},
-          '${deliveryCode}'
-        )"
-      >
-        🟡 MTN Mobile Money
-      </button>
+
+         <button
+      class="btn-green"
+      onclick="creerPaiement(
+        '${orderId}',
+        'orange_money',
+        '${escapeHTML(orderNumber)}',
+        '${escapeHTML(annonce.title)}',
+        ${prix},
+        ${commission},
+        ${montantVendeur}
+      )"
+    >
+      🟠 Orange Money
+    </button>
+    <br><br>
+    <button
+      class="btn-primary"
+      onclick="creerPaiement(
+        '${orderId}',
+        'mtn_momo',
+        '${escapeHTML(orderNumber)}',
+        '${escapeHTML(annonce.title)}',
+        ${prix},
+        ${commission},
+        ${montantVendeur}
+      )"
+    >
+      🟡 MTN Mobile Money
+    </button>
     `;
     console.log(
       "Commande créée :",
