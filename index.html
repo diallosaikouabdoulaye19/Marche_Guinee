@@ -4500,193 +4500,185 @@ function fermerMesAchats(){
 
 
 async function chargerMesAchats(){
-
-  const container =
-    document.getElementById(
-      "listeMesAchats"
-    );
-
+  const container = document.getElementById("listeMesAchats");
   if(!container) return;
-
+  if(!utilisateurConnecte){
+    container.innerHTML =
+      '<div style="padding:20px;text-align:center;color:#777;">Connecte-toi pour consulter tes achats.</div>';
+    return;
+  }
   container.innerHTML =
-    '<div style="padding:20px;text-align:center;color:#666;">' +
-    'Chargement de tes achats...' +
-    '</div>';
-
+    '<div style="padding:20px;text-align:center;color:#666;">Chargement de tes achats...</div>';
   try{
-
-    const commandes =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?buyer_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=id,order_number,product_title,price_gnf,status,delivery_status,delivery_code,commission_gnf,seller_amount_gnf,created_at" +
-        "&order=created_at.desc"
-
-      );
-
-    const achats =
-      Array.isArray(commandes)
-        ? commandes
-        : [];
-
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?buyer_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&order=created_at.desc"
+    );
+    const achats = Array.isArray(commandes) ? commandes : [];
     if(!achats.length){
-
       container.innerHTML =
         '<div style="padding:20px;text-align:center;color:#777;">' +
         '🛒 Aucun achat pour le moment.' +
-        '<br><br>' +
-        '<small>Quand tu achèteras un produit, ta commande apparaîtra ici.</small>' +
+        '<br><br><small>Quand tu achèteras un produit, ta commande apparaîtra ici.</small>' +
         '</div>';
-
       return;
-
     }
-
     container.innerHTML = "";
-
-    achats.forEach(
-      achat => {
-
-        const prix =
-          Number(
-            achat.price_gnf || 0
+    for(const achat of achats){
+      const prix = Number(achat.price_gnf || 0);
+      const commission = Number(achat.commission_gnf || 0);
+      const montantVendeur = Number(achat.seller_amount_gnf || 0);
+      const statut = achat.status || "";
+      const livraison = achat.delivery_status || "pending";
+      let codeAcheteur = "";
+      let messageCode = "";
+      let boutonReception = "";
+      /*
+       * Le code acheteur est récupéré uniquement
+       * pour les commandes dont la livraison a commencé.
+       */
+      const livraisonCommencee = [
+        "handed_to_courier",
+        "in_delivery",
+        "awaiting_receipt",
+        "completed"
+      ].includes(statut);
+      if(livraisonCommencee && statut !== "completed"){
+        try{
+          const resultatCode = await supabaseFetch(
+            SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
+            {
+              method: "POST",
+              headers: headers({
+                "Content-Type": "application/json"
+              }),
+              body: JSON.stringify({
+                p_order_id: achat.id
+              })
+            }
           );
-
-        const commission =
-          Number(
-            achat.commission_gnf || 0
+          if(
+            resultatCode &&
+            resultatCode.success === true &&
+            resultatCode.role === "buyer" &&
+            /^\d{6}$/.test(String(resultatCode.code || ""))
+          ){
+            codeAcheteur = String(resultatCode.code);
+          }
+        }catch(erreurCode){
+          console.error(
+            "Erreur récupération code acheteur :",
+            erreurCode
           );
-
-        const montantVendeur =
-          Number(
-            achat.seller_amount_gnf || 0
-          );
-
-        const div =
-          document.createElement(
-            "div"
-          );
-
-        div.style.cssText =
-          "border:1px solid #ddd;" +
-          "border-radius:14px;" +
-          "padding:15px;" +
-          "margin-bottom:12px;" +
-          "background:#fafafa;";
-
-        let boutonReception = "";
-
-        if(
-          achat.status ===
-          "awaiting_receipt"
-        ){
-
-          boutonReception = `
-
-            <button
-              onclick="confirmerReceptionAchat('${escapeHTML(achat.id)}')"
-              style="
-                margin-top:12px;
-                width:100%;
-                padding:13px;
-                border:none;
-                border-radius:10px;
-                background:#16a34a;
-                color:white;
-                font-weight:bold;
-                cursor:pointer;
-              ">
-              ✅ Confirmer la réception
-            </button>
-
-          `;
-
         }
-
-        div.innerHTML =
-
-          "<strong>" +
-          escapeHTML(
-            achat.product_title ||
-            "Produit"
-          ) +
-          "</strong>" +
-
-          "<div style='margin-top:8px;'>" +
+        if(codeAcheteur){
+          messageCode =
+            '<div style="' +
+              'margin-top:12px;' +
+              'padding:13px;' +
+              'border:1px solid #f59e0b;' +
+              'border-radius:10px;' +
+              'background:#fffbeb;' +
+            '">' +
+              '<strong>🔐 Ton code acheteur</strong>' +
+              '<div style="' +
+                'font-size:26px;' +
+                'font-weight:bold;' +
+                'letter-spacing:5px;' +
+                'text-align:center;' +
+                'margin:10px 0;' +
+                'color:#92400e;' +
+              '">' +
+                escapeHTML(codeAcheteur) +
+              '</div>' +
+              '<small>' +
+                'Garde ce code secret. Présente-le au vendeur ou au livreur lors de la remise du colis.' +
+              '</small>' +
+            '</div>';
+        }else{
+          messageCode =
+            '<div style="' +
+              'margin-top:10px;' +
+              'padding:10px;' +
+              'background:#fff7ed;' +
+              'border-radius:8px;' +
+              'color:#9a3412;' +
+            '">' +
+              '⚠️ Ton code de livraison est temporairement indisponible. Réessaie plus tard.' +
+            '</div>';
+        }
+      }
+      if(statut === "awaiting_receipt"){
+        boutonReception = `
+          <button
+            onclick="confirmerReceptionAchat('${escapeHTML(achat.id)}')"
+            style="
+              margin-top:12px;
+              width:100%;
+              padding:13px;
+              border:none;
+              border-radius:10px;
+              background:#16a34a;
+              color:white;
+              font-weight:bold;
+              cursor:pointer;
+            ">
+            ✅ Confirmer la réception
+          </button>
+        `;
+      }
+      const div = document.createElement("div");
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:14px;" +
+        "padding:15px;" +
+        "margin-bottom:12px;" +
+        "background:#fafafa;";
+      div.innerHTML =
+        "<strong>" +
+          escapeHTML(achat.product_title || "Produit") +
+        "</strong>" +
+        "<div style='margin-top:8px;'>" +
           "🧾 Commande : " +
-          escapeHTML(
-            achat.order_number || ""
-          ) +
-          "</div>" +
-
-          "<div>💰 Prix : " +
+          escapeHTML(achat.order_number || "") +
+        "</div>" +
+        "<div>💰 Prix : " +
           prix.toLocaleString("fr-FR") +
           " GNF</div>" +
-
-          "<div>🏦 Commission : " +
-          commission.toLocaleString("fr-FR") +
+        "<div>🏦 Commission prévue (3 %) : " +
+          Math.round(prix * 0.03).toLocaleString("fr-FR") +
           " GNF</div>" +
-
-          "<div style='margin-top:8px;'>📦 Statut : " +
-          escapeHTML(
-            statutCommandeTexte(
-              achat.status
-            )
-          ) +
-          "</div>" +
-
-          "<div>🚚 Livraison : " +
-          escapeHTML(
-            livraisonTexte(
-              achat.delivery_status
-            )
-          ) +
-          "</div>" +
-
-          "<div style='margin-top:8px;color:#777;font-size:12px;'>" +
+        "<div>💵 Montant vendeur prévu : " +
+          Math.round(prix * 0.97).toLocaleString("fr-FR") +
+          " GNF</div>" +
+        "<div style='margin-top:8px;'>📦 Statut : " +
+          escapeHTML(statutCommandeTexte(statut)) +
+        "</div>" +
+        "<div>🚚 Livraison : " +
+          escapeHTML(livraisonTexte(livraison)) +
+        "</div>" +
+        messageCode +
+        "<div style='margin-top:8px;color:#777;font-size:12px;'>" +
           "📅 " +
-          escapeHTML(
-            formatDate(
-              achat.created_at
-            )
-          ) +
-          "</div>" +
-
-          boutonReception;
-
-        container.appendChild(
-          div
-        );
-
-      }
-    );
-
+          escapeHTML(formatDate(achat.created_at)) +
+        "</div>" +
+        boutonReception;
+      container.appendChild(div);
+    }
   }catch(error){
-
-    console.error(
-      "Erreur chargement achats :",
-      error
-    );
-
+    console.error("Erreur chargement achats :", error);
     container.innerHTML =
       '<div style="padding:15px;color:#dc2626;background:#fdeaea;border-radius:10px;">' +
-      "<strong>Impossible de charger tes achats.</strong>" +
-      "<br><br>" +
-      escapeHTML(
-        error.message ||
-        "Erreur Supabase inconnue."
-      ) +
-      "</div>";
-
+        '<strong>Impossible de charger tes achats.</strong>' +
+        '<br><br>' +
+        escapeHTML(error.message || "Erreur Supabase inconnue.") +
+      '</div>';
   }
-
 }
-
 
 /* =========================
    CONFIRMATION DE RÉCEPTION
