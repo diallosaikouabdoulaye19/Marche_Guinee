@@ -9427,143 +9427,127 @@ function fermerLivraisonModal(){
 
 
 async function verifierLivraison(){
-
   const orderNumber =
     document.getElementById(
       "verificationOrderNumber"
     ).value.trim();
-
-
   const code =
     document.getElementById(
       "verificationCode"
     ).value.trim();
-
-
+  if(!utilisateurConnecte || !utilisateurConnecte.id){
+    alert("Connecte-toi à ton compte pour vérifier la livraison.");
+    return;
+  }
   if(!orderNumber){
-
-    alert(
-      "Entre le numéro de commande."
-    );
-
+    alert("Entre le numéro de commande.");
     return;
-
   }
-
-
   if(!/^\d{6}$/.test(code)){
-
-    alert(
-      "Le code doit contenir exactement 6 chiffres."
-    );
-
+    alert("Le code doit contenir exactement 6 chiffres.");
     return;
-
   }
-
-
   try{
-
     const commandes =
       await supabaseFetch(
-
         SUPABASE_URL +
         "/rest/v1/orders?order_number=eq." +
-        encodeURIComponent(
-          orderNumber
-        ) +
-        "&select=id,order_number,delivery_code,status,delivery_status"
-
+        encodeURIComponent(orderNumber) +
+        "&select=id,order_number,buyer_id,seller_id,status,delivery_status"
       );
-
-
     if(
       !Array.isArray(commandes) ||
       !commandes.length
     ){
-
-      alert(
-        "Commande introuvable."
-      );
-
+      alert("Commande introuvable.");
       return;
-
     }
-
-
-    const commande =
-      commandes[0];
-
-
-    const resultat =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/rpc/confirm_delivery",
-
-        {
-          method:"POST",
-
-          body:JSON.stringify({
-
-            p_order_id:
-              commande.id,
-
-            p_delivery_code:
-              code
-
-          })
-
-        }
-
+    const commande = commandes[0];
+    const utilisateurId =
+      String(utilisateurConnecte.id);
+    const acheteurId =
+      String(commande.buyer_id);
+    const vendeurId =
+      String(commande.seller_id);
+    let resultat;
+    if(utilisateurId === vendeurId){
+      resultat =
+        await supabaseFetch(
+          SUPABASE_URL +
+          "/rest/v1/rpc/validate_seller_delivery_code",
+          {
+            method: "POST",
+            headers: headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_order_id: commande.id,
+              p_code: code
+            })
+          }
+        );
+    }else if(utilisateurId === acheteurId){
+      resultat =
+        await supabaseFetch(
+          SUPABASE_URL +
+          "/rest/v1/rpc/buyer_confirm_receipt",
+          {
+            method: "POST",
+            headers: headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_order_id: commande.id,
+              p_buyer_code: code
+            })
+          }
+        );
+    }else{
+      alert(
+        "Tu n'es ni l'acheteur ni le vendeur de cette commande."
       );
-
-
+      return;
+    }
     if(
       !resultat ||
       resultat.success !== true
     ){
-
       alert(
         resultat?.message ||
-        "Code de livraison incorrect."
+        "Vérification impossible. Vérifie le code et l'état de la commande."
       );
-
       return;
-
     }
-
-
     fermerLivraisonModal();
-
-
-    alert(
-
-      "✅ Livraison confirmée !\n\n" +
-      "La commande " +
-      commande.order_number +
-      " est maintenant livrée."
-
-    );
-
-
+    if(utilisateurId === vendeurId){
+      alert(
+        "✅ Code vendeur validé !\n\n" +
+        "Commande : " +
+        commande.order_number +
+        "\n\nL'acheteur doit maintenant confirmer la réception avec son propre code."
+      );
+    }else{
+      alert(
+        "✅ Confirmation de réception enregistrée !\n\n" +
+        "Commande : " +
+        commande.order_number +
+        "\n\nSi les deux validations sont terminées, la vente est finalisée avec une commission de 3 %."
+      );
+    }
     chargerAnnonces();
-
-
   }catch(error){
-
+    console.error(
+      "Erreur de vérification de livraison :",
+      error
+    );
     alert(
-
       "Impossible de vérifier la livraison.\n\n" +
       (
-        error.message ||
+        error?.message ||
         "Erreur inconnue."
       )
-
     );
-
   }
-
 }
 
 
