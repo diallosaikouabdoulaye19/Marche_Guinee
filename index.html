@@ -14452,7 +14452,7 @@ Montant vendeur après commission :
           Choisis ton moyen de paiement :
         </p>
 
-        <button
+             <button
           class="btn-green"
           onclick="creerPaiement(
             '${orderId}',
@@ -14461,15 +14461,12 @@ Montant vendeur après commission :
             '${escapeHTML(annonce.title)}',
             ${prix},
             ${commission},
-            ${montantVendeur},
-            '${deliveryCode}'
+            ${montantVendeur}
           )"
         >
           🟠 Orange Money
         </button>
-
         <br><br>
-
         <button
           class="btn-primary"
           onclick="creerPaiement(
@@ -14479,23 +14476,17 @@ Montant vendeur après commission :
             '${escapeHTML(annonce.title)}',
             ${prix},
             ${commission},
-            ${montantVendeur},
-            '${deliveryCode}'
+            ${montantVendeur}
           )"
         >
           🟡 MTN Mobile Money
         </button>
-
       `;
-
-
     }catch(error){
-
       console.error(
         "Erreur création commande :",
         error
       );
-
       alert(
         "ERREUR : " +
         (
@@ -14503,11 +14494,8 @@ Montant vendeur après commission :
           JSON.stringify(error)
         )
       );
-
     }
-
   };
-
 
 /* =========================================================
    🔔 NOTIFICATIONS — CORRECTION supabaseFetch()
