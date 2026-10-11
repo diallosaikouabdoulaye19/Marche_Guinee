@@ -6769,18 +6769,16 @@ function livraisonTexte(status){
 }
 
 async function chargerMesVentes(){
-
   const container = document.getElementById("listeMesVentes");
-
   if(!container) return;
-
+  if(!utilisateurConnecte){
+    container.innerHTML =
+      '<div style="padding:15px;text-align:center;color:#666;">Connecte-toi pour consulter tes ventes.</div>';
+    return;
+  }
   container.innerHTML =
-    '<div style="padding:15px;text-align:center;color:#666;">' +
-    'Chargement des ventes...' +
-    '</div>';
-
+    '<div style="padding:15px;text-align:center;color:#666;">Chargement des ventes...</div>';
   try{
-
     const commandes = await supabaseFetch(
       SUPABASE_URL +
       "/rest/v1/orders" +
@@ -6789,84 +6787,119 @@ async function chargerMesVentes(){
       "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
-
     const ventes = Array.isArray(commandes) ? commandes : [];
-
     if(!ventes.length){
-
       container.innerHTML =
         '<div style="padding:20px;text-align:center;color:#666;">' +
         '📦 Aucune vente pour le moment.' +
         '<br><br>' +
         '<small>Quand un client achètera un de tes produits, la commande apparaîtra ici.</small>' +
         '</div>';
-
       return;
     }
-
     container.innerHTML = "";
-
     for(const vente of ventes){
-
       const prix = Number(vente.price_gnf || 0);
       const commission = Number(vente.commission_gnf || 0);
       const montantVendeur = Number(vente.seller_amount_gnf || 0);
-
-      let codeVendeur = "Non disponible";
-
-      // Le vendeur récupère uniquement son propre code.
-      try{
-
-        const resultatCode = await supabaseFetch(
-          SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
-          {
-            method: "POST",
-            headers: headers({
-              "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-              p_order_id: vente.id
-            })
+      const statut = vente.status || "";
+      
+      let codeVendeurHTML = "";
+      /*
+       * Le code vendeur n'est récupéré que lorsque
+       * la commande est dans une étape de livraison.
+       */
+      const livraisonCommencee = [
+        "handed_to_courier",
+        "in_delivery"
+      ].includes(statut);
+      if(livraisonCommencee){
+        try{
+          const resultatCode = await supabaseFetch(
+            SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
+            {
+              method: "POST",
+              headers: headers({
+                "Content-Type": "application/json"
+              }),
+              body: JSON.stringify({
+                p_order_id: vente.id
+              })
+            }
+          );
+          if(
+            resultatCode &&
+            resultatCode.success === true &&
+            resultatCode.role === "seller" &&
+            /^[0-9]{6}$/.test(String(resultatCode.code || ""))
+          ){
+            codeVendeurHTML =
+              "<div style='" +
+                "margin-top:10px;" +
+                "padding:12px;" +
+                "border-radius:10px;" +
+                "background:#e8f5e9;" +
+              "'>" +
+                "<div style='font-size:13px;color:#166534;'>" +
+                  "🔐 TON CODE VENDEUR" +
+                "</div>" +
+                "<strong style='" +
+                  "display:block;" +
+                  "margin-top:5px;" +
+                  "font-size:22px;" +
+                  "letter-spacing:3px;" +
+                  "color:#166534;" +
+                "'>" +
+                  escapeHTML(String(resultatCode.code)) +
+                "</strong>" +
+                "<small style='display:block;margin-top:6px;color:#555;'>" +
+                  "Présente ce code au moment prévu pour vérifier la remise du colis." +
+                "</small>" +
+              "</div>";
+          }else{
+            codeVendeurHTML =
+              "<div style='margin-top:10px;padding:10px;background:#fff7ed;border-radius:8px;color:#9a3412;'>" +
+                "⚠️ Code vendeur temporairement indisponible." +
+              "</div>";
           }
-        );
-
-        if(
-          resultatCode &&
-          resultatCode.success === true &&
-          resultatCode.role === "seller" &&
-          /^[0-9]{6}$/.test(String(resultatCode.code || ""))
-        ){
-
-          codeVendeur = String(resultatCode.code);
-
+        }catch(erreurCode){
+          console.error(
+            "Impossible de récupérer le code vendeur :",
+            erreurCode
+          );
+          codeVendeurHTML =
+            "<div style='margin-top:10px;color:#9a3412;'>" +
+              "⚠️ Impossible de charger le code vendeur." +
+            "</div>";
         }
-
-      }catch(erreurCode){
-
-        console.error(
-          "Impossible de récupérer le code vendeur :",
-          erreurCode
-        );
-
+      }else if(statut === "awaiting_receipt"){
+        codeVendeurHTML =
+          "<div style='margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;color:#1d4ed8;'>" +
+            "📦 La remise a été validée. En attente de la confirmation de réception de l'acheteur." +
+          "</div>";
+      }else if(statut === "completed"){
+        codeVendeurHTML =
+          "<div style='margin-top:10px;padding:10px;background:#e8f5e9;border-radius:8px;color:#166534;'>" +
+            "✅ Vente terminée. Le code de livraison est masqué." +
+          "</div>";
+      }else{
+        codeVendeurHTML =
+          "<div style='margin-top:10px;padding:10px;background:#f3f4f6;border-radius:8px;color:#555;'>" +
+            "🔒 Code vendeur masqué jusqu'à l'étape de livraison." +
+          "</div>";
       }
-
       const div = document.createElement("div");
-
       div.style.cssText =
         "border:1px solid #ddd;" +
         "border-radius:14px;" +
         "padding:15px;" +
         "margin-bottom:12px;" +
         "background:#fafafa;";
-
       let boutonLivraison = "";
-
       if([
         "handed_to_courier",
-        "in_delivery",
-        "awaiting_receipt"
-      ].includes(vente.status)){
-
+        "in_delivery"
+      ].includes(statut)){
         boutonLivraison =
           "<button" +
           " onclick=\"verifierCodeLivraison('" +
@@ -6885,89 +6918,49 @@ async function chargerMesVentes(){
           "'>" +
           "🔐 Vérifier le code vendeur" +
           "</button>";
-
       }
-
       div.innerHTML =
-
         "<strong>" +
-        escapeHTML(vente.product_title || "Produit") +
+          escapeHTML(vente.product_title || "Produit") +
         "</strong>" +
-
         "<div style='margin-top:8px;'>" +
-        "🧾 Commande : " +
-        escapeHTML(vente.order_number || "") +
+          "🧾 Commande : " +
+          escapeHTML(vente.order_number || "") +
         "</div>" +
-
         "<div>💰 Prix : " +
-        prix.toLocaleString("fr-FR") +
-        " GNF</div>" +
-
+          prix.toLocaleString("fr-FR") +
+          " GNF</div>" +
         "<div>🏦 Commission Marché Guinée : " +
-        commission.toLocaleString("fr-FR") +
-        " GNF</div>" +
-
+          commission.toLocaleString("fr-FR") +
+          " GNF</div>" +
         "<div>💵 Montant vendeur : " +
-        montantVendeur.toLocaleString("fr-FR") +
-        " GNF</div>" +
-
+          montantVendeur.toLocaleString("fr-FR") +
+          " GNF</div>" +
         "<div style='margin-top:8px;'>📦 Statut : " +
-        escapeHTML(
-          statutCommandeTexte(vente.status)
-        ) +
+          escapeHTML(statutCommandeTexte(statut)) +
         "</div>" +
-
         "<div>🚚 Livraison : " +
-        escapeHTML(
-          livraisonTexte(vente.delivery_status)
-        ) +
+          escapeHTML(livraisonTexte(vente.delivery_status)) +
         "</div>" +
-
-        "<div style='margin-top:10px;padding:12px;border-radius:10px;background:#e8f5e9;'>" +
-
-        "<div style='font-size:13px;color:#166534;'>" +
-        "🔐 TON CODE VENDEUR" +
-        "</div>" +
-
-        "<strong style='display:block;margin-top:5px;font-size:22px;letter-spacing:3px;color:#166534;'>" +
-        escapeHTML(codeVendeur) +
-        "</strong>" +
-
-        "<small style='display:block;margin-top:6px;color:#555;'>" +
-        "Ce code est destiné à la validation de la remise du colis." +
-        "</small>" +
-
-        "</div>" +
-
+        codeVendeurHTML +
         "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
-        escapeHTML(
-          formatDate(vente.created_at)
-        ) +
+          escapeHTML(formatDate(vente.created_at)) +
         "</div>" +
-
         boutonLivraison;
-
       container.appendChild(div);
-
     }
-
   }catch(error){
-
+    console.error("Erreur chargement des ventes :", error);
     container.innerHTML =
       '<div style="padding:15px;color:#dc2626;background:#fdeaea;border-radius:10px;">' +
       "<strong>Impossible de charger les ventes.</strong>" +
       "<br><br>" +
-      escapeHTML(
-        error.message ||
-        "Erreur Supabase inconnue."
-      ) +
+      escapeHTML(error.message || "Erreur Supabase inconnue.") +
       "</div>";
-
   }
-
 }
 
- async function verifierCodeLivraison(orderId){
+  async function verifierCodeLivraison(orderId){
   if(!utilisateurConnecte){
     alert("Connecte-toi pour continuer.");
     return;
