@@ -4703,15 +4703,36 @@ async function confirmerReceptionAchat(
     );
 
     return;
-
   }
 
-  const confirmation =
-    confirm(
-      "✅ Confirmer la réception\n\n" +
-      "As-tu bien reçu ton colis ?\n\n" +
-      "Après confirmation, la vente sera finalisée et le montant vendeur sera disponible après déduction de la commission de 3 %."
+  const codeAcheteur = prompt(
+    "🔐 CODE SECRET DE RÉCEPTION\n\n" +
+    "Saisis ton code acheteur à 6 chiffres.\n\n" +
+    "Ce code sert à confirmer que tu as bien reçu ton colis."
+  );
+
+  if(codeAcheteur === null){
+
+    return;
+  }
+
+  const code = codeAcheteur.trim();
+
+  if(!/^\d{6}$/.test(code)){
+
+    alert(
+      "❌ Code invalide.\n\n" +
+      "Le code doit contenir exactement 6 chiffres."
     );
+
+    return;
+  }
+
+  const confirmation = confirm(
+    "✅ CONFIRMATION DE RÉCEPTION\n\n" +
+    "Confirme-tu avoir reçu ton colis ?\n\n" +
+    "Après validation du code, la commande sera finalisée et la commission de 3 % sera appliquée."
+  );
 
   if(!confirmation) return;
 
@@ -4721,18 +4742,28 @@ async function confirmerReceptionAchat(
       await supabaseFetch(
 
         SUPABASE_URL +
-        "/rest/v1/rpc/confirm_receipt",
+        "/rest/v1/rpc/buyer_confirm_receipt",
 
         {
           method:"POST",
 
+          headers:
+            headers({
+              "Content-Type":
+                "application/json"
+            }),
+
           body:
             JSON.stringify({
+
               p_order_id:
-                orderId
+                orderId,
+
+              p_buyer_code:
+                code
+
             })
         }
-
       );
 
     if(
@@ -4742,17 +4773,18 @@ async function confirmerReceptionAchat(
 
       alert(
         resultat?.message ||
-        "Impossible de confirmer la réception."
+        "❌ Impossible de confirmer la réception.\n\n" +
+        "Vérifie le code et assure-toi que le vendeur a validé la remise du colis."
       );
 
       return;
-
     }
 
     alert(
-      "✅ Réception confirmée !\n\n" +
-      "La commande est maintenant terminée.\n\n" +
-      "La vente a été finalisée."
+      "✅ RÉCEPTION CONFIRMÉE !\n\n" +
+      "Ton code a été validé.\n\n" +
+      "La commande est terminée. " +
+      "La commission de 3 % est appliquée conformément au système de la plateforme."
     );
 
     fermerMesAchats();
@@ -4786,7 +4818,6 @@ async function confirmerReceptionAchat(
   }
 
 }
-
 /* =========================
    COMPTE DE PAIEMENT VENDEUR
 ========================= */
