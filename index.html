@@ -8087,17 +8087,7 @@ async function continuerPaiement(listingId){
       );
     }
     const orderNumber =
-      await reponseNumero.json();
-    /* =========================
-       CODE UNIQUE DE LIVRAISON
-    ========================= */
-    const deliveryCode =
-      String(
-        Math.floor(
-          100000 +
-          Math.random() * 900000
-        )
-      );
+      await reponseNumero.json(); 
     /* =========================
        CRÉER LA COMMANDE
     ========================= */
@@ -8121,8 +8111,6 @@ async function continuerPaiement(listingId){
         commission,
       seller_amount_gnf:
         montantVendeur,
-      delivery_code:
-        deliveryCode,
       status:
         "payment_pending",
       product_title:
