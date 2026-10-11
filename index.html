@@ -6768,16 +6768,81 @@ function livraisonTexte(status){
 
 }
 
+/* =========================================
+   CHANGER LE STATUT D'UNE COMMANDE VENDEUR
+========================================= */
+async function changerStatutVente(orderId, nouveauStatut){
+  if(!utilisateurConnecte || !utilisateurConnecte.id){
+    alert("Connecte-toi pour gérer tes ventes.");
+    return;
+  }
+  const actionsAutorisees = {
+    payment_confirmed: {
+      suivant: "accepted",
+      confirmation: "Accepter cette commande ?"
+    },
+    accepted: {
+      suivant: "preparing",
+      confirmation: "Commencer la préparation de cette commande ?"
+    },
+    preparing: {
+      suivant: "handed_to_courier",
+      confirmation: "Confirmer que le colis est remis au livreur ?"
+    },
+    handed_to_courier: {
+      suivant: "in_delivery",
+      confirmation: "Confirmer que la livraison commence ?"
+    }
+  };
+  const action = actionsAutorisees[arguments[1]];
+  if(!action || action.suivant !== nouveauStatut){
+    alert("Cette action n'est pas autorisée.");
+    return;
+  }
+  if(!confirm(action.confirmation)){
+    return;
+  }
+  try{
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/seller_update_order_status",
+      {
+        method: "POST",
+        headers: headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify({
+          p_order_id: orderId,
+          p_new_status: nouveauStatut
+        })
+      }
+    );
+    alert("✅ Statut de la commande mis à jour.");
+    await chargerMesVentes();
+  }catch(erreur){
+    console.error("Erreur changement de statut :", erreur);
+    alert(
+      "Impossible de modifier le statut de la commande.\n\n" +
+      (erreur.message || "Vérifie ta connexion et les autorisations Supabase.")
+    );
+  }
+}
+/* =========================================
+   CHARGER LES VENTES DU VENDEUR
+========================================= */
 async function chargerMesVentes(){
   const container = document.getElementById("listeMesVentes");
   if(!container) return;
   if(!utilisateurConnecte){
     container.innerHTML =
-      '<div style="padding:15px;text-align:center;color:#666;">Connecte-toi pour consulter tes ventes.</div>';
+      '<div style="padding:15px;text-align:center;color:#666;">' +
+      'Connecte-toi pour consulter tes ventes.' +
+      '</div>';
     return;
   }
   container.innerHTML =
-    '<div style="padding:15px;text-align:center;color:#666;">Chargement des ventes...</div>';
+    '<div style="padding:15px;text-align:center;color:#666;">' +
+    'Chargement des ventes...' +
+    '</div>';
   try{
     const commandes = await supabaseFetch(
       SUPABASE_URL +
@@ -6803,12 +6868,59 @@ async function chargerMesVentes(){
       const commission = Number(vente.commission_gnf || 0);
       const montantVendeur = Number(vente.seller_amount_gnf || 0);
       const statut = vente.status || "";
-      
       let codeVendeurHTML = "";
-      /*
-       * Le code vendeur n'est récupéré que lorsque
-       * la commande est dans une étape de livraison.
-       */
+      let boutonActionHTML = "";
+      /* -------------------------------------
+         BOUTONS DE GESTION DE LA COMMANDE
+      ------------------------------------- */
+      const actions = {
+        payment_confirmed: {
+          suivant: "accepted",
+          texte: "✅ Accepter la commande",
+          couleur: "#15803d"
+        },
+        accepted: {
+          suivant: "preparing",
+          texte: "📦 Commencer la préparation",
+          couleur: "#2563eb"
+        },
+        preparing: {
+          suivant: "handed_to_courier",
+          texte: "🛵 Remettre au livreur",
+          couleur: "#7c3aed"
+        },
+        handed_to_courier: {
+          suivant: "in_delivery",
+          texte: "🚚 Commencer la livraison",
+          couleur: "#0369a1"
+        }
+      };
+      if(actions[statut]){
+        const action = actions[statut];
+        boutonActionHTML =
+          "<button type='button' " +
+          "onclick=\"changerStatutVente('" +
+          escapeHTML(vente.id) +
+          "','" +
+          action.suivant +
+          "')\" " +
+          "style='" +
+          "margin-top:12px;" +
+          "width:100%;" +
+          "padding:12px;" +
+          "border:none;" +
+          "border-radius:10px;" +
+          "background:" + action.couleur + ";" +
+          "color:white;" +
+          "font-weight:bold;" +
+          "cursor:pointer;" +
+          "'>" +
+          action.texte +
+          "</button>";
+      }
+      /* -------------------------------------
+         CODE VENDEUR
+      ------------------------------------- */
       const livraisonCommencee = [
         "handed_to_courier",
         "in_delivery"
@@ -6816,7 +6928,8 @@ async function chargerMesVentes(){
       if(livraisonCommencee){
         try{
           const resultatCode = await supabaseFetch(
-            SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
+            SUPABASE_URL +
+            "/rest/v1/rpc/get_my_delivery_code",
             {
               method: "POST",
               headers: headers({
@@ -6853,7 +6966,7 @@ async function chargerMesVentes(){
                   escapeHTML(String(resultatCode.code)) +
                 "</strong>" +
                 "<small style='display:block;margin-top:6px;color:#555;'>" +
-                  "Présente ce code au moment prévu pour vérifier la remise du colis." +
+                  "Utilise ce code pour vérifier la remise du colis à l'étape prévue." +
                 "</small>" +
               "</div>";
           }else{
@@ -6864,7 +6977,7 @@ async function chargerMesVentes(){
           }
         }catch(erreurCode){
           console.error(
-            "Impossible de récupérer le code vendeur :",
+            "Erreur récupération du code vendeur :",
             erreurCode
           );
           codeVendeurHTML =
@@ -6875,7 +6988,7 @@ async function chargerMesVentes(){
       }else if(statut === "awaiting_receipt"){
         codeVendeurHTML =
           "<div style='margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;color:#1d4ed8;'>" +
-            "📦 La remise a été validée. En attente de la confirmation de réception de l'acheteur." +
+            "📦 Remise validée. En attente de la confirmation de réception de l'acheteur." +
           "</div>";
       }else if(statut === "completed"){
         codeVendeurHTML =
@@ -6888,24 +7001,17 @@ async function chargerMesVentes(){
             "🔒 Code vendeur masqué jusqu'à l'étape de livraison." +
           "</div>";
       }
-      const div = document.createElement("div");
-      div.style.cssText =
-        "border:1px solid #ddd;" +
-        "border-radius:14px;" +
-        "padding:15px;" +
-        "margin-bottom:12px;" +
-        "background:#fafafa;";
+      /* -------------------------------------
+         BOUTON DE VÉRIFICATION DE LIVRAISON
+      ------------------------------------- */
       let boutonLivraison = "";
-      if([
-        "handed_to_courier",
-        "in_delivery"
-      ].includes(statut)){
+      if(livraisonCommencee){
         boutonLivraison =
-          "<button" +
-          " onclick=\"verifierCodeLivraison('" +
+          "<button type='button' " +
+          "onclick=\"verifierCodeLivraison('" +
           escapeHTML(vente.id) +
-          "')\"" +
-          " style='" +
+          "')\" " +
+          "style='" +
           "margin-top:12px;" +
           "width:100%;" +
           "padding:12px;" +
@@ -6919,6 +7025,16 @@ async function chargerMesVentes(){
           "🔐 Vérifier le code vendeur" +
           "</button>";
       }
+      /* -------------------------------------
+         AFFICHER LA COMMANDE
+      ------------------------------------- */
+      const div = document.createElement("div");
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:14px;" +
+        "padding:15px;" +
+        "margin-bottom:12px;" +
+        "background:#fafafa;";
       div.innerHTML =
         "<strong>" +
           escapeHTML(vente.product_title || "Produit") +
@@ -6946,6 +7062,7 @@ async function chargerMesVentes(){
         "<div style='margin-top:8px;color:#777;font-size:12px;'>📅 " +
           escapeHTML(formatDate(vente.created_at)) +
         "</div>" +
+        boutonActionHTML +
         boutonLivraison;
       container.appendChild(div);
     }
