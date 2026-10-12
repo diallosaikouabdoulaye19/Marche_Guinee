@@ -2874,60 +2874,50 @@ function fermerModal(id){
 ========================= */
 
 function ouvrirCompte(){
-
-  document.getElementById(
-    "accountModal"
-  ).style.display = "block";
-
+  document.getElementById("accountModal").style.display = "block";
 
   if(utilisateurConnecte){
+    document.getElementById("accountForms").classList.add("hidden");
+    document.getElementById("accountConnected").classList.remove("hidden");
 
-    document.getElementById(
-      "accountForms"
-    ).classList.add("hidden");
+    document.getElementById("connectedName").textContent =
+      utilisateurConnecte.fullName || "Utilisateur";
 
+    document.getElementById("connectedPhone").textContent =
+      utilisateurConnecte.phone || "";
 
-    document.getElementById(
-      "accountConnected"
-    ).classList.remove("hidden");
+    const avatar = document.getElementById("connectedAvatar");
+    const avatarFallback = document.getElementById("connectedAvatarFallback");
 
+    if(avatar && avatarFallback){
+      const photoUrl =
+        utilisateurConnecte.photo_url ||
+        utilisateurConnecte.photoUrl ||
+        "";
 
-    document.getElementById(
-      "connectedName"
-    ).textContent =
+      if(photoUrl){
+        avatar.onerror = function(){
+          avatar.style.display = "none";
+          avatarFallback.style.display = "block";
+        };
 
-      utilisateurConnecte.fullName ||
-      "Utilisateur";
-
-
-    document.getElementById(
-      "connectedPhone"
-    ).textContent =
-
-      utilisateurConnecte.phone ||
-      "";
-
+        avatar.src = photoUrl;
+        avatar.style.display = "block";
+        avatarFallback.style.display = "none";
+      }else{
+        avatar.removeAttribute("src");
+        avatar.style.display = "none";
+        avatarFallback.style.display = "block";
+      }
+    }
 
     chargerSoldeVendeur();
-
   }else{
-
-    document.getElementById(
-      "accountForms"
-    ).classList.remove("hidden");
-
-
-    document.getElementById(
-      "accountConnected"
-    ).classList.add("hidden");
-
-
+    document.getElementById("accountForms").classList.remove("hidden");
+    document.getElementById("accountConnected").classList.add("hidden");
     afficherInscription();
-
   }
-
 }
-
 
 function afficherInscription(){
 
