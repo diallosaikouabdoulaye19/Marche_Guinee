@@ -15462,8 +15462,11 @@ async function televerserPhotoProfil(file){
     console.error("Erreur upload photo profil :", details);
 
     throw new Error(
-      "Supabase n'a pas accepté la photo. Vérifie les règles Storage et ta connexion."
-    );
+  "Erreur Storage HTTP " +
+  response.status +
+  " : " +
+  details
+);
 
   }
 
