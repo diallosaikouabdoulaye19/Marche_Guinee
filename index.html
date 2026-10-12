@@ -16820,6 +16820,403 @@ document.addEventListener("keydown", function(event){
 })();
 </script>
 <!-- FIN DU CORRECTIF CIBLE -->
+
+<!-- ============================================
+     MARCHÉ GUINÉE — COMPTE PLEIN ÉCRAN
+     Style + navigation de retour
+     Ne remplace pas les fonctions existantes.
+=============================================== -->
+
+<style id="mg-account-fullscreen-v3">
+  /* Écran du compte : plein écran sur iPhone */
+  #accountModal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    background: #101112 !important;
+  }
+
+  #accountModal .modal-box {
+    position: relative !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100% !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #101112 !important;
+    color: #f5f5f5 !important;
+    box-shadow: none !important;
+  }
+
+  /* En-tête */
+  #accountModal .modal-box > div:first-child {
+    position: relative !important;
+    padding:
+      calc(env(safe-area-inset-top) + 24px)
+      20px 22px !important;
+    background: #101112 !important;
+    background-image: none !important;
+    border-bottom: 1px solid #303134 !important;
+    color: #fff !important;
+  }
+
+  #accountModal #accountTitle {
+    margin: 0 45px 0 0 !important;
+    color: #fff !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
+  }
+
+  #accountModal .modal-box > div:first-child p {
+    color: #b5b5b5 !important;
+  }
+
+  #accountModal .modal-box > div:first-child .close {
+    position: absolute !important;
+    top: calc(env(safe-area-inset-top) + 15px) !important;
+    right: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: #292a2c !important;
+    color: #fff !important;
+  }
+
+  /* Contenu */
+  #accountModal .modal-box > div:nth-child(2) {
+    padding: 20px 16px calc(30px + env(safe-area-inset-bottom)) !important;
+    background: #101112 !important;
+    color: #f5f5f5 !important;
+  }
+
+  #accountModal h1,
+  #accountModal h2,
+  #accountModal h3,
+  #accountModal h4,
+  #accountModal label,
+  #accountModal strong {
+    color: #f5f5f5;
+  }
+
+  #accountModal p,
+  #accountModal small {
+    color: #bdbdbd;
+  }
+
+  /* Profil */
+  #accountModal .mg-profile-card {
+    padding: 19px !important;
+    margin-bottom: 22px !important;
+    border: 1px solid #353638 !important;
+    border-radius: 20px !important;
+    background: #202123 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  #accountModal .mg-profile-avatar {
+    flex-shrink: 0 !important;
+    border-color: #087f3f !important;
+    background: #303134 !important;
+  }
+
+  #accountModal .mg-profile-info strong,
+  #accountModal .mg-profile-info #connectedPhone {
+    color: #fff !important;
+  }
+
+  #accountModal .mg-profile-label,
+  #accountModal .mg-profile-status {
+    color: #56d68b !important;
+  }
+
+  #accountModal .mg-profile-edit-btn {
+    min-height: 46px !important;
+    border: 1px solid #3a654b !important;
+    border-radius: 13px !important;
+    background: #173b29 !important;
+    color: #8ee5ad !important;
+  }
+
+  /* Rubriques */
+  #accountModal #accountConnected .form-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 14px 0 24px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #353638 !important;
+    border-radius: 18px !important;
+    background: #202123 !important;
+  }
+
+  #accountModal #accountConnected .form-actions > button.mg-account-menu-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 13px !important;
+    width: 100% !important;
+    min-height: 62px !important;
+    margin: 0 !important;
+    padding: 12px 15px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #353638 !important;
+    border-radius: 0 !important;
+    background: #202123 !important;
+    color: #f5f5f5 !important;
+    text-align: left !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+
+  #accountModal #accountConnected .form-actions > button:last-child {
+    border-bottom: 0 !important;
+  }
+
+  #accountModal .mg-menu-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    background: #303134 !important;
+    font-size: 19px !important;
+  }
+
+  #accountModal .mg-menu-label {
+    flex: 1 !important;
+    color: #f5f5f5 !important;
+  }
+
+  #accountModal .mg-menu-arrow {
+    margin-left: auto !important;
+    color: #aaa !important;
+    font-size: 24px !important;
+  }
+
+  #accountModal .mg-account-logout {
+    color: #ff8888 !important;
+    background: #351b1d !important;
+  }
+
+  /* Messages et formulaires du compte */
+  #accountModal #accountMessage .success {
+    background: #173b29 !important;
+    color: #8ee5ad !important;
+  }
+
+  #accountModal #accountMessage .error {
+    background: #451e22 !important;
+    color: #ffaaaa !important;
+  }
+
+  #accountModal input,
+  #accountModal textarea,
+  #accountModal select {
+    max-width: 100% !important;
+    background: #202123 !important;
+    color: #fff !important;
+    border-color: #454648 !important;
+  }
+
+  #accountModal input::placeholder,
+  #accountModal textarea::placeholder {
+    color: #aaa !important;
+  }
+
+  @media (max-width: 380px) {
+    #accountModal .modal-box > div:nth-child(2) {
+      padding-right: 12px !important;
+      padding-left: 12px !important;
+    }
+
+    #accountModal #accountConnected .form-actions > button.mg-account-menu-row {
+      gap: 10px !important;
+      min-height: 58px !important;
+      padding: 10px 11px !important;
+      font-size: 14px !important;
+    }
+  }
+</style>
+
+<script id="mg-account-return-v3">
+(function () {
+  "use strict";
+
+  if (window.mgAccountReturnV3Installed) return;
+  window.mgAccountReturnV3Installed = true;
+
+  var account = document.getElementById("accountModal");
+  var connected = document.getElementById("accountConnected");
+
+  if (!account || !connected) return;
+
+  /*
+   * Les rubriques ouvrent leurs fenêtres existantes.
+   * Lorsqu'une de ces fenêtres est fermée, le compte
+   * peut être rouvert sans changer ses fonctions métier.
+   */
+  var retourAuCompte = false;
+  var ouvertureEnCours = false;
+
+  var actions = connected.querySelector(".form-actions");
+
+  if (actions) {
+    actions.addEventListener("click", function (event) {
+      var button = event.target.closest("button");
+
+      if (!button || !actions.contains(button)) return;
+
+      /* Ne jamais revenir au compte après déconnexion. */
+      var action = button.getAttribute("onclick") || "";
+
+      if (action.indexOf("deconnecter") !== -1) {
+        retourAuCompte = false;
+        return;
+      }
+
+      /* Le solde possède déjà sa propre fenêtre. */
+      if (button.classList.contains("mg-account-balance")) {
+        retourAuCompte = true;
+        return;
+      }
+
+      /* Les rubriques utilisent leurs fonctions existantes. */
+      if (action || button.classList.contains("mg-delivery-menu-row")) {
+        retourAuCompte = true;
+      }
+    }, true);
+  }
+
+  /*
+   * Ajouter une commande de retour dans les fenêtres
+   * ouvertes depuis les rubriques, quand c'est possible.
+   */
+  function ajouterBoutonRetour(modal) {
+    if (!modal || modal === account || modal.id === "mgBalanceModal") {
+      return;
+    }
+
+    var box = modal.querySelector(".modal-box");
+
+    if (!box || box.querySelector(".mg-retour-compte")) return;
+
+    var retour = document.createElement("button");
+    retour.type = "button";
+    retour.className = "mg-retour-compte";
+    retour.textContent = "‹  Retour à Mon compte";
+
+    retour.style.cssText =
+      "display:none;width:100%;text-align:left;" +
+      "padding:13px 16px;margin:0 0 12px;" +
+      "border:0;border-radius:12px;" +
+      "background:#202123;color:#fff;" +
+      "font-size:15px;font-weight:700;";
+
+    retour.addEventListener("click", function () {
+      modal.style.display = "none";
+      retourAuCompte = false;
+      account.style.display = "block";
+      account.scrollTop = 0;
+    });
+
+    box.insertBefore(retour, box.firstChild);
+  }
+
+  /*
+   * Conserver la fermeture existante. Si une fenêtre
+   * est fermée après une rubrique, le compte est restauré.
+   */
+  if (typeof window.fermerModal === "function") {
+    var fermerModalOriginal = window.fermerModal;
+
+    window.fermerModal = function (id) {
+      fermerModalOriginal.apply(this, arguments);
+
+      if (
+        id !== "accountModal" &&
+        retourAuCompte &&
+        !ouvertureEnCours
+      ) {
+        retourAuCompte = false;
+
+        window.setTimeout(function () {
+          var modal = document.getElementById(id);
+
+          if (modal) {
+            var retour = modal.querySelector(".mg-retour-compte");
+            if (retour) retour.style.display = "none";
+          }
+
+          if (
+            !document.getElementById("accountModal") ||
+            !document.getElementById("accountConnected")
+          ) return;
+
+          account.style.display = "block";
+          account.scrollTop = 0;
+        }, 50);
+      }
+    };
+  }
+
+  /*
+   * Observer l'ouverture des fenêtres existantes.
+   * Le bouton Retour est affiché seulement lorsque
+   * l'utilisateur vient du menu du compte.
+   */
+  var observer = new MutationObserver(function () {
+    if (!retourAuCompte) return;
+
+    document.querySelectorAll(".modal").forEach(function (modal) {
+      if (
+        modal.id !== "accountModal" &&
+        modal.style.display === "block"
+      ) {
+        ajouterBoutonRetour(modal);
+
+        var retour = modal.querySelector(".mg-retour-compte");
+        if (retour) retour.style.display = "block";
+      }
+    });
+  });
+
+  observer.observe(document.body, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["style"]
+  });
+
+  /* Retour clavier sur ordinateur, sans modifier l'accueil. */
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+
+    if (account.style.display === "block") {
+      account.style.display = "none";
+      retourAuCompte = false;
+    }
+  });
+
+})();
+</script>
   
 </body>
 </html>
