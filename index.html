@@ -16392,6 +16392,362 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN REFONTE MON COMPTE -->
+
+<!-- =====================================================
+     CORRECTIF PROFIL PERSISTANT — MARCHÉ GUINÉE
+     Nom + photo enregistrés et rechargés depuis Supabase
+===================================================== -->
+
+<script>
+(function () {
+  "use strict";
+
+  /* Éviter d'installer deux fois le correctif */
+  if (window.mgCorrectifProfilV2Installe) {
+    return;
+  }
+  window.mgCorrectifProfilV2Installe = true;
+
+
+  /* =====================================================
+     1. RECHARGER LE PROFIL DEPUIS SUPABASE
+  ===================================================== */
+
+  window.mgRechargerProfilDepuisSupabase = async function () {
+    if (
+      !window.utilisateurConnecte ||
+      !utilisateurConnecte.id ||
+      !utilisateurConnecte.accessToken
+    ) {
+      return false;
+    }
+
+    try {
+      const id = utilisateurConnecte.id;
+
+      const lignes = await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/users?id=eq." +
+        encodeURIComponent(id) +
+        "&select=id,full_name,phone,photo_url&limit=1"
+      );
+
+      if (
+        !Array.isArray(lignes) ||
+        lignes.length === 0 ||
+        !utilisateurConnecte ||
+        utilisateurConnecte.id !== id
+      ) {
+        console.warn(
+          "Profil introuvable dans Supabase."
+        );
+        return false;
+      }
+
+      const profil = lignes[0];
+
+      /* Reprendre les valeurs réellement enregistrées */
+      utilisateurConnecte.fullName =
+        profil.full_name || utilisateurConnecte.fullName || "";
+
+      utilisateurConnecte.phone =
+        profil.phone || utilisateurConnecte.phone || "";
+
+      utilisateurConnecte.photo_url =
+        profil.photo_url || "";
+
+      utilisateurConnecte.photoUrl =
+        profil.photo_url || "";
+
+      /* Sauvegarder la session actualisée */
+      localStorage.setItem(
+        "marche_guinee_session",
+        JSON.stringify(utilisateurConnecte)
+      );
+
+      /* Actualiser le nom affiché */
+      const nom = document.getElementById("connectedName");
+
+      if (nom) {
+        nom.textContent =
+          utilisateurConnecte.fullName || "Utilisateur";
+      }
+
+      /* Actualiser la photo */
+      if (typeof afficherPhotoProfilConnecte === "function") {
+        afficherPhotoProfilConnecte(
+          utilisateurConnecte.photo_url
+        );
+      }
+
+      return true;
+
+    } catch (erreur) {
+      console.error(
+        "Rechargement du profil impossible :",
+        erreur
+      );
+
+      return false;
+    }
+  };
+
+
+  /* =====================================================
+     2. RECHARGER LE PROFIL APRÈS RESTAURATION SESSION
+  ===================================================== */
+
+  const mgAncienneRestaurerSession =
+    window.restaurerSession;
+
+  if (typeof mgAncienneRestaurerSession === "function") {
+    window.restaurerSession = async function () {
+      await mgAncienneRestaurerSession();
+
+      await window.mgRechargerProfilDepuisSupabase();
+    };
+  }
+
+
+  /* =====================================================
+     3. RECHARGER LE PROFIL À L'OUVERTURE DU COMPTE
+  ===================================================== */
+
+  const mgAncienneOuvrirCompte =
+    window.ouvrirCompte;
+
+  if (typeof mgAncienneOuvrirCompte === "function") {
+    window.ouvrirCompte = function () {
+      mgAncienneOuvrirCompte();
+
+      window.mgRechargerProfilDepuisSupabase();
+    };
+  }
+
+
+  /* =====================================================
+     4. ENREGISTRER LE PROFIL ET VÉRIFIER LE RÉSULTAT
+  ===================================================== */
+
+  window.enregistrerModificationProfil = async function () {
+    if (
+      typeof mgProfilEnregistrementEnCours !== "undefined" &&
+      mgProfilEnregistrementEnCours
+    ) {
+      return;
+    }
+
+    if (
+      !utilisateurConnecte ||
+      !utilisateurConnecte.id
+    ) {
+      afficherMessageModificationProfil(
+        "Connecte-toi avant de modifier ton profil.",
+        "error"
+      );
+      return;
+    }
+
+    const champNom =
+      document.getElementById("mgEditProfileName");
+
+    const bouton =
+      document.getElementById("mgEditProfileSave");
+
+    if (!champNom || !bouton) {
+      alert("La fenêtre de modification est introuvable.");
+      return;
+    }
+
+    const nouveauNom = champNom.value.trim();
+
+    if (nouveauNom.length < 2 || nouveauNom.length > 100) {
+      afficherMessageModificationProfil(
+        "Le nom doit contenir entre 2 et 100 caractères.",
+        "error"
+      );
+      return;
+    }
+
+    if (!utilisateurConnecte.accessToken) {
+      afficherMessageModificationProfil(
+        "Ta session a expiré. Reconnecte-toi.",
+        "error"
+      );
+      return;
+    }
+
+    mgProfilEnregistrementEnCours = true;
+    bouton.disabled = true;
+    bouton.textContent = "Enregistrement...";
+
+    try {
+      let photoURL =
+        utilisateurConnecte.photo_url ||
+        utilisateurConnecte.photoUrl ||
+        "";
+
+      /* Envoyer la nouvelle photo si nécessaire */
+      if (mgNouvellePhotoProfil) {
+        afficherMessageModificationProfil(
+          "Envoi de la photo en cours...",
+          "success"
+        );
+
+        photoURL = await televerserPhotoProfil(
+          mgNouvellePhotoProfil
+        );
+      }
+
+      afficherMessageModificationProfil(
+        "Vérification de l'enregistrement...",
+        "success"
+      );
+
+      const modifications = {
+        full_name: nouveauNom
+      };
+
+      if (mgNouvellePhotoProfil) {
+        modifications.photo_url = photoURL;
+      }
+
+      /*
+       * return=representation permet de vérifier
+       * si Supabase a réellement modifié une ligne.
+       */
+      const lignesModifiees = await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/users?id=eq." +
+        encodeURIComponent(utilisateurConnecte.id) +
+        "&select=id,full_name,phone,photo_url",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
+          },
+          body: JSON.stringify(modifications)
+        }
+      );
+
+      if (
+        !Array.isArray(lignesModifiees) ||
+        lignesModifiees.length === 0
+      ) {
+        throw new Error(
+          "Supabase n'a confirmé aucune modification. Vérifie les droits UPDATE de la table users."
+        );
+      }
+
+      const profilEnregistre = lignesModifiees[0];
+
+      /* Utiliser les valeurs réellement enregistrées */
+      utilisateurConnecte.fullName =
+        profilEnregistre.full_name || nouveauNom;
+
+      utilisateurConnecte.phone =
+        profilEnregistre.phone ||
+        utilisateurConnecte.phone ||
+        "";
+
+      utilisateurConnecte.photo_url =
+        profilEnregistre.photo_url || "";
+
+      utilisateurConnecte.photoUrl =
+        profilEnregistre.photo_url || "";
+
+      localStorage.setItem(
+        "marche_guinee_session",
+        JSON.stringify(utilisateurConnecte)
+      );
+
+      /* Mettre à jour l'affichage */
+      const nomAffiche =
+        document.getElementById("connectedName");
+
+      if (nomAffiche) {
+        nomAffiche.textContent =
+          utilisateurConnecte.fullName;
+      }
+
+      afficherPhotoProfilConnecte(
+        utilisateurConnecte.photo_url
+      );
+
+      afficherMessageModificationProfil(
+        "✅ Ton nom et ton profil ont été enregistrés.",
+        "success"
+      );
+
+      bouton.textContent = "✅ Enregistré";
+
+      mgNouvellePhotoProfil = null;
+
+      if (mgApercuPhotoProfilURL) {
+        URL.revokeObjectURL(mgApercuPhotoProfilURL);
+        mgApercuPhotoProfilURL = null;
+      }
+
+      setTimeout(function () {
+        const modal =
+          document.getElementById("mgEditProfileModal");
+
+        if (modal) {
+          modal.style.display = "none";
+        }
+
+        bouton.disabled = false;
+        bouton.textContent = "💾 Enregistrer";
+      }, 1200);
+
+    } catch (erreur) {
+      console.error(
+        "Échec de l'enregistrement du profil :",
+        erreur
+      );
+
+      afficherMessageModificationProfil(
+        "❌ Enregistrement impossible : " +
+        (erreur.message || "Erreur inconnue."),
+        "error"
+      );
+
+      bouton.disabled = false;
+      bouton.textContent = "💾 Réessayer";
+
+    } finally {
+      mgProfilEnregistrementEnCours = false;
+    }
+  };
+
+
+  /* =====================================================
+     5. RECHARGER AUSSI LE PROFIL APRÈS LE DÉMARRAGE
+  ===================================================== */
+
+  async function mgVerifierProfilAuDemarrage() {
+    if (
+      utilisateurConnecte &&
+      utilisateurConnecte.id &&
+      utilisateurConnecte.accessToken
+    ) {
+      await window.mgRechargerProfilDepuisSupabase();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      mgVerifierProfilAuDemarrage
+    );
+  } else {
+    mgVerifierProfilAuDemarrage();
+  }
+
+})();
+</script>
+<!-- FIN DU CORRECTIF PROFIL PERSISTANT -->
   
 </body>
 </html>
