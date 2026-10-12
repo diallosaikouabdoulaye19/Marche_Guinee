@@ -16734,6 +16734,92 @@ document.addEventListener("keydown", function(event){
 })();
 </script>
 <!-- FIN DU CORRECTIF PROFIL PERSISTANT -->
+
+<!-- CORRECTIF CIBLE : RESTAURATION PHOTO DE PROFIL -->
+<script>
+(function () {
+  "use strict";
+
+  async function restaurerPhotoProfilMarchéGuinee() {
+    try {
+      /* Restaurer la session enregistrée sur le téléphone */
+      const sessionSauvee = localStorage.getItem(
+        "marche_guinee_session"
+      );
+
+      if (!sessionSauvee) return;
+
+      const session = JSON.parse(sessionSauvee);
+
+      if (!session || !session.id) return;
+
+      /* Conserver la session déjà utilisée par l'application */
+      if (
+        typeof utilisateurConnecte !== "undefined" &&
+        !utilisateurConnecte
+      ) {
+        utilisateurConnecte = session;
+      }
+
+      /* Afficher immédiatement la photo locale si elle existe */
+      const photoLocale =
+        session.photo_url ||
+        session.photoUrl ||
+        "";
+
+      if (
+        photoLocale &&
+        typeof afficherPhotoProfilConnecte === "function"
+      ) {
+        afficherPhotoProfilConnecte(photoLocale);
+      }
+
+      /* Recharger ensuite les données les plus récentes */
+      if (
+        typeof window.mgRechargerProfilDepuisSupabase === "function"
+      ) {
+        await window.mgRechargerProfilDepuisSupabase();
+      }
+
+      /* Réafficher la photo sauvegardée si nécessaire */
+      const sessionActuelle =
+        typeof utilisateurConnecte !== "undefined"
+          ? utilisateurConnecte
+          : session;
+
+      const photoFinale =
+        sessionActuelle &&
+        (
+          sessionActuelle.photo_url ||
+          sessionActuelle.photoUrl
+        );
+
+      if (
+        photoFinale &&
+        typeof afficherPhotoProfilConnecte === "function"
+      ) {
+        afficherPhotoProfilConnecte(photoFinale);
+      }
+
+    } catch (erreur) {
+      console.error(
+        "Restauration de la photo de profil impossible :",
+        erreur
+      );
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      restaurerPhotoProfilMarchéGuinee
+    );
+  } else {
+    restaurerPhotoProfilMarchéGuinee();
+  }
+})();
+</script>
+<!-- FIN DU CORRECTIF CIBLE -->
   
 </body>
 </html>
