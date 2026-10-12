@@ -15748,6 +15748,650 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN MODIFICATION DU PROFIL -->
+
+<!-- =====================================================
+     MARCHÉ GUINÉE 🇬🇳
+     REFONTE DU MENU MON COMPTE
+     Style moderne inspiré de Facebook
+     ===================================================== -->
+
+<style>
+/* Fenêtre du compte */
+#accountModal .modal-box{
+  max-width:560px!important;
+  background:#f5f7f6!important;
+  border-radius:22px!important;
+}
+
+/* Conserver le profil actuel */
+#accountConnected .mg-profile-card{
+  background:#fff;
+  border:1px solid #e3e9e5;
+  border-radius:19px;
+  padding:18px;
+  margin-bottom:20px;
+  box-shadow:0 3px 12px rgba(0,0,0,.035);
+}
+
+/* Liste des options */
+#accountConnected .form-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  margin-top:8px;
+  background:#fff;
+  border:1px solid #e3e9e5;
+  border-radius:17px;
+  overflow:hidden;
+}
+
+/* Chaque option devient une ligne */
+#accountConnected .form-actions > button.mg-account-menu-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:13px!important;
+  width:100%!important;
+  min-height:61px!important;
+  padding:12px 15px!important;
+  margin:0!important;
+  border:0!important;
+  border-bottom:1px solid #edf0ee!important;
+  border-radius:0!important;
+  background:#fff!important;
+  color:#25332b!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  text-align:left!important;
+  cursor:pointer;
+  grid-column:auto!important;
+  box-shadow:none!important;
+  transition:background .15s ease;
+}
+
+/* Effet au toucher */
+#accountConnected .form-actions > button.mg-account-menu-row:active{
+  background:#eff8f1!important;
+}
+
+/* Dernière ligne sans séparation */
+#accountConnected .form-actions > button.mg-account-menu-row:last-child{
+  border-bottom:0!important;
+}
+
+/* Icône */
+#accountConnected .mg-menu-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 39px;
+  width:39px;
+  height:39px;
+  border-radius:12px;
+  background:#edf7f0;
+  font-size:20px;
+}
+
+/* Texte */
+#accountConnected .mg-menu-label{
+  flex:1;
+  min-width:0;
+  line-height:1.4;
+}
+
+/* Flèche */
+#accountConnected .mg-menu-arrow{
+  flex:0 0 auto;
+  color:#9aa59e;
+  font-size:23px;
+  font-weight:400;
+}
+
+/* Déconnexion */
+#accountConnected .form-actions > button.mg-account-logout{
+  margin-top:12px!important;
+  border:1px solid #f2dada!important;
+  border-radius:13px!important;
+  background:#fff5f5!important;
+  color:#bd3030!important;
+}
+
+/* Solde vendeur dans le menu */
+#accountConnected .form-actions > button.mg-account-balance{
+  background:#fff!important;
+}
+
+#accountConnected .mg-menu-balance-value{
+  display:block;
+  margin-top:2px;
+  color:#087f3f;
+  font-size:12px;
+  font-weight:800;
+}
+
+/* Message de connexion */
+#accountConnected > .success{
+  border-radius:12px!important;
+  font-size:13px;
+}
+
+/* Fenêtre dédiée au solde */
+#mgBalanceModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:21000;
+  padding:14px;
+  overflow-y:auto;
+  background:rgba(10,25,16,.68);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+#mgBalanceModal .mg-balance-panel{
+  width:100%;
+  max-width:440px;
+  margin:50px auto;
+  overflow:hidden;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 20px 55px rgba(0,0,0,.22);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+#mgBalanceModal .mg-balance-header{
+  position:relative;
+  padding:23px 20px;
+  background:linear-gradient(135deg,#087f3f,#10a653);
+  color:#fff;
+}
+
+#mgBalanceModal .mg-balance-header h2{
+  margin:0;
+  font-size:23px;
+  font-weight:900;
+}
+
+#mgBalanceModal .mg-balance-header p{
+  margin:7px 0 0;
+  font-size:13px;
+  opacity:.9;
+}
+
+#mgBalanceModal .mg-balance-close{
+  position:absolute;
+  top:13px;
+  right:13px;
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.17);
+  color:#fff;
+  font-size:24px;
+}
+
+#mgBalanceModal .mg-balance-content{
+  padding:20px;
+}
+
+#mgBalanceModal .mg-balance-card{
+  padding:21px;
+  border:1px solid #ccebd5;
+  border-radius:17px;
+  background:linear-gradient(135deg,#effcf3,#e4f8eb);
+}
+
+#mgBalanceModal .mg-balance-label{
+  color:#587061;
+  font-size:13px;
+  font-weight:700;
+}
+
+#mgBalanceModal .mg-balance-amount{
+  margin-top:9px;
+  color:#087f3f;
+  font-size:clamp(25px,7vw,34px);
+  font-weight:900;
+  overflow-wrap:anywhere;
+}
+
+#mgBalanceModal .mg-balance-details{
+  margin-top:9px;
+  color:#65736b;
+  font-size:12px;
+  line-height:1.6;
+}
+
+#mgBalanceModal .mg-balance-note{
+  margin-top:15px;
+  color:#69756e;
+  font-size:12px;
+  line-height:1.6;
+}
+
+#mgBalanceModal .mg-balance-done{
+  width:100%;
+  min-height:47px;
+  margin-top:18px;
+  border-radius:12px;
+  background:#087f3f;
+  color:#fff;
+  font-size:14px;
+  font-weight:800;
+}
+
+@media(min-width:700px){
+  #accountModal .modal-box{
+    margin:30px auto;
+  }
+}
+
+@media(max-width:380px){
+  #accountModal .modal-box{
+    margin:8px auto!important;
+    border-radius:17px!important;
+  }
+
+  #accountConnected .form-actions > button.mg-account-menu-row{
+    min-height:57px!important;
+    padding:10px 11px!important;
+    gap:10px!important;
+  }
+
+  #accountConnected .mg-menu-icon{
+    flex-basis:35px;
+    width:35px;
+    height:35px;
+    font-size:18px;
+  }
+
+  #mgBalanceModal .mg-balance-panel{
+    margin:25px auto;
+  }
+}
+</style>
+
+<!-- Fenêtre du solde -->
+<div id="mgBalanceModal" role="dialog" aria-modal="true"
+     aria-labelledby="mgBalanceTitle">
+
+  <div class="mg-balance-panel">
+
+    <div class="mg-balance-header">
+
+      <button type="button"
+              class="mg-balance-close"
+              onclick="fermerSoldeVendeur()"
+              aria-label="Fermer">
+        ×
+      </button>
+
+      <div style="font-size:12px;font-weight:800;margin-bottom:8px;">
+        🇬🇳 MARCHÉ GUINÉE
+      </div>
+
+      <h2 id="mgBalanceTitle">💰 Mon solde</h2>
+
+      <p>Consulte le solde de ton compte vendeur.</p>
+
+    </div>
+
+    <div class="mg-balance-content">
+
+      <div class="mg-balance-card">
+
+        <div class="mg-balance-label">
+          SOLDE VENDEUR DISPONIBLE
+        </div>
+
+        <div id="mgBalanceAmount" class="mg-balance-amount">
+          Chargement...
+        </div>
+
+        <div id="mgBalanceDetails" class="mg-balance-details">
+          Chargement des informations...
+        </div>
+
+      </div>
+
+      <div class="mg-balance-note">
+        Le solde affiché correspond aux informations calculées
+        par Marché Guinée. Les paiements réels et les retraits
+        ne sont pas modifiés par cette présentation.
+      </div>
+
+      <button type="button"
+              class="mg-balance-done"
+              onclick="fermerSoldeVendeur()">
+        Fermer
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  "use strict";
+
+  const compte = document.getElementById("accountConnected");
+
+  if(!compte) return;
+
+  const actions = compte.querySelector(".form-actions");
+
+  const soldeOriginal = document.getElementById("soldeVendeur");
+
+  const detailsOriginal = document.getElementById("detailsSoldeVendeur");
+
+  const soldeBox = document.getElementById("soldeVendeurBox");
+
+  const soldeModal = document.getElementById("mgBalanceModal");
+
+  if(!actions || !soldeOriginal || !detailsOriginal || !soldeBox || !soldeModal){
+    console.warn("Menu du compte : éléments nécessaires introuvables.");
+    return;
+  }
+
+  /* Ne pas initialiser deux fois */
+  if(actions.dataset.mgMenuReady === "true") return;
+
+  actions.dataset.mgMenuReady = "true";
+
+  /* Garder le calcul du solde existant, mais déplacer son affichage
+     vers la fenêtre dédiée. Le calcul Supabase n'est pas modifié. */
+  soldeBox.style.display = "none";
+
+  /* Créer l'entrée Mon solde */
+  const balanceButton = document.createElement("button");
+
+  balanceButton.type = "button";
+  balanceButton.className = "mg-account-menu-row mg-account-balance";
+
+  balanceButton.innerHTML =
+    '<span class="mg-menu-icon">💰</span>' +
+    '<span class="mg-menu-label">' +
+      '<span>Mon solde vendeur</span>' +
+      '<span class="mg-menu-balance-value" id="mgMenuBalanceValue">Chargement...</span>' +
+    '</span>' +
+    '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+
+  balanceButton.addEventListener("click", ouvrirSoldeVendeur);
+
+  actions.insertBefore(balanceButton, actions.firstChild);
+
+  /* Icônes, libellés et ordre des fonctions existantes */
+  const configuration = [
+    {
+      match:"boutonAdmin",
+      icon:"🛡️",
+      label:"Tableau de bord admin",
+      order:1
+    },
+    {
+      match:"mg-balance",
+      icon:"💰",
+      label:"Mon solde vendeur",
+      order:2
+    },
+    {
+      match:"ouvrirSignalement",
+      icon:"⚠️",
+      label:"Signaler un problème",
+      order:3
+    },
+    {
+      match:"ouvrirMesAchats",
+      icon:"🛒",
+      label:"Mes achats",
+      order:4
+    },
+    {
+      match:"ouvrirComptePaiement",
+      icon:"🏦",
+      label:"Compte de paiement",
+      order:5
+    },
+    {
+      match:"ouvrirMesVentes",
+      icon:"📦",
+      label:"Mes ventes",
+      order:6
+    },
+    {
+      match:"ouvrirMessages",
+      icon:"💬",
+      label:"Mes messages",
+      order:7
+    },
+    {
+      match:"ouvrirVente",
+      icon:"➕",
+      label:"Publier une annonce",
+      order:8
+    },
+    {
+      match:"ouvrirVerificationLivraison",
+      icon:"🚚",
+      label:"Vérification de livraison",
+      order:9,
+      create:true
+    },
+    {
+      match:"deconnecter",
+      icon:"🚪",
+      label:"Se déconnecter",
+      order:10
+    }
+  ];
+
+  function identifierBouton(button){
+
+    if(button.id === "boutonAdmin"){
+      return configuration[0];
+    }
+
+    const action = button.getAttribute("onclick") || "";
+
+    return configuration.find(function(item){
+      return item.match !== "mg-balance" &&
+             item.match !== "boutonAdmin" &&
+             action.includes(item.match);
+    }) || null;
+
+  }
+
+  /* Transformer les boutons existants sans changer leurs actions */
+  Array.from(actions.querySelectorAll("button")).forEach(function(button){
+
+    if(button === balanceButton) return;
+
+    const item = identifierBouton(button);
+
+    if(!item) return;
+
+    button.classList.add("mg-account-menu-row");
+
+    if(item.match === "deconnecter"){
+      button.classList.add("mg-account-logout");
+    }
+
+    button.innerHTML =
+      '<span class="mg-menu-icon">' + item.icon + '</span>' +
+      '<span class="mg-menu-label">' + item.label + '</span>' +
+      '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+
+    button.style.gridColumn = "auto";
+
+    button.style.order = String(item.order);
+
+    /* Fermer le compte avant d'ouvrir une autre fonctionnalité */
+    button.addEventListener("click", function(){
+
+      const modal = document.getElementById("accountModal");
+
+      if(modal){
+        modal.style.display = "none";
+      }
+
+    }, true);
+
+  });
+
+  balanceButton.style.order = "2";
+
+  /* Ajouter la livraison sans remplacer la fonction existante */
+  if(!actions.querySelector(".mg-delivery-menu-row")){
+
+    const deliveryButton = document.createElement("button");
+
+    deliveryButton.type = "button";
+
+    deliveryButton.className =
+      "mg-account-menu-row mg-delivery-menu-row";
+
+    deliveryButton.style.order = "9";
+
+    deliveryButton.innerHTML =
+      '<span class="mg-menu-icon">🚚</span>' +
+      '<span class="mg-menu-label">Vérification de livraison</span>' +
+      '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+
+    deliveryButton.addEventListener("click", function(){
+
+      const modal = document.getElementById("accountModal");
+
+      if(modal){
+        modal.style.display = "none";
+      }
+
+      if(typeof ouvrirVerificationLivraison === "function"){
+        ouvrirVerificationLivraison();
+      }else{
+        alert("La fonction de livraison est momentanément indisponible.");
+      }
+
+    });
+
+    actions.appendChild(deliveryButton);
+
+  }
+
+  /* Appliquer l'ordre visuel */
+  Array.from(actions.children).forEach(function(button){
+
+    const action = button.getAttribute("onclick") || "";
+
+    if(button.id === "boutonAdmin"){
+      button.style.order = "1";
+    }else if(button.classList.contains("mg-account-balance")){
+      button.style.order = "2";
+    }else if(action.includes("ouvrirSignalement")){
+      button.style.order = "3";
+    }else if(action.includes("ouvrirMesAchats")){
+      button.style.order = "4";
+    }else if(action.includes("ouvrirComptePaiement")){
+      button.style.order = "5";
+    }else if(action.includes("ouvrirMesVentes")){
+      button.style.order = "6";
+    }else if(action.includes("ouvrirMessages")){
+      button.style.order = "7";
+    }else if(action.includes("ouvrirVente")){
+      button.style.order = "8";
+    }else if(button.classList.contains("mg-delivery-menu-row")){
+      button.style.order = "9";
+    }else if(action.includes("deconnecter")){
+      button.style.order = "10";
+    }
+
+  });
+
+  /* Mettre à jour le montant dans la ligne Mon solde */
+  function actualiserSoldeMenu(){
+
+    const amount = document.getElementById("mgMenuBalanceValue");
+
+    const modalAmount = document.getElementById("mgBalanceAmount");
+
+    const modalDetails = document.getElementById("mgBalanceDetails");
+
+    if(amount){
+      amount.textContent = soldeOriginal.textContent || "0 GNF";
+    }
+
+    if(modalAmount){
+      modalAmount.textContent = soldeOriginal.textContent || "0 GNF";
+    }
+
+    if(modalDetails){
+      modalDetails.textContent = detailsOriginal.textContent || "";
+    }
+
+  }
+
+  /* Ouvrir le solde et rafraîchir son affichage */
+  window.ouvrirSoldeVendeur = function(){
+
+    actualiserSoldeMenu();
+
+    soldeModal.style.display = "block";
+
+    if(typeof chargerSoldeVendeur === "function"){
+      Promise.resolve(chargerSoldeVendeur()).then(function(){
+        actualiserSoldeMenu();
+      }).catch(function(error){
+        console.error("Actualisation du solde impossible :", error);
+      });
+    }
+
+  };
+
+  window.fermerSoldeVendeur = function(){
+
+    soldeModal.style.display = "none";
+
+  };
+
+  soldeModal.addEventListener("click", function(event){
+
+    if(event.target === soldeModal){
+      fermerSoldeVendeur();
+    }
+
+  });
+
+  document.addEventListener("keydown", function(event){
+
+    if(event.key === "Escape" && soldeModal.style.display === "block"){
+      fermerSoldeVendeur();
+    }
+
+  });
+
+  /* Synchroniser l'affichage avec le calcul de solde déjà existant */
+  const observer = new MutationObserver(actualiserSoldeMenu);
+
+  observer.observe(soldeOriginal, {
+    childList:true,
+    subtree:true,
+    characterData:true
+  });
+
+  observer.observe(detailsOriginal, {
+    childList:true,
+    subtree:true,
+    characterData:true
+  });
+
+  actualiserSoldeMenu();
+
+})();
+</script>
+
+<!-- FIN REFONTE MON COMPTE -->
   
 </body>
 </html>
