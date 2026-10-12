@@ -16416,85 +16416,68 @@ document.addEventListener("keydown", function(event){
      1. RECHARGER LE PROFIL DEPUIS SUPABASE
   ===================================================== */
 
-  window.mgRechargerProfilDepuisSupabase = async function () {
+ window.mgRechargerProfilDepuisSupabase = async function () {
     if (
-      !window.utilisateurConnecte ||
+      typeof utilisateurConnecte === "undefined" ||
+      !utilisateurConnecte ||
       !utilisateurConnecte.id ||
       !utilisateurConnecte.accessToken
     ) {
       return false;
     }
-
     try {
       const id = utilisateurConnecte.id;
-
       const lignes = await supabaseFetch(
         SUPABASE_URL +
         "/rest/v1/users?id=eq." +
         encodeURIComponent(id) +
         "&select=id,full_name,phone,photo_url&limit=1"
       );
-
       if (
         !Array.isArray(lignes) ||
         lignes.length === 0 ||
         !utilisateurConnecte ||
         utilisateurConnecte.id !== id
       ) {
-        console.warn(
-          "Profil introuvable dans Supabase."
-        );
+        console.warn("Profil introuvable dans Supabase.");
         return false;
       }
-
       const profil = lignes[0];
-
-      /* Reprendre les valeurs réellement enregistrées */
+      /* Mettre à jour les informations enregistrées */
       utilisateurConnecte.fullName =
         profil.full_name || utilisateurConnecte.fullName || "";
-
       utilisateurConnecte.phone =
         profil.phone || utilisateurConnecte.phone || "";
-
       utilisateurConnecte.photo_url =
         profil.photo_url || "";
-
       utilisateurConnecte.photoUrl =
         profil.photo_url || "";
-
-      /* Sauvegarder la session actualisée */
+      /* Enregistrer la session actualisée */
       localStorage.setItem(
         "marche_guinee_session",
         JSON.stringify(utilisateurConnecte)
       );
-
-      /* Actualiser le nom affiché */
+      /* Actualiser le nom */
       const nom = document.getElementById("connectedName");
-
       if (nom) {
         nom.textContent =
           utilisateurConnecte.fullName || "Utilisateur";
       }
-
       /* Actualiser la photo */
       if (typeof afficherPhotoProfilConnecte === "function") {
         afficherPhotoProfilConnecte(
           utilisateurConnecte.photo_url
         );
       }
-
       return true;
-
     } catch (erreur) {
       console.error(
         "Rechargement du profil impossible :",
         erreur
       );
-
       return false;
     }
   };
-
 
   /* =====================================================
      2. RECHARGER LE PROFIL APRÈS RESTAURATION SESSION
