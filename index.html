@@ -21645,9 +21645,7 @@ document.addEventListener("keydown", function(event){
   var compte = document.getElementById("accountModal");
 
   if (!welcome || !compte) {
-    console.error(
-      "Page de bienvenue : accountModal introuvable."
-    );
+    console.error("Page de bienvenue : éléments introuvables.");
     return;
   }
 
@@ -21676,40 +21674,48 @@ document.addEventListener("keydown", function(event){
   }
 
   function afficherMessage(texte) {
-    if (!message) return;
+    if (message) {
+      message.textContent = texte;
+      message.style.display = "block";
+    }
+  }
 
-    message.textContent = texte;
-    message.style.display = "block";
+  function effacerMessage() {
+    if (message) {
+      message.textContent = "";
+      message.style.display = "none";
+    }
   }
 
   function ouvrirFormulaire(type) {
+    effacerMessage();
+
     var utilisateur = utilisateurActuel();
 
-    if (utilisateur) {
-      if (type === "connexion") {
-        masquerBienvenue();
-        compte.style.display = "none";
-        return;
-      }
-
-      afficherMessage(
-        "Tu es déjà connecté. Appuie sur « Se connecter » " +
-        "pour accéder à l’accueil."
-      );
+    /*
+      Si une session utilisateur existe déjà,
+      le bouton Connexion permet d'accéder à l'accueil.
+      Il ne crée pas une nouvelle connexion.
+    */
+    if (utilisateur && type === "connexion") {
+      masquerBienvenue();
+      compte.style.display = "none";
       return;
     }
 
+    /*
+      Une personne non connectée doit utiliser
+      le véritable formulaire d'authentification.
+    */
     masquerBienvenue();
 
-    if (typeof ouvrirCompte === "function") {
-      ouvrirCompte();
-    } else {
+    if (typeof ouvrirCompte !== "function") {
       afficherBienvenue();
-      afficherMessage(
-        "Impossible d’ouvrir le compte. Réessaie."
-      );
+      afficherMessage("Impossible d'ouvrir le compte. Réessaie.");
       return;
     }
+
+    ouvrirCompte();
 
     var forms = document.getElementById("accountForms");
     var connected = document.getElementById("accountConnected");
@@ -21728,7 +21734,7 @@ document.addEventListener("keydown", function(event){
     }
 
     var accountMessage = document.getElementById("accountMessage");
-    if (accountMessage) accountMessage.innerHTML = "";
+    if (accountMessage) accountMessage.textContent = "";
   }
 
   window.mgWelcomeInscription = function () {
@@ -21740,15 +21746,16 @@ document.addEventListener("keydown", function(event){
   };
 
   /*
-    À chaque chargement de la page, la bienvenue est affichée.
-    On ne déconnecte personne et on ne supprime aucune session.
+    Afficher la bienvenue au démarrage.
+    La vérification réelle de la session doit être
+    réalisée par le système d'authentification existant.
   */
   afficherBienvenue();
 
   /*
-    Si l'utilisateur ferme le formulaire sans se connecter,
-    il revient à la page de bienvenue.
-    Après une connexion réussie, l'accueil reste visible.
+    Fermer le formulaire :
+    - utilisateur connecté : rester sur l'accueil ;
+    - utilisateur non connecté : revenir à la bienvenue.
   */
   var ancienneFermerModal = window.fermerModal;
 
@@ -21767,24 +21774,33 @@ document.addEventListener("keydown", function(event){
   }
 
   /*
-    La connexion existante reste responsable de l'authentification.
-    Ce complément masque la bienvenue uniquement après connexion.
+    Ne masquer la bienvenue après la connexion
+    que si la fonction de connexion a effectivement
+    renseigné utilisateurConnecte.
   */
   var ancienneConnexion = window.connecterCompte;
 
   if (typeof ancienneConnexion === "function") {
     window.connecterCompte = async function () {
-      await ancienneConnexion.apply(this, arguments);
+      var resultat;
+
+      try {
+        resultat = await ancienneConnexion.apply(this, arguments);
+      } catch (erreur) {
+        afficherMessage("Connexion impossible. Vérifie tes identifiants.");
+        throw erreur;
+      }
 
       if (utilisateurActuel()) {
         masquerBienvenue();
       }
+
+      return resultat;
     };
   }
 
 })();
 </script>
-
 <!-- FIN PAGE DE BIENVENUE MARCHÉ GUINÉE -->
 
 <style id="mg-welcome-compact">
