@@ -19282,6 +19282,227 @@ document.addEventListener("keydown", function(event){
 
 })();
 </script>
+
+<!-- CORRECTION PROFIL VENDEUR ET CHARGEMENT DES ANNONCES -->
+<script id="mg-correction-profil-vendeur">
+(function () {
+  "use strict";
+
+  window.mgOuvrirProfilVendeur = async function (
+    sellerId,
+    annonceCouranteId
+  ) {
+    if (!sellerId) {
+      alert("Impossible de retrouver l'identifiant du vendeur.");
+      return;
+    }
+
+    var modal = document.getElementById("mgProfilVendeurModal");
+
+    if (!modal) {
+      alert("La page du profil vendeur est introuvable.");
+      return;
+    }
+
+    var identite = document.getElementById("mgProfilIdentite");
+    var liste = document.getElementById("mgProfilAnnonces");
+
+    modal.style.display = "block";
+    modal.scrollTop = 0;
+
+    identite.textContent = "Chargement du profil vendeur...";
+    liste.innerHTML =
+      '<div class="mg-profil-message">Recherche de ses annonces...</div>';
+
+    function echapperTexte(valeur) {
+      if (typeof window.escapeHTML === "function") {
+        return window.escapeHTML(String(valeur || ""));
+      }
+
+      return String(valeur || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formaterPrix(prix) {
+      if (typeof window.formatPrix === "function") {
+        return window.formatPrix(prix);
+      }
+
+      return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
+    }
+
+    try {
+      var base = window.SUPABASE_URL;
+
+      if (!base || typeof window.supabaseFetch !== "function") {
+        throw new Error(
+          "La connexion Supabase n'est pas accessible."
+        );
+      }
+
+      /* 1. Récupérer le véritable profil vendeur */
+      var urlProfil =
+        base +
+        "/rest/v1/users?id=eq." +
+        encodeURIComponent(sellerId) +
+        "&select=id,full_name,photo_url&limit=1";
+
+      var resultatProfil = await window.supabaseFetch(urlProfil);
+
+      if (!Array.isArray(resultatProfil) || resultatProfil.length === 0) {
+        throw new Error(
+          "Aucun profil vendeur trouvé. Vérifie la table users."
+        );
+      }
+
+      var vendeur = resultatProfil[0];
+      var nom = vendeur.full_name || "Vendeur Marché Guinée";
+      var photo = vendeur.photo_url || "";
+
+      if (modal.style.display !== "block") return;
+
+      var initiale = nom.trim().charAt(0).toUpperCase() || "V";
+
+      identite.innerHTML = `
+        ${
+          photo
+            ? `<img class="mg-profil-photo"
+                    src="${echapperTexte(photo)}"
+                    alt="Photo du vendeur"
+                    onerror="this.style.display='none'">`
+            : `<div class="mg-profil-photo">${echapperTexte(initiale)}</div>`
+        }
+        <h1 class="mg-profil-nom">${echapperTexte(nom)}</h1>
+        <div class="mg-profil-sous-titre">
+          Vendeur sur Marché Guinée 🇬🇳
+        </div>
+      `;
+
+      /* 2. Charger directement les annonces depuis Supabase */
+      var urlAnnonces =
+        base +
+        "/rest/v1/listings?select=id,seller_id,title,price_gnf,condition,city,neighborhood,status,created_at" +
+        "&seller_id=eq." + encodeURIComponent(sellerId) +
+        "&status=eq.active" +
+        "&order=created_at.desc";
+
+      var annonces = await window.supabaseFetch(urlAnnonces);
+
+      if (!Array.isArray(annonces)) {
+        throw new Error(
+          "La liste des annonces n'a pas pu être récupérée."
+        );
+      }
+
+      annonces = annonces.filter(function (annonce) {
+        return String(annonce.id) !== String(annonceCouranteId);
+      });
+
+      if (modal.style.display !== "block") return;
+
+      if (annonces.length === 0) {
+        liste.innerHTML = `
+          <div class="mg-profil-message">
+            Ce vendeur n'a pas d'autres annonces actives pour le moment.
+          </div>
+        `;
+        return;
+      }
+
+      liste.innerHTML = "";
+
+      annonces.forEach(function (annonce) {
+        var carte = document.createElement("div");
+        carte.className = "mg-profil-annonce";
+
+        carte.innerHTML = `
+          <div class="mg-profil-annonce-photo">📦</div>
+          <div class="mg-profil-annonce-info">
+            <div class="mg-profil-annonce-nom">
+              ${echapperTexte(annonce.title || "Annonce")}
+            </div>
+            <div class="mg-profil-annonce-prix">
+              ${echapperTexte(formaterPrix(annonce.price_gnf))}
+            </div>
+          </div>
+        `;
+
+        carte.addEventListener("click", function () {
+          modal.style.display = "none";
+
+          if (typeof window.ouvrirDetailAnnonce === "function") {
+            window.ouvrirDetailAnnonce(annonce.id);
+          }
+        });
+
+        liste.appendChild(carte);
+
+        /* Charger la photo si la fonction existante est disponible */
+        if (typeof window.chargerImages === "function") {
+          Promise.resolve(window.chargerImages(annonce.id))
+            .then(function (urlImage) {
+              if (!urlImage || !carte.isConnected) return;
+
+              var zoneImage = carte.querySelector(
+                ".mg-profil-annonce-photo"
+              );
+
+              var image = document.createElement("img");
+              image.src = urlImage;
+              image.alt = annonce.title || "Photo de l'annonce";
+              image.loading = "lazy";
+
+              image.onerror = function () {
+                image.remove();
+                zoneImage.textContent = "📦";
+              };
+
+              zoneImage.textContent = "";
+              zoneImage.appendChild(image);
+            })
+            .catch(function (erreur) {
+              console.warn("Photo de l'annonce indisponible :", erreur);
+            });
+        }
+      });
+
+    } catch (erreur) {
+      console.error("Erreur profil vendeur :", erreur);
+
+      identite.innerHTML = `
+        <div class="mg-profil-message">
+          Impossible de charger le profil du vendeur.
+        </div>
+      `;
+
+      liste.innerHTML = `
+        <div class="mg-profil-message">
+          Le chargement a échoué. Vérifie la connexion puis réessaie.
+          <br><br>
+          <button type="button" id="mgReessayerProfil">
+            Réessayer
+          </button>
+        </div>
+      `;
+
+      var bouton = document.getElementById("mgReessayerProfil");
+
+      if (bouton) {
+        bouton.addEventListener("click", function () {
+          window.mgOuvrirProfilVendeur(
+            sellerId,
+            annonceCouranteId
+          );
+        });
+      }
+    }
+  };
+})();
+</script>
   
 </body>
 </html>
