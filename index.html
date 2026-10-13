@@ -17683,8 +17683,11 @@ document.addEventListener("keydown", function(event){
   }
 
   window.ouvrirMesAnnonces = function () {
-    if (!window.utilisateurConnecte ||
-        !window.utilisateurConnecte.id) {
+    if (
+       typeof utilisateurConnecte === "undefined" ||
+        !utilisateurConnecte ||
+        !utilisateurConnecte.id
+        ) {
       alert("Connecte-toi pour consulter tes annonces.");
 
       if (typeof window.ouvrirCompte === "function") {
