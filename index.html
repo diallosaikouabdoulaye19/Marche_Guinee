@@ -21786,6 +21786,156 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN PAGE DE BIENVENUE MARCHÉ GUINÉE -->
+
+<style id="mg-welcome-compact">
+  /* Page de bienvenue : tout afficher sans défilement */
+  #mgWelcomePage {
+    align-items: flex-start !important;
+    padding: max(8px, env(safe-area-inset-top)) 12px
+             max(8px, env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
+  }
+
+  #mgWelcomePage .mgw-container {
+    width: 100% !important;
+    max-width: 430px !important;
+    margin: 0 auto !important;
+  }
+
+  #mgWelcomePage .mgw-brand {
+    margin-bottom: 8px !important;
+  }
+
+  #mgWelcomePage .mgw-logo {
+    font-size: 22px !important;
+    margin-bottom: 3px !important;
+  }
+
+  #mgWelcomePage .mgw-slogan {
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  #mgWelcomePage .mgw-welcome-card {
+    padding: 12px 12px !important;
+    border-radius: 17px !important;
+  }
+
+  #mgWelcomePage .mgw-badge {
+    font-size: 10px !important;
+    padding: 5px 9px !important;
+    margin-bottom: 7px !important;
+  }
+
+  #mgWelcomePage .mgw-title {
+    font-size: 21px !important;
+    line-height: 1.12 !important;
+    margin-bottom: 6px !important;
+  }
+
+  #mgWelcomePage .mgw-description {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 9px !important;
+  }
+
+  #mgWelcomePage .mgw-button {
+    min-height: 38px !important;
+    padding: 7px 10px !important;
+    margin-top: 6px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
+  }
+
+  #mgWelcomePage .mgw-how-card {
+    margin-top: 8px !important;
+    padding: 10px 11px !important;
+    border-radius: 14px !important;
+  }
+
+  #mgWelcomePage .mgw-how-title {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4px !important;
+  }
+
+  #mgWelcomePage .mgw-how-intro {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
+  }
+
+  #mgWelcomePage .mgw-step {
+    gap: 7px !important;
+    padding: 4px 0 !important;
+  }
+
+  #mgWelcomePage .mgw-step-icon {
+    flex-basis: 27px !important;
+    width: 27px !important;
+    height: 27px !important;
+    border-radius: 8px !important;
+    font-size: 15px !important;
+  }
+
+  #mgWelcomePage .mgw-step-text {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+  }
+
+  #mgWelcomePage .mgw-step-text strong {
+    font-size: 10px !important;
+    margin-bottom: 1px !important;
+  }
+
+  #mgWelcomePage .mgw-important {
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+    padding: 6px 8px !important;
+    margin-top: 5px !important;
+  }
+
+  #mgWelcomePage .mgw-footer {
+    padding: 7px 3px 0 !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  #mgWelcomePage .mgw-message {
+    font-size: 11px !important;
+    padding: 7px !important;
+    margin-top: 6px !important;
+  }
+
+  /* Petits écrans : réduire encore les espaces */
+  @media (max-height: 750px) {
+    #mgWelcomePage {
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+    }
+
+    #mgWelcomePage .mgw-brand {
+      margin-bottom: 5px !important;
+    }
+
+    #mgWelcomePage .mgw-welcome-card {
+      padding: 9px 10px !important;
+    }
+
+    #mgWelcomePage .mgw-how-card {
+      margin-top: 6px !important;
+      padding: 8px 9px !important;
+    }
+
+    #mgWelcomePage .mgw-step {
+      padding: 3px 0 !important;
+    }
+
+    #mgWelcomePage .mgw-footer {
+      padding-top: 5px !important;
+    }
+  }
+</style>
   
 </body>
 </html>
