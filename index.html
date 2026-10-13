@@ -18038,6 +18038,727 @@ document.addEventListener("keydown", function(event){
   }
 })();
 </script>
+
+<!-- =====================================================
+     MARCHÉ GUINÉE — DÉTAIL ANNONCE PLEIN ÉCRAN
+     Profil vendeur + Favoris + Barre d'action fixe
+     ===================================================== -->
+<script id="mg-detail-annonce-plein-ecran">
+(function () {
+  "use strict";
+
+  if (window.mgDetailPleinEcranInstalle) return;
+  window.mgDetailPleinEcranInstalle = true;
+
+  /* ---------- STYLE DE LA PAGE ---------- */
+
+  var style = document.createElement("style");
+  style.id = "mg-style-detail-plein-ecran";
+
+  style.textContent = `
+    #detailModal {
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: #ffffff !important;
+      z-index: 9999 !important;
+    }
+
+    #detailModal .modal-box {
+      width: 100% !important;
+      max-width: none !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: #fff !important;
+    }
+
+    #detailModal .modal-box > .close {
+      display: none !important;
+    }
+
+    #detailContent {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+    }
+
+    .mg-detail-page {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      color: #17221d;
+      overflow: hidden;
+    }
+
+    .mg-detail-header {
+      flex: 0 0 auto;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 15px;
+      padding-top: max(10px, env(safe-area-inset-top));
+      border-bottom: 1px solid #edf0ee;
+      background: #fff;
+    }
+
+    .mg-detail-back {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      flex: 0 0 40px;
+      border-radius: 50%;
+      background: #f1f5f2;
+      color: #17221d;
+      font-size: 24px;
+    }
+
+    .mg-detail-header-title {
+      font-size: 17px;
+      font-weight: 800;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .mg-detail-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 15px 15px 24px;
+    }
+
+    .mg-seller-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      margin-bottom: 16px;
+      background: #f6f9f7;
+      border: 1px solid #e9efeb;
+      border-radius: 15px;
+    }
+
+    .mg-seller-avatar {
+      width: 49px;
+      height: 49px;
+      flex: 0 0 49px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e2f2e8;
+      color: #087f3f;
+      font-size: 23px;
+      font-weight: 800;
+      overflow: hidden;
+    }
+
+    .mg-seller-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mg-seller-name {
+      font-size: 15px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-seller-label {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #68756d;
+    }
+
+    .mg-seller-arrow {
+      color: #087f3f;
+      font-size: 24px;
+    }
+
+    .mg-detail-image {
+      width: 100%;
+      height: min(42vh, 380px);
+      min-height: 220px;
+      margin-bottom: 18px;
+      border-radius: 17px;
+      background: #f1f4f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .mg-detail-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .mg-detail-image-placeholder {
+      font-size: 70px;
+      opacity: .55;
+    }
+
+    .mg-detail-product-title {
+      margin: 0 0 10px;
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-detail-product-price {
+      margin: 0 0 15px;
+      font-size: 27px;
+      font-weight: 900;
+      color: #087f3f;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-detail-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 19px;
+    }
+
+    .mg-detail-badge {
+      padding: 7px 10px;
+      border-radius: 20px;
+      background: #eef8f1;
+      color: #087f3f;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mg-detail-description {
+      padding: 15px;
+      margin-bottom: 17px;
+      border-radius: 15px;
+      background: #f7f9f8;
+    }
+
+    .mg-detail-description-title {
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .mg-detail-description-text {
+      font-size: 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #536159;
+    }
+
+    .mg-detail-extra {
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #65716a;
+    }
+
+    .mg-detail-actions {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr .85fr;
+      gap: 7px;
+      padding: 10px 10px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      background: #fff;
+      border-top: 1px solid #e8ede9;
+      box-shadow: 0 -4px 15px rgba(0,0,0,.04);
+    }
+
+    .mg-detail-action {
+      min-width: 0;
+      min-height: 48px;
+      padding: 9px 4px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-detail-contact {
+      background: #edf6f0;
+      color: #087f3f;
+    }
+
+    .mg-detail-buy {
+      background: #087f3f;
+      color: #fff;
+    }
+
+    .mg-detail-favorite {
+      background: #fff0f2;
+      color: #b4233c;
+      border: 1px solid #f4d5db;
+    }
+
+    .mg-detail-favorite.is-favorite {
+      background: #ffe2e7;
+      border-color: #eaa6b3;
+    }
+
+    .mg-detail-action:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    @media (min-width: 700px) {
+      #detailModal {
+        padding: 20px !important;
+        overflow-y: auto !important;
+        background: rgba(0,0,0,.55) !important;
+      }
+
+      #detailModal .modal-box {
+        max-width: 680px !important;
+        height: calc(100dvh - 40px) !important;
+        max-height: calc(100dvh - 40px) !important;
+        margin: 0 auto !important;
+        border-radius: 18px !important;
+      }
+
+      .mg-detail-scroll {
+        padding: 20px 22px 25px;
+      }
+
+      .mg-detail-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  /* ---------- OUTILS ---------- */
+
+  function echapper(valeur) {
+    if (typeof escapeHTML === "function") {
+      return escapeHTML(String(valeur == null ? "" : valeur));
+    }
+
+    return String(valeur == null ? "" : valeur)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function obtenirUtilisateur() {
+    try {
+      return typeof utilisateurConnecte !== "undefined"
+        ? utilisateurConnecte
+        : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function obtenirAnnonces() {
+    try {
+      return typeof toutesLesAnnonces !== "undefined"
+        ? toutesLesAnnonces
+        : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function afficherPrix(prix) {
+    if (typeof formatPrix === "function") {
+      return formatPrix(prix);
+    }
+
+    return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
+  }
+
+  async function requeteSupabase(url, options) {
+    if (typeof supabaseFetch !== "function") {
+      throw new Error("Connexion Supabase indisponible.");
+    }
+
+    return await supabaseFetch(url, options || {});
+  }
+
+  /* ---------- CHARGER LE PROFIL DU VENDEUR ---------- */
+
+  async function chargerProfilVendeur(sellerId) {
+    if (!sellerId) return null;
+
+    try {
+      var lignes = await requeteSupabase(
+        SUPABASE_URL +
+        "/rest/v1/users?id=eq." +
+        encodeURIComponent(sellerId) +
+        "&select=id,full_name,photo_url&limit=1"
+      );
+
+      if (Array.isArray(lignes) && lignes.length) {
+        return lignes[0];
+      }
+    } catch (erreur) {
+      console.warn("Profil vendeur non disponible :", erreur);
+    }
+
+    return null;
+  }
+
+  /* ---------- ÉTAT DU FAVORI ---------- */
+
+  async function verifierFavori(listingId, userId) {
+    var lignes = await requeteSupabase(
+      SUPABASE_URL +
+      "/rest/v1/favorites" +
+      "?user_id=eq." + encodeURIComponent(userId) +
+      "&listing_id=eq." + encodeURIComponent(listingId) +
+      "&select=id&limit=1"
+    );
+
+    return Array.isArray(lignes) && lignes.length > 0;
+  }
+
+  async function actualiserBoutonFavori(listingId) {
+    var bouton = document.getElementById("mgBoutonFavori");
+    if (!bouton) return;
+
+    var user = obtenirUtilisateur();
+
+    if (!user || !user.id) {
+      bouton.innerHTML = "♡<br>Favoris";
+      bouton.classList.remove("is-favorite");
+      bouton.setAttribute("aria-pressed", "false");
+      return;
+    }
+
+    try {
+      var estFavori = await verifierFavori(listingId, user.id);
+
+      bouton = document.getElementById("mgBoutonFavori");
+      if (!bouton) return;
+
+      bouton.innerHTML = estFavori
+        ? "♥<br>Enregistré"
+        : "♡<br>Favoris";
+
+      bouton.classList.toggle("is-favorite", estFavori);
+      bouton.setAttribute("aria-pressed", String(estFavori));
+    } catch (erreur) {
+      console.warn("Impossible de vérifier le favori :", erreur);
+    }
+  }
+
+  /* ---------- AJOUTER OU RETIRER UN FAVORI ---------- */
+
+  window.mgBasculerFavori = async function (listingId) {
+    var user = obtenirUtilisateur();
+
+    if (!user || !user.id) {
+      alert("Connecte-toi pour ajouter cette annonce à tes favoris.");
+      if (typeof ouvrirCompte === "function") ouvrirCompte();
+      return;
+    }
+
+    var bouton = document.getElementById("mgBoutonFavori");
+    if (bouton) bouton.disabled = true;
+
+    try {
+      var estFavori = await verifierFavori(listingId, user.id);
+
+      if (estFavori) {
+        await requeteSupabase(
+          SUPABASE_URL +
+          "/rest/v1/favorites" +
+          "?user_id=eq." + encodeURIComponent(user.id) +
+          "&listing_id=eq." + encodeURIComponent(listingId),
+          {
+            method: "DELETE",
+            headers: {
+              "Prefer": "return=minimal"
+            }
+          }
+        );
+
+        alert("Annonce retirée de tes favoris.");
+      } else {
+        await requeteSupabase(
+          SUPABASE_URL + "/rest/v1/favorites",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify({
+              user_id: user.id,
+              listing_id: listingId
+            })
+          }
+        );
+
+        alert("Annonce ajoutée à tes favoris ❤️");
+      }
+
+      await actualiserBoutonFavori(listingId);
+
+    } catch (erreur) {
+      console.error("Erreur favoris :", erreur);
+
+      alert(
+        "Impossible de modifier tes favoris. " +
+        "Vérifie ta connexion puis réessaie."
+      );
+    } finally {
+      bouton = document.getElementById("mgBoutonFavori");
+      if (bouton) bouton.disabled = false;
+    }
+  };
+
+  /* ---------- OUVERTURE DU DÉTAIL ---------- */
+
+  window.ouvrirDetailAnnonce = async function (id) {
+    var annonces = obtenirAnnonces();
+
+    var annonce = annonces.find(function (a) {
+      return String(a.id) === String(id);
+    });
+
+    if (!annonce) {
+      alert("Annonce introuvable.");
+      return;
+    }
+
+    var modal = document.getElementById("detailModal");
+    var content = document.getElementById("detailContent");
+
+    if (!modal || !content) {
+      alert("Impossible d'ouvrir le détail de cette annonce.");
+      return;
+    }
+
+    modal.style.display = "block";
+
+    content.innerHTML = `
+      <div class="mg-detail-page">
+        <div class="mg-detail-header">
+          <button class="mg-detail-back"
+                  onclick="fermerModal('detailModal')"
+                  aria-label="Retour">‹</button>
+          <div class="mg-detail-header-title">Détail de l'annonce</div>
+        </div>
+        <div class="mg-detail-scroll">
+          <div style="padding:30px;text-align:center;color:#68736d">
+            Chargement de l'annonce...
+          </div>
+        </div>
+      </div>
+    `;
+
+    try {
+      var resultats = await Promise.all([
+        typeof chargerImages === "function"
+          ? chargerImages(annonce.id).catch(function () { return null; })
+          : Promise.resolve(null),
+        chargerProfilVendeur(annonce.seller_id)
+      ]);
+
+      var image = resultats[0];
+      var vendeur = resultats[1];
+
+      var nomVendeur =
+        (vendeur && vendeur.full_name) ||
+        "Vendeur Marché Guinée";
+
+      var photoVendeur =
+        vendeur && vendeur.photo_url
+          ? vendeur.photo_url
+          : "";
+
+      var initiale = nomVendeur.trim().charAt(0).toUpperCase() || "👤";
+
+      var imageHTML = image
+        ? `<img src="${echapper(image)}"
+                alt="${echapper(annonce.title || "Annonce")}"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+           <div class="mg-detail-image-placeholder"
+                style="display:none">📦</div>`
+        : `<div class="mg-detail-image-placeholder">📦</div>`;
+
+      var avatarHTML = photoVendeur
+        ? `<img class="mg-seller-avatar"
+                src="${echapper(photoVendeur)}"
+                alt="Photo du vendeur"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="mg-seller-avatar" style="display:none">${echapper(initiale)}</div>`
+        : `<div class="mg-seller-avatar">${echapper(initiale)}</div>`;
+
+      var badges = "";
+
+      if (annonce.condition) {
+        badges += `
+          <span class="mg-detail-badge">
+            🏷️ État : ${echapper(annonce.condition)}
+          </span>
+        `;
+      }
+
+      badges += `
+        <span class="mg-detail-badge">
+          📍 ${echapper(annonce.city || "Guinée")}
+        </span>
+      `;
+
+      if (annonce.neighborhood) {
+        badges += `
+          <span class="mg-detail-badge">
+            ${echapper(annonce.neighborhood)}
+          </span>
+        `;
+      }
+
+      content.innerHTML = `
+        <div class="mg-detail-page">
+
+          <div class="mg-detail-header">
+            <button class="mg-detail-back"
+                    onclick="fermerModal('detailModal')"
+                    aria-label="Retour">‹</button>
+            <div class="mg-detail-header-title">
+              Détail de l'annonce
+            </div>
+          </div>
+
+          <div class="mg-detail-scroll">
+
+            <div class="mg-seller-card">
+              ${avatarHTML}
+              <div class="mg-seller-info">
+                <div class="mg-seller-name">
+                  ${echapper(nomVendeur)}
+                </div>
+                <div class="mg-seller-label">
+                  Vendeur sur Marché Guinée 🇬🇳
+                </div>
+              </div>
+              <div class="mg-seller-arrow">›</div>
+            </div>
+
+            <div class="mg-detail-image">
+              ${imageHTML}
+            </div>
+
+            <h1 class="mg-detail-product-title">
+              ${echapper(annonce.title || "Sans titre")}
+            </h1>
+
+            <div class="mg-detail-product-price">
+              ${echapper(afficherPrix(annonce.price_gnf))}
+            </div>
+
+            <div class="mg-detail-badges">
+              ${badges}
+            </div>
+
+            <div class="mg-detail-description">
+              <div class="mg-detail-description-title">
+                📝 Description
+              </div>
+              <div class="mg-detail-description-text">${echapper(
+                annonce.description || "Aucune description renseignée."
+              )}</div>
+            </div>
+
+            <div class="mg-detail-extra">
+              👁️ ${Number(annonce.views || 0)} vue(s)
+            </div>
+
+            <div class="mg-detail-extra">
+              📅 Publication : ${echapper(
+                typeof formatDate === "function"
+                  ? formatDate(annonce.created_at)
+                  : ""
+              )}
+            </div>
+
+          </div>
+
+          <div class="mg-detail-actions">
+
+            <button class="mg-detail-action mg-detail-contact"
+                    onclick="ouvrirMessageVendeur('${echapper(annonce.id)}')">
+              💬<br>Contacter
+            </button>
+
+            <button class="mg-detail-action mg-detail-buy"
+                    onclick="ouvrirPaiement('${echapper(annonce.id)}')">
+              🛒<br>Acheter
+            </button>
+
+            <button id="mgBoutonFavori"
+                    class="mg-detail-action mg-detail-favorite"
+                    aria-pressed="false"
+                    onclick="mgBasculerFavori('${echapper(annonce.id)}')">
+              ♡<br>Favoris
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+      actualiserBoutonFavori(annonce.id);
+
+      if (typeof enregistrerVue === "function") {
+        enregistrerVue(annonce);
+      }
+
+    } catch (erreur) {
+      console.error("Erreur détail annonce :", erreur);
+
+      content.innerHTML = `
+        <div class="mg-detail-page">
+          <div class="mg-detail-header">
+            <button class="mg-detail-back"
+                    onclick="fermerModal('detailModal')">‹</button>
+            <div class="mg-detail-header-title">Détail de l'annonce</div>
+          </div>
+          <div class="mg-detail-scroll">
+            <div class="error">
+              Impossible d'afficher cette annonce.
+              Réessaie dans quelques instants.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  };
+
+})();
+</script>
   
 </body>
 </html>
