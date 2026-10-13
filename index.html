@@ -17734,9 +17734,14 @@ document.addEventListener("keydown", function(event){
     afficherListe();
   };
 
-  window.chargerMesAnnonces = async function () {
+ window.chargerMesAnnonces = async function () {
     var numeroGeneration = ++generation;
-    var user = window.utilisateurConnecte;
+
+    var user =
+        typeof utilisateurConnecte !== "undefined"
+            ? utilisateurConnecte
+            : null;
+
     var liste = element("mgMaList");
 
     if (!user || !user.id) {
@@ -17748,8 +17753,8 @@ document.addEventListener("keydown", function(event){
       '<div class="mg-ma-empty">Chargement de tes annonces...</div>';
 
     try {
-      if (typeof window.supabaseFetch !== "function" ||
-          typeof window.SUPABASE_URL === "undefined") {
+      if (typeof supabaseFetch !== "function" ||
+          typeof SUPABASE_URL === "undefined") {
         throw new Error("Le service de données n'est pas disponible.");
       }
 
@@ -17767,7 +17772,7 @@ document.addEventListener("keydown", function(event){
         "created_at"
       ].join(",");
 
-      var url = window.SUPABASE_URL +
+      var url = SUPABASE_URL +
         "/rest/v1/listings?select=" + encodeURIComponent(champs) +
         "&seller_id=eq." + encodeURIComponent(user.id) +
         "&order=created_at.desc";
