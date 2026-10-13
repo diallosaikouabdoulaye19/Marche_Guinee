@@ -17942,6 +17942,102 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN — MES ANNONCES V1 -->
+
+<script id="mg-uniformiser-rubriques-compte">
+(function () {
+  "use strict";
+  if (window.mgUniformiserRubriquesCompte) return;
+  window.mgUniformiserRubriquesCompte = true;
+  function uniformiserRubriques() {
+    var actions = document.querySelector(
+      "#accountConnected .form-actions"
+    );
+    if (!actions) return;
+    var configurations = [
+      {
+        action: "ouvrirSignalement",
+        icon: "⚠️",
+        label: "Signaler un problème"
+      },
+      {
+        action: "ouvrirMesAchats",
+        icon: "🛒",
+        label: "Mes achats"
+      },
+      {
+        action: "ouvrirComptePaiement",
+        icon: "🏦",
+        label: "Compte de paiement"
+      },
+      {
+        action: "ouvrirMesVentes",
+        icon: "📦",
+        label: "Mes ventes"
+      },
+      {
+        action: "ouvrirMessages",
+        icon: "💬",
+        label: "Mes messages"
+      },
+      {
+        action: "ouvrirVente",
+        icon: "➕",
+        label: "Publier une annonce"
+      },
+      {
+        action: "deconnecter",
+        icon: "🚪",
+        label: "Se déconnecter"
+      }
+    ];
+    actions.querySelectorAll("button").forEach(function (bouton) {
+      if (bouton.id === "mgBoutonMesAnnonces") return;
+      if (bouton.classList.contains("mg-account-balance")) return;
+      if (bouton.classList.contains("mg-delivery-menu-row")) {
+        bouton.classList.add("mg-account-menu-row");
+        bouton.innerHTML =
+          '<span class="mg-menu-icon">🚚</span>' +
+          '<span class="mg-menu-label">Vérification de livraison</span>' +
+          '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+        return;
+      }
+      if (bouton.id === "boutonAdmin") {
+        bouton.classList.add("mg-account-menu-row");
+        bouton.innerHTML =
+          '<span class="mg-menu-icon">🛡️</span>' +
+          '<span class="mg-menu-label">Tableau de bord admin</span>' +
+          '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+        return;
+      }
+      var action = bouton.getAttribute("onclick") || "";
+      var configuration = configurations.find(function (item) {
+        return action.indexOf(item.action) !== -1;
+      });
+      if (!configuration) return;
+      bouton.classList.add("mg-account-menu-row");
+      if (configuration.action === "deconnecter") {
+        bouton.classList.add("mg-account-logout");
+      }
+      bouton.innerHTML =
+        '<span class="mg-menu-icon">' +
+          configuration.icon +
+        '</span>' +
+        '<span class="mg-menu-label">' +
+          configuration.label +
+        '</span>' +
+        '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      uniformiserRubriques
+    );
+  } else {
+    uniformiserRubriques();
+  }
+})();
+</script>
   
 </body>
 </html>
