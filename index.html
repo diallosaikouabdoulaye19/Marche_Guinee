@@ -17325,6 +17325,615 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN DU CORRECTIF MON COMPTE V6 -->
+
+<!-- =====================================================
+     MARCHÉ GUINÉE 🇬🇳 — MES ANNONCES V1
+     Consultation des annonces du vendeur connecté
+===================================================== -->
+
+<style id="mg-mes-annonces-style">
+#mgMesAnnoncesModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #f5f8f6;
+  color: #17221d;
+}
+
+#mgMesAnnoncesModal * {
+  box-sizing: border-box;
+}
+
+#mgMesAnnoncesModal .mg-ma-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  padding-top: max(15px, env(safe-area-inset-top));
+  background: #fff;
+  border-bottom: 1px solid #e6ece8;
+}
+
+#mgMesAnnoncesModal .mg-ma-close {
+  flex: 0 0 43px;
+  width: 43px;
+  height: 43px;
+  padding: 0;
+  border-radius: 50%;
+  background: #edf7f0;
+  color: #087f3f;
+  font-size: 26px;
+}
+
+#mgMesAnnoncesModal .mg-ma-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+#mgMesAnnoncesModal .mg-ma-heading strong {
+  display: block;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+#mgMesAnnoncesModal .mg-ma-heading span {
+  display: block;
+  margin-top: 4px;
+  color: #77837b;
+  font-size: 12px;
+}
+
+#mgMesAnnoncesModal .mg-ma-content {
+  max-width: 800px;
+  margin: auto;
+  padding: 16px;
+  padding-bottom: 35px;
+}
+
+#mgMesAnnoncesModal .mg-ma-summary {
+  padding: 19px;
+  margin-bottom: 17px;
+  border-radius: 19px;
+  background: linear-gradient(135deg, #087f3f, #13a653);
+  color: white;
+}
+
+#mgMesAnnoncesModal .mg-ma-summary small {
+  display: block;
+  font-size: 12px;
+  opacity: .9;
+}
+
+#mgMesAnnoncesModal .mg-ma-count {
+  display: block;
+  margin-top: 5px;
+  font-size: 31px;
+  font-weight: 900;
+}
+
+#mgMesAnnoncesModal .mg-ma-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 3px 0 13px;
+  margin-bottom: 5px;
+}
+
+#mgMesAnnoncesModal .mg-ma-filter {
+  flex: 0 0 auto;
+  padding: 10px 13px;
+  border: 1px solid #e1e9e3;
+  border-radius: 25px;
+  background: white;
+  color: #415047;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#mgMesAnnoncesModal .mg-ma-filter.active {
+  background: #087f3f;
+  color: white;
+  border-color: #087f3f;
+}
+
+#mgMesAnnoncesModal .mg-ma-list {
+  display: grid;
+  gap: 13px;
+}
+
+#mgMesAnnoncesModal .mg-ma-card {
+  display: flex;
+  gap: 13px;
+  padding: 12px;
+  border: 1px solid #e6ece8;
+  border-radius: 17px;
+  background: white;
+  box-shadow: 0 3px 12px rgba(0,0,0,.035);
+}
+
+#mgMesAnnoncesModal .mg-ma-image {
+  flex: 0 0 108px;
+  width: 108px;
+  height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f0f4f1;
+  font-size: 33px;
+}
+
+#mgMesAnnoncesModal .mg-ma-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#mgMesAnnoncesModal .mg-ma-details {
+  flex: 1;
+  min-width: 0;
+}
+
+#mgMesAnnoncesModal .mg-ma-title {
+  margin: 2px 0 8px;
+  color: #17221d;
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+#mgMesAnnoncesModal .mg-ma-price {
+  margin-bottom: 7px;
+  color: #087f3f;
+  font-size: 16px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+#mgMesAnnoncesModal .mg-ma-meta {
+  margin-top: 5px;
+  color: #78847c;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#mgMesAnnoncesModal .mg-ma-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 8px;
+  border-radius: 20px;
+  background: #e8f8ed;
+  color: #087f3f;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+#mgMesAnnoncesModal .mg-ma-badge.paused {
+  background: #fff4d9;
+  color: #8a5b00;
+}
+
+#mgMesAnnoncesModal .mg-ma-badge.sold {
+  background: #fce8e8;
+  color: #b4232d;
+}
+
+#mgMesAnnoncesModal .mg-ma-empty {
+  padding: 35px 20px;
+  border: 1px solid #e6ece8;
+  border-radius: 18px;
+  background: white;
+  text-align: center;
+  color: #718077;
+  line-height: 1.7;
+}
+
+#mgMesAnnoncesModal .mg-ma-reload {
+  width: 100%;
+  margin-top: 15px;
+  padding: 13px;
+  border-radius: 12px;
+  background: #edf7f0;
+  color: #087f3f;
+  font-weight: 800;
+}
+
+@media(max-width:380px) {
+  #mgMesAnnoncesModal .mg-ma-content {
+    padding: 12px;
+  }
+
+  #mgMesAnnoncesModal .mg-ma-card {
+    gap: 9px;
+    padding: 9px;
+  }
+
+  #mgMesAnnoncesModal .mg-ma-image {
+    flex-basis: 88px;
+    width: 88px;
+    height: 105px;
+  }
+
+  #mgMesAnnoncesModal .mg-ma-title {
+    font-size: 13px;
+  }
+
+  #mgMesAnnoncesModal .mg-ma-price {
+    font-size: 14px;
+  }
+}
+</style>
+
+<div id="mgMesAnnoncesModal" aria-label="Mes annonces">
+  <header class="mg-ma-header">
+    <button type="button" class="mg-ma-close"
+            onclick="fermerMesAnnonces()"
+            aria-label="Retour à Mon compte">×</button>
+
+    <div class="mg-ma-heading">
+      <strong>🏷️ Mes annonces</strong>
+      <span>Gère et consulte tes publications</span>
+    </div>
+  </header>
+
+  <main class="mg-ma-content">
+    <section class="mg-ma-summary">
+      <small>MES PUBLICATIONS</small>
+      <span id="mgMaCount" class="mg-ma-count">—</span>
+      <small id="mgMaSummaryText">Chargement de tes annonces...</small>
+    </section>
+
+    <nav class="mg-ma-filters" aria-label="Filtrer mes annonces">
+      <button type="button" class="mg-ma-filter active"
+              data-mg-ma-filter="all"
+              onclick="filtrerMesAnnonces('all',this)">Toutes</button>
+
+      <button type="button" class="mg-ma-filter"
+              data-mg-ma-filter="active"
+              onclick="filtrerMesAnnonces('active',this)">🟢 Actives</button>
+
+      <button type="button" class="mg-ma-filter"
+              data-mg-ma-filter="paused"
+              onclick="filtrerMesAnnonces('paused',this)">⏸️ En pause</button>
+
+      <button type="button" class="mg-ma-filter"
+              data-mg-ma-filter="sold"
+              onclick="filtrerMesAnnonces('sold',this)">✅ Vendues</button>
+    </nav>
+
+    <section id="mgMaList" class="mg-ma-list">
+      <div class="mg-ma-empty">Chargement de tes annonces...</div>
+    </section>
+
+    <button type="button" class="mg-ma-reload"
+            onclick="chargerMesAnnonces()">
+      ↻ Actualiser mes annonces
+    </button>
+  </main>
+</div>
+
+<script id="mg-mes-annonces-script">
+(function () {
+  "use strict";
+
+  if (window.mgMesAnnoncesV1) return;
+  window.mgMesAnnoncesV1 = true;
+
+  var annonces = [];
+  var filtre = "all";
+  var generation = 0;
+
+  function element(id) {
+    return document.getElementById(id);
+  }
+
+  function html(value) {
+    if (typeof window.escapeHTML === "function") {
+      return window.escapeHTML(value == null ? "" : String(value));
+    }
+
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function prix(value) {
+    if (typeof window.formatPrix === "function") {
+      return window.formatPrix(value);
+    }
+
+    return Number(value || 0).toLocaleString("fr-FR") + " GNF";
+  }
+
+  function statut(value) {
+    var s = String(value || "").toLowerCase();
+
+    if (s === "active") return "Active";
+    if (s === "paused") return "En pause";
+    if (s === "sold") return "Vendue";
+
+    return value || "Non précisé";
+  }
+
+  function classeStatut(value) {
+    var s = String(value || "").toLowerCase();
+
+    if (s === "paused") return "paused";
+    if (s === "sold") return "sold";
+
+    return "";
+  }
+
+  function messageVide(texte) {
+    element("mgMaList").innerHTML =
+      '<div class="mg-ma-empty">' + html(texte) + '</div>';
+  }
+
+  window.ouvrirMesAnnonces = function () {
+    if (!window.utilisateurConnecte ||
+        !window.utilisateurConnecte.id) {
+      alert("Connecte-toi pour consulter tes annonces.");
+
+      if (typeof window.ouvrirCompte === "function") {
+        window.ouvrirCompte();
+      }
+
+      return;
+    }
+
+    element("mgMesAnnoncesModal").style.display = "block";
+    element("mgMesAnnoncesModal").scrollTop = 0;
+
+    filtre = "all";
+
+    element("mgMesAnnoncesModal")
+      .querySelectorAll(".mg-ma-filter")
+      .forEach(function (button) {
+        button.classList.toggle(
+          "active",
+          button.getAttribute("data-mg-ma-filter") === "all"
+        );
+      });
+
+    window.chargerMesAnnonces();
+  };
+
+  window.fermerMesAnnonces = function () {
+    element("mgMesAnnoncesModal").style.display = "none";
+
+    if (typeof window.ouvrirCompte === "function") {
+      window.ouvrirCompte();
+    }
+  };
+
+  window.filtrerMesAnnonces = function (nouveauFiltre, bouton) {
+    filtre = nouveauFiltre;
+
+    element("mgMesAnnoncesModal")
+      .querySelectorAll(".mg-ma-filter")
+      .forEach(function (item) {
+        item.classList.toggle("active", item === bouton);
+      });
+
+    afficherListe();
+  };
+
+  window.chargerMesAnnonces = async function () {
+    var numeroGeneration = ++generation;
+    var user = window.utilisateurConnecte;
+    var liste = element("mgMaList");
+
+    if (!user || !user.id) {
+      messageVide("Connecte-toi pour consulter tes annonces.");
+      return;
+    }
+
+    liste.innerHTML =
+      '<div class="mg-ma-empty">Chargement de tes annonces...</div>';
+
+    try {
+      if (typeof window.supabaseFetch !== "function" ||
+          typeof window.SUPABASE_URL === "undefined") {
+        throw new Error("Le service de données n'est pas disponible.");
+      }
+
+      var champs = [
+        "id",
+        "seller_id",
+        "title",
+        "description",
+        "price_gnf",
+        "condition",
+        "city",
+        "neighborhood",
+        "status",
+        "views",
+        "created_at"
+      ].join(",");
+
+      var url = window.SUPABASE_URL +
+        "/rest/v1/listings?select=" + encodeURIComponent(champs) +
+        "&seller_id=eq." + encodeURIComponent(user.id) +
+        "&order=created_at.desc";
+
+      var resultat = await window.supabaseFetch(url);
+
+      if (numeroGeneration !== generation) return;
+
+      annonces = Array.isArray(resultat) ? resultat : [];
+
+      var total = annonces.length;
+      var actives = annonces.filter(function (a) {
+        return String(a.status || "").toLowerCase() === "active";
+      }).length;
+
+      element("mgMaCount").textContent = String(total);
+      element("mgMaSummaryText").textContent =
+        actives + (actives > 1 ? " annonces actives" : " annonce active");
+
+      afficherListe();
+
+    } catch (erreur) {
+      console.error("Erreur Mes annonces :", erreur);
+
+      element("mgMaCount").textContent = "—";
+      element("mgMaSummaryText").textContent = "Chargement impossible";
+
+      messageVide(
+        "Impossible de charger tes annonces. Vérifie ta connexion puis appuie sur « Actualiser mes annonces »."
+      );
+    }
+  };
+
+  function afficherListe() {
+    var liste = element("mgMaList");
+
+    var resultat = annonces.filter(function (annonce) {
+      if (filtre === "all") return true;
+
+      return String(annonce.status || "").toLowerCase() === filtre;
+    });
+
+    if (!resultat.length) {
+      var texte = filtre === "all"
+        ? "Tu n'as pas encore publié d'annonce avec ce compte."
+        : "Aucune annonce dans cette catégorie.";
+
+      messageVide(texte);
+      return;
+    }
+
+    liste.innerHTML = "";
+
+    resultat.forEach(function (annonce) {
+      var carte = document.createElement("article");
+      carte.className = "mg-ma-card";
+
+      var image = document.createElement("div");
+      image.className = "mg-ma-image";
+      image.textContent = "📦";
+
+      var details = document.createElement("div");
+      details.className = "mg-ma-details";
+
+      details.innerHTML =
+        '<div class="mg-ma-title">' +
+          html(annonce.title || "Annonce sans titre") +
+        '</div>' +
+        '<div class="mg-ma-price">' +
+          html(prix(annonce.price_gnf)) +
+        '</div>' +
+        '<div class="mg-ma-meta">📍 ' +
+          html(annonce.city || "Guinée") +
+          (annonce.neighborhood
+            ? " · " + html(annonce.neighborhood)
+            : "") +
+        '</div>' +
+        '<div class="mg-ma-meta">👁️ ' +
+          html(annonce.views || 0) + ' vue(s)</div>' +
+        '<span class="mg-ma-badge ' +
+          classeStatut(annonce.status) + '">' +
+          html(statut(annonce.status)) +
+        '</span>';
+
+      carte.appendChild(image);
+      carte.appendChild(details);
+      liste.appendChild(carte);
+
+      if (typeof window.chargerImages === "function" && annonce.id) {
+        window.chargerImages(annonce.id)
+          .then(function (url) {
+            if (!url || !image.isConnected) return;
+
+            var img = document.createElement("img");
+            img.src = url;
+            img.alt = annonce.title || "Photo de l'annonce";
+            img.loading = "lazy";
+
+            img.onerror = function () {
+              img.remove();
+              image.textContent = "📦";
+            };
+
+            image.textContent = "";
+            image.appendChild(img);
+          })
+          .catch(function (erreur) {
+            console.warn("Photo de l'annonce indisponible :", erreur);
+          });
+      }
+    });
+  }
+
+  /* Ajouter l'accès dans Mon compte sans remplacer les fonctions existantes. */
+  function ajouterBoutonCompte() {
+    var actions = element("accountConnected");
+    if (!actions) return;
+
+    actions = actions.querySelector(".form-actions");
+    if (!actions || element("mgBoutonMesAnnonces")) return;
+
+    var bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.id = "mgBoutonMesAnnonces";
+    bouton.className = "mg-account-menu-row";
+
+    bouton.innerHTML =
+      '<span class="mg-menu-icon">🏷️</span>' +
+      '<span class="mg-menu-label">Mes annonces</span>' +
+      '<span class="mg-menu-arrow">›</span>';
+
+    bouton.addEventListener("click", function () {
+      if (typeof window.fermerModal === "function") {
+        window.fermerModal("accountModal");
+      } else {
+        element("accountModal").style.display = "none";
+      }
+
+      window.ouvrirMesAnnonces();
+    });
+
+    var boutonVentes = actions.querySelector(
+      'button[onclick*="ouvrirMesVentes"]'
+    );
+
+    if (boutonVentes && boutonVentes.parentNode === actions) {
+      actions.insertBefore(bouton, boutonVentes);
+    } else {
+      actions.insertBefore(bouton, actions.firstChild);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ajouterBoutonCompte);
+  } else {
+    ajouterBoutonCompte();
+  }
+
+  var observer = new MutationObserver(ajouterBoutonCompte);
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+})();
+</script>
+
+<!-- FIN — MES ANNONCES V1 -->
   
 </body>
 </html>
