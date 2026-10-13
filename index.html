@@ -18759,6 +18759,529 @@ document.addEventListener("keydown", function(event){
 
 })();
 </script>
+
+<!-- =====================================================
+     MARCHÉ GUINÉE — COMPLÉMENT DÉTAIL ANNONCE
+     Profil vendeur + autres annonces + pied de page
+     Préserve le plein écran et les favoris existants.
+     ===================================================== -->
+<script id="mg-complement-profil-vendeur">
+(function () {
+  "use strict";
+
+  if (window.mgComplementProfilVendeurInstalle) return;
+  window.mgComplementProfilVendeurInstalle = true;
+
+  var style = document.createElement("style");
+  style.textContent = `
+    /* Pied de page dans le détail de l'annonce */
+    #detailContent .mg-detail-scroll {
+      padding-bottom: 0 !important;
+    }
+
+    #detailContent .mg-detail-scroll > .mg-detail-actions {
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
+      margin: 16px -15px 0;
+      padding: 10px 10px max(10px, env(safe-area-inset-bottom));
+      background: #fff;
+      border-top: 1px solid #e8ede9;
+      box-shadow: 0 -4px 15px rgba(0,0,0,.05);
+    }
+
+    .mg-detail-footer {
+      margin: 0 -15px;
+      padding: 20px 14px;
+      background: #17221d;
+      color: #dce5df;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .mg-detail-footer strong {
+      color: #fff;
+      font-size: 15px;
+    }
+
+    /* Profil vendeur plein écran */
+    #mgProfilVendeurModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      background: #f5f7f6;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mg-profil-page {
+      min-height: 100%;
+      background: #f5f7f6;
+      color: #17221d;
+    }
+
+    .mg-profil-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: max(12px, env(safe-area-inset-top)) 15px 12px;
+      background: #fff;
+      border-bottom: 1px solid #e8ede9;
+    }
+
+    .mg-profil-retour {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 50%;
+      background: #eef4f0;
+      color: #17221d;
+      font-size: 25px;
+    }
+
+    .mg-profil-titre {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .mg-profil-identite {
+      margin: 15px;
+      padding: 22px 15px;
+      border-radius: 20px;
+      background: #fff;
+      text-align: center;
+      box-shadow: 0 3px 14px rgba(0,0,0,.04);
+    }
+
+    .mg-profil-photo {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e2f2e8;
+      color: #087f3f;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .mg-profil-nom {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-profil-sous-titre {
+      margin-top: 7px;
+      color: #68756d;
+      font-size: 13px;
+    }
+
+    .mg-profil-annonces-titre {
+      margin: 22px 15px 12px;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .mg-profil-annonces {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 15px 25px;
+    }
+
+    .mg-profil-annonce {
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 3px 12px rgba(0,0,0,.06);
+      cursor: pointer;
+    }
+
+    .mg-profil-annonce-photo {
+      height: 145px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #edf1ee;
+      font-size: 42px;
+    }
+
+    .mg-profil-annonce-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mg-profil-annonce-info {
+      padding: 10px;
+    }
+
+    .mg-profil-annonce-nom {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-profil-annonce-prix {
+      margin-top: 7px;
+      color: #087f3f;
+      font-size: 15px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .mg-profil-message {
+      margin: 15px;
+      padding: 20px;
+      border-radius: 14px;
+      background: #fff;
+      color: #68756d;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    @media (min-width: 700px) {
+      .mg-profil-annonces {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .mg-profil-annonce-photo {
+        height: 180px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function echapper(texte) {
+    if (typeof window.escapeHTML === "function") {
+      return window.escapeHTML(String(texte == null ? "" : texte));
+    }
+
+    return String(texte == null ? "" : texte)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function obtenirAnnonces() {
+    try {
+      return typeof toutesLesAnnonces !== "undefined"
+        ? toutesLesAnnonces
+        : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function prixFormate(prix) {
+    if (typeof window.formatPrix === "function") {
+      return window.formatPrix(prix);
+    }
+
+    return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
+  }
+
+  function obtenirIdAnnonceCourante(page) {
+    var boutonAcheter = page.querySelector(
+      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
+    );
+
+    if (!boutonAcheter) return "";
+
+    var texte = boutonAcheter.getAttribute("onclick") || "";
+    var resultat = texte.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
+
+    return resultat ? resultat[1] : "";
+  }
+
+  /* Déplace les boutons dans la zone défilante pour placer
+     le pied de page juste après eux. Les boutons restent collés
+     en bas pendant le défilement. */
+  function completerDetail() {
+    var contenu = document.getElementById("detailContent");
+    if (!contenu) return;
+
+    var page = contenu.querySelector(".mg-detail-page");
+    if (!page) return;
+
+    var zone = page.querySelector(".mg-detail-scroll");
+    var actions = page.querySelector(".mg-detail-actions");
+
+    if (!zone || !actions) return;
+
+    var idAnnonce = obtenirIdAnnonceCourante(page);
+    var annonces = obtenirAnnonces();
+
+    var annonce = annonces.find(function (a) {
+      return String(a.id) === String(idAnnonce);
+    });
+
+    if (!annonce) return;
+
+    /* Rendre la carte vendeur cliquable sans remplacer
+       le système de favoris ou les boutons existants. */
+    var carteVendeur = zone.querySelector(".mg-seller-card");
+
+    if (carteVendeur && !carteVendeur.dataset.mgProfilActif) {
+      carteVendeur.dataset.mgProfilActif = "oui";
+      carteVendeur.style.cursor = "pointer";
+      carteVendeur.setAttribute("role", "button");
+      carteVendeur.setAttribute("tabindex", "0");
+      carteVendeur.setAttribute(
+        "aria-label",
+        "Voir le profil et les annonces du vendeur"
+      );
+
+      carteVendeur.addEventListener("click", function () {
+        window.mgOuvrirProfilVendeur(
+          annonce.seller_id,
+          annonce.id
+        );
+      });
+
+      carteVendeur.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.mgOuvrirProfilVendeur(
+            annonce.seller_id,
+            annonce.id
+          );
+        }
+      });
+    }
+
+    /* Les boutons restent les mêmes : on les déplace seulement
+       dans la zone de défilement. */
+    if (actions.parentElement !== zone) {
+      zone.appendChild(actions);
+    }
+
+    /* Ajouter le pied de page une seule fois par annonce. */
+    var pied = zone.querySelector(".mg-detail-footer");
+
+    if (!pied) {
+      pied = document.createElement("footer");
+      pied.className = "mg-detail-footer";
+      pied.innerHTML =
+        "<strong>🇬🇳 Marché Guinée</strong><br>" +
+        "Acheter, vendre et échanger simplement.";
+
+      zone.appendChild(pied);
+    }
+  }
+
+  /* Observer les changements de contenu du détail.
+     Cela fonctionne aussi lorsque l'annonce se recharge. */
+  var observateur = new MutationObserver(function () {
+    completerDetail();
+  });
+
+  var detail = document.getElementById("detailContent");
+
+  if (detail) {
+    observateur.observe(detail, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  /* Créer la page de profil vendeur. */
+  function creerModalProfil() {
+    var modal = document.getElementById("mgProfilVendeurModal");
+    if (modal) return modal;
+
+    modal = document.createElement("div");
+    modal.id = "mgProfilVendeurModal";
+    modal.innerHTML = `
+      <div class="mg-profil-page">
+        <div class="mg-profil-header">
+          <button type="button"
+                  class="mg-profil-retour"
+                  id="mgProfilRetour"
+                  aria-label="Retour">‹</button>
+          <div class="mg-profil-titre">Profil du vendeur</div>
+        </div>
+
+        <div id="mgProfilIdentite" class="mg-profil-identite">
+          Chargement du profil...
+        </div>
+
+        <h2 class="mg-profil-annonces-titre">
+          Ses autres annonces
+        </h2>
+
+        <div id="mgProfilAnnonces" class="mg-profil-annonces"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector("#mgProfilRetour").addEventListener(
+      "click",
+      function () {
+        modal.style.display = "none";
+      }
+    );
+
+    return modal;
+  }
+
+  window.mgOuvrirProfilVendeur = async function (
+    sellerId,
+    annonceCouranteId
+  ) {
+    if (!sellerId) {
+      alert("Le profil de ce vendeur n'est pas disponible.");
+      return;
+    }
+
+    var modal = creerModalProfil();
+    var identite = modal.querySelector("#mgProfilIdentite");
+    var liste = modal.querySelector("#mgProfilAnnonces");
+
+    modal.style.display = "block";
+    modal.scrollTop = 0;
+
+    identite.innerHTML = "Chargement du profil...";
+    liste.innerHTML =
+      '<div class="mg-profil-message">Chargement des annonces...</div>';
+
+    var nom = "Vendeur Marché Guinée";
+    var photo = "";
+
+    try {
+      if (
+        typeof supabaseFetch === "function" &&
+        typeof SUPABASE_URL !== "undefined"
+      ) {
+        var profil = await supabaseFetch(
+          SUPABASE_URL +
+          "/rest/v1/users?id=eq." +
+          encodeURIComponent(sellerId) +
+          "&select=id,full_name,photo_url&limit=1"
+        );
+
+        if (Array.isArray(profil) && profil.length) {
+          nom = profil[0].full_name || nom;
+          photo = profil[0].photo_url || "";
+        }
+      }
+    } catch (erreur) {
+      console.warn("Profil vendeur indisponible :", erreur);
+    }
+
+    if (modal.style.display !== "block") return;
+
+    var initiale = nom.trim().charAt(0).toUpperCase() || "👤";
+
+    identite.innerHTML = `
+      ${
+        photo
+          ? `<img class="mg-profil-photo"
+                  src="${echapper(photo)}"
+                  alt="Photo du vendeur"
+                  onerror="this.outerHTML='<div class=&quot;mg-profil-photo&quot;>👤</div>'">`
+          : `<div class="mg-profil-photo">${echapper(initiale)}</div>`
+      }
+      <h1 class="mg-profil-nom">${echapper(nom)}</h1>
+      <div class="mg-profil-sous-titre">
+        Vendeur sur Marché Guinée 🇬🇳
+      </div>
+    `;
+
+    var annonces = obtenirAnnonces().filter(function (a) {
+      return (
+        String(a.seller_id) === String(sellerId) &&
+        String(a.id) !== String(annonceCouranteId) &&
+        String(a.status || "").toLowerCase() === "active"
+      );
+    });
+
+    if (!annonces.length) {
+      liste.innerHTML = `
+        <div class="mg-profil-message">
+          Ce vendeur n'a pas d'autres annonces actives pour le moment.
+        </div>
+      `;
+      return;
+    }
+
+    liste.innerHTML = "";
+
+    annonces.forEach(function (a) {
+      var carte = document.createElement("div");
+      carte.className = "mg-profil-annonce";
+      carte.innerHTML = `
+        <div class="mg-profil-annonce-photo">📦</div>
+        <div class="mg-profil-annonce-info">
+          <div class="mg-profil-annonce-nom">
+            ${echapper(a.title || "Annonce sans titre")}
+          </div>
+          <div class="mg-profil-annonce-prix">
+            ${echapper(prixFormate(a.price_gnf))}
+          </div>
+        </div>
+      `;
+
+      carte.addEventListener("click", function () {
+        modal.style.display = "none";
+
+        if (typeof window.ouvrirDetailAnnonce === "function") {
+          window.ouvrirDetailAnnonce(a.id);
+        }
+      });
+
+      liste.appendChild(carte);
+
+      if (typeof window.chargerImages === "function") {
+        window.chargerImages(a.id)
+          .then(function (url) {
+            if (!url || !carte.isConnected) return;
+
+            var zoneImage = carte.querySelector(
+              ".mg-profil-annonce-photo"
+            );
+
+            var image = document.createElement("img");
+            image.src = url;
+            image.alt = a.title || "Photo de l'annonce";
+            image.loading = "lazy";
+
+            image.onerror = function () {
+              image.remove();
+              zoneImage.textContent = "📦";
+            };
+
+            zoneImage.textContent = "";
+            zoneImage.appendChild(image);
+          })
+          .catch(function (erreur) {
+            console.warn("Image annonce indisponible :", erreur);
+          });
+      }
+    });
+  };
+
+  /* Vérification initiale après installation. */
+  completerDetail();
+
+})();
+</script>
   
 </body>
 </html>
