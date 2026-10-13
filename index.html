@@ -4464,79 +4464,52 @@ function ouvrirMesAchats() {
       "margin:0;" +
       "box-sizing:border-box;" +
       "overflow-y:auto;" +
-      "overflow-x:hidden;" +
-      "border-radius:0;";
+      "overflow-x:hidden;";
 
     modal.innerHTML = `
       <div style="
         width:100%;
-        max-width:none;
         min-height:100%;
         margin:0;
+        padding:0;
         background:#f7faf8;
-        border-radius:0;
-        overflow:visible;
-        box-shadow:none;
         box-sizing:border-box;
       ">
 
-     <!-- EN-TÊTE -->
-<div style="
-  position:relative;
-  padding:90px 16px 22px;
-  background:linear-gradient(135deg,#07883f,#12a85a);
-  color:white;
-  box-sizing:border-box;
-">
-  <button
-    type="button"
-    onclick="fermerMesAchats(); ouvrirCompte();"
-    aria-label="Retour à Mon compte"
-    style="
-      position:absolute;
-      top:10px;
-      left:10px;
-      z-index:20010;
-      min-height:36px;
-      padding:7px 10px;
-      border:1px solid rgba(255,255,255,.35);
-      border-radius:10px;
-      background:#ffffff;
-      color:#08783b;
-      font-size:10px;
-      font-weight:700;
-      line-height:1.2;
-      cursor:pointer;
-      box-shadow:0 3px 12px rgba(0,0,0,.15);
-      box-sizing:border-box;
-    "
-  >
-    ‹ Retour à Mon compte
-  </button>
-  <div style="
-    font-size:13px;
-    font-weight:700;
-    opacity:.9;
-    margin-bottom:5px;
-  ">
-    🇬🇳 Marché Guinée
-  </div>
-  <h2 style="
-    margin:0;
-    font-size:20px;
-    font-weight:900;
-  ">
-    🛒 Mes achats
-  </h2>
-  <p style="
-    margin:7px 0 0;
-    font-size:13px;
-    opacity:.95;
-    line-height:1.5;
-  ">
-    Retrouve ici toutes tes commandes et leur livraison.
-  </p>
-</div>
+        <!-- EN-TÊTE -->
+        <div style="
+          position:relative;
+          padding:76px 16px 22px;
+          background:linear-gradient(135deg,#07883f,#12a85a);
+          color:white;
+          box-sizing:border-box;
+        ">
+
+          <button
+            type="button"
+            onclick="fermerMesAchats(); ouvrirCompte();"
+            aria-label="Retour à Mon compte"
+            style="
+              position:absolute;
+              top:10px;
+              left:10px;
+              z-index:2;
+              min-height:36px;
+              padding:7px 10px;
+              border:1px solid rgba(255,255,255,.35);
+              border-radius:10px;
+              background:#ffffff;
+              color:#08783b;
+              font-size:10px;
+              font-weight:700;
+              line-height:1.2;
+              cursor:pointer;
+              box-shadow:0 3px 12px rgba(0,0,0,.15);
+              box-sizing:border-box;
+            "
+          >
+            ‹ Retour à Mon compte
+          </button>
 
           <div style="
             font-size:13px;
@@ -4549,7 +4522,7 @@ function ouvrirMesAchats() {
 
           <h2 style="
             margin:0;
-            font-size:25px;
+            font-size:20px;
             font-weight:900;
           ">
             🛒 Mes achats
@@ -4563,16 +4536,16 @@ function ouvrirMesAchats() {
           ">
             Retrouve ici toutes tes commandes et leur livraison.
           </p>
+
         </div>
 
-        <!-- CONTENU DES ACHATS -->
+        <!-- HISTORIQUE DES ACHATS -->
         <div
           id="listeMesAchats"
           style="
+            width:100%;
             padding:16px;
-            min-height:calc(100dvh - 160px);
-            max-height:none;
-            overflow:visible;
+            min-height:200px;
             box-sizing:border-box;
           "
         >
@@ -4599,13 +4572,11 @@ function ouvrirMesAchats() {
   modal.style.height = "100dvh";
   modal.style.padding = "0";
   modal.style.margin = "0";
-  modal.style.borderRadius = "0";
   modal.style.overflowY = "auto";
   modal.style.overflowX = "hidden";
 
   chargerMesAchats();
 }
-
 function fermerMesAchats(){
 
   const modal =
