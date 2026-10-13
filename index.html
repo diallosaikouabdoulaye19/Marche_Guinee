@@ -17266,37 +17266,37 @@ document.addEventListener("keydown", function(event){
     }
   }
 
-  function afficherRetour() {
+function afficherRetour() {
     var feature = trouverFenetre();
     if (!feature) return;
-
+    /* Mes achats possède déjà son propre bouton de retour.
+       On évite donc d'ajouter un deuxième bouton par-dessus. */
+    if (feature.id === "mesAchatsModal") {
+      retirerRetour();
+      return;
+    }
     if (returnButton && returnTarget === feature &&
         returnButton.isConnected) return;
-
     retirerRetour();
-
     returnTarget = feature;
     returnButton = document.createElement("button");
     returnButton.type = "button";
     returnButton.className = "mg-v6-back-button";
     returnButton.textContent = "×";
     returnButton.setAttribute("aria-label", "Retour à Mon compte");
-
     returnButton.addEventListener("click", function () {
       var target = returnTarget;
       retirerRetour();
       fermerFonction(target);
-
       var account = document.getElementById("accountModal");
       if (account) {
         account.style.display = "flex";
         account.scrollTop = 0;
       }
     });
-
     document.body.appendChild(returnButton);
   }
-
+  
   function retirerRetour() {
     if (returnButton && returnButton.parentNode) {
       returnButton.parentNode.removeChild(returnButton);
