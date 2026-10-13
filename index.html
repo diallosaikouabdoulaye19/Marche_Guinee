@@ -21814,6 +21814,298 @@ document.addEventListener("keydown", function(event){
 </style>
 
     <!-- FIN PAGE DE BIENVENUE MARCHÉ GUINÉE -->.
+
+<!-- MARCHÉ GUINÉE — HARMONISATION DU MENU ET DES PAGES -->
+<style id="mg-menu-pages-final-style">
+
+/* Toutes les rubriques du compte utilisent une seule colonne */
+#accountModal #accountConnected .form-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+/* Une ligne : icône à gauche, nom au centre, flèche à droite */
+#accountModal #accountConnected .form-actions > button.mg-account-menu-row,
+#accountModal #accountConnected .form-actions > button.mg-extra-menu-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 58px !important;
+  margin: 0 !important;
+  padding: 10px 13px !important;
+  gap: 12px !important;
+  border: 1px solid #e5ece7 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  color: #26352c !important;
+  text-align: left !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.035) !important;
+}
+
+/* Icônes */
+#accountModal #accountConnected .mg-menu-icon,
+#accountModal #accountConnected .mg-extra-menu-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 39px !important;
+  width: 39px !important;
+  min-width: 39px !important;
+  height: 39px !important;
+  border-radius: 12px !important;
+  background: #edf8f0 !important;
+  font-size: 20px !important;
+}
+
+/* Noms */
+#accountModal #accountConnected .mg-menu-label,
+#accountModal #accountConnected .mg-extra-menu-label {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: left !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* Flèches */
+#accountModal #accountConnected .mg-menu-arrow,
+#accountModal #accountConnected .mg-extra-menu-arrow {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  color: #94a199 !important;
+  font-size: 25px !important;
+}
+
+/* Mes annonces : véritable page plein écran */
+#mgMesAnnoncesModal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: #f5f8f6 !important;
+  z-index: 30000 !important;
+}
+
+/* Préparer l'en-tête pour le bouton Retour */
+#mgMesAnnoncesModal .mg-ma-header {
+  padding-left: 65px !important;
+  padding-top: max(15px, env(safe-area-inset-top)) !important;
+}
+
+/* Solde vendeur : page plein écran */
+#mgBalanceModal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow-y: auto !important;
+  border-radius: 0 !important;
+  background: #f5f8f6 !important;
+  z-index: 30000 !important;
+}
+
+#mgBalanceModal .mg-balance-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#mgBalanceModal .mg-balance-header {
+  padding-left: 68px !important;
+  padding-top: max(25px, env(safe-area-inset-top)) !important;
+}
+
+/* Masquer les boutons de fermeture en double sur ces pages */
+#mgMesAnnoncesModal .mg-ma-close,
+#mgBalanceModal .mg-balance-close,
+#mgBalanceModal .mg-balance-done {
+  display: none !important;
+}
+
+/* Paramètres et rubriques complémentaires : plein écran */
+#mgExtraModal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: #f5f8f6 !important;
+  z-index: 30000 !important;
+}
+
+#mgExtraModal .mg-extra-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 5 !important;
+  padding-top: max(12px, env(safe-area-inset-top)) !important;
+  background: #fff !important;
+}
+
+#mgExtraModal .mg-extra-content {
+  padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+}
+
+/* Petits écrans */
+@media (max-width: 380px) {
+  #accountModal #accountConnected .form-actions > button.mg-account-menu-row,
+  #accountModal #accountConnected .form-actions > button.mg-extra-menu-row {
+    min-height: 55px !important;
+    gap: 9px !important;
+    padding: 9px !important;
+  }
+
+  #accountModal #accountConnected .mg-menu-icon,
+  #accountModal #accountConnected .mg-extra-menu-icon {
+    flex-basis: 35px !important;
+    width: 35px !important;
+    min-width: 35px !important;
+    height: 35px !important;
+    font-size: 18px !important;
+  }
+}
+
+</style>
+
+<script id="mg-menu-pages-final-script">
+(function () {
+  "use strict";
+
+  if (window.mgMenuPagesFinalInstalled) return;
+  window.mgMenuPagesFinalInstalled = true;
+
+  var boutonRetour = null;
+  var ancienneOuverture = null;
+
+  function estVisible(element) {
+    if (!element) return false;
+
+    var style = window.getComputedStyle(element);
+
+    return style.display !== "none" &&
+           style.visibility !== "hidden";
+  }
+
+  function supprimerRetour() {
+    if (boutonRetour && boutonRetour.parentNode) {
+      boutonRetour.parentNode.removeChild(boutonRetour);
+    }
+
+    boutonRetour = null;
+  }
+
+  function afficherRetourMesAnnonces() {
+    var page = document.getElementById("mgMesAnnoncesModal");
+
+    if (!page || !estVisible(page)) return;
+
+    if (boutonRetour && boutonRetour.isConnected) return;
+
+    supprimerRetour();
+
+    boutonRetour = document.createElement("button");
+    boutonRetour.type = "button";
+    boutonRetour.textContent = "‹";
+    boutonRetour.setAttribute("aria-label", "Retour à Mon compte");
+
+    boutonRetour.style.cssText =
+      "position:fixed;" +
+      "top:max(12px,env(safe-area-inset-top));" +
+      "left:12px;" +
+      "z-index:50000;" +
+      "width:44px;" +
+      "height:44px;" +
+      "padding:0;" +
+      "border:1px solid #e0e9e3;" +
+      "border-radius:50%;" +
+      "background:#fff;" +
+      "color:#087f3f;" +
+      "font-size:30px;" +
+      "line-height:1;" +
+      "box-shadow:0 3px 12px rgba(0,0,0,.10);";
+
+    boutonRetour.addEventListener("click", function () {
+      supprimerRetour();
+
+      if (typeof window.fermerMesAnnonces === "function") {
+        window.fermerMesAnnonces();
+      } else {
+        page.style.display = "none";
+      }
+
+      var compte = document.getElementById("accountModal");
+
+      if (compte) {
+        compte.style.display = "block";
+        compte.scrollTop = 0;
+      }
+    });
+
+    document.body.appendChild(boutonRetour);
+  }
+
+  /*
+    On réutilise la fonction existante de Mes annonces.
+    Son chargement et ses données ne sont pas remplacés.
+  */
+  function installer() {
+    if (typeof window.ouvrirMesAnnonces === "function" &&
+        window.ouvrirMesAnnonces !== ancienneOuverture) {
+
+      ancienneOuverture = window.ouvrirMesAnnonces;
+
+      window.ouvrirMesAnnonces = function () {
+        var resultat = ancienneOuverture.apply(this, arguments);
+
+        window.setTimeout(afficherRetourMesAnnonces, 100);
+        window.setTimeout(afficherRetourMesAnnonces, 500);
+
+        return resultat;
+      };
+    }
+  }
+
+  installer();
+
+  var observateur = new MutationObserver(function () {
+    installer();
+
+    var page = document.getElementById("mgMesAnnoncesModal");
+
+    if (boutonRetour && (!page || !estVisible(page))) {
+      supprimerRetour();
+    }
+  });
+
+  observateur.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+})();
+</script>
+<!-- FIN — HARMONISATION DU MENU MARCHÉ GUINÉE -->
   
 </body>
 </html>
