@@ -19283,14 +19283,14 @@ document.addEventListener("keydown", function(event){
 })();
 </script>
 
-<!-- CORRECTION DEFINITIVE : PROFIL VENDEUR -->
+<!-- CORRECTION PROFIL VENDEUR - VERSION 2 -->
 <script id="mg-correction-profil-vendeur">
 (function () {
   "use strict";
 
-  /* Créer la page du profil si elle n'existe pas */
   function creerPageProfil() {
     var modal = document.getElementById("mgProfilVendeurModal");
+
     if (modal) return modal;
 
     modal = document.createElement("div");
@@ -19346,6 +19346,49 @@ document.addEventListener("keydown", function(event){
     return Number(prix || 0).toLocaleString("fr-FR") + " GNF";
   }
 
+  function obtenirAdresseSupabase() {
+    /*
+     * Dans ton application, SUPABASE_URL est déclarée
+     * comme constante. On privilégie cette constante.
+     */
+    try {
+      if (
+        typeof SUPABASE_URL !== "undefined" &&
+        SUPABASE_URL
+      ) {
+        return SUPABASE_URL;
+      }
+    } catch (e) {}
+
+    /*
+     * Solution de secours si l'adresse est aussi exposée
+     * sur window.
+     */
+    if (window.SUPABASE_URL) {
+      return window.SUPABASE_URL;
+    }
+
+    throw new Error(
+      "Adresse Supabase introuvable. Vérifie la déclaration de SUPABASE_URL."
+    );
+  }
+
+  function obtenirFonctionFetch() {
+    if (typeof window.supabaseFetch === "function") {
+      return window.supabaseFetch;
+    }
+
+    try {
+      if (typeof supabaseFetch === "function") {
+        return supabaseFetch;
+      }
+    } catch (e) {}
+
+    throw new Error(
+      "La fonction supabaseFetch est introuvable."
+    );
+  }
+
   window.mgOuvrirProfilVendeur = async function (
     sellerId,
     annonceCouranteId
@@ -19362,32 +19405,34 @@ document.addEventListener("keydown", function(event){
     modal.style.display = "block";
     modal.scrollTop = 0;
 
-    identite.textContent = "Chargement du profil...";
+    identite.textContent = "Chargement du profil vendeur...";
     liste.innerHTML =
       '<div class="mg-profil-message">Chargement des annonces...</div>';
 
     try {
-      var base = window.SUPABASE_URL;
+      var base = obtenirAdresseSupabase().replace(/\/+$/, "");
+      var requete = obtenirFonctionFetch();
 
-      if (!base || typeof window.supabaseFetch !== "function") {
-        throw new Error("Connexion Supabase indisponible.");
-      }
-
-      /* Charger le vendeur */
-      var urlProfil = base +
+      /* 1. Charger les informations du vendeur */
+      var urlProfil =
+        base +
         "/rest/v1/users?id=eq." +
         encodeURIComponent(sellerId) +
         "&select=id,full_name,photo_url&limit=1";
 
-      var profils = await window.supabaseFetch(urlProfil);
+      var profils = await requete(urlProfil);
 
       if (!Array.isArray(profils) || profils.length === 0) {
-        throw new Error("Aucun profil trouvé pour cet identifiant.");
+        throw new Error(
+          "Le profil vendeur est absent ou inaccessible dans la table users."
+        );
       }
 
       var vendeur = profils[0];
       var nom = vendeur.full_name || "Vendeur Marché Guinée";
       var photo = vendeur.photo_url || "";
+
+      if (modal.style.display !== "block") return;
 
       identite.innerHTML = `
         ${
@@ -19406,21 +19451,27 @@ document.addEventListener("keydown", function(event){
         </div>
       `;
 
-      /* Charger les annonces directement depuis Supabase */
-      var urlAnnonces = base +
+      /* 2. Charger les annonces actives du vendeur */
+      var urlAnnonces =
+        base +
         "/rest/v1/listings?select=id,seller_id,title,price_gnf,condition,city,neighborhood,status,created_at" +
         "&seller_id=eq." + encodeURIComponent(sellerId) +
-        "&status=eq.active&order=created_at.desc";
+        "&status=eq.active" +
+        "&order=created_at.desc";
 
-      var annonces = await window.supabaseFetch(urlAnnonces);
+      var annonces = await requete(urlAnnonces);
 
       if (!Array.isArray(annonces)) {
-        throw new Error("Impossible de récupérer les annonces.");
+        throw new Error(
+          "La réponse Supabase des annonces n'est pas une liste valide."
+        );
       }
 
-      annonces = annonces.filter(function (a) {
-        return String(a.id) !== String(annonceCouranteId);
+      annonces = annonces.filter(function (annonce) {
+        return String(annonce.id) !== String(annonceCouranteId);
       });
+
+      if (modal.style.display !== "block") return;
 
       if (annonces.length === 0) {
         liste.innerHTML = `
@@ -19449,13 +19500,13 @@ document.addEventListener("keydown", function(event){
           </div>
         `;
 
-        carte.onclick = function () {
+        carte.addEventListener("click", function () {
           modal.style.display = "none";
 
           if (typeof window.ouvrirDetailAnnonce === "function") {
             window.ouvrirDetailAnnonce(annonce.id);
           }
-        };
+        });
 
         liste.appendChild(carte);
 
@@ -19468,27 +19519,33 @@ document.addEventListener("keydown", function(event){
                 ".mg-profil-annonce-photo"
               );
 
-              var img = document.createElement("img");
-              img.src = url;
-              img.alt = annonce.title || "Photo de l'annonce";
-              img.loading = "lazy";
+              var image = document.createElement("img");
+              image.src = url;
+              image.alt = annonce.title || "Photo de l'annonce";
+              image.loading = "lazy";
 
-              img.onerror = function () {
-                img.remove();
+              image.onerror = function () {
+                image.remove();
                 zone.textContent = "📦";
               };
 
               zone.textContent = "";
-              zone.appendChild(img);
+              zone.appendChild(image);
             })
-            .catch(function (e) {
-              console.warn("Image indisponible :", e);
+            .catch(function (erreur) {
+              console.warn(
+                "Impossible de charger la photo de l'annonce :",
+                erreur
+              );
             });
         }
       });
 
-    } catch (e) {
-      console.error("Erreur profil vendeur :", e);
+    } catch (erreur) {
+      console.error(
+        "[Marché Guinée] Erreur de chargement du profil vendeur :",
+        erreur
+      );
 
       identite.innerHTML = `
         <div class="mg-profil-message">
@@ -19498,8 +19555,9 @@ document.addEventListener("keydown", function(event){
 
       liste.innerHTML = `
         <div class="mg-profil-message">
-          Le chargement a échoué. Vérifie la connexion Internet,
-          puis réessaie.
+          Le chargement a échoué.
+          <br>
+          Vérifie la connexion puis réessaie.
           <br><br>
           <button type="button" id="mgReessayerProfil">
             Réessayer
@@ -19519,7 +19577,6 @@ document.addEventListener("keydown", function(event){
       }
     }
   };
-
 })();
 </script>
   
