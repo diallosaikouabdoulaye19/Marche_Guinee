@@ -21241,26 +21241,22 @@ document.addEventListener("keydown", function(event){
     );
   }
 
-  /* =====================================================
-     B. TRANSFORMER LE X DU BOUTON RETOUR EN FLÈCHE
-     On conserve son écouteur et son fonctionnement existants.
-  ===================================================== */
-  function corrigerBoutonRetour() {
-    var boutons = document.querySelectorAll(
-      ".mg-v6-back-button"
+ function corrigerBoutonRetour() {
+  var boutons = document.querySelectorAll(
+    ".mg-v6-back-button"
+  );
+
+  boutons.forEach(function (bouton) {
+    if (bouton.textContent !== "×") {
+      bouton.textContent = "×";
+    }
+
+    bouton.setAttribute(
+      "aria-label",
+      "Retour à Mon compte"
     );
-
-    boutons.forEach(function (bouton) {
-      if (bouton.textContent !== "‹") {
-        bouton.textContent = "‹";
-      }
-
-      bouton.setAttribute(
-        "aria-label",
-        "Retour à Mon compte"
-      );
-    });
-  }
+  });
+}
 
   corrigerBoutonRetour();
 
