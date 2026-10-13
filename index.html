@@ -21052,6 +21052,261 @@ document.addEventListener("keydown", function(event){
 </script>
 
 <!-- FIN — NOUVELLES RUBRIQUES MARCHÉ GUINÉE -->
+
+<!-- ======================================================
+     MARCHÉ GUINÉE 🇬🇳
+     CORRECTIF : RUBRIQUES PLEIN ÉCRAN + MES FAVORIS
+     À placer juste avant </body>
+====================================================== -->
+
+<style id="mg-correctif-rubriques-v2">
+
+/* 1. UNIFORMISER LES ANCIENNES FENÊTRES DU COMPTE */
+#mgEditProfileModal,
+#problemeModal,
+#mesAchatsModal,
+#mesVentesModal,
+#messagesModal,
+#notificationsModal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: #f5f8f6 !important;
+  z-index: 20000 !important;
+}
+
+/* Les anciennes boîtes deviennent de vraies pages */
+#mgEditProfileModal .modal-box,
+#problemeModal .modal-box,
+#mesAchatsModal .modal-box,
+#mesVentesModal .modal-box,
+#messagesModal .modal-box,
+#notificationsModal .modal-box {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  padding: 18px 15px 35px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #f5f8f6 !important;
+}
+
+/* 2. SUPPRIMER LES X INTÉRIEURS EN DOUBLE
+   Le bouton retour unique sera placé à gauche. */
+#mgEditProfileModal .close,
+#problemeModal .close,
+#mesAchatsModal .close,
+#mesVentesModal .close,
+#messagesModal .close,
+#notificationsModal .close {
+  display: none !important;
+}
+
+/* 3. STYLE DU BOUTON RETOUR UNIQUE */
+.mg-v6-back-button {
+  position: fixed !important;
+  top: max(12px, env(safe-area-inset-top)) !important;
+  left: 12px !important;
+  z-index: 45000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  border: 1px solid #e0e9e3 !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  color: #087f3f !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,.10) !important;
+  font-size: 29px !important;
+  line-height: 1 !important;
+}
+
+/* 4. GARDER LES LIGNES DU MENU BIEN ALIGNÉES */
+#accountModal #accountConnected .form-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#accountModal #accountConnected .form-actions > button.mg-account-menu-row,
+#accountModal #accountConnected .form-actions > button.mg-extra-menu-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 60px !important;
+  margin: 0 !important;
+  padding: 10px 13px !important;
+  gap: 12px !important;
+  border: 1px solid #e5ece7 !important;
+  border-radius: 15px !important;
+  background: #ffffff !important;
+  color: #26352c !important;
+  text-align: left !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,.035) !important;
+}
+
+#accountModal #accountConnected .mg-menu-icon,
+#accountModal #accountConnected .mg-extra-menu-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 39px !important;
+  width: 39px !important;
+  min-width: 39px !important;
+  height: 39px !important;
+  border-radius: 12px !important;
+  background: #edf8f0 !important;
+  font-size: 20px !important;
+}
+
+#accountModal #accountConnected .mg-menu-label,
+#accountModal #accountConnected .mg-extra-menu-label {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: left !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+#accountModal #accountConnected .mg-menu-arrow,
+#accountModal #accountConnected .mg-extra-menu-arrow {
+  margin-left: auto !important;
+  color: #94a199 !important;
+  font-size: 25px !important;
+}
+
+@media (max-width: 380px) {
+  #accountModal #accountConnected .form-actions > button.mg-account-menu-row,
+  #accountModal #accountConnected .form-actions > button.mg-extra-menu-row {
+    min-height: 57px !important;
+    gap: 9px !important;
+    padding: 9px !important;
+  }
+}
+
+</style>
+
+<script id="mg-correctif-rubriques-v2-script">
+(function () {
+  "use strict";
+
+  if (window.mgCorrectifRubriquesV2) return;
+  window.mgCorrectifRubriquesV2 = true;
+
+  /* =====================================================
+     A. RENDRE SUPABASE ACCESSIBLE AUX NOUVELLES RUBRIQUES
+  ===================================================== */
+  try {
+    if (typeof SUPABASE_URL !== "undefined") {
+      window.SUPABASE_URL = SUPABASE_URL;
+    }
+
+    if (typeof supabaseFetch === "function") {
+      window.supabaseFetch = supabaseFetch;
+    }
+
+    console.log("Marché Guinée : accès Supabase initialisé.");
+  } catch (erreur) {
+    console.error(
+      "Initialisation Supabase impossible :",
+      erreur
+    );
+  }
+
+  /* =====================================================
+     B. TRANSFORMER LE X DU BOUTON RETOUR EN FLÈCHE
+     On conserve son écouteur et son fonctionnement existants.
+  ===================================================== */
+  function corrigerBoutonRetour() {
+    var boutons = document.querySelectorAll(
+      ".mg-v6-back-button"
+    );
+
+    boutons.forEach(function (bouton) {
+      if (bouton.textContent !== "‹") {
+        bouton.textContent = "‹";
+      }
+
+      bouton.setAttribute(
+        "aria-label",
+        "Retour à Mon compte"
+      );
+    });
+  }
+
+  corrigerBoutonRetour();
+
+  var observateurRetour = new MutationObserver(function () {
+    corrigerBoutonRetour();
+  });
+
+  observateurRetour.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  /* =====================================================
+     C. RETOUR DES NOUVELLES RUBRIQUES VERS MON COMPTE
+     Le compte reste accessible lorsque la page est fermée.
+  ===================================================== */
+  var ancienneFermeture = window.mgExtraFermer;
+
+  window.mgExtraFermer = function () {
+    if (typeof ancienneFermeture === "function") {
+      ancienneFermeture();
+    } else {
+      var page = document.getElementById("mgExtraModal");
+      if (page) page.style.display = "none";
+    }
+
+    var compte = document.getElementById("accountModal");
+
+    if (compte) {
+      compte.style.display = "block";
+      compte.scrollTop = 0;
+    }
+  };
+
+  /* =====================================================
+     D. GARANTIR L'ACCÈS AUX FONCTIONS DEPUIS LES PAGES
+  ===================================================== */
+  [
+    "mgOuvrirFavoris",
+    "mgOuvrirParametres",
+    "mgOuvrirSecurite",
+    "mgOuvrirConseilsSecurite",
+    "mgOuvrirAide",
+    "mgOuvrirFAQ",
+    "mgOuvrirAPropos",
+    "mgOuvrirConditions",
+    "mgOuvrirConfidentialite",
+    "mgOuvrirContact"
+  ].forEach(function (nom) {
+    if (typeof window[nom] === "function") {
+      console.log("Rubrique disponible :", nom);
+    }
+  });
+
+})();
+</script>
+
+<!-- FIN DU CORRECTIF MARCHÉ GUINÉE -->
   
 </body>
 </html>
