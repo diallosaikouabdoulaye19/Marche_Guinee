@@ -21300,6 +21300,492 @@ document.addEventListener("keydown", function(event){
     display: none !important;
   }
 </style>
+
+<!-- ======================================================
+     MARCHÉ GUINÉE 🇬🇳
+     PAGE DE BIENVENUE
+     Inscription, connexion et explication de l'application
+====================================================== -->
+
+<style id="mg-welcome-style">
+  #mgWelcomePage {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding:
+      max(28px, env(safe-area-inset-top))
+      18px
+      max(28px, env(safe-area-inset-bottom));
+    background: linear-gradient(160deg, #f2faf4 0%, #ffffff 55%, #edf8f0 100%);
+    font-family: Arial, Helvetica, sans-serif;
+    color: #17221d;
+  }
+
+  #mgWelcomePage * {
+    box-sizing: border-box;
+  }
+
+  #mgWelcomePage .mgw-container {
+    width: 100%;
+    max-width: 460px;
+    margin: auto;
+  }
+
+  #mgWelcomePage .mgw-brand {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  #mgWelcomePage .mgw-logo {
+    font-size: 29px;
+    font-weight: 900;
+    letter-spacing: -0.7px;
+    color: #087f3f;
+    margin-bottom: 9px;
+  }
+
+  #mgWelcomePage .mgw-slogan {
+    color: #66736b;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  #mgWelcomePage .mgw-welcome-card {
+    background: #ffffff;
+    border: 1px solid #e4eee7;
+    border-radius: 24px;
+    padding: 25px 19px;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(8, 127, 63, 0.08);
+  }
+
+  #mgWelcomePage .mgw-badge {
+    display: inline-block;
+    padding: 8px 13px;
+    border-radius: 30px;
+    background: #e9f8ee;
+    color: #087f3f;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 15px;
+  }
+
+  #mgWelcomePage .mgw-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 900;
+    margin: 0 0 12px;
+    color: #17221d;
+  }
+
+  #mgWelcomePage .mgw-description {
+    margin: 0 0 22px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #66736b;
+  }
+
+  #mgWelcomePage .mgw-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 11px;
+  }
+
+  #mgWelcomePage .mgw-register {
+    background: #087f3f;
+    color: #ffffff;
+    border: 1px solid #087f3f;
+  }
+
+  #mgWelcomePage .mgw-login {
+    background: #ffffff;
+    color: #087f3f;
+    border: 1px solid #cfe3d5;
+  }
+
+  #mgWelcomePage .mgw-button:active {
+    transform: scale(0.985);
+  }
+
+  #mgWelcomePage .mgw-how-card {
+    margin-top: 17px;
+    padding: 20px 17px;
+    border: 1px solid #e4eee7;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.035);
+  }
+
+  #mgWelcomePage .mgw-how-title {
+    margin: 0 0 10px;
+    font-size: 18px;
+    line-height: 1.35;
+    font-weight: 900;
+    color: #087f3f;
+  }
+
+  #mgWelcomePage .mgw-how-intro {
+    margin: 0 0 15px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #66736b;
+  }
+
+  #mgWelcomePage .mgw-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 11px 0;
+    border-bottom: 1px solid #edf1ee;
+  }
+
+  #mgWelcomePage .mgw-step:last-of-type {
+    border-bottom: none;
+  }
+
+  #mgWelcomePage .mgw-step-icon {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #edf8f0;
+    font-size: 20px;
+  }
+
+  #mgWelcomePage .mgw-step-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #526057;
+  }
+
+  #mgWelcomePage .mgw-step-text strong {
+    display: block;
+    color: #17221d;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  #mgWelcomePage .mgw-important {
+    margin-top: 13px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f3f8f4;
+    color: #53635a;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  #mgWelcomePage .mgw-footer {
+    text-align: center;
+    padding: 22px 5px 4px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #77817b;
+  }
+
+  #mgWelcomePage .mgw-footer strong {
+    color: #087f3f;
+  }
+
+  #mgWelcomePage .mgw-message {
+    display: none;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 12px;
+    background: #fff5df;
+    color: #75510b;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 380px) {
+    #mgWelcomePage .mgw-logo {
+      font-size: 26px;
+    }
+
+    #mgWelcomePage .mgw-title {
+      font-size: 25px;
+    }
+
+    #mgWelcomePage .mgw-welcome-card {
+      padding: 22px 15px;
+    }
+
+    #mgWelcomePage .mgw-how-card {
+      padding: 17px 14px;
+    }
+  }
+</style>
+
+<div id="mgWelcomePage" role="main" aria-label="Bienvenue sur Marché Guinée">
+  <div class="mgw-container">
+
+    <header class="mgw-brand">
+      <div class="mgw-logo">🇬🇳 Marché Guinée</div>
+      <div class="mgw-slogan">
+        Achetez et vendez en Guinée.
+      </div>
+    </header>
+
+    <section class="mgw-welcome-card">
+      <div class="mgw-badge">🇬🇳 Marketplace guinéenne</div>
+
+      <h1 class="mgw-title">
+        Bienvenue sur<br>Marché Guinée !
+      </h1>
+
+      <p class="mgw-description">
+        Achetez, vendez et échangez simplement.
+        Découvrez des produits et publiez vos annonces
+        gratuitement.
+      </p>
+
+      <button
+        type="button"
+        class="mgw-button mgw-register"
+        onclick="mgWelcomeInscription()">
+        ✨ Créer un compte gratuitement
+      </button>
+
+      <button
+        type="button"
+        class="mgw-button mgw-login"
+        onclick="mgWelcomeConnexion()">
+        👤 Se connecter
+      </button>
+
+      <div id="mgWelcomeMessage" class="mgw-message"></div>
+    </section>
+
+    <section class="mgw-how-card">
+      <h2 class="mgw-how-title">🛡️ Comment fonctionne Marché Guinée ?</h2>
+
+      <p class="mgw-how-intro">
+        Notre objectif est de rendre les achats et les ventes
+        plus simples et plus sûrs en Guinée.
+      </p>
+
+      <div class="mgw-step">
+        <div class="mgw-step-icon">🛍️</div>
+        <div class="mgw-step-text">
+          <strong>1. Choisissez votre produit</strong>
+          Parcourez les annonces et sélectionnez ce qui vous intéresse.
+        </div>
+      </div>
+
+      <div class="mgw-step">
+        <div class="mgw-step-icon">💰</div>
+        <div class="mgw-step-text">
+          <strong>2. Le paiement prévu</strong>
+          Le système prévu doit permettre de conserver le paiement
+          en attente au lieu de le verser immédiatement au vendeur.
+        </div>
+      </div>
+
+      <div class="mgw-step">
+        <div class="mgw-step-icon">📦</div>
+        <div class="mgw-step-text">
+          <strong>3. Recevez votre colis</strong>
+          Le vendeur organise la livraison du produit à l’acheteur.
+        </div>
+      </div>
+
+      <div class="mgw-step">
+        <div class="mgw-step-icon">✅</div>
+        <div class="mgw-step-text">
+          <strong>4. Confirmez la réception</strong>
+          Après réception et confirmation du colis, le versement au
+          vendeur devra être effectué selon les conditions prévues.
+        </div>
+      </div>
+
+      <div class="mgw-important">
+        <strong>À retenir :</strong> le paiement sécurisé et son
+        versement automatique au vendeur nécessitent une intégration
+        technique opérationnelle. Cette explication présente le
+        fonctionnement prévu de Marché Guinée.
+      </div>
+    </section>
+
+    <footer class="mgw-footer">
+      <strong>🇬🇳 Marché Guinée</strong><br>
+      Le commerce guinéen à portée de main.
+    </footer>
+
+  </div>
+</div>
+
+<script id="mg-welcome-script">
+(function () {
+  "use strict";
+
+  if (window.mgWelcomeInitialise) return;
+  window.mgWelcomeInitialise = true;
+
+  var welcome = document.getElementById("mgWelcomePage");
+  var message = document.getElementById("mgWelcomeMessage");
+  var compte = document.getElementById("accountModal");
+
+  if (!welcome || !compte) {
+    console.error(
+      "Page de bienvenue : accountModal introuvable."
+    );
+    return;
+  }
+
+  function utilisateurActuel() {
+    try {
+      if (
+        typeof utilisateurConnecte !== "undefined" &&
+        utilisateurConnecte &&
+        utilisateurConnecte.id
+      ) {
+        return utilisateurConnecte;
+      }
+    } catch (e) {}
+
+    return null;
+  }
+
+  function afficherBienvenue() {
+    welcome.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function masquerBienvenue() {
+    welcome.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  function afficherMessage(texte) {
+    if (!message) return;
+
+    message.textContent = texte;
+    message.style.display = "block";
+  }
+
+  function ouvrirFormulaire(type) {
+    var utilisateur = utilisateurActuel();
+
+    if (utilisateur) {
+      if (type === "connexion") {
+        masquerBienvenue();
+        compte.style.display = "none";
+        return;
+      }
+
+      afficherMessage(
+        "Tu es déjà connecté. Appuie sur « Se connecter » " +
+        "pour accéder à l’accueil."
+      );
+      return;
+    }
+
+    masquerBienvenue();
+
+    if (typeof ouvrirCompte === "function") {
+      ouvrirCompte();
+    } else {
+      afficherBienvenue();
+      afficherMessage(
+        "Impossible d’ouvrir le compte. Réessaie."
+      );
+      return;
+    }
+
+    var forms = document.getElementById("accountForms");
+    var connected = document.getElementById("accountConnected");
+
+    if (forms) forms.classList.remove("hidden");
+    if (connected) connected.classList.add("hidden");
+
+    if (type === "inscription") {
+      if (typeof afficherInscription === "function") {
+        afficherInscription();
+      }
+    } else {
+      if (typeof afficherConnexion === "function") {
+        afficherConnexion();
+      }
+    }
+
+    var accountMessage = document.getElementById("accountMessage");
+    if (accountMessage) accountMessage.innerHTML = "";
+  }
+
+  window.mgWelcomeInscription = function () {
+    ouvrirFormulaire("inscription");
+  };
+
+  window.mgWelcomeConnexion = function () {
+    ouvrirFormulaire("connexion");
+  };
+
+  /*
+    À chaque chargement de la page, la bienvenue est affichée.
+    On ne déconnecte personne et on ne supprime aucune session.
+  */
+  afficherBienvenue();
+
+  /*
+    Si l'utilisateur ferme le formulaire sans se connecter,
+    il revient à la page de bienvenue.
+    Après une connexion réussie, l'accueil reste visible.
+  */
+  var ancienneFermerModal = window.fermerModal;
+
+  if (typeof ancienneFermerModal === "function") {
+    window.fermerModal = function (id) {
+      ancienneFermerModal.apply(this, arguments);
+
+      if (id === "accountModal") {
+        if (utilisateurActuel()) {
+          masquerBienvenue();
+        } else {
+          afficherBienvenue();
+        }
+      }
+    };
+  }
+
+  /*
+    La connexion existante reste responsable de l'authentification.
+    Ce complément masque la bienvenue uniquement après connexion.
+  */
+  var ancienneConnexion = window.connecterCompte;
+
+  if (typeof ancienneConnexion === "function") {
+    window.connecterCompte = async function () {
+      await ancienneConnexion.apply(this, arguments);
+
+      if (utilisateurActuel()) {
+        masquerBienvenue();
+      }
+    };
+  }
+
+})();
+</script>
+
+<!-- FIN PAGE DE BIENVENUE MARCHÉ GUINÉE -->
   
 </body>
 </html>
