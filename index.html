@@ -16822,486 +16822,402 @@ document.addEventListener("keydown", function(event){
 <!-- FIN DU CORRECTIF CIBLE -->
 
 
-<!-- =========================================================
-     MARCHÉ GUINÉE 🇬🇳 — COMPTE PLEIN ÉCRAN ET RETOUR
-     Correctif complémentaire — conserve les fonctions existantes
-========================================================= -->
+<!-- ============================================
+     MARCHÉ GUINÉE — COMPTE PLEIN ÉCRAN
+     Style + navigation de retour
+     Ne remplace pas les fonctions existantes.
+=============================================== -->
 
-<style id="mg-account-fullscreen-final">
-
-/* ---------- MON COMPTE : PLEIN ÉCRAN ---------- */
-
-#accountModal{
-  position:fixed!important;
-  inset:0!important;
-  z-index:20000!important;
-  width:100%!important;
-  height:100%!important;
-  height:100dvh!important;
-  padding:0!important;
-  margin:0!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  background:#f5f7f6!important;
-  -webkit-overflow-scrolling:touch;
-}
-
-#accountModal .modal-box{
-  width:100%!important;
-  max-width:none!important;
-  min-height:100%!important;
-  margin:0!important;
-  padding:0!important;
-  border-radius:0!important;
-  background:#f5f7f6!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-}
-
-#accountModal .modal-box > div:first-child{
-  border-radius:0!important;
-}
-
-#accountModal .modal-box > div:nth-child(2){
-  padding:18px 16px 35px!important;
-  background:#f5f7f6!important;
-}
-
-/* Masquer uniquement les messages de connexion sur l'écran connecté.
-   Les erreurs des formulaires restent disponibles hors connexion. */
-
-#accountModal:has(#accountConnected:not(.hidden)) #accountMessage{
-  display:none!important;
-}
-
-/* ---------- PROFIL ---------- */
-
-#accountConnected .mg-profile-card{
-  width:100%!important;
-  margin:0 0 20px!important;
-  padding:18px!important;
-  border:1px solid #e1e9e3!important;
-  border-radius:18px!important;
-  background:#fff!important;
-  box-shadow:0 3px 14px rgba(0,0,0,.04)!important;
-  text-align:left!important;
-}
-
-/* ---------- MENU : ICÔNE À GAUCHE, FLÈCHE À DROITE ---------- */
-
-#accountConnected .form-actions{
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:stretch!important;
-  gap:0!important;
-  width:100%!important;
-  margin-top:12px!important;
-  padding:0!important;
-  border:1px solid #e1e9e3!important;
-  border-radius:17px!important;
-  overflow:hidden!important;
-  background:#fff!important;
-}
-
-#accountConnected .form-actions > button.mg-account-menu-row{
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:12px!important;
-  width:100%!important;
-  min-height:62px!important;
-  margin:0!important;
-  padding:12px 15px!important;
-  border:0!important;
-  border-bottom:1px solid #edf1ee!important;
-  border-radius:0!important;
-  background:#fff!important;
-  color:#26362c!important;
-  text-align:left!important;
-  font-size:14px!important;
-  font-weight:700!important;
-  box-shadow:none!important;
-}
-
-#accountConnected .form-actions > button.mg-account-menu-row:active{
-  background:#eff8f1!important;
-}
-
-#accountConnected .form-actions > button.mg-account-menu-row:last-child{
-  border-bottom:0!important;
-}
-
-#accountConnected .mg-menu-icon{
-  display:flex!important;
-  flex:0 0 39px!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:39px!important;
-  height:39px!important;
-  border-radius:12px!important;
-  background:#edf7f0!important;
-  font-size:20px!important;
-}
-
-#accountConnected .mg-menu-label{
-  flex:1 1 auto!important;
-  min-width:0!important;
-  text-align:left!important;
-  line-height:1.4!important;
-}
-
-#accountConnected .mg-menu-arrow{
-  display:block!important;
-  flex:0 0 auto!important;
-  margin-left:auto!important;
-  color:#89968e!important;
-  font-size:27px!important;
-  font-weight:400!important;
-  line-height:1!important;
-}
-
-#accountConnected .form-actions > button.mg-account-logout{
-  margin-top:12px!important;
-  border:1px solid #f0dada!important;
-  border-radius:12px!important;
-  background:#fff5f5!important;
-  color:#b52c2c!important;
-}
-
-/* ---------- SOUS-PAGES OUVERTES DEPUIS MON COMPTE ---------- */
-
-.mg-account-subpage{
-  position:fixed!important;
-  inset:0!important;
-  z-index:30000!important;
-  width:100%!important;
-  height:100%!important;
-  height:100dvh!important;
-  max-height:100dvh!important;
-  margin:0!important;
-  padding:0!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  border-radius:0!important;
-  background:#f5f7f6!important;
-  -webkit-overflow-scrolling:touch;
-}
-
-.mg-account-subpage > div:first-of-type,
-.mg-account-subpage > section:first-of-type,
-.mg-account-subpage > .modal-box{
-  width:100%!important;
-  max-width:none!important;
-  min-height:100%!important;
-  margin:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  box-sizing:border-box!important;
-}
-
-.mg-account-back{
-  position:sticky!important;
-  top:0!important;
-  z-index:100!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:8px!important;
-  width:100%!important;
-  min-height:54px!important;
-  margin:0!important;
-  padding:12px 16px!important;
-  border:0!important;
-  border-bottom:1px solid #e5ebe7!important;
-  border-radius:0!important;
-  background:#fff!important;
-  color:#087f3f!important;
-  text-align:left!important;
-  font-family:Arial,Helvetica,sans-serif!important;
-  font-size:14px!important;
-  font-weight:800!important;
-  box-shadow:0 2px 7px rgba(0,0,0,.035)!important;
-}
-
-.mg-account-back:active{
-  background:#edf8f0!important;
-}
-
-/* ---------- PETITS ÉCRANS ---------- */
-
-@media(max-width:380px){
-  #accountModal .modal-box > div:nth-child(2){
-    padding:14px 12px 28px!important;
+<style id="mg-account-fullscreen-v3">
+  /* Écran du compte : plein écran sur iPhone */
+  #accountModal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    background: #101112 !important;
   }
 
-  #accountConnected .form-actions > button.mg-account-menu-row{
-    min-height:58px!important;
-    padding:10px 11px!important;
-    gap:10px!important;
+  #accountModal .modal-box {
+    position: relative !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100% !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #101112 !important;
+    color: #f5f5f5 !important;
+    box-shadow: none !important;
   }
 
-  #accountConnected .mg-menu-icon{
-    flex-basis:35px!important;
-    width:35px!important;
-    height:35px!important;
-    font-size:18px!important;
+  /* En-tête */
+  #accountModal .modal-box > div:first-child {
+    position: relative !important;
+    padding:
+      calc(env(safe-area-inset-top) + 24px)
+      20px 22px !important;
+    background: #101112 !important;
+    background-image: none !important;
+    border-bottom: 1px solid #303134 !important;
+    color: #fff !important;
   }
-}
 
+  #accountModal #accountTitle {
+    margin: 0 45px 0 0 !important;
+    color: #fff !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
+  }
+
+  #accountModal .modal-box > div:first-child p {
+    color: #b5b5b5 !important;
+  }
+
+  #accountModal .modal-box > div:first-child .close {
+    position: absolute !important;
+    top: calc(env(safe-area-inset-top) + 15px) !important;
+    right: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: #292a2c !important;
+    color: #fff !important;
+  }
+
+  /* Contenu */
+  #accountModal .modal-box > div:nth-child(2) {
+    padding: 20px 16px calc(30px + env(safe-area-inset-bottom)) !important;
+    background: #101112 !important;
+    color: #f5f5f5 !important;
+  }
+
+  #accountModal h1,
+  #accountModal h2,
+  #accountModal h3,
+  #accountModal h4,
+  #accountModal label,
+  #accountModal strong {
+    color: #f5f5f5;
+  }
+
+  #accountModal p,
+  #accountModal small {
+    color: #bdbdbd;
+  }
+
+  /* Profil */
+  #accountModal .mg-profile-card {
+    padding: 19px !important;
+    margin-bottom: 22px !important;
+    border: 1px solid #353638 !important;
+    border-radius: 20px !important;
+    background: #202123 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  #accountModal .mg-profile-avatar {
+    flex-shrink: 0 !important;
+    border-color: #087f3f !important;
+    background: #303134 !important;
+  }
+
+  #accountModal .mg-profile-info strong,
+  #accountModal .mg-profile-info #connectedPhone {
+    color: #fff !important;
+  }
+
+  #accountModal .mg-profile-label,
+  #accountModal .mg-profile-status {
+    color: #56d68b !important;
+  }
+
+  #accountModal .mg-profile-edit-btn {
+    min-height: 46px !important;
+    border: 1px solid #3a654b !important;
+    border-radius: 13px !important;
+    background: #173b29 !important;
+    color: #8ee5ad !important;
+  }
+
+  /* Rubriques */
+  #accountModal #accountConnected .form-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 14px 0 24px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #353638 !important;
+    border-radius: 18px !important;
+    background: #202123 !important;
+  }
+
+  #accountModal #accountConnected .form-actions > button.mg-account-menu-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 13px !important;
+    width: 100% !important;
+    min-height: 62px !important;
+    margin: 0 !important;
+    padding: 12px 15px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #353638 !important;
+    border-radius: 0 !important;
+    background: #202123 !important;
+    color: #f5f5f5 !important;
+    text-align: left !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+
+  #accountModal #accountConnected .form-actions > button:last-child {
+    border-bottom: 0 !important;
+  }
+
+  #accountModal .mg-menu-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    background: #303134 !important;
+    font-size: 19px !important;
+  }
+
+  #accountModal .mg-menu-label {
+    flex: 1 !important;
+    color: #f5f5f5 !important;
+  }
+
+  #accountModal .mg-menu-arrow {
+    margin-left: auto !important;
+    color: #aaa !important;
+    font-size: 24px !important;
+  }
+
+  #accountModal .mg-account-logout {
+    color: #ff8888 !important;
+    background: #351b1d !important;
+  }
+
+  /* Messages et formulaires du compte */
+  #accountModal #accountMessage .success {
+    background: #173b29 !important;
+    color: #8ee5ad !important;
+  }
+
+  #accountModal #accountMessage .error {
+    background: #451e22 !important;
+    color: #ffaaaa !important;
+  }
+
+  #accountModal input,
+  #accountModal textarea,
+  #accountModal select {
+    max-width: 100% !important;
+    background: #202123 !important;
+    color: #fff !important;
+    border-color: #454648 !important;
+  }
+
+  #accountModal input::placeholder,
+  #accountModal textarea::placeholder {
+    color: #aaa !important;
+  }
+
+  @media (max-width: 380px) {
+    #accountModal .modal-box > div:nth-child(2) {
+      padding-right: 12px !important;
+      padding-left: 12px !important;
+    }
+
+    #accountModal #accountConnected .form-actions > button.mg-account-menu-row {
+      gap: 10px !important;
+      min-height: 58px !important;
+      padding: 10px 11px !important;
+      font-size: 14px !important;
+    }
+  }
 </style>
 
-<script id="mg-account-fullscreen-final-script">
-(function(){
-
+<script id="mg-account-return-v3">
+(function () {
   "use strict";
 
-  if(window.mgAccountFullscreenFinalInstalled) return;
-  window.mgAccountFullscreenFinalInstalled = true;
+  if (window.mgAccountReturnV3Installed) return;
+  window.mgAccountReturnV3Installed = true;
+
+  var account = document.getElementById("accountModal");
+  var connected = document.getElementById("accountConnected");
+
+  if (!account || !connected) return;
 
   /*
-   * Ces fenêtres sont les rubriques accessibles depuis Mon compte.
-   * Leurs fonctions métier ne sont pas remplacées.
+   * Les rubriques ouvrent leurs fenêtres existantes.
+   * Lorsqu'une de ces fenêtres est fermée, le compte
+   * peut être rouvert sans changer ses fonctions métier.
    */
+  var retourAuCompte = false;
+  var ouvertureEnCours = false;
 
-  const pageIds = [
-    "mesAchatsModal",
-    "payoutAccountModal",
-    "mesVentesModal",
-    "messagesModal",
-    "problemeModal",
-    "livraisonModal",
-    "mgEditProfileModal",
-    "mgBalanceModal"
-  ];
+  var actions = connected.querySelector(".form-actions");
 
-  const closeFunctions = {
-    mesAchatsModal: "fermerMesAchats",
-    payoutAccountModal: "fermerComptePaiement",
-    mesVentesModal: "fermerMesVentes",
-    messagesModal: "fermerModal",
-    problemeModal: "fermerProblemeModal",
-    livraisonModal: "fermerLivraisonModal",
-    mgEditProfileModal: "fermerModificationProfil",
-    mgBalanceModal: "fermerSoldeVendeur"
-  };
+  if (actions) {
+    actions.addEventListener("click", function (event) {
+      var button = event.target.closest("button");
 
-  let ouvertureDepuisCompte = false;
-  let retourEnCours = false;
+      if (!button || !actions.contains(button)) return;
 
-  function compteVisible(){
-    const compte = document.getElementById("accountModal");
-    return !!compte && getComputedStyle(compte).display !== "none";
-  }
+      /* Ne jamais revenir au compte après déconnexion. */
+      var action = button.getAttribute("onclick") || "";
 
-  function afficherCompte(){
-    const compte = document.getElementById("accountModal");
-    if(!compte) return;
-
-    compte.style.display = "block";
-
-    if(typeof window.ouvrirCompte === "function"){
-      window.ouvrirCompte();
-    }
-
-    compte.style.display = "block";
-
-    const message = document.getElementById("accountMessage");
-    const connecte = document.getElementById("accountConnected");
-
-    if(message && connecte && !connecte.classList.contains("hidden")){
-      message.innerHTML = "";
-      message.style.display = "none";
-    }
-
-    window.scrollTo(0,0);
-  }
-
-  function fermerPage(page){
-    if(!page) return;
-
-    const id = page.id;
-    const fonction = closeFunctions[id];
-
-    /*
-     * Utiliser la fermeture existante quand elle est disponible
-     * pour conserver le nettoyage des intervalles et des états.
-     */
-    if(id === "messagesModal" && typeof window.fermerModal === "function"){
-      window.fermerModal(id);
-    }else if(fonction && typeof window[fonction] === "function"){
-      window[fonction]();
-    }else{
-      page.style.display = "none";
-    }
-
-    page.style.display = "none";
-  }
-
-  function retourCompte(page){
-    if(retourEnCours) return;
-    retourEnCours = true;
-
-    fermerPage(page);
-
-    pageIds.forEach(function(id){
-      const autre = document.getElementById(id);
-      if(autre) autre.classList.remove("mg-account-subpage");
-    });
-
-    ouvertureDepuisCompte = false;
-    afficherCompte();
-
-    setTimeout(function(){
-      retourEnCours = false;
-    },100);
-  }
-
-  function ajouterRetour(page){
-    if(!page || !page.id) return;
-    if(!page.classList.contains("mg-account-subpage")) return;
-    if(page.querySelector(":scope > .mg-account-back")) return;
-
-    const bouton = document.createElement("button");
-    bouton.type = "button";
-    bouton.className = "mg-account-back";
-    bouton.innerHTML = '<span aria-hidden="true">←</span><span>Retour à Mon compte</span>';
-    bouton.addEventListener("click",function(event){
-      event.preventDefault();
-      event.stopPropagation();
-      retourCompte(page);
-    });
-
-    page.insertBefore(bouton,page.firstChild);
-  }
-
-  function preparerPages(){
-    pageIds.forEach(function(id){
-      const page = document.getElementById(id);
-      if(!page) return;
-
-      if(
-        ouvertureDepuisCompte &&
-        getComputedStyle(page).display !== "none"
-      ){
-        page.classList.add("mg-account-subpage");
-        ajouterRetour(page);
-      }
-    });
-  }
-
-  /*
-   * Le clic est capturé avant les fonctions existantes du menu.
-   * On ne change pas leurs actions.
-   */
-  document.addEventListener("click",function(event){
-    const bouton = event.target.closest(
-      "#accountConnected .form-actions button"
-    );
-
-    if(!bouton) return;
-
-    ouvertureDepuisCompte = true;
-
-    setTimeout(preparerPages,0);
-    setTimeout(preparerPages,100);
-    setTimeout(preparerPages,350);
-    setTimeout(preparerPages,800);
-  },true);
-
-  /*
-   * Certaines fenêtres sont créées seulement au premier clic.
-   * L'observateur les détecte lorsqu'elles apparaissent.
-   */
-  const observateur = new MutationObserver(function(){
-    if(!ouvertureDepuisCompte) return;
-    preparerPages();
-  });
-
-  observateur.observe(document.body,{
-    childList:true,
-    subtree:true,
-    attributes:true,
-    attributeFilter:["style","class"]
-  });
-
-  /*
-   * Réinitialiser l'affichage du message à chaque ouverture
-   * du compte connecté, sans modifier les erreurs de connexion.
-   */
-  const ancienneOuverture = window.ouvrirCompte;
-
-  if(typeof ancienneOuverture === "function"){
-    window.ouvrirCompte = function(){
-      const resultat = ancienneOuverture.apply(this,arguments);
-
-      const message = document.getElementById("accountMessage");
-      const connecte = document.getElementById("accountConnected");
-
-      if(message && connecte && !connecte.classList.contains("hidden")){
-        message.innerHTML = "";
-        message.style.display = "none";
-      }else if(message){
-        message.style.display = "";
-      }
-
-      return resultat;
-    };
-  }
-
-  /*
-   * Une fermeture avec le bouton X d'une sous-page
-   * ramène aussi au menu Mon compte.
-   */
-  const ancienneFermeture = window.fermerModal;
-
-  if(typeof ancienneFermeture === "function"){
-    window.fermerModal = function(id){
-      const page = document.getElementById(id);
-
-      if(
-        ouvertureDepuisCompte &&
-        page &&
-        page.classList.contains("mg-account-subpage")
-      ){
-        retourCompte(page);
+      if (action.indexOf("deconnecter") !== -1) {
+        retourAuCompte = false;
         return;
       }
 
-      return ancienneFermeture.apply(this,arguments);
-    };
-  }
-
-  /*
-   * La fenêtre de solde possède sa propre fonction de fermeture.
-   */
-  const ancienneFermetureSolde = window.fermerSoldeVendeur;
-
-  if(typeof ancienneFermetureSolde === "function"){
-    window.fermerSoldeVendeur = function(){
-      const page = document.getElementById("mgBalanceModal");
-
-      if(ouvertureDepuisCompte && page && page.classList.contains("mg-account-subpage")){
-        retourCompte(page);
+      /* Le solde possède déjà sa propre fenêtre. */
+      if (button.classList.contains("mg-account-balance")) {
+        retourAuCompte = true;
         return;
       }
 
-      return ancienneFermetureSolde.apply(this,arguments);
+      /* Les rubriques utilisent leurs fonctions existantes. */
+      if (action || button.classList.contains("mg-delivery-menu-row")) {
+        retourAuCompte = true;
+      }
+    }, true);
+  }
+
+  /*
+   * Ajouter une commande de retour dans les fenêtres
+   * ouvertes depuis les rubriques, quand c'est possible.
+   */
+  function ajouterBoutonRetour(modal) {
+    if (!modal || modal === account || modal.id === "mgBalanceModal") {
+      return;
+    }
+
+    var box = modal.querySelector(".modal-box");
+
+    if (!box || box.querySelector(".mg-retour-compte")) return;
+
+    var retour = document.createElement("button");
+    retour.type = "button";
+    retour.className = "mg-retour-compte";
+    retour.textContent = "‹  Retour à Mon compte";
+
+    retour.style.cssText =
+      "display:none;width:100%;text-align:left;" +
+      "padding:13px 16px;margin:0 0 12px;" +
+      "border:0;border-radius:12px;" +
+      "background:#202123;color:#fff;" +
+      "font-size:15px;font-weight:700;";
+
+    retour.addEventListener("click", function () {
+      modal.style.display = "none";
+      retourAuCompte = false;
+      account.style.display = "block";
+      account.scrollTop = 0;
+    });
+
+    box.insertBefore(retour, box.firstChild);
+  }
+
+  /*
+   * Conserver la fermeture existante. Si une fenêtre
+   * est fermée après une rubrique, le compte est restauré.
+   */
+  if (typeof window.fermerModal === "function") {
+    var fermerModalOriginal = window.fermerModal;
+
+    window.fermerModal = function (id) {
+      fermerModalOriginal.apply(this, arguments);
+
+      if (
+        id !== "accountModal" &&
+        retourAuCompte &&
+        !ouvertureEnCours
+      ) {
+        retourAuCompte = false;
+
+        window.setTimeout(function () {
+          var modal = document.getElementById(id);
+
+          if (modal) {
+            var retour = modal.querySelector(".mg-retour-compte");
+            if (retour) retour.style.display = "none";
+          }
+
+          if (
+            !document.getElementById("accountModal") ||
+            !document.getElementById("accountConnected")
+          ) return;
+
+          account.style.display = "block";
+          account.scrollTop = 0;
+        }, 50);
+      }
     };
   }
 
   /*
-   * La fenêtre de modification du profil peut se fermer après
-   * l'enregistrement. On conserve son comportement normal.
+   * Observer l'ouverture des fenêtres existantes.
+   * Le bouton Retour est affiché seulement lorsque
+   * l'utilisateur vient du menu du compte.
    */
-  window.addEventListener("pageshow",function(){
-    ouvertureDepuisCompte = false;
-    preparerPages();
+  var observer = new MutationObserver(function () {
+    if (!retourAuCompte) return;
+
+    document.querySelectorAll(".modal").forEach(function (modal) {
+      if (
+        modal.id !== "accountModal" &&
+        modal.style.display === "block"
+      ) {
+        ajouterBoutonRetour(modal);
+
+        var retour = modal.querySelector(".mg-retour-compte");
+        if (retour) retour.style.display = "block";
+      }
+    });
+  });
+
+  observer.observe(document.body, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["style"]
+  });
+
+  /* Retour clavier sur ordinateur, sans modifier l'accueil. */
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+
+    if (account.style.display === "block") {
+      account.style.display = "none";
+      retourAuCompte = false;
+    }
   });
 
 })();
 </script>
-
-<!-- FIN DU CORRECTIF MON COMPTE -->
   
 </body>
 </html>
