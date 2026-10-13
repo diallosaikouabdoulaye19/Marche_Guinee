@@ -19829,6 +19829,1229 @@ document.addEventListener("keydown", function(event){
   };
 })();
 </script>
+
+<!-- =========================================================
+     MARCHÉ GUINÉE 🇬🇳
+     NOUVELLES RUBRIQUES DU COMPTE — VERSION 1
+     À insérer juste avant </body>
+     Conserve les fonctions et les rubriques existantes.
+========================================================= -->
+
+<style id="mg-rubriques-complementaires-style">
+#mgExtraModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #f5f8f6;
+  color: #17221d;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#mgExtraModal * {
+  box-sizing: border-box;
+}
+
+#mgExtraModal .mg-extra-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  padding-top: max(14px, env(safe-area-inset-top));
+  background: #fff;
+  border-bottom: 1px solid #e5ece7;
+}
+
+#mgExtraModal .mg-extra-back {
+  flex: 0 0 43px;
+  width: 43px;
+  height: 43px;
+  padding: 0;
+  border-radius: 50%;
+  background: #edf7f0;
+  color: #087f3f;
+  font-size: 25px;
+}
+
+#mgExtraModal .mg-extra-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+#mgExtraModal .mg-extra-heading strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+#mgExtraModal .mg-extra-heading span {
+  display: block;
+  margin-top: 4px;
+  color: #748078;
+  font-size: 12px;
+}
+
+#mgExtraModal .mg-extra-content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 35px;
+}
+
+#mgExtraModal .mg-extra-card {
+  margin-bottom: 13px;
+  padding: 17px;
+  border: 1px solid #e3ebe5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,.035);
+}
+
+#mgExtraModal .mg-extra-card h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+#mgExtraModal .mg-extra-card p {
+  margin: 0 0 10px;
+  color: #59665e;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+#mgExtraModal .mg-extra-card p:last-child {
+  margin-bottom: 0;
+}
+
+#mgExtraModal .mg-extra-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 9px;
+  padding: 12px;
+  border: 1px solid #e3ebe5;
+  border-radius: 12px;
+  background: #fff;
+  color: #25332b;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#mgExtraModal .mg-extra-action span:first-child {
+  font-size: 21px;
+}
+
+#mgExtraModal .mg-extra-action span:nth-child(2) {
+  flex: 1;
+}
+
+#mgExtraModal .mg-extra-action span:last-child {
+  color: #9aa59e;
+  font-size: 23px;
+  font-weight: 400;
+}
+
+#mgExtraModal .mg-extra-notice {
+  padding: 13px;
+  border-radius: 12px;
+  background: #edf8f0;
+  color: #24643b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#mgExtraModal .mg-extra-listing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 11px;
+  padding: 12px;
+  border: 1px solid #e5ece7;
+  border-radius: 14px;
+  background: #fff;
+}
+
+#mgExtraModal .mg-extra-listing-image {
+  display: flex;
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #f0f3f1;
+  font-size: 27px;
+}
+
+#mgExtraModal .mg-extra-listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#mgExtraModal .mg-extra-listing-info {
+  flex: 1;
+  min-width: 0;
+}
+
+#mgExtraModal .mg-extra-listing-title {
+  font-size: 14px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+#mgExtraModal .mg-extra-listing-price {
+  margin-top: 6px;
+  color: #087f3f;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+#mgExtraModal .mg-extra-listing-status {
+  margin-top: 5px;
+  color: #69766e;
+  font-size: 12px;
+}
+
+#mgExtraModal .mg-extra-listing-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+#mgExtraModal .mg-extra-listing-buttons button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: #edf7f0;
+  color: #087f3f;
+  font-size: 12px;
+}
+
+#mgExtraModal .mg-extra-listing-buttons .mg-extra-remove {
+  background: #fff0f0;
+  color: #b42332;
+}
+
+#mgExtraModal .mg-extra-empty {
+  padding: 30px 15px;
+  border-radius: 15px;
+  background: #fff;
+  color: #68756d;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+#mgExtraModal .mg-extra-footer {
+  padding: 18px 10px;
+  color: #7a857e;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+#accountConnected .form-actions > button.mg-extra-menu-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 63px !important;
+  margin: 0 !important;
+  padding: 11px 13px !important;
+  border: 1px solid #e8eee9 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #26352c !important;
+  text-align: left !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,.035) !important;
+}
+
+#accountConnected .mg-extra-menu-icon {
+  display: inline-flex !important;
+  flex: 0 0 39px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 39px !important;
+  min-width: 39px !important;
+  height: 39px !important;
+  border-radius: 12px !important;
+  background: #edf8f0 !important;
+  font-size: 20px !important;
+}
+
+#accountConnected .mg-extra-menu-label {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+#accountConnected .mg-extra-menu-arrow {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  color: #94a199 !important;
+  font-size: 25px !important;
+}
+
+#accountConnected .mg-extra-section-title {
+  width: 100%;
+  margin: 20px 0 8px;
+  color: #738078;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 380px) {
+  #mgExtraModal .mg-extra-content {
+    padding: 12px;
+  }
+
+  #mgExtraModal .mg-extra-listing-image {
+    flex-basis: 65px;
+    width: 65px;
+    height: 65px;
+  }
+
+  #accountConnected .form-actions > button.mg-extra-menu-row {
+    min-height: 59px !important;
+    gap: 9px !important;
+    padding: 10px !important;
+  }
+
+  #accountConnected .mg-extra-menu-icon {
+    flex-basis: 35px !important;
+    width: 35px !important;
+    min-width: 35px !important;
+    height: 35px !important;
+    font-size: 18px !important;
+  }
+}
+</style>
+
+<div id="mgExtraModal" role="dialog" aria-modal="true"
+     aria-labelledby="mgExtraTitle">
+
+  <header class="mg-extra-header">
+    <button type="button" class="mg-extra-back"
+            onclick="mgExtraFermer()"
+            aria-label="Retour">‹</button>
+
+    <div class="mg-extra-heading">
+      <strong id="mgExtraTitle">Marché Guinée</strong>
+      <span id="mgExtraSubtitle">Ton espace personnel</span>
+    </div>
+  </header>
+
+  <main class="mg-extra-content" id="mgExtraContent"></main>
+</div>
+
+<script id="mg-rubriques-complementaires-script">
+(function () {
+  "use strict";
+
+  if (window.mgRubriquesComplementairesV1) return;
+  window.mgRubriquesComplementairesV1 = true;
+
+  var modalId = "mgExtraModal";
+  var contentId = "mgExtraContent";
+  var titreId = "mgExtraTitle";
+  var sousTitreId = "mgExtraSubtitle";
+
+  function element(id) {
+    return document.getElementById(id);
+  }
+
+  function echapper(valeur) {
+    if (typeof window.escapeHTML === "function") {
+      return window.escapeHTML(
+        String(valeur == null ? "" : valeur)
+      );
+    }
+
+    return String(valeur == null ? "" : valeur)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function utilisateur() {
+    try {
+      return typeof utilisateurConnecte !== "undefined"
+        ? utilisateurConnecte
+        : null;
+    } catch (erreur) {
+      return null;
+    }
+  }
+
+  function fermerCompte() {
+    var compte = element("accountModal");
+    if (compte) compte.style.display = "none";
+  }
+
+  function ouvrirPage(titre, sousTitre, html) {
+    element(titreId).textContent = titre;
+    element(sousTitreId).textContent =
+      sousTitre || "Marché Guinée 🇬🇳";
+
+    element(contentId).innerHTML = html;
+    element(modalId).style.display = "block";
+    element(modalId).scrollTop = 0;
+  }
+
+  window.mgExtraFermer = function () {
+    element(modalId).style.display = "none";
+  };
+
+  function carte(titre, contenu) {
+    return '<section class="mg-extra-card">' +
+      '<h3>' + titre + '</h3>' +
+      contenu +
+      '</section>';
+  }
+
+  function boutonInterne(icone, texte, action) {
+    return '<button type="button" class="mg-extra-action" ' +
+      'onclick="' + action + '">' +
+      '<span>' + icone + '</span>' +
+      '<span>' + texte + '</span>' +
+      '<span aria-hidden="true">›</span>' +
+      '</button>';
+  }
+
+  function ouvrirComptePuis(action) {
+    window.mgExtraFermer();
+    if (typeof window[action] === "function") {
+      window[action]();
+    } else {
+      alert("Cette fonction n'est pas disponible pour le moment.");
+    }
+  }
+
+  /* =====================================================
+     À PROPOS DE MARCHÉ GUINÉE
+  ===================================================== */
+
+  window.mgOuvrirAPropos = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "🇬🇳 À propos",
+      "Marché Guinée — Achetez et vendez en Guinée",
+      carte(
+        "🛍️ Notre plateforme",
+        '<p>Marché Guinée est une marketplace conçue pour faciliter ' +
+        'la découverte de produits et les échanges entre acheteurs ' +
+        'et vendeurs en Guinée.</p>'
+      ) +
+      carte(
+        "🎯 Notre mission",
+        '<p>Rapprocher les acheteurs et les vendeurs, simplifier ' +
+        'la publication d’annonces et contribuer au développement ' +
+        'du commerce guinéen.</p>'
+      ) +
+      carte(
+        "🤝 Nos valeurs",
+        '<p>La simplicité, la confiance, l’accessibilité et le respect ' +
+        'entre les membres de notre communauté.</p>'
+      ) +
+      carte(
+        "🛡️ Notre engagement",
+        '<p>Nous encourageons les utilisateurs à vérifier les annonces, ' +
+        'à rester prudents lors des échanges et à signaler les problèmes.</p>'
+      ) +
+      carte(
+        "💚 Notre ambition",
+        '<p><strong>Le commerce guinéen à portée de main.</strong></p>' +
+        '<p>Faciliter les échanges et donner davantage de visibilité ' +
+        'aux vendeurs et commerçants de Guinée.</p>'
+      ) +
+      carte(
+        "📱 Informations",
+        '<p><strong>Application :</strong> Marché Guinée 🇬🇳</p>' +
+        '<p><strong>Slogan :</strong> Achetez et vendez en Guinée</p>' +
+        '<p>© Marché Guinée — Tous droits réservés.</p>'
+      ) +
+      '<div class="mg-extra-footer">' +
+      'Merci de faire partie de la communauté Marché Guinée 🇬🇳' +
+      '</div>'
+    );
+  };
+
+  /* =====================================================
+     PARAMÈTRES
+  ===================================================== */
+
+  window.mgOuvrirParametres = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "⚙️ Paramètres",
+      "Gère les préférences de ton compte",
+      carte(
+        "👤 Profil",
+        '<p>Modifie les informations de ton profil et ta photo.</p>' +
+        boutonInterne(
+          "✏️",
+          "Modifier mon profil",
+          "mgExtraActionProfil()"
+        )
+      ) +
+      carte(
+        "🔔 Notifications",
+        '<p>Consulte les notifications disponibles dans ton compte.</p>' +
+        boutonInterne(
+          "🔔",
+          "Ouvrir mes notifications",
+          "mgExtraActionNotifications()"
+        )
+      ) +
+      carte(
+        "🔒 Confidentialité",
+        '<p>Consulte les informations sur la protection des données.</p>' +
+        boutonInterne(
+          "🔒",
+          "Confidentialité",
+          "mgExtraActionConfidentialite()"
+        )
+      ) +
+      carte(
+        "🛡️ Sécurité",
+        '<p>Découvre les conseils pour protéger ton compte.</p>' +
+        boutonInterne(
+          "🛡️",
+          "Sécurité du compte",
+          "mgExtraActionSecurite()"
+        )
+      ) +
+      '<div class="mg-extra-notice">' +
+      'Les réglages avancés du compte seront ajoutés lorsque les ' +
+      'fonctions correspondantes seront disponibles. Cette page ' +
+      'ne modifie pas ton mot de passe et ne change aucun statut ' +
+      'de commande ou de paiement.' +
+      '</div>'
+    );
+  };
+
+  window.mgExtraActionProfil = function () {
+    ouvrirComptePuis("ouvrirModificationProfil");
+  };
+
+  window.mgExtraActionNotifications = function () {
+    ouvrirComptePuis("ouvrirNotifications");
+  };
+
+  window.mgExtraActionConfidentialite = function () {
+    window.mgOuvrirConfidentialite();
+  };
+
+  window.mgExtraActionSecurite = function () {
+    window.mgOuvrirSecurite();
+  };
+
+  /* =====================================================
+     SÉCURITÉ DU COMPTE
+  ===================================================== */
+
+  window.mgOuvrirSecurite = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "🛡️ Sécurité du compte",
+      "Protège ton compte Marché Guinée",
+      carte(
+        "🔐 Protège tes accès",
+        '<p>Ne partage jamais ton mot de passe ni les codes de ' +
+        'vérification reçus.</p>' +
+        '<p>Utilise un mot de passe difficile à deviner et évite ' +
+        'de te connecter sur un appareil public.</p>'
+      ) +
+      carte(
+        "🤝 Lors d’un échange",
+        '<p>Vérifie les informations du vendeur et du produit avant ' +
+        'de prendre une décision.</p>' +
+        '<p>Ne communique pas de données sensibles dans une annonce ' +
+        'publique ou à un inconnu.</p>'
+      ) +
+      carte(
+        "⚠️ Un problème ?",
+        '<p>Si tu remarques une activité inhabituelle, signale-la ' +
+        'à Marché Guinée.</p>' +
+        boutonInterne(
+          "⚠️",
+          "Signaler un problème",
+          "mgExtraActionSignalement()"
+        )
+      )
+    );
+  };
+
+  window.mgExtraActionSignalement = function () {
+    ouvrirComptePuis("ouvrirSignalement");
+  };
+
+  /* =====================================================
+     AIDE ET ASSISTANCE
+  ===================================================== */
+
+  window.mgOuvrirAide = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "🆘 Aide et assistance",
+      "Nous t’aidons à utiliser la plateforme",
+      carte(
+        "🛍️ Acheter un produit",
+        '<p>Parcours les annonces, ouvre une fiche produit et ' +
+        'utilise les fonctions disponibles pour échanger avec le vendeur.</p>'
+      ) +
+      carte(
+        "➕ Publier une annonce",
+        '<p>Utilise le bouton de publication et renseigne les ' +
+        'informations du produit de manière claire et exacte.</p>'
+      ) +
+      carte(
+        "❤️ Retrouver mes favoris",
+        '<p>Enregistre une annonce depuis sa fiche, puis ouvre ' +
+        'la rubrique « Mes favoris » dans ton compte.</p>'
+      ) +
+      carte(
+        "🚚 Livraison",
+        '<p>Consulte les informations de livraison affichées ' +
+        'dans l’application. Vérifie toujours les éléments ' +
+        'nécessaires avant de confirmer une réception.</p>'
+      ) +
+      carte(
+        "⚠️ Contacter l’assistance",
+        '<p>Si une fonction ne marche pas ou si tu rencontres ' +
+        'un problème, envoie un signalement depuis ton compte.</p>' +
+        boutonInterne(
+          "⚠️",
+          "Signaler un problème",
+          "mgExtraActionSignalement()"
+        )
+      )
+    );
+  };
+
+  /* =====================================================
+     QUESTIONS FRÉQUENTES
+  ===================================================== */
+
+  window.mgOuvrirFAQ = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "❓ Questions fréquentes",
+      "Les réponses utiles pour commencer",
+      carte(
+        "L’inscription est-elle gratuite ?",
+        '<p>L’inscription à Marché Guinée est prévue pour être gratuite.</p>'
+      ) +
+      carte(
+        "Puis-je publier une annonce ?",
+        '<p>Oui, utilise « Publier une annonce » et renseigne les ' +
+        'informations demandées.</p>'
+      ) +
+      carte(
+        "Comment retrouver une annonce ?",
+        '<p>Utilise la recherche sur l’accueil ou enregistre ' +
+        'l’annonce dans tes favoris.</p>'
+      ) +
+      carte(
+        "Comment signaler un problème ?",
+        '<p>Ouvre « Signaler un problème » depuis ton compte.</p>'
+      ) +
+      carte(
+        "Les paiements en ligne sont-ils disponibles ?",
+        '<p>Les fonctionnalités de paiement sont encore en développement. ' +
+        'Cette page ne confirme aucun paiement et ne modifie aucune commande.</p>'
+      )
+    );
+  };
+
+  /* =====================================================
+     CONSEILS DE SÉCURITÉ
+  ===================================================== */
+
+  window.mgOuvrirConseilsSecurite = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "🛡️ Conseils de sécurité",
+      "Quelques précautions avant chaque échange",
+      carte(
+        "🔎 Vérifie l’annonce",
+        '<p>Lis attentivement la description, examine les photos ' +
+        'et demande des précisions si nécessaire.</p>'
+      ) +
+      carte(
+        "🤝 Échange avec prudence",
+        '<p>Ne partage pas ton mot de passe, tes codes secrets ' +
+        'ou des informations personnelles inutiles.</p>'
+      ) +
+      carte(
+        "📦 Lors de la remise du produit",
+        '<p>Vérifie le produit et les informations de livraison ' +
+        'prévues par l’application avant de confirmer la réception.</p>'
+      ) +
+      carte(
+        "🚨 Signale les comportements suspects",
+        '<p>Si une annonce semble trompeuse ou si un utilisateur ' +
+        'se comporte de manière suspecte, utilise le signalement.</p>' +
+        boutonInterne(
+          "⚠️",
+          "Signaler un problème",
+          "mgExtraActionSignalement()"
+        )
+      )
+    );
+  };
+
+  /* =====================================================
+     CONDITIONS D’UTILISATION
+  ===================================================== */
+
+  window.mgOuvrirConditions = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "📜 Conditions d’utilisation",
+      "Règles générales de la plateforme",
+      carte(
+        "1. Utilisation responsable",
+        '<p>Les utilisateurs doivent fournir des informations ' +
+        'exactes et utiliser la plateforme de manière responsable.</p>'
+      ) +
+      carte(
+        "2. Annonces",
+        '<p>Les annonces doivent décrire honnêtement les produits ' +
+        'proposés. Les contenus trompeurs ou illicites ne sont pas acceptables.</p>'
+      ) +
+      carte(
+        "3. Échanges entre utilisateurs",
+        '<p>Les acheteurs et les vendeurs doivent communiquer avec ' +
+        'respect et prendre les précautions nécessaires lors des échanges.</p>'
+      ) +
+      carte(
+        "4. Signalements",
+        '<p>Les utilisateurs peuvent signaler les annonces ou les ' +
+        'situations qui leur semblent problématiques.</p>'
+      ) +
+      carte(
+        "5. Évolution des services",
+        '<p>Les fonctionnalités peuvent évoluer. Les fonctions ' +
+        'de paiement restent distinctes et ne sont pas confirmées ' +
+        'comme opérationnelles par cette page.</p>'
+      ) +
+      '<div class="mg-extra-notice">' +
+      'Ce texte est une base informative à compléter et à valider ' +
+      'avant de constituer des conditions juridiques définitives.' +
+      '</div>'
+    );
+  };
+
+  /* =====================================================
+     CONFIDENTIALITÉ
+  ===================================================== */
+
+  window.mgOuvrirConfidentialite = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "🔒 Confidentialité",
+      "Informations sur tes données",
+      carte(
+        "📋 Données du compte",
+        '<p>Le fonctionnement du compte peut nécessiter des ' +
+        'informations telles que le nom, le numéro de téléphone ' +
+        'et la photo de profil.</p>'
+      ) +
+      carte(
+        "🛍️ Activité sur la plateforme",
+        '<p>Les annonces, messages, favoris et notifications ' +
+        'nécessitent le traitement des informations associées à ces fonctions.</p>'
+      ) +
+      carte(
+        "🔐 Protection",
+        '<p>Ne publie pas d’informations confidentielles dans ' +
+        'les descriptions d’annonces ou dans les espaces publics.</p>'
+      ) +
+      carte(
+        "ℹ️ Tes questions",
+        '<p>Pour signaler un problème lié à tes informations, ' +
+        'utilise la rubrique de signalement.</p>' +
+        boutonInterne(
+          "⚠️",
+          "Signaler un problème",
+          "mgExtraActionSignalement()"
+        )
+      ) +
+      '<div class="mg-extra-notice">' +
+      'Cette présentation ne remplace pas une politique de confidentialité ' +
+      'juridique complète. Les détails de conservation et de traitement ' +
+      'doivent être vérifiés avec la configuration réelle du service.' +
+      '</div>'
+    );
+  };
+
+  /* =====================================================
+     CONTACT / ASSISTANCE
+  ===================================================== */
+
+  window.mgOuvrirContact = function () {
+    fermerCompte();
+
+    ouvrirPage(
+      "📞 Contacter l’assistance",
+      "Aide pour ton compte et tes annonces",
+      carte(
+        "🆘 Besoin d’aide ?",
+        '<p>Décris clairement le problème rencontré et précise ' +
+        'la rubrique concernée. N’envoie jamais ton mot de passe.</p>' +
+        boutonInterne(
+          "⚠️",
+          "Ouvrir le signalement",
+          "mgExtraActionSignalement()"
+        )
+      ) +
+      carte(
+        "ℹ️ À savoir",
+        '<p>Aucune adresse e-mail ou aucun numéro d’assistance ' +
+        'n’est affiché ici, car un contact officiel doit être ' +
+        'confirmé avant d’être publié.</p>'
+      )
+    );
+  };
+
+  /* =====================================================
+     MES NOTIFICATIONS
+  ===================================================== */
+
+  window.mgExtraOuvrirNotifications = function () {
+    fermerCompte();
+
+    if (typeof window.ouvrirNotifications === "function") {
+      window.ouvrirNotifications();
+    } else {
+      ouvrirPage(
+        "🔔 Mes notifications",
+        "Informations de ton compte",
+        '<div class="mg-extra-empty">' +
+        'Le système de notifications est momentanément indisponible.' +
+        '</div>'
+      );
+    }
+  };
+
+  /* =====================================================
+     MES FAVORIS
+  ===================================================== */
+
+  function prix(prixGNF) {
+    if (typeof window.formatPrix === "function") {
+      return window.formatPrix(prixGNF);
+    }
+
+    return Number(prixGNF || 0).toLocaleString("fr-FR") + " GNF";
+  }
+
+  function afficherFavorisVide(texte) {
+    element(contentId).innerHTML =
+      '<div class="mg-extra-empty">' +
+      '<div style="font-size:40px;margin-bottom:10px;">❤️</div>' +
+      echapper(texte) +
+      '</div>';
+  }
+
+  window.mgOuvrirFavoris = async function () {
+    var user = utilisateur();
+
+    fermerCompte();
+
+    ouvrirPage(
+      "❤️ Mes favoris",
+      "Les annonces que tu as enregistrées",
+      '<div class="mg-extra-empty">Chargement de tes favoris...</div>'
+    );
+
+    if (!user || !user.id) {
+      afficherFavorisVide(
+        "Connecte-toi pour consulter tes annonces favorites."
+      );
+      return;
+    }
+
+    if (typeof window.supabaseFetch !== "function" ||
+        typeof window.SUPABASE_URL === "undefined") {
+      afficherFavorisVide(
+        "La connexion aux données est indisponible. Réessaie plus tard."
+      );
+      return;
+    }
+
+    try {
+      var favoris = await window.supabaseFetch(
+        window.SUPABASE_URL +
+        "/rest/v1/favorites?select=id,listing_id,created_at" +
+        "&user_id=eq." + encodeURIComponent(user.id) +
+        "&order=created_at.desc"
+      );
+
+      if (favoris && Array.isArray(favoris.data)) {
+        favoris = favoris.data;
+      }
+
+      if (!Array.isArray(favoris)) {
+        throw new Error("Réponse inattendue lors du chargement des favoris.");
+      }
+
+      if (!favoris.length) {
+        afficherFavorisVide(
+          "Tu n’as pas encore de favoris. Ouvre une annonce et appuie sur le cœur pour l’enregistrer."
+        );
+        return;
+      }
+
+      var listeAnnonces = [];
+
+      for (var i = 0; i < favoris.length; i++) {
+        var favori = favoris[i];
+
+        if (!favori.listing_id) continue;
+
+        var lignes = await window.supabaseFetch(
+          window.SUPABASE_URL +
+          "/rest/v1/listings?select=id,seller_id,title,description," +
+          "price_gnf,condition,city,neighborhood,status,created_at" +
+          "&id=eq." + encodeURIComponent(favori.listing_id) +
+          "&limit=1"
+        );
+
+        if (lignes && Array.isArray(lignes.data)) {
+          lignes = lignes.data;
+        }
+
+        if (Array.isArray(lignes) && lignes.length) {
+          listeAnnonces.push({
+            favoriId: favori.id,
+            annonce: lignes[0]
+          });
+        }
+      }
+
+      if (element(modalId).style.display === "none") return;
+
+      if (!listeAnnonces.length) {
+        afficherFavorisVide(
+          "Aucune de tes annonces favorites n’est actuellement accessible."
+        );
+        return;
+      }
+
+      element(contentId).innerHTML = "";
+
+      listeAnnonces.forEach(function (item) {
+        var annonce = item.annonce;
+        var carteAnnonce = document.createElement("article");
+
+        carteAnnonce.className = "mg-extra-listing";
+
+        var image = document.createElement("div");
+        image.className = "mg-extra-listing-image";
+        image.textContent = "📦";
+
+        var infos = document.createElement("div");
+        infos.className = "mg-extra-listing-info";
+
+        var statut = String(annonce.status || "").toLowerCase();
+        var statutTexte =
+          statut === "active" ? "Disponible" :
+          statut === "paused" ? "En pause" :
+          statut === "sold" ? "Vendue" :
+          "Statut non précisé";
+
+        infos.innerHTML =
+          '<div class="mg-extra-listing-title">' +
+            echapper(annonce.title || "Annonce sans titre") +
+          '</div>' +
+          '<div class="mg-extra-listing-price">' +
+            echapper(prix(annonce.price_gnf)) +
+          '</div>' +
+          '<div class="mg-extra-listing-status">' +
+            echapper(statutTexte) +
+          '</div>' +
+          '<div class="mg-extra-listing-buttons">' +
+            (statut === "active"
+              ? '<button type="button" data-mg-favori-voir="' +
+                echapper(annonce.id) + '">Voir l’annonce</button>'
+              : '') +
+            '<button type="button" class="mg-extra-remove" ' +
+              'data-mg-favori-retirer="' +
+              echapper(annonce.id) + '">Retirer ❤️</button>' +
+          '</div>';
+
+        carteAnnonce.appendChild(image);
+        carteAnnonce.appendChild(infos);
+        element(contentId).appendChild(carteAnnonce);
+
+        if (typeof window.chargerImages === "function") {
+          Promise.resolve(window.chargerImages(annonce.id))
+            .then(function (url) {
+              if (!url || !image.isConnected) return;
+
+              var img = document.createElement("img");
+              img.src = url;
+              img.alt = annonce.title || "Photo de l’annonce";
+              img.loading = "lazy";
+              img.onerror = function () {
+                img.remove();
+                image.textContent = "📦";
+              };
+
+              image.textContent = "";
+              image.appendChild(img);
+            })
+            .catch(function () {});
+        }
+      });
+
+      element(contentId).querySelectorAll("[data-mg-favori-voir]")
+        .forEach(function (bouton) {
+          bouton.addEventListener("click", function () {
+            var id = bouton.getAttribute("data-mg-favori-voir");
+
+            if (typeof window.ouvrirDetailAnnonce === "function") {
+              window.ouvrirDetailAnnonce(id);
+            } else {
+              alert("Le détail de cette annonce est indisponible.");
+            }
+          });
+        });
+
+      element(contentId).querySelectorAll("[data-mg-favori-retirer]")
+        .forEach(function (bouton) {
+          bouton.addEventListener("click", async function () {
+            var id = bouton.getAttribute("data-mg-favori-retirer");
+
+            if (!confirm("Retirer cette annonce de tes favoris ?")) {
+              return;
+            }
+
+            bouton.disabled = true;
+
+            try {
+              await window.supabaseFetch(
+                window.SUPABASE_URL +
+                "/rest/v1/favorites?user_id=eq." +
+                encodeURIComponent(user.id) +
+                "&listing_id=eq." + encodeURIComponent(id),
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Prefer": "return=minimal"
+                  }
+                }
+              );
+
+              await window.mgOuvrirFavoris();
+
+            } catch (erreur) {
+              console.error("Erreur retrait favori :", erreur);
+              alert("Impossible de retirer ce favori. Réessaie.");
+              bouton.disabled = false;
+            }
+          });
+        });
+
+    } catch (erreur) {
+      console.error("Chargement des favoris impossible :", erreur);
+
+      afficherFavorisVide(
+        "Impossible de charger tes favoris. Vérifie ta connexion et réessaie."
+      );
+    }
+  };
+
+  /* =====================================================
+     AJOUT DES RUBRIQUES AU MENU EXISTANT
+     Ne remplace aucun bouton déjà présent.
+  ===================================================== */
+
+  var nouvellesRubriques = [
+    {
+      id: "mgExtraMenuFavoris",
+      icon: "❤️",
+      label: "Mes favoris",
+      action: "mgOuvrirFavoris",
+      order: 12
+    },
+    {
+      id: "mgExtraMenuParametres",
+      icon: "⚙️",
+      label: "Paramètres",
+      action: "mgOuvrirParametres",
+      order: 13
+    },
+    {
+      id: "mgExtraMenuNotifications",
+      icon: "🔔",
+      label: "Mes notifications",
+      action: "mgExtraOuvrirNotifications",
+      order: 14
+    },
+    {
+      id: "mgExtraMenuSecurite",
+      icon: "🛡️",
+      label: "Sécurité du compte",
+      action: "mgOuvrirSecurite",
+      order: 15
+    },
+    {
+      id: "mgExtraMenuConseils",
+      icon: "🛡️",
+      label: "Conseils de sécurité",
+      action: "mgOuvrirConseilsSecurite",
+      order: 16
+    },
+    {
+      id: "mgExtraMenuAide",
+      icon: "🆘",
+      label: "Aide et assistance",
+      action: "mgOuvrirAide",
+      order: 17
+    },
+    {
+      id: "mgExtraMenuFAQ",
+      icon: "❓",
+      label: "Questions fréquentes",
+      action: "mgOuvrirFAQ",
+      order: 18
+    },
+    {
+      id: "mgExtraMenuAPropos",
+      icon: "🇬🇳",
+      label: "À propos de Marché Guinée",
+      action: "mgOuvrirAPropos",
+      order: 19
+    },
+    {
+      id: "mgExtraMenuConditions",
+      icon: "📜",
+      label: "Conditions d’utilisation",
+      action: "mgOuvrirConditions",
+      order: 20
+    },
+    {
+      id: "mgExtraMenuConfidentialite",
+      icon: "🔒",
+      label: "Confidentialité",
+      action: "mgOuvrirConfidentialite",
+      order: 21
+    },
+    {
+      id: "mgExtraMenuContact",
+      icon: "📞",
+      label: "Contacter l’assistance",
+      action: "mgOuvrirContact",
+      order: 22
+    }
+  ];
+
+  function ajouterRubriques() {
+    var compte = element("accountConnected");
+    if (!compte) return;
+
+    var actions = compte.querySelector(".form-actions");
+    if (!actions) return;
+
+    nouvellesRubriques.forEach(function (rubrique) {
+      if (element(rubrique.id)) return;
+
+      var bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.id = rubrique.id;
+      bouton.className = "mg-extra-menu-row";
+
+      bouton.style.order = String(rubrique.order);
+
+      bouton.innerHTML =
+        '<span class="mg-extra-menu-icon">' +
+          rubrique.icon +
+        '</span>' +
+        '<span class="mg-extra-menu-label">' +
+          rubrique.label +
+        '</span>' +
+        '<span class="mg-extra-menu-arrow" aria-hidden="true">›</span>';
+
+      bouton.addEventListener("click", function () {
+        fermerCompte();
+
+        var fonction = window[rubrique.action];
+
+        if (typeof fonction === "function") {
+          fonction();
+        } else {
+          alert("Cette rubrique est momentanément indisponible.");
+        }
+      });
+
+      actions.appendChild(bouton);
+    });
+
+    /*
+      Garder la déconnexion à la fin du menu,
+      sans modifier sa fonction.
+    */
+    actions.querySelectorAll("button").forEach(function (bouton) {
+      var action = bouton.getAttribute("onclick") || "";
+
+      if (action.indexOf("deconnecter") !== -1) {
+        bouton.style.order = "99";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ajouterRubriques);
+  } else {
+    ajouterRubriques();
+  }
+
+  /*
+    Certains éléments du compte sont créés ou actualisés
+    dynamiquement. L’observateur ajoute uniquement les
+    rubriques absentes et évite les doublons.
+  */
+  var observateur = new MutationObserver(function () {
+    ajouterRubriques();
+  });
+
+  observateur.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+})();
+</script>
+
+<!-- FIN — NOUVELLES RUBRIQUES MARCHÉ GUINÉE -->
   
 </body>
 </html>
