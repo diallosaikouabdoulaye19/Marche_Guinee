@@ -19310,9 +19310,14 @@ document.addEventListener("keydown", function(event){
           Chargement du profil...
         </div>
 
-        <h2 class="mg-profil-annonces-titre">Ses autres annonces</h2>
+        <h2 class="mg-profil-annonces-titre">Toutes ses annonces</h2>
 
         <div id="mgProfilAnnonces" class="mg-profil-annonces"></div>
+
+        <footer class="mg-profil-footer">
+          <strong>🇬🇳 Marché Guinée</strong>
+          <div>Acheter, vendre et échanger simplement.</div>
+        </footer>
       </div>
     `;
 
@@ -19375,68 +19380,233 @@ document.addEventListener("keydown", function(event){
   }
 
   function obtenirStatut(statut) {
-    var valeur = String(statut || "").toLowerCase();
+    var valeur = String(statut || "").toLowerCase().trim();
 
     if (valeur === "active") {
       return {
-        texte: "Disponible",
+        texte: "🟢 Disponible",
         classe: "mg-statut-active"
       };
     }
 
     if (valeur === "paused") {
       return {
-        texte: "Suspendue",
+        texte: "🟠 Suspendue",
         classe: "mg-statut-paused"
       };
     }
 
     if (valeur === "sold") {
       return {
-        texte: "Vendue",
+        texte: "🔴 Vendue",
         classe: "mg-statut-sold"
       };
     }
 
     return {
-      texte: statut || "Statut inconnu",
+      texte: "Statut : " + (statut || "inconnu"),
       classe: "mg-statut-inconnu"
     };
   }
 
-  /* Style des statuts */
   if (!document.getElementById("mg-styles-statuts-vendeur")) {
     var style = document.createElement("style");
     style.id = "mg-styles-statuts-vendeur";
 
     style.textContent = `
-      .mg-profil-statut {
+      #mgProfilVendeurModal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        overflow-y: auto;
+        background: #fff;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #mgProfilVendeurModal .mg-profil-page {
+        min-height: 100%;
+        box-sizing: border-box;
+        padding-bottom: 24px;
+        background: #fff;
+      }
+
+      #mgProfilVendeurModal .mg-profil-header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+      }
+
+      #mgProfilVendeurModal .mg-profil-retour {
+        width: 40px;
+        height: 40px;
+        border: 0;
+        border-radius: 50%;
+        background: #f1f3f1;
+        font-size: 30px;
+        cursor: pointer;
+      }
+
+      #mgProfilVendeurModal .mg-profil-titre {
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      #mgProfilVendeurModal .mg-profil-identite {
+        padding: 24px 16px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+      }
+
+      #mgProfilVendeurModal .mg-profil-photo {
+        display: block;
+        width: 84px;
+        height: 84px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e5f3e9;
+        color: #087f3f;
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 84px;
+        text-align: center;
+      }
+
+      #mgProfilVendeurModal .mg-profil-nom {
+        margin: 8px 0;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      #mgProfilVendeurModal .mg-profil-sous-titre {
+        color: #666;
+        font-size: 14px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonces-titre {
+        padding: 0 16px;
+        margin-top: 22px;
+        font-size: 19px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonces {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        padding: 12px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #e7e7e7;
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce-photo {
+        width: 100%;
+        height: 145px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f5f5f5;
+        font-size: 38px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce-info {
+        padding: 10px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce-nom {
+        font-size: 14px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      #mgProfilVendeurModal .mg-profil-annonce-prix {
+        margin-top: 7px;
+        color: #087f3f;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      #mgProfilVendeurModal .mg-profil-statut {
         display: inline-block;
         margin-top: 8px;
-        padding: 5px 9px;
+        padding: 5px 8px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 800;
       }
 
-      .mg-statut-active {
+      #mgProfilVendeurModal .mg-statut-active {
         background: #d9f7e4;
         color: #087f3f;
       }
 
-      .mg-statut-paused {
+      #mgProfilVendeurModal .mg-statut-paused {
         background: #fff0c2;
         color: #805700;
       }
 
-      .mg-statut-sold {
+      #mgProfilVendeurModal .mg-statut-sold {
         background: #eeeeee;
-        color: #555555;
+        color: #555;
       }
 
-      .mg-statut-inconnu {
+      #mgProfilVendeurModal .mg-statut-inconnu {
         background: #eeeeee;
-        color: #555555;
+        color: #555;
+      }
+
+      #mgProfilVendeurModal .mg-profil-message {
+        grid-column: 1 / -1;
+        padding: 20px;
+        text-align: center;
+        color: #555;
+      }
+
+      #mgProfilVendeurModal .mg-profil-footer {
+        padding: 25px 12px;
+        margin-top: 20px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        color: #666;
+        font-size: 13px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-footer strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #087f3f;
+        font-size: 17px;
+      }
+
+      @media (max-width: 360px) {
+        #mgProfilVendeurModal .mg-profil-annonces {
+          gap: 8px;
+          padding: 8px;
+        }
+
+        #mgProfilVendeurModal .mg-profil-annonce-photo {
+          height: 120px;
+        }
       }
     `;
 
@@ -19461,13 +19631,13 @@ document.addEventListener("keydown", function(event){
 
     identite.textContent = "Chargement du profil vendeur...";
     liste.innerHTML =
-      '<div class="mg-profil-message">Chargement de ses annonces...</div>';
+      '<div class="mg-profil-message">Chargement de toutes ses annonces...</div>';
 
     try {
       var base = obtenirAdresseSupabase().replace(/\/+$/, "");
       var requete = obtenirFetch();
 
-      /* 1. Récupérer le profil vendeur */
+      /* Récupérer les informations du vendeur */
       var urlProfil =
         base +
         "/rest/v1/users?id=eq." +
@@ -19504,9 +19674,9 @@ document.addEventListener("keydown", function(event){
       `;
 
       /*
-       * 2. Charger toutes les annonces du vendeur.
-       * IMPORTANT : aucun filtre sur status ici.
-       * Les annonces active, paused et sold seront affichées.
+       * Charger les annonces de CE vendeur.
+       * Aucun filtre de statut : active, paused et sold sont inclus.
+       * Aucun retrait de l'annonce courante : toutes ses annonces restent visibles.
        */
       var urlAnnonces =
         base +
@@ -19521,9 +19691,12 @@ document.addEventListener("keydown", function(event){
         throw new Error("Réponse des annonces invalide.");
       }
 
-      /* Exclure uniquement l'annonce actuellement consultée */
+      /*
+       * Vérifier aussi côté navigateur que chaque résultat appartient
+       * bien au vendeur dont le profil est ouvert.
+       */
       annonces = annonces.filter(function (annonce) {
-        return String(annonce.id) !== String(annonceCouranteId);
+        return String(annonce.seller_id) === String(sellerId);
       });
 
       if (modal.style.display !== "block") return;
@@ -19531,7 +19704,10 @@ document.addEventListener("keydown", function(event){
       if (annonces.length === 0) {
         liste.innerHTML = `
           <div class="mg-profil-message">
-            Ce vendeur n'a pas d'autres annonces à afficher.
+            Aucune annonce n'a été trouvée pour ce vendeur.
+            <br><br>
+            Si ce vendeur a déjà publié des annonces, il faudra vérifier
+            les données et les autorisations de lecture dans Supabase.
           </div>
         `;
         return;
@@ -19563,14 +19739,16 @@ document.addEventListener("keydown", function(event){
           </div>
         `;
 
-        /* Ouvrir le détail uniquement pour les annonces disponibles */
         carte.addEventListener("click", function () {
-          if (String(annonce.status).toLowerCase() !== "active") {
-            alert(
-              String(annonce.status).toLowerCase() === "sold"
-                ? "Cette annonce est déjà vendue."
-                : "Cette annonce est actuellement suspendue."
-            );
+          var etat = String(annonce.status || "").toLowerCase().trim();
+
+          if (etat === "sold") {
+            alert("Cette annonce est déjà vendue.");
+            return;
+          }
+
+          if (etat !== "active") {
+            alert("Cette annonce est actuellement suspendue.");
             return;
           }
 
@@ -19583,7 +19761,6 @@ document.addEventListener("keydown", function(event){
 
         liste.appendChild(carte);
 
-        /* Charger l'image avec la fonction existante */
         if (typeof window.chargerImages === "function") {
           Promise.resolve(window.chargerImages(annonce.id))
             .then(function (urlImage) {
@@ -19607,7 +19784,10 @@ document.addEventListener("keydown", function(event){
               zoneImage.appendChild(image);
             })
             .catch(function (erreur) {
-              console.warn("Image annonce indisponible :", erreur);
+              console.warn(
+                "Image annonce indisponible :",
+                erreur
+              );
             });
         }
       });
@@ -19635,7 +19815,7 @@ document.addEventListener("keydown", function(event){
         </div>
       `;
 
-      var bouton = document.getElementById("mgReessayerProfil");
+      var bouton = modal.querySelector("#mgReessayerProfil");
 
       if (bouton) {
         bouton.onclick = function () {
