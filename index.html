@@ -849,13 +849,21 @@ footer{
 
 <div class="mg-home">
 
-  <!-- HEADER -->
+ <!-- HEADER -->
 <header class="mg-header">
   <div class="mg-header-top">
     <div class="mg-logo">
       🇬🇳 Marché Guinée
     </div>
     <div class="mg-header-actions">
+      <!-- BOUTON MES MESSAGES -->
+      <button
+        class="mg-icon-btn"
+        onclick="ouvrirMessages()"
+        aria-label="Mes messages"
+        title="Mes messages">
+        💬
+      </button>
       <!-- BOUTON LIVRAISON -->
       <button
         class="mg-icon-btn"
@@ -876,9 +884,7 @@ footer{
   </div>
   <div class="mg-search-area">
     <div class="mg-search">
-      <span class="mg-search-icon">
-        🔎
-      </span>
+      <span class="mg-search-icon">🔎</span>
       <input
         id="searchInput"
         type="search"
