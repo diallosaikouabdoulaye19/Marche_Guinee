@@ -17306,33 +17306,10 @@ document.addEventListener("keydown", function(event){
   }
 
 function afficherRetour() {
-    var feature = trouverFenetre();
-    if (!feature) return;
-    /* Mes achats possède déjà son propre bouton de retour. */
-    if (feature.id === "mesAchatsModal") {
-      retirerRetour();
-      return;
-    }
-    if (returnButton && returnTarget === feature &&
-        returnButton.isConnected) return;
-    retirerRetour();
-    returnTarget = feature;
-    returnButton = document.createElement("button");
-    returnButton.type = "button";
-    returnButton.className = "mg-v6-back-button";
-    returnButton.textContent = "Retour à Mon compte";
-    returnButton.setAttribute("aria-label", "Retour à Mon compte");
-    returnButton.addEventListener("click", function () {
-      var target = returnTarget;
-      retirerRetour();
-      fermerFonction(target);
-      var account = document.getElementById("accountModal");
-      if (account) {
-        account.style.display = "flex";
-        account.scrollTop = 0;
-      }
-    });
-    document.body.appendChild(returnButton);
+  /* Bouton Retour global désactivé.
+     Chaque rubrique conserve ses propres commandes
+     et ses fonctions d'ouverture et de fermeture. */
+  retirerRetour();
 }
   
   function retirerRetour() {
