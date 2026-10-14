@@ -22520,6 +22520,271 @@ function afficherRetourMesAnnonces() {
   console.log("Correctif Mes annonces installé.");
 })();
 </script>
- 
+
+<script id="mg-session-auto-refresh">
+(function () {
+  "use strict";
+  if (window.mgSessionAutoRefreshInstalled) return;
+  window.mgSessionAutoRefreshInstalled = true;
+  var refreshEnCours = null;
+  var ancienSupabaseFetch =
+    window.supabaseFetch ||
+    (typeof supabaseFetch === "function" ? supabaseFetch : null);
+  function utilisateurActuel() {
+    try {
+      if (
+        typeof utilisateurConnecte !== "undefined" &&
+        utilisateurConnecte
+      ) {
+        return utilisateurConnecte;
+      }
+    } catch (e) {}
+    return window.utilisateurConnecte || null;
+  }
+  function definirUtilisateur(user) {
+    try {
+      utilisateurConnecte = user;
+    } catch (e) {}
+    try {
+      window.utilisateurConnecte = user;
+    } catch (e) {}
+  }
+  function enregistrerSession(user) {
+    try {
+      localStorage.setItem(
+        "marche_guinee_session",
+        JSON.stringify(user)
+      );
+    } catch (erreur) {
+      console.error(
+        "Marché Guinée : impossible d'enregistrer la session.",
+        erreur
+      );
+    }
+  }
+  function expirationJeton(token) {
+    try {
+      if (!token || token.split(".").length < 2) return 0;
+      var partie = token.split(".")[1]
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+      while (partie.length % 4) partie += "=";
+      var contenu = JSON.parse(atob(partie));
+      return Number(contenu.exp || 0);
+    } catch (e) {
+      return 0;
+    }
+  }
+  function obtenirConfiguration() {
+    var url =
+      typeof SUPABASE_URL !== "undefined"
+        ? SUPABASE_URL
+        : window.SUPABASE_URL;
+    var cle =
+      typeof SUPABASE_KEY !== "undefined"
+        ? SUPABASE_KEY
+        : window.SUPABASE_KEY;
+    if (!url || !cle) {
+      throw new Error(
+        "La configuration Supabase est introuvable."
+      );
+    }
+    return {
+      url: url,
+      cle: cle
+    };
+  }
+  async function renouvelerSession(force) {
+    var user = utilisateurActuel();
+    if (!user || !user.id || !user.refreshToken) {
+      return false;
+    }
+    var expiration = expirationJeton(user.accessToken);
+    var maintenant = Math.floor(Date.now() / 1000);
+    // Renouveler 2 minutes avant l'expiration.
+    if (
+      !force &&
+      expiration &&
+      expiration > maintenant + 120
+    ) {
+      return true;
+    }
+    // Éviter plusieurs renouvellements simultanés.
+    if (refreshEnCours) {
+      return refreshEnCours;
+    }
+    refreshEnCours = (async function () {
+      var configuration = obtenirConfiguration();
+      var reponse = await fetch(
+        configuration.url +
+          "/auth/v1/token?grant_type=refresh_token",
+        {
+          method: "POST",
+          headers: {
+            apikey: configuration.cle,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            refresh_token: user.refreshToken
+          })
+        }
+      );
+      var donnees = await reponse.json();
+      if (
+        !reponse.ok ||
+        !donnees.access_token ||
+        !donnees.refresh_token
+      ) {
+        throw new Error(
+          donnees.error_description ||
+          donnees.msg ||
+          donnees.message ||
+          "Le renouvellement de la session a échoué."
+        );
+      }
+      // Mettre à jour la session sans changer l'identité.
+      user.accessToken = donnees.access_token;
+      user.refreshToken = donnees.refresh_token;
+      if (donnees.expires_in) {
+        user.expiresAt =
+          Math.floor(Date.now() / 1000) +
+          Number(donnees.expires_in);
+      }
+      definirUtilisateur(user);
+      enregistrerSession(user);
+      console.log(
+        "Marché Guinée : session renouvelée automatiquement."
+      );
+      return true;
+    })();
+    try {
+      return await refreshEnCours;
+    } finally {
+      refreshEnCours = null;
+    }
+  }
+  function erreurJetonExpire(erreur) {
+    var message = String(
+      erreur && erreur.message
+        ? erreur.message
+        : erreur
+    ).toLowerCase();
+    return (
+      message.includes("jwt expired") ||
+      message.includes("token expired") ||
+      message.includes("token has expired") ||
+      message.includes("invalid jwt") ||
+      message.includes("jwt is expired")
+    );
+  }
+  if (ancienSupabaseFetch) {
+    window.supabaseFetch = async function (url, options) {
+      // Essayer de renouveler avant la requête.
+      try {
+        await renouvelerSession(false);
+      } catch (erreurRenouvellement) {
+        console.warn(
+          "Marché Guinée : renouvellement préalable impossible.",
+          erreurRenouvellement.message
+        );
+      }
+      try {
+        return await ancienSupabaseFetch(
+          url,
+          options || {}
+        );
+      } catch (erreur) {
+        // Si le serveur confirme l'expiration,
+        // renouveler puis réessayer une seule fois.
+        if (!erreurJetonExpire(erreur)) {
+          throw erreur;
+        }
+        await renouvelerSession(true);
+        return await ancienSupabaseFetch(
+          url,
+          options || {}
+        );
+      }
+    };
+  } else {
+    console.error(
+      "Marché Guinée : supabaseFetch est introuvable."
+    );
+  }
+  // Restaurer la session sauvegardée et vérifier son jeton.
+  async function verifierSessionAuDemarrage() {
+    var user = utilisateurActuel();
+    if (!user) {
+      try {
+        var sauvegarde = localStorage.getItem(
+          "marche_guinee_session"
+        );
+        if (sauvegarde) {
+          user = JSON.parse(sauvegarde);
+          if (user && user.id) {
+            definirUtilisateur(user);
+          }
+        }
+      } catch (erreur) {
+        console.warn(
+          "Marché Guinée : session locale illisible.",
+          erreur
+        );
+      }
+    }
+    if (user && user.id && user.refreshToken) {
+      try {
+        await renouvelerSession(false);
+      } catch (erreur) {
+        console.warn(
+          "Marché Guinée : vérification de session impossible.",
+          erreur.message
+        );
+      }
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      verifierSessionAuDemarrage,
+      { once: true }
+    );
+  } else {
+    verifierSessionAuDemarrage();
+  }
+  // Vérifier périodiquement sans interrompre l'utilisateur.
+  window.setInterval(function () {
+    renouvelerSession(false).catch(function (erreur) {
+      console.warn(
+        "Marché Guinée : renouvellement automatique reporté.",
+        erreur.message
+      );
+    });
+  }, 60000);
+  // Vérifier aussi lorsque l'utilisateur revient dans l'application.
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      renouvelerSession(false).catch(function (erreur) {
+        console.warn(
+          "Marché Guinée : vérification après retour impossible.",
+          erreur.message
+        );
+      });
+    }
+  });
+  window.addEventListener("pageshow", function () {
+    renouvelerSession(false).catch(function (erreur) {
+      console.warn(
+        "Marché Guinée : vérification à la réouverture impossible.",
+        erreur.message
+      );
+    });
+  });
+  console.log(
+    "Marché Guinée : renouvellement automatique des sessions installé."
+  );
+})();
+</script>
+  
 </body>
 </html>
