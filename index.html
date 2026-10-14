@@ -22445,6 +22445,58 @@ function afficherRetourMesAnnonces() {
   console.log("Correctif Mes annonces installé.");
 })();
 </script>
+
+<style id="mg-correctif-retour-mes-annonces">
+  /* Garder le titre Mes annonces visible */
+  #mgMesAnnoncesModal {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  #mgBoutonRetourCompte {
+    top: 66px !important;
+    left: 12px !important;
+    z-index: 100001 !important;
+    padding: 8px 12px !important;
+    min-height: 36px;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #mgMesAnnoncesModal button,
+  #mgMesAnnoncesModal .mg-ma-filter {
+    touch-action: manipulation;
+  }
+</style>
+<script id="mg-correctif-tactile-mes-annonces">
+(function () {
+  "use strict";
+  function ajusterBoutonRetour() {
+    var page = document.getElementById("mgMesAnnoncesModal");
+    var bouton = document.getElementById("mgBoutonRetourCompte");
+    if (!page || !bouton) return;
+    if (page.style.display === "none") {
+      bouton.style.display = "none";
+      return;
+    }
+    bouton.style.display = "block";
+    bouton.style.top = "66px";
+    bouton.style.left = "12px";
+  }
+  document.addEventListener("click", function (event) {
+    var cible = event.target;
+    if (
+      cible &&
+      typeof cible.closest === "function" &&
+      cible.closest("#mgBoutonMesAnnonces")
+    ) {
+      window.setTimeout(ajusterBoutonRetour, 200);
+    }
+  }, true);
+  window.addEventListener("resize", ajusterBoutonRetour);
+  window.setTimeout(ajusterBoutonRetour, 300);
+})();
+</script>
   
 </body>
 </html>
