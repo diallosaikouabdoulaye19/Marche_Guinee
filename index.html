@@ -850,50 +850,44 @@ footer{
 <div class="mg-home">
 
   <!-- HEADER -->
-
-  <header class="mg-header">
-
-    <div class="mg-header-top">
-
-      <div class="mg-logo">
-        🇬🇳 Marché Guinée
-      </div>
-
-     <div class="mg-header-actions">
-
-  <button
-    class="mg-icon-btn"
-    onclick="ouvrirCompte()"
-    aria-label="Mon compte">
-    👤
-  </button>
-
-</div>
-
+<header class="mg-header">
+  <div class="mg-header-top">
+    <div class="mg-logo">
+      🇬🇳 Marché Guinée
     </div>
-
-
-    <div class="mg-search-area">
-
-      <div class="mg-search">
-
-        <span class="mg-search-icon">
-          🔎
-        </span>
-
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="Que recherchez-vous ?"
-          oninput="filtrerAnnonces()"
-        >
-
-      </div>
-
+    <div class="mg-header-actions">
+      <!-- BOUTON LIVRAISON -->
+      <button
+        class="mg-icon-btn"
+        onclick="ouvrirVerificationLivraison()"
+        aria-label="Livraison"
+        title="Vérifier une livraison">
+        🚚
+      </button>
+      <!-- BOUTON MON COMPTE -->
+      <button
+        class="mg-icon-btn"
+        onclick="ouvrirCompte()"
+        aria-label="Mon compte"
+        title="Mon compte">
+        👤
+      </button>
     </div>
-
-  </header>
-
+  </div>
+  <div class="mg-search-area">
+    <div class="mg-search">
+      <span class="mg-search-icon">
+        🔎
+      </span>
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Que recherchez-vous ?"
+        oninput="filtrerAnnonces()"
+      >
+    </div>
+  </div>
+</header>
 
   <!-- CONTENU -->
 
