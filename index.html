@@ -21279,47 +21279,6 @@ function afficherRetour() {
     );
   }
 
-function corrigerBoutonRetour() {
-  var boutons = document.querySelectorAll(
-    ".mg-v6-back-button"
-  );
-
-  boutons.forEach(function (bouton) {
-    if (bouton.textContent.trim() !== "Retour à Mon compte") {
-      bouton.textContent = "Retour à Mon compte";
-    }
-
-    bouton.setAttribute(
-      "aria-label",
-      "Retour à Mon compte"
-    );
-
-    bouton.style.width = "auto";
-    bouton.style.minWidth = "0";
-    bouton.style.height = "auto";
-    bouton.style.minHeight = "36px";
-    bouton.style.padding = "9px 12px";
-    bouton.style.borderRadius = "10px";
-    bouton.style.background = "#ffffff";
-    bouton.style.color = "#08783b";
-    bouton.style.fontSize = "12px";
-    bouton.style.fontWeight = "700";
-    bouton.style.lineHeight = "1.3";
-    bouton.style.whiteSpace = "nowrap";
-  });
-}
-
-corrigerBoutonRetour();
-
-var observateurRetour = new MutationObserver(function () {
-  corrigerBoutonRetour();
-});
-
-observateurRetour.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-
   /* =====================================================
      C. RETOUR DES NOUVELLES RUBRIQUES VERS MON COMPTE
      Le compte reste accessible lorsque la page est fermée.
