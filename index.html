@@ -17980,12 +17980,17 @@ function afficherRetour() {
   };
 
   window.fermerMesAnnonces = function () {
-    element("mgMesAnnoncesModal").style.display = "none";
+  var modalAnnonces = element("mgMesAnnoncesModal");
+  var modalCompte = element("accountModal");
 
-    if (typeof window.ouvrirCompte === "function") {
-      window.ouvrirCompte();
-    }
-  };
+  if (modalAnnonces) {
+    modalAnnonces.style.display = "none";
+  }
+
+  if (modalCompte) {
+    modalCompte.style.display = "block";
+  }
+};
 
   window.filtrerMesAnnonces = function (nouveauFiltre, bouton) {
     filtre = nouveauFiltre;
