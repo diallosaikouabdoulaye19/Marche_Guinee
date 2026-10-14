@@ -22497,6 +22497,23 @@ function afficherRetourMesAnnonces() {
   window.setTimeout(ajusterBoutonRetour, 300);
 })();
 </script>
+
+<script id="mg-retour-sans-fleche">
+(function () {
+  "use strict";
+  function corrigerBoutonRetour() {
+    var bouton = document.getElementById("mgBoutonRetourCompte");
+    if (!bouton) return;
+    bouton.textContent = "Retour à Mon compte";
+    bouton.style.fontWeight = "600";
+    bouton.style.textAlign = "left";
+  }
+  corrigerBoutonRetour();
+  window.addEventListener("load", corrigerBoutonRetour);
+  window.setTimeout(corrigerBoutonRetour, 500);
+  window.setTimeout(corrigerBoutonRetour, 1500);
+})();
+</script>
   
 </body>
 </html>
