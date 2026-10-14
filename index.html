@@ -17269,8 +17269,7 @@ document.addEventListener("keydown", function(event){
 function afficherRetour() {
     var feature = trouverFenetre();
     if (!feature) return;
-    /* Mes achats possède déjà son propre bouton de retour.
-       On évite donc d'ajouter un deuxième bouton par-dessus. */
+    /* Mes achats possède déjà son propre bouton de retour. */
     if (feature.id === "mesAchatsModal") {
       retirerRetour();
       return;
@@ -17282,7 +17281,7 @@ function afficherRetour() {
     returnButton = document.createElement("button");
     returnButton.type = "button";
     returnButton.className = "mg-v6-back-button";
-    returnButton.textContent = "×";
+    returnButton.textContent = "Retour à Mon compte";
     returnButton.setAttribute("aria-label", "Retour à Mon compte");
     returnButton.addEventListener("click", function () {
       var target = returnTarget;
@@ -17295,7 +17294,7 @@ function afficherRetour() {
       }
     });
     document.body.appendChild(returnButton);
-  }
+}
   
   function retirerRetour() {
     if (returnButton && returnButton.parentNode) {
