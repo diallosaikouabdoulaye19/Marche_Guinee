@@ -2411,219 +2411,258 @@ footer{
     display:none;
     position:fixed;
     inset:0;
-    background:rgba(4,20,12,.72);
-    backdrop-filter:blur(5px);
-    -webkit-backdrop-filter:blur(5px);
-    z-index:16000;
-    padding:12px;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    background:#f7faf8;
+    z-index:20000;
+    padding:0;
+    margin:0;
     box-sizing:border-box;
+    overflow-x:hidden;
     overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   ">
+
   <section
     style="
       width:100%;
-      max-width:540px;
-      margin:12px auto;
+      min-height:100%;
+      margin:0;
+      padding:0;
       background:#f7faf8;
-      border-radius:24px;
+      border-radius:0;
+      box-shadow:none;
+      box-sizing:border-box;
       overflow:hidden;
-      box-shadow:0 20px 60px rgba(0,0,0,.22);
     ">
-<header
-  style="
-    position:relative;
-    padding:20px;
-    background:linear-gradient(135deg,#b91c1c,#ef4444);
-    color:#fff;
-  ">
-  <button
-    onclick="fermerProblemeModal()"
-    aria-label="Fermer"
-    style="
-      position:absolute;
-      right:14px;
-      top:14px;
-      width:40px;
-      height:40px;
-      border:0;
-      border-radius:50%;
-      background:rgba(255,255,255,.18);
-      color:#fff;
-      font-size:22px;
-      cursor:pointer;
-    ">
-    ×
-  </button>
-  <small style="font-weight:700;opacity:.88;">
-    🇬🇳 Marché Guinée
-  </small>
-  <h2
-    style="
-      margin:7px 0 0;
-      font-size:24px;
-      font-weight:900;
-    ">
-    ⚠️ Signaler un problème
-  </h2>
-  <p
-    style="
-      margin:7px 0 0;
-      font-size:13px;
-      line-height:1.45;
-      opacity:.92;
-    ">
-    Aide-nous à résoudre rapidement ton problème concernant une commande.
-  </p>
-</header>
-<main style="padding:18px;">
-  <div
-    style="
-      padding:14px;
-      background:#fff4f4;
-      border:1px solid #fecaca;
-      border-radius:15px;
-      color:#7f1d1d;
-      font-size:13px;
-      line-height:1.5;
-    ">
-    🛡️ Décris clairement le problème afin que notre équipe puisse examiner ton signalement.
-  </div>
-  <label
-    style="
-      display:block;
-      margin-top:18px;
-      font-weight:800;
-      font-size:14px;
-      color:#26352d;
-    ">
-    Numéro de commande
-  </label>
-  <input
-    id="problemeOrderNumber"
-    type="text"
-    placeholder="Exemple : MG 000005"
-    style="
-      width:100%;
-      height:48px;
-      margin-top:7px;
-      padding:0 13px;
-      border:1px solid #d9e2dc;
-      border-radius:14px;
-      box-sizing:border-box;
-      font-size:15px;
-      background:#fff;
-      outline:none;
-    "
-  >
-  <label
-    style="
-      display:block;
-      margin-top:18px;
-      font-weight:800;
-      font-size:14px;
-      color:#26352d;
-    ">
-    Motif du problème
-  </label>
-  <select
-    id="problemeReason"
-    style="
-      width:100%;
-      height:48px;
-      margin-top:7px;
-      padding:0 13px;
-      border:1px solid #d9e2dc;
-      border-radius:14px;
-      box-sizing:border-box;
-      font-size:15px;
-      background:#fff;
-      color:#26352d;
-      outline:none;
-    ">
-    <option value="">
-      Choisir le problème
-    </option>
-    <option value="Produit non reçu">
-      Produit non reçu
-    </option>
-    <option value="Produit différent">
-      Produit différent de l'annonce
-    </option>
-    <option value="Produit endommagé">
-      Produit endommagé
-    </option>
-    <option value="Problème de livraison">
-      Problème de livraison
-    </option>
-    <option value="Autre">
-      Autre problème
-    </option>
-  </select>
-  <label
-    style="
-      display:block;
-      margin-top:18px;
-      font-weight:800;
-      font-size:14px;
-      color:#26352d;
-    ">
-    Description
-  </label>
-  <textarea
-    id="problemeDescription"
-    placeholder="Explique le problème en détail..."
-    rows="5"
-    style="
-      width:100%;
-      margin-top:7px;
-      padding:13px;
-      border:1px solid #d9e2dc;
-      border-radius:14px;
-      box-sizing:border-box;
-      font-size:15px;
-      background:#fff;
-      outline:none;
-      resize:vertical;
-      line-height:1.45;
-    "
-  ></textarea>
-  <button
-    onclick="envoyerSignalement()"
-    style="
-      width:100%;
-      height:50px;
-      margin-top:18px;
-      border:0;
-      border-radius:14px;
-      background:#dc2626;
-      color:#fff;
-      font-size:15px;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 6px 16px rgba(220,38,38,.2);
-    ">
-    ⚠️ Envoyer le signalement
-  </button>
-  <button
-    onclick="fermerProblemeModal()"
-    style="
-      width:100%;
-      height:46px;
-      margin-top:10px;
-      border:0;
-      border-radius:14px;
-      background:#e9efeb;
-      color:#315a43;
-      font-size:14px;
-      font-weight:800;
-      cursor:pointer;
-    ">
-    Annuler
-  </button>
-</main>
+
+    <!-- EN-TÊTE -->
+    <header
+      style="
+        position:relative;
+        padding:76px 16px 22px;
+        background:linear-gradient(135deg,#b91c1c,#ef4444);
+        color:#fff;
+        box-sizing:border-box;
+      ">
+
+      <button
+        type="button"
+        onclick="fermerProblemeModal(); ouvrirCompte();"
+        aria-label="Retour à Mon compte"
+        style="
+          position:absolute;
+          top:10px;
+          left:10px;
+          z-index:2;
+          min-height:36px;
+          padding:7px 10px;
+          border:1px solid rgba(255,255,255,.35);
+          border-radius:10px;
+          background:#fff;
+          color:#b91c1c;
+          font-size:10px;
+          font-weight:700;
+          line-height:1.2;
+          cursor:pointer;
+          box-shadow:0 3px 12px rgba(0,0,0,.15);
+          box-sizing:border-box;
+        ">
+        Retour à Mon compte
+      </button>
+
+      <small style="font-weight:700;opacity:.9;">
+        🇬🇳 Marché Guinée
+      </small>
+
+      <h2
+        style="
+          margin:7px 0 0;
+          font-size:22px;
+          font-weight:900;
+        ">
+        Signaler un problème
+      </h2>
+
+      <p
+        style="
+          margin:7px 0 0;
+          font-size:13px;
+          line-height:1.5;
+          opacity:.95;
+        ">
+        Aide-nous à résoudre rapidement ton problème concernant une commande.
+      </p>
+
+    </header>
+
+    <!-- FORMULAIRE CONSERVÉ -->
+    <main
+      style="
+        width:100%;
+        padding:16px;
+        box-sizing:border-box;
+      ">
+
+      <div
+        style="
+          padding:14px;
+          background:#fff4f4;
+          border:1px solid #fecaca;
+          border-radius:15px;
+          color:#7f1d1d;
+          font-size:13px;
+          line-height:1.5;
+        ">
+        🛡️ Décris clairement le problème afin que notre équipe puisse examiner ton signalement.
+      </div>
+
+      <label
+        for="problemeOrderNumber"
+        style="
+          display:block;
+          margin-top:18px;
+          font-weight:800;
+          font-size:14px;
+          color:#26352d;
+        ">
+        Numéro de commande
+      </label>
+
+      <input
+        id="problemeOrderNumber"
+        type="text"
+        placeholder="Exemple : MG 000005"
+        style="
+          width:100%;
+          height:48px;
+          margin-top:7px;
+          padding:0 13px;
+          border:1px solid #d9e2dc;
+          border-radius:14px;
+          box-sizing:border-box;
+          font-size:15px;
+          background:#fff;
+          outline:none;
+        ">
+
+      <label
+        for="problemeReason"
+        style="
+          display:block;
+          margin-top:18px;
+          font-weight:800;
+          font-size:14px;
+          color:#26352d;
+        ">
+        Motif du problème
+      </label>
+
+      <select
+        id="problemeReason"
+        style="
+          width:100%;
+          height:48px;
+          margin-top:7px;
+          padding:0 13px;
+          border:1px solid #d9e2dc;
+          border-radius:14px;
+          box-sizing:border-box;
+          font-size:15px;
+          background:#fff;
+          color:#26352d;
+          outline:none;
+        ">
+
+        <option value="">Choisir le problème</option>
+        <option value="Produit non reçu">Produit non reçu</option>
+        <option value="Produit différent">Produit différent de l'annonce</option>
+        <option value="Produit endommagé">Produit endommagé</option>
+        <option value="Problème de livraison">Problème de livraison</option>
+        <option value="Autre">Autre problème</option>
+
+      </select>
+
+      <label
+        for="problemeDescription"
+        style="
+          display:block;
+          margin-top:18px;
+          font-weight:800;
+          font-size:14px;
+          color:#26352d;
+        ">
+        Description
+      </label>
+
+      <textarea
+        id="problemeDescription"
+        placeholder="Explique le problème en détail..."
+        rows="5"
+        style="
+          display:block;
+          width:100%;
+          min-height:120px;
+          margin-top:7px;
+          padding:13px;
+          border:1px solid #d9e2dc;
+          border-radius:14px;
+          box-sizing:border-box;
+          font-size:15px;
+          background:#fff;
+          outline:none;
+          resize:vertical;
+          line-height:1.45;
+        "></textarea>
+
+      <button
+        type="button"
+        onclick="envoyerSignalement()"
+        style="
+          width:100%;
+          min-height:50px;
+          margin-top:18px;
+          padding:12px;
+          border:0;
+          border-radius:14px;
+          background:#dc2626;
+          color:#fff;
+          font-size:15px;
+          font-weight:900;
+          cursor:pointer;
+          box-shadow:0 6px 16px rgba(220,38,38,.2);
+          box-sizing:border-box;
+        ">
+        ⚠️ Envoyer le signalement
+      </button>
+
+      <button
+        type="button"
+        onclick="fermerProblemeModal(); ouvrirCompte();"
+        style="
+          width:100%;
+          min-height:46px;
+          margin-top:10px;
+          margin-bottom:20px;
+          padding:12px;
+          border:0;
+          border-radius:14px;
+          background:#e9efeb;
+          color:#315a43;
+          font-size:14px;
+          font-weight:800;
+          cursor:pointer;
+          box-sizing:border-box;
+        ">
+        Retour à Mon compte
+      </button>
+
+    </main>
+
   </section>
 </div>
-
+  
 <!-- =========================
      MES VENTES
 ========================= -->
