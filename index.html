@@ -17839,52 +17839,159 @@ function afficherRetour() {
 }
 </style>
 
-<div id="mgMesAnnoncesModal" aria-label="Mes annonces">
-  <header class="mg-ma-header">
-    <button type="button" class="mg-ma-close"
-            onclick="fermerMesAnnonces()"
-            aria-label="Retour à Mon compte">×</button>
-
-    <div class="mg-ma-heading">
-      <strong>🏷️ Mes annonces</strong>
-      <span>Gère et consulte tes publications</span>
-    </div>
-  </header>
-
-  <main class="mg-ma-content">
-    <section class="mg-ma-summary">
-      <small>MES PUBLICATIONS</small>
-      <span id="mgMaCount" class="mg-ma-count">—</span>
-      <small id="mgMaSummaryText">Chargement de tes annonces...</small>
-    </section>
-
-    <nav class="mg-ma-filters" aria-label="Filtrer mes annonces">
-      <button type="button" class="mg-ma-filter active"
-              data-mg-ma-filter="all"
-              onclick="filtrerMesAnnonces('all',this)">Toutes</button>
-
-      <button type="button" class="mg-ma-filter"
-              data-mg-ma-filter="active"
-              onclick="filtrerMesAnnonces('active',this)">🟢 Actives</button>
-
-      <button type="button" class="mg-ma-filter"
-              data-mg-ma-filter="paused"
-              onclick="filtrerMesAnnonces('paused',this)">⏸️ En pause</button>
-
-      <button type="button" class="mg-ma-filter"
-              data-mg-ma-filter="sold"
-              onclick="filtrerMesAnnonces('sold',this)">✅ Vendues</button>
-    </nav>
-
-    <section id="mgMaList" class="mg-ma-list">
-      <div class="mg-ma-empty">Chargement de tes annonces...</div>
-    </section>
-
-    <button type="button" class="mg-ma-reload"
-            onclick="chargerMesAnnonces()">
-      ↻ Actualiser mes annonces
-    </button>
-  </main>
+<div
+  id="mgMesAnnoncesModal"
+  aria-label="Mes annonces"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    background:#f7faf8;
+    z-index:30000;
+    padding:0;
+    margin:0;
+    box-sizing:border-box;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  ">
+  <section
+    style="
+      width:100%;
+      min-height:100%;
+      margin:0;
+      padding:0;
+      background:#f7faf8;
+      border-radius:0;
+      box-shadow:none;
+      box-sizing:border-box;
+      overflow:hidden;
+    ">
+    <!-- EN-TÊTE -->
+    <header
+      class="mg-ma-header"
+      style="
+        position:relative;
+        padding:76px 16px 22px;
+        background:linear-gradient(135deg,#075e36,#0b7a3e);
+        color:#fff;
+        box-sizing:border-box;
+      ">
+      <button
+        type="button"
+        onclick="fermerMesAnnonces()"
+        aria-label="Retour à Mon compte"
+        style="
+          position:absolute;
+          top:10px;
+          left:10px;
+          z-index:2;
+          min-height:36px;
+          padding:7px 10px;
+          border:1px solid rgba(255,255,255,.35);
+          border-radius:10px;
+          background:#fff;
+          color:#075e36;
+          font-size:11px;
+          font-weight:800;
+          line-height:1.2;
+          cursor:pointer;
+          box-shadow:0 3px 12px rgba(0,0,0,.15);
+          box-sizing:border-box;
+          touch-action:manipulation;
+        ">
+          Retour à Mon compte
+      </button>
+      <small style="font-weight:700;opacity:.9;">
+        🇬🇳 Marché Guinée
+      </small>
+      <div class="mg-ma-heading">
+        <strong
+          style="
+            display:block;
+            margin:7px 0 0;
+            font-size:22px;
+            font-weight:900;
+            color:#fff;
+          ">
+          🏷️ Mes annonces
+        </strong>
+        <span
+          style="
+            display:block;
+            margin:7px 0 0;
+            font-size:13px;
+            line-height:1.5;
+            color:#fff;
+            opacity:.95;
+          ">
+          Gère et consulte tes publications
+        </span>
+      </div>
+    </header>
+    <!-- CONTENU : CONSERVÉ -->
+    <main
+      class="mg-ma-content"
+      style="
+        width:100%;
+        padding:16px;
+        box-sizing:border-box;
+      ">
+      <section class="mg-ma-summary">
+        <small>MES PUBLICATIONS</small>
+        <span id="mgMaCount" class="mg-ma-count">—</span>
+        <small id="mgMaSummaryText">
+          Chargement de tes annonces...
+        </small>
+      </section>
+      <nav
+        class="mg-ma-filters"
+        aria-label="Filtrer mes annonces">
+        <button
+          type="button"
+          class="mg-ma-filter active"
+          data-mg-ma-filter="all"
+          onclick="filtrerMesAnnonces('all',this)">
+          Toutes
+        </button>
+        <button
+          type="button"
+          class="mg-ma-filter"
+          data-mg-ma-filter="active"
+          onclick="filtrerMesAnnonces('active',this)">
+          🟢 Actives
+        </button>
+        <button
+          type="button"
+          class="mg-ma-filter"
+          data-mg-ma-filter="paused"
+          onclick="filtrerMesAnnonces('paused',this)">
+          ⏸️ En pause
+        </button>
+        <button
+          type="button"
+          class="mg-ma-filter"
+          data-mg-ma-filter="sold"
+          onclick="filtrerMesAnnonces('sold',this)">
+          ✅ Vendues
+        </button>
+      </nav>
+      <section id="mgMaList" class="mg-ma-list">
+        <div class="mg-ma-empty">
+          Chargement de tes annonces...
+        </div>
+      </section>
+      <button
+        type="button"
+        class="mg-ma-reload"
+        onclick="chargerMesAnnonces()">
+        ↻ Actualiser mes annonces
+      </button>
+    </main>
+  </section>
 </div>
 
 <script id="mg-mes-annonces-script">
