@@ -2164,7 +2164,7 @@ footer{
      MESSAGES
 ========================= -->
 
-<!-- 💬 MODAL MESSAGERIE PLEIN ÉCRAN -->
+  <!-- 💬 MODAL MESSAGERIE PLEIN ÉCRAN -->
 <div id="messagesModal" class="modal" style="
   display:none;
   position:fixed;
@@ -2195,7 +2195,7 @@ footer{
     overflow:visible;
   ">
 
-    <!-- EN-TÊTE VERT COMPACT : DÉFILE AVEC LA PAGE -->
+    <!-- EN-TÊTE VERT COMPACT -->
     <div style="
       flex-shrink:0;
       width:100%;
@@ -2214,7 +2214,7 @@ footer{
         style="
           display:inline-flex;
           align-items:center;
-          min-height:34px;
+          min-height:36px;
           padding:7px 10px;
           margin:0 0 12px;
           border:1px solid rgba(255,255,255,.4);
@@ -2270,7 +2270,6 @@ footer{
     <div
       id="messagesList"
       style="
-        display:block;
         width:100%;
         min-height:200px;
         padding:16px;
@@ -2285,8 +2284,9 @@ footer{
       id="chatContainer"
       class="hidden"
       style="
-        min-height:400px;
         flex-direction:column;
+        width:100%;
+        min-height:400px;
         background:#f7faf8;
         overflow:visible;
         box-sizing:border-box;
@@ -2309,7 +2309,10 @@ footer{
           class="btn-light"
           onclick="retourConversations()"
           style="
+            display:inline-flex;
+            align-items:center;
             flex-shrink:0;
+            min-height:42px;
             border:0;
             border-radius:12px;
             padding:10px 13px;
@@ -2317,6 +2320,8 @@ footer{
             cursor:pointer;
             background:#eef3f0;
             color:#166b3b;
+            position:relative;
+            z-index:2;
           "
         >
           ← Conversations
@@ -2415,10 +2420,11 @@ footer{
           Envoyer
         </button>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
+
 <!-- =========================
      VÉRIFICATION LIVRAISON
 ========================= -->
