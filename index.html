@@ -21283,12 +21283,17 @@ function corrigerBoutonRetour() {
   var boutons = document.querySelectorAll(
     ".mg-v6-back-button"
   );
+
   boutons.forEach(function (bouton) {
-    bouton.textContent = "Retour à Mon compte";
+    if (bouton.textContent.trim() !== "Retour à Mon compte") {
+      bouton.textContent = "Retour à Mon compte";
+    }
+
     bouton.setAttribute(
       "aria-label",
       "Retour à Mon compte"
     );
+
     bouton.style.width = "auto";
     bouton.style.minWidth = "0";
     bouton.style.height = "auto";
@@ -21303,10 +21308,13 @@ function corrigerBoutonRetour() {
     bouton.style.whiteSpace = "nowrap";
   });
 }
+
 corrigerBoutonRetour();
+
 var observateurRetour = new MutationObserver(function () {
   corrigerBoutonRetour();
 });
+
 observateurRetour.observe(document.body, {
   childList: true,
   subtree: true
