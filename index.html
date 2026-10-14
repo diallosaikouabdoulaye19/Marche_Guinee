@@ -22621,6 +22621,49 @@ function afficherRetourMesAnnonces() {
   window.setTimeout(corrigerBoutonRetour, 1500);
 })();
 </script>
+
+<script id="mg-supprimer-retour-double">
+(function () {
+  "use strict";
+  function supprimerDoublon() {
+    var page = document.getElementById("mgMesAnnoncesModal");
+    if (!page) return;
+    var boutons = page.querySelectorAll(
+      'button[aria-label="Retour à Mon compte"]'
+    );
+    boutons.forEach(function (bouton) {
+      bouton.remove();
+    });
+    var boutonAjoute = document.getElementById("mgBoutonRetourCompte");
+    if (boutonAjoute) {
+      boutonAjoute.remove();
+    }
+    var entete = page.querySelector(".mg-ma-header");
+    if (entete && !entete.querySelector(".mg-ma-retour-officiel")) {
+      var retour = document.createElement("button");
+      retour.type = "button";
+      retour.className = "mg-ma-retour-officiel";
+      retour.textContent = "← Retour à Mon compte";
+      retour.style.cssText =
+        "position:absolute;top:10px;left:10px;z-index:2;" +
+        "min-height:36px;padding:7px 10px;" +
+        "border:1px solid rgba(255,255,255,.35);" +
+        "border-radius:10px;background:#fff;color:#075e36;" +
+        "font-size:11px;font-weight:800;line-height:1.2;" +
+        "box-shadow:0 3px 12px rgba(0,0,0,.15);";
+      retour.addEventListener("click", function () {
+        if (typeof window.fermerMesAnnonces === "function") {
+          window.fermerMesAnnonces();
+        }
+      });
+      entete.insertBefore(retour, entete.firstChild);
+    }
+  }
+  supprimerDoublon();
+  window.addEventListener("load", supprimerDoublon);
+  window.setTimeout(supprimerDoublon, 500);
+})();
+</script>
   
 </body>
 </html>
