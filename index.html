@@ -20369,14 +20369,16 @@ function afficherRetour() {
       var base = obtenirAdresseSupabase().replace(/\/+$/, "");
       var requete = obtenirFetch();
 
-      /* Récupérer les informations du vendeur */
-      var urlProfil =
-        base +
-        "/rest/v1/users?id=eq." +
-        encodeURIComponent(sellerId) +
-        "&select=id,full_name,photo_url&limit=1";
-
-      var profils = await requete(urlProfil);
+             /* Récupérer les informations publiques du vendeur */
+      var profils = await requete(
+        base + "/rest/v1/rpc/get_public_seller_profile",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            p_seller_id: sellerId
+          })
+        }
+      );
 
       if (!Array.isArray(profils) || profils.length === 0) {
         throw new Error("Profil vendeur introuvable.");
@@ -20410,14 +20412,16 @@ function afficherRetour() {
        * Aucun filtre de statut : active, paused et sold sont inclus.
        * Aucun retrait de l'annonce courante : toutes ses annonces restent visibles.
        */
-      var urlAnnonces =
-        base +
-        "/rest/v1/listings?select=id,seller_id,title,price_gnf,condition,city,neighborhood,status,created_at" +
-        "&seller_id=eq." +
-        encodeURIComponent(sellerId) +
-        "&order=created_at.desc";
 
-      var annonces = await requete(urlAnnonces);
+            var annonces = await requete(
+        base + "/rest/v1/rpc/get_public_seller_listings",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            p_seller_id: sellerId
+          })
+        }
+      );
 
       if (!Array.isArray(annonces)) {
         throw new Error("Réponse des annonces invalide.");
