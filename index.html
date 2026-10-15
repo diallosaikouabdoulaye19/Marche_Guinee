@@ -24343,6 +24343,260 @@ function afficherRetourMesAnnonces() {
   };
 })();
 </script>
+
+<!-- MARCHÉ GUINÉE — TABLEAU DE BORD ADMINISTRATEUR PLEIN ÉCRAN -->
+<style id="mg-admin-navigation-styles">
+  #adminDashboardModal {
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #f4f7f5 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  #adminDashboardModal > section {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  #adminDashboardModal > section > header {
+    flex: 0 0 auto !important;
+    padding-top: max(22px, env(safe-area-inset-top, 0px)) !important;
+  }
+
+  #adminDashboardModal > section > main {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px !important;
+  }
+
+  #adminDashboardModal > section > footer {
+    flex: 0 0 auto !important;
+    padding: 8px 14px max(10px, env(safe-area-inset-bottom, 0px)) !important;
+    display: flex !important;
+    gap: 8px !important;
+    background: #fff !important;
+    border-top: 1px solid #e2e9e4;
+  }
+
+  #adminDashboardModal > section > footer button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    margin-top: 0 !important;
+  }
+
+  #mgAdminNavigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-bottom: 16px;
+  }
+
+  #mgAdminNavigation button {
+    min-width: 0;
+    min-height: 54px;
+    padding: 10px;
+    border: 1px solid #e0e8e2;
+    border-radius: 13px;
+    background: #fff;
+    color: #244333;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  #mgAdminNavigation button[aria-selected="true"] {
+    background: #087f3f;
+    color: #fff;
+    border-color: #087f3f;
+  }
+
+  #mgAdminNavigation button:focus-visible {
+    outline: 3px solid #f0c808;
+    outline-offset: 2px;
+  }
+
+  #adminDashboardContent > [data-mg-admin-panel="true"] {
+    margin-top: 0 !important;
+  }
+
+  @media (min-width: 600px) {
+    #mgAdminNavigation {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script id="mg-admin-navigation">
+(function () {
+  "use strict";
+
+  if (window.mgAdminNavigationInstallee) return;
+  window.mgAdminNavigationInstallee = true;
+
+  var ancienneOuverture = window.ouvrirTableauAdmin;
+  var ancienChargement = window.chargerTableauAdmin;
+
+  if (
+    typeof ancienneOuverture !== "function" ||
+    typeof ancienChargement !== "function"
+  ) {
+    console.warn(
+      "Marché Guinée : fonctions du tableau de bord introuvables."
+    );
+    return;
+  }
+
+  function configurerNavigation() {
+    var modal = document.getElementById("adminDashboardModal");
+    var container = document.getElementById("adminDashboardContent");
+
+    if (!modal || !container) return;
+
+    var ancienMenu = document.getElementById("mgAdminNavigation");
+    if (ancienMenu) ancienMenu.remove();
+
+    var elements = Array.from(container.children).filter(function (element) {
+      return !element.hasAttribute("data-mg-admin-menu");
+    });
+
+    if (!elements.length) return;
+
+    var menu = document.createElement("nav");
+    menu.id = "mgAdminNavigation";
+    menu.setAttribute("aria-label", "Rubriques administrateur");
+
+    var panneaux = [];
+
+    elements.forEach(function (element, index) {
+      element.setAttribute("data-mg-admin-panel", "true");
+
+      var titre = element.querySelector("h3, h2");
+      var texteTitre = titre
+        ? titre.textContent.trim().toLowerCase()
+        : "";
+
+      var panneau = {
+        element: element,
+        titre: "",
+        icone: "",
+        cle: ""
+      };
+
+      if (index === 0 && !titre) {
+        panneau.titre = "Vue d’ensemble";
+        panneau.icone = "📊";
+        panneau.cle = "accueil";
+      } else if (texteTitre.includes("utilisateur")) {
+        panneau.titre = "Utilisateurs";
+        panneau.icone = "👥";
+        panneau.cle = "utilisateurs";
+      } else if (texteTitre.includes("annonce")) {
+        panneau.titre = "Annonces";
+        panneau.icone = "📦";
+        panneau.cle = "annonces";
+      } else if (texteTitre.includes("finance")) {
+        panneau.titre = "Finances";
+        panneau.icone = "💰";
+        panneau.cle = "finances";
+      } else if (texteTitre.includes("litige")) {
+        panneau.titre = "Litiges";
+        panneau.icone = "⚠️";
+        panneau.cle = "litiges";
+      } else if (texteTitre.includes("retrait")) {
+        panneau.titre = "Retraits";
+        panneau.icone = "💸";
+        panneau.cle = "retraits";
+      } else {
+        panneau.titre = titre
+          ? titre.textContent.trim()
+          : "Autres informations";
+        panneau.icone = "📋";
+        panneau.cle = "autre-" + index;
+      }
+
+      panneaux.push(panneau);
+    });
+
+    panneaux.forEach(function (panneau, index) {
+      var bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.textContent = panneau.icone + "  " + panneau.titre;
+      bouton.setAttribute("aria-selected", index === 0 ? "true" : "false");
+
+      bouton.addEventListener("click", function () {
+        panneaux.forEach(function (autre, autreIndex) {
+          autre.element.style.display =
+            autreIndex === index ? "" : "none";
+
+          var boutons = menu.querySelectorAll("button");
+          boutons[autreIndex].setAttribute(
+            "aria-selected",
+            autreIndex === index ? "true" : "false"
+          );
+        });
+
+        menu.querySelectorAll("button").forEach(function (b) {
+          b.setAttribute("tabindex", b === bouton ? "0" : "-1");
+        });
+
+        container.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+      });
+
+      menu.appendChild(bouton);
+    });
+
+    menu.setAttribute("data-mg-admin-menu", "true");
+    container.insertBefore(menu, container.firstChild);
+
+    panneaux.forEach(function (panneau, index) {
+      panneau.element.style.display = index === 0 ? "" : "none";
+    });
+  }
+
+  window.chargerTableauAdmin = async function () {
+    await ancienChargement.apply(this, arguments);
+
+    configurerNavigation();
+  };
+
+  window.ouvrirTableauAdmin = async function () {
+    await ancienneOuverture.apply(this, arguments);
+
+    var modal = document.getElementById("adminDashboardModal");
+    if (modal) {
+      modal.style.display = "block";
+      document.body.style.overflow = "hidden";
+    }
+  };
+
+  var ancienneFermeture = window.fermerTableauAdmin;
+
+  if (typeof ancienneFermeture === "function") {
+    window.fermerTableauAdmin = function () {
+      ancienneFermeture.apply(this, arguments);
+      document.body.style.overflow = "";
+    };
+  }
+
+})();
+</script>
   
 </body>
 </html>
