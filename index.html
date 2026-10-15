@@ -23984,15 +23984,14 @@ function afficherRetourMesAnnonces() {
   }
 
   function creerLienAnnonce(id) {
-    var lien = new URL(
-      window.location.pathname,
-      "https://marche-guinee.netlify.app"
-    );
+  var lien = new URL(
+    "https://diallosaikouabdoulaye19.github.io/Marche_Guinee/"
+  );
 
-    lien.searchParams.set("annonce", String(id));
+  lien.searchParams.set("annonce", String(id));
 
-    return lien.toString();
-  }
+  return lien.toString();
+}
 
   window.mgPartagerAnnonce = async function (id) {
     var annonce = trouverAnnonce(id);
