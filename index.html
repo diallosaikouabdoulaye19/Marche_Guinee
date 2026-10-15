@@ -9403,224 +9403,289 @@ async function ouvrirMessages(){
 
 }
 
+async function chargerListeConversations() {
 
-async function chargerListeConversations(){
+  const container = document.getElementById("messagesList");
 
-  const container =
-    document.getElementById(
-      "messagesList"
+  if (!container || !utilisateurConnecte) return;
+
+  container.innerHTML = `
+    <div class="empty">
+      Chargement des conversations...
+    </div>
+  `;
+
+  try {
+
+    // 1. Charger les conversations de l'acheteur
+    const buyerRows = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/conversations" +
+      "?buyer_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*" +
+      "&order=created_at.desc"
     );
 
+    // 2. Charger les conversations du vendeur
+    const sellerRows = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/conversations" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*" +
+      "&order=created_at.desc"
+    );
 
-  if(!container) return;
+    // 3. Fusionner les conversations sans doublons
+    const map = new Map();
 
-
-  container.innerHTML =
-    '<div class="empty">' +
-    'Chargement des conversations...' +
-    '</div>';
-
-
-  try{
-
-    const buyerRows =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/conversations" +
-        "?buyer_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=*" +
-        "&order=created_at.desc"
-
-      );
-
-
-    const sellerRows =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/conversations" +
-        "?seller_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&select=*" +
-        "&order=created_at.desc"
-
-      );
-
-
-    const map =
-      new Map();
-
-
-    [
-      ...(buyerRows || []),
-      ...(sellerRows || [])
-    ]
-    .forEach(
-      c => {
-
-        if(c && c.id){
-
-          map.set(
-            c.id,
-            c
-          );
-
-        }
-
+    [...(buyerRows || []), ...(sellerRows || [])].forEach(c => {
+      if (c && c.id) {
+        map.set(c.id, c);
       }
+    });
+
+    const conversations = Array.from(map.values()).sort(
+      (a, b) =>
+        new Date(b.created_at || 0) -
+        new Date(a.created_at || 0)
     );
 
-
-    const conversations =
-      Array.from(
-        map.values()
-      )
-      .sort(
-        (a,b) =>
-          new Date(
-            b.created_at || 0
-          ) -
-          new Date(
-            a.created_at || 0
-          )
-      );
-
-
-    if(!conversations.length){
-
-      container.innerHTML =
-        '<div class="empty">' +
-        'Aucune conversation pour le moment.' +
-        '<br><br>' +
-        '<small>' +
-        'Contacte un vendeur depuis une annonce pour commencer une conversation.' +
-        '</small>' +
-        '</div>';
-
+    if (!conversations.length) {
+      container.innerHTML = `
+        <div class="empty">
+          Aucune conversation pour le moment.
+          <br><br>
+          <small>
+            Contacte un vendeur depuis une annonce
+            pour commencer une conversation.
+          </small>
+        </div>
+      `;
       return;
-
     }
 
+    // 4. Récupérer le profil de chaque correspondant
+    const conversationsPreparees = await Promise.all(
+      conversations.map(async conversation => {
 
-    container.innerHTML = "";
+        const autreUtilisateurId =
+          conversation.buyer_id === utilisateurConnecte.id
+            ? conversation.seller_id
+            : conversation.buyer_id;
 
+        let profil = null;
 
-    conversations.forEach(
-      conversation => {
+        try {
 
-        const annonce =
-          toutesLesAnnonces.find(
-            a =>
-              a.id ===
-              conversation.listing_id
-          );
-
-
-        const titre =
-          annonce?.title ||
-          "Conversation";
-
-
-        const role =
-          conversation.buyer_id ===
-          utilisateurConnecte.id
-            ? "Acheteur"
-            : "Vendeur";
-
-
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "conversation-item";
-
-
-        div.innerHTML = `
-
-          <div class="conversation-title">
-
-            💬 ${escapeHTML(
-              titre
-            )}
-
-          </div>
-
-          <div style="
-            margin-top:5px;
-            font-size:13px;
-            color:#555;
-          ">
-
-            ${
-              role === "Acheteur"
-                ? "👤 Conversation avec le vendeur"
-                : "🛍️ Conversation avec l'acheteur"
+          const resultat = await supabaseFetch(
+            SUPABASE_URL + "/rest/v1/rpc/get_chat_profile",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                p_user_id: autreUtilisateurId
+              })
             }
+          );
 
-          </div>
+          if (Array.isArray(resultat)) {
+            profil = resultat[0] || null;
+          } else if (resultat && resultat.id) {
+            profil = resultat;
+          }
 
-          <div class="conversation-date">
+        } catch (erreurProfil) {
+          console.warn(
+            "Profil du correspondant indisponible :",
+            erreurProfil
+          );
+        }
 
-            ${formatDate(
-              conversation.created_at
-            )}
-
-          </div>
-
-        `;
-
-
-        div.onclick =
-          async () => {
-
-            conversationActuelle =
-              conversation;
-
-
-            annonceConversationActuelle =
-              annonce || {
-                title:titre,
-                id:
-                  conversation.listing_id
-              };
-
-
-            await afficherChat();
-
-          };
-
-
-        container.appendChild(
-          div
+        const annonce = (toutesLesAnnonces || []).find(
+          a => a.id === conversation.listing_id
         );
 
-      }
+        return {
+          conversation,
+          annonce,
+          profil,
+          autreUtilisateurId
+        };
+      })
     );
 
+    // 5. Afficher les conversations
+    container.innerHTML = "";
 
-  }catch(error){
+    conversationsPreparees.forEach(element => {
 
-    container.innerHTML =
-      '<div class="error">' +
-      'Impossible de charger les conversations.' +
-      '<br><br>' +
-      escapeHTML(
-        error.message ||
-        "Erreur inconnue."
-      ) +
-      '</div>';
+      const {
+        conversation,
+        annonce,
+        profil
+      } = element;
 
+      const titre = annonce?.title || "Conversation";
+
+      const role =
+        conversation.buyer_id === utilisateurConnecte.id
+          ? "Acheteur"
+          : "Vendeur";
+
+      const nomCorrespondant =
+        profil?.full_name ||
+        (role === "Acheteur"
+          ? "Vendeur"
+          : "Acheteur");
+
+      let photoCorrespondant = "";
+
+      if (profil?.photo_url) {
+        try {
+          photoCorrespondant =
+            /^https?:\/\//i.test(profil.photo_url)
+              ? profil.photo_url
+              : construireImageUrl(profil.photo_url);
+        } catch (erreurPhoto) {
+          photoCorrespondant = "";
+        }
+      }
+
+      const div = document.createElement("div");
+
+      div.className = "conversation-item";
+
+      div.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:14px;
+        cursor:pointer;
+      `;
+
+      const avatar = document.createElement("div");
+
+      avatar.style.cssText = `
+        width:52px;
+        height:52px;
+        min-width:52px;
+        border-radius:50%;
+        background:#e8f3ec;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        font-size:25px;
+      `;
+
+      if (photoCorrespondant) {
+
+        const img = document.createElement("img");
+
+        img.src = photoCorrespondant;
+        img.alt = "Photo de profil";
+        img.loading = "lazy";
+
+        img.style.cssText = `
+          width:100%;
+          height:100%;
+          object-fit:cover;
+        `;
+
+        img.onerror = function() {
+          avatar.innerHTML = "👤";
+        };
+
+        avatar.appendChild(img);
+
+      } else {
+        avatar.textContent = "👤";
+      }
+
+      const informations = document.createElement("div");
+
+      informations.style.cssText = `
+        flex:1;
+        min-width:0;
+      `;
+
+      const nom = document.createElement("div");
+
+      nom.style.cssText = `
+        font-weight:700;
+        font-size:15px;
+        color:#173d2a;
+        overflow-wrap:anywhere;
+      `;
+
+      nom.textContent = nomCorrespondant;
+
+      const titreAnnonce = document.createElement("div");
+
+      titreAnnonce.style.cssText = `
+        margin-top:4px;
+        font-size:13px;
+        color:#444;
+        overflow-wrap:anywhere;
+      `;
+
+      titreAnnonce.textContent = "💬 " + titre;
+
+      const date = document.createElement("div");
+
+      date.className = "conversation-date";
+
+      date.style.cssText = `
+        margin-top:5px;
+        font-size:12px;
+        color:#777;
+      `;
+
+      date.textContent = formatDate(conversation.created_at);
+
+      informations.appendChild(nom);
+      informations.appendChild(titreAnnonce);
+      informations.appendChild(date);
+
+      div.appendChild(avatar);
+      div.appendChild(informations);
+
+      // Ouvrir la conversation
+      div.onclick = async function() {
+
+        conversationActuelle = conversation;
+
+        annonceConversationActuelle = annonce || {
+          id: conversation.listing_id,
+          title: titre,
+          seller_id: conversation.seller_id
+        };
+
+        await afficherChat();
+      };
+
+      container.appendChild(div);
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Erreur chargement des conversations :",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="error">
+        Impossible de charger les conversations.
+        <br><br>
+        ${escapeHTML(error.message || "Erreur inconnue.")}
+      </div>
+    `;
   }
-
 }
 
 
