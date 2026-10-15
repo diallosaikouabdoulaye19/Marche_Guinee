@@ -19131,31 +19131,37 @@ function afficherRetour() {
     return await supabaseFetch(url, options || {});
   }
 
-  /* ---------- CHARGER LE PROFIL DU VENDEUR ---------- */
+   /* ---------- CHARGER LE PROFIL PUBLIC DU VENDEUR ---------- */
 
   async function chargerProfilVendeur(sellerId) {
     if (!sellerId) return null;
 
     try {
       var lignes = await requeteSupabase(
-        SUPABASE_URL +
-        "/rest/v1/users?id=eq." +
-        encodeURIComponent(sellerId) +
-        "&select=id,full_name,photo_url&limit=1"
+        SUPABASE_URL + "/rest/v1/rpc/get_public_seller_profile",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            p_seller_id: sellerId
+          })
+        }
       );
 
-      if (Array.isArray(lignes) && lignes.length) {
+      if (Array.isArray(lignes) && lignes.length > 0) {
         return lignes[0];
       }
-    } catch (erreur) {
-      console.warn("Profil vendeur non disponible :", erreur);
-    }
 
-    return null;
+      return null;
+    } catch (erreur) {
+      console.warn(
+        "Profil public du vendeur indisponible :",
+        erreur
+      );
+      return null;
+    }
   }
 
   /* ---------- ÉTAT DU FAVORI ---------- */
-
   async function verifierFavori(listingId, userId) {
     var lignes = await requeteSupabase(
       SUPABASE_URL +
