@@ -24597,6 +24597,343 @@ function afficherRetourMesAnnonces() {
 
 })();
 </script>
+
+<!-- MARCHÉ GUINÉE : NAVIGATION ADMINISTRATEUR ET COMMANDES -->
+<style>
+#mgAdminNavigation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+#mgAdminNavigation button {
+  min-height: 46px;
+  padding: 10px 8px;
+  border: 1px solid #dce7df;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #17452b;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#mgAdminNavigation button.active {
+  background: #087f3f;
+  color: #ffffff;
+  border-color: #087f3f;
+}
+
+#mgAdminCommandes {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #dce7df;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.mg-admin-commande {
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid #e0e5e2;
+  border-radius: 12px;
+  background: #f9fbfa;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}
+
+.mg-admin-commande strong {
+  color: #17452b;
+}
+
+@media (max-width: 380px) {
+  #mgAdminNavigation button {
+    font-size: 12px;
+    padding: 9px 5px;
+  }
+}
+</style>
+
+<script>
+(function () {
+  if (window.__mgAdminNavigationInstalled) return;
+  window.__mgAdminNavigationInstalled = true;
+
+  function echapperAdmin(valeur) {
+    if (typeof window.escapeHTML === "function") {
+      return window.escapeHTML(String(valeur ?? ""));
+    }
+
+    return String(valeur ?? "").replace(/[&<>"']/g, function (c) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[c];
+    });
+  }
+
+  function trouverSectionAdmin(element) {
+    if (!element) return "other";
+
+    if (element.id === "mgAdminCommandes") return "orders";
+
+    if (element.querySelector("#listeUtilisateursAdmin")) {
+      return "users";
+    }
+
+    if (element.querySelector("#listeAnnoncesAdmin")) {
+      return "listings";
+    }
+
+    const titre = (
+      element.querySelector("h3")?.textContent || ""
+    ).toLowerCase();
+
+    if (titre.includes("finances")) return "finances";
+    if (titre.includes("litiges")) return "disputes";
+    if (titre.includes("retraits vendeurs")) return "withdrawals";
+    if (titre.includes("historique des retraits")) return "withdrawals";
+
+    if (
+      element.querySelector('[style*="grid-template-columns"]') &&
+      !element.querySelector("h3")
+    ) {
+      return "overview";
+    }
+
+    return "other";
+  }
+
+  function installerNavigationAdmin() {
+    const container = document.getElementById("adminDashboardContent");
+    if (!container) return;
+
+    let navigation = document.getElementById("mgAdminNavigation");
+
+    if (!navigation) {
+      navigation = document.createElement("nav");
+      navigation.id = "mgAdminNavigation";
+      navigation.setAttribute("aria-label", "Navigation administrateur");
+
+      navigation.innerHTML = `
+        <button type="button" data-section="overview">📊 Vue d’ensemble</button>
+        <button type="button" data-section="users">👥 Utilisateurs</button>
+        <button type="button" data-section="listings">📦 Annonces</button>
+        <button type="button" data-section="orders">🛒 Commandes</button>
+        <button type="button" data-section="finances">💰 Finances</button>
+        <button type="button" data-section="disputes">⚠️ Litiges</button>
+        <button type="button" data-section="withdrawals">💸 Retraits</button>
+        <button type="button" data-section="other">📋 Autres informations</button>
+      `;
+
+      navigation.querySelectorAll("button").forEach(function (bouton) {
+        bouton.addEventListener("click", function () {
+          afficherSectionAdmin(bouton.dataset.section);
+        });
+      });
+    }
+
+    const ancienneSection = container.querySelector("#mgAdminCommandes");
+    if (ancienneSection) ancienneSection.remove();
+
+    const sectionCommandes = document.createElement("section");
+    sectionCommandes.id = "mgAdminCommandes";
+    sectionCommandes.dataset.mgAdminSection = "orders";
+    sectionCommandes.innerHTML = `
+      <h3 style="margin-top:0">🛒 Commandes</h3>
+      <p style="color:#647067;font-size:13px">
+        Liste des commandes enregistrées dans la plateforme.
+      </p>
+      <div id="mgAdminCommandesListe">Chargement des commandes…</div>
+      <button type="button" id="mgAdminActualiserCommandes"
+        style="width:100%;margin-top:10px;background:#087f3f;color:white">
+        🔄 Actualiser les commandes
+      </button>
+    `;
+
+    sectionCommandes.querySelector("#mgAdminActualiserCommandes")
+      .addEventListener("click", chargerCommandesAdmin);
+
+    const enfants = Array.from(container.children);
+    const boutonActualiser = enfants.find(function (element) {
+      return element.tagName === "BUTTON";
+    });
+
+    if (boutonActualiser) {
+      container.insertBefore(sectionCommandes, boutonActualiser);
+    } else {
+      container.appendChild(sectionCommandes);
+    }
+
+    enfants.forEach(function (element) {
+      if (element === navigation || element === sectionCommandes) return;
+
+      element.dataset.mgAdminSection = trouverSectionAdmin(element);
+    });
+
+    container.insertBefore(navigation, container.firstChild);
+
+    const autreSectionExiste = enfants.some(function (element) {
+      return trouverSectionAdmin(element) === "other";
+    });
+
+    let autreSection = container.querySelector("#mgAdminAutresInformations");
+
+    if (!autreSection) {
+      autreSection = document.createElement("section");
+      autreSection.id = "mgAdminAutresInformations";
+      autreSection.dataset.mgAdminSection = "other";
+      autreSection.style.cssText =
+        "margin-top:16px;padding:16px;background:white;" +
+        "border:1px solid #dce7df;border-radius:16px;";
+      autreSection.innerHTML = `
+        <h3 style="margin-top:0">📋 Autres informations</h3>
+        <p style="color:#647067">
+          Les informations complémentaires seront affichées ici lorsqu’elles
+          seront disponibles dans le tableau de bord.
+        </p>
+      `;
+      sectionCommandes.insertAdjacentElement("afterend", autreSection);
+    }
+
+    afficherSectionAdmin("overview");
+  }
+
+  function afficherSectionAdmin(section) {
+    const container = document.getElementById("adminDashboardContent");
+    if (!container) return;
+
+    container.querySelectorAll("[data-mg-admin-section]").forEach(function (element) {
+      element.style.display =
+        element.dataset.mgAdminSection === section ? "" : "none";
+    });
+
+    container.querySelectorAll("#mgAdminNavigation button").forEach(function (bouton) {
+      const actif = bouton.dataset.section === section;
+      bouton.classList.toggle("active", actif);
+      bouton.setAttribute("aria-current", actif ? "page" : "false");
+    });
+
+    if (section === "orders") {
+      chargerCommandesAdmin();
+    }
+
+    if (section === "users" && typeof window.chargerUtilisateursAdmin === "function") {
+      window.chargerUtilisateursAdmin();
+    }
+
+    if (section === "listings" && typeof window.chargerAnnoncesAdmin === "function") {
+      window.chargerAnnoncesAdmin();
+    }
+  }
+
+  async function chargerCommandesAdmin() {
+    const liste = document.getElementById("mgAdminCommandesListe");
+    if (!liste) return;
+
+    liste.innerHTML = `
+      <p style="text-align:center;padding:15px">⏳ Chargement des commandes…</p>
+    `;
+
+    try {
+      if (typeof window.verifierAccesAdmin !== "function" ||
+          !(await window.verifierAccesAdmin())) {
+        liste.innerHTML = "<p>Accès administrateur refusé.</p>";
+        return;
+      }
+
+      const commandes = await window.supabaseFetch(
+        window.SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?select=id,order_number,listing_id,buyer_id,seller_id,product_title,price_gnf,status,delivery_status,created_at" +
+        "&order=created_at.desc"
+      );
+
+      const lignes = Array.isArray(commandes) ? commandes : [];
+
+      if (!lignes.length) {
+        liste.innerHTML = `
+          <div style="padding:15px;text-align:center;color:#647067">
+            Aucune commande trouvée.
+          </div>
+        `;
+        return;
+      }
+
+      let utilisateurs = [];
+
+      try {
+        utilisateurs = await window.supabaseFetch(
+          window.SUPABASE_URL +
+          "/rest/v1/users?select=id,full_name,phone"
+        );
+      } catch (erreurProfils) {
+        console.warn("Les profils des participants n’ont pas pu être chargés.", erreurProfils);
+      }
+
+      const profils = new Map(
+        (Array.isArray(utilisateurs) ? utilisateurs : []).map(function (u) {
+          return [String(u.id), u];
+        })
+      );
+
+      liste.innerHTML = lignes.map(function (commande) {
+        const acheteur = profils.get(String(commande.buyer_id));
+        const vendeur = profils.get(String(commande.seller_id));
+
+        const date = commande.created_at
+          ? new Date(commande.created_at).toLocaleString("fr-FR")
+          : "Date inconnue";
+
+        const montant = Number(commande.price_gnf || 0)
+          .toLocaleString("fr-FR");
+
+        return `
+          <article class="mg-admin-commande">
+            <strong>📦 Commande ${echapperAdmin(commande.order_number || commande.id)}</strong>
+            <div>🛍️ Produit : ${echapperAdmin(commande.product_title || "Produit non renseigné")}</div>
+            <div>💰 Montant : ${montant} GNF</div>
+            <div>👤 Acheteur : ${echapperAdmin(acheteur?.full_name || "Nom indisponible")}</div>
+            ${acheteur?.phone ? `<div>📱 Téléphone acheteur : ${echapperAdmin(acheteur.phone)}</div>` : ""}
+            <div>🏪 Vendeur : ${echapperAdmin(vendeur?.full_name || "Nom indisponible")}</div>
+            ${vendeur?.phone ? `<div>📱 Téléphone vendeur : ${echapperAdmin(vendeur.phone)}</div>` : ""}
+            <div>📌 Statut commande : ${echapperAdmin(commande.status || "Inconnu")}</div>
+            <div>🚚 Statut livraison : ${echapperAdmin(commande.delivery_status || "Inconnu")}</div>
+            <div>📅 Date : ${echapperAdmin(date)}</div>
+          </article>
+        `;
+      }).join("");
+
+    } catch (erreur) {
+      console.error("Erreur chargement commandes administrateur :", erreur);
+      liste.innerHTML = `
+        <div style="padding:14px;background:#fff1f1;color:#a11;border-radius:10px">
+          Impossible de charger les commandes.<br><br>
+          ${echapperAdmin(erreur?.message || "Erreur inconnue")}
+        </div>
+      `;
+    }
+  }
+
+  const fonctionOriginale = window.chargerTableauAdmin;
+
+  if (typeof fonctionOriginale === "function") {
+    window.chargerTableauAdmin = async function () {
+      await fonctionOriginale.apply(this, arguments);
+      installerNavigationAdmin();
+    };
+  }
+
+  window.installerNavigationAdmin = installerNavigationAdmin;
+  window.afficherSectionAdmin = afficherSectionAdmin;
+  window.chargerCommandesAdmin = chargerCommandesAdmin;
+})();
+</script>
+<!-- FIN NAVIGATION ADMINISTRATEUR -->
   
 </body>
 </html>
