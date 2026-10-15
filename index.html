@@ -24164,6 +24164,218 @@ function afficherRetourMesAnnonces() {
 
 })();
 </script>
+
+<!-- =====================================================
+     MARCHÉ GUINÉE — ANNONCE PARTAGÉE ET RETOUR APRÈS CONNEXION
+     ===================================================== -->
+<script id="mg-annonce-partage-auth">
+(function () {
+  "use strict";
+
+  if (window.mgAnnoncePartageAuthInstalle) return;
+  window.mgAnnoncePartageAuthInstalle = true;
+
+  var CLE_ANNONCE = "mg_annonce_a_reouvrir";
+
+  function lireAnnonceEnAttente() {
+    try {
+      return sessionStorage.getItem(CLE_ANNONCE) || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function memoriserAnnonce(id) {
+    if (!id) return;
+
+    try {
+      sessionStorage.setItem(CLE_ANNONCE, String(id));
+    } catch (e) {
+      console.warn("Impossible de mémoriser l'annonce.", e);
+    }
+  }
+
+  function effacerAnnonceEnAttente() {
+    try {
+      sessionStorage.removeItem(CLE_ANNONCE);
+    } catch (e) {}
+  }
+
+  function utilisateurConnecteOK() {
+    try {
+      return typeof utilisateurConnecte !== "undefined" &&
+        utilisateurConnecte &&
+        utilisateurConnecte.id;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function masquerBienvenuePourAnnoncePartagee() {
+    var id = new URLSearchParams(
+      window.location.search
+    ).get("annonce");
+
+    if (!id) return;
+
+    var bienvenue = document.getElementById("mgWelcomePage");
+
+    if (bienvenue) {
+      bienvenue.style.display = "none";
+    }
+
+    document.body.style.overflow = "";
+  }
+
+  /*
+   * La page de bienvenue possède déjà son propre
+   * gestionnaire DOMContentLoaded. On masque donc la
+   * bienvenue après son initialisation si un lien
+   * d'annonce a été ouvert.
+   */
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      masquerBienvenuePourAnnoncePartagee,
+      { once: true }
+    );
+  } else {
+    masquerBienvenuePourAnnoncePartagee();
+  }
+
+  /*
+   * Reprendre l'annonce après une connexion réussie.
+   * On attend que le formulaire de compte se ferme,
+   * puis on cherche l'annonce dans les données chargées.
+   */
+  async function reprendreAnnonceApresConnexion() {
+    var id = lireAnnonceEnAttente();
+
+    if (!id || !utilisateurConnecteOK()) return;
+
+    window.setTimeout(async function () {
+      if (!utilisateurConnecteOK()) return;
+
+      var bienvenue = document.getElementById("mgWelcomePage");
+      if (bienvenue) bienvenue.style.display = "none";
+
+      var modalCompte = document.getElementById("accountModal");
+      if (modalCompte) modalCompte.style.display = "none";
+
+      var annonce = null;
+
+      for (var tentative = 0; tentative < 40; tentative++) {
+        try {
+          if (
+            typeof toutesLesAnnonces !== "undefined" &&
+            Array.isArray(toutesLesAnnonces)
+          ) {
+            annonce = toutesLesAnnonces.find(function (item) {
+              return String(item.id) === String(id);
+            }) || null;
+          }
+        } catch (e) {}
+
+        if (annonce) break;
+
+        await new Promise(function (resolve) {
+          window.setTimeout(resolve, 250);
+        });
+      }
+
+      if (!annonce) {
+        console.warn(
+          "Annonce à rouvrir introuvable :",
+          id
+        );
+        alert(
+          "Connexion réussie, mais l'annonce n'a pas pu être retrouvée. " +
+          "Retourne à l'accueil et réessaie."
+        );
+        return;
+      }
+
+      if (typeof window.ouvrirDetailAnnonce !== "function") {
+        alert(
+          "Connexion réussie. Réouvre l'annonce depuis l'accueil."
+        );
+        return;
+      }
+
+      effacerAnnonceEnAttente();
+
+      await window.ouvrirDetailAnnonce(annonce.id);
+
+    }, 950);
+  }
+
+  /*
+   * Conserver l'annonce lorsqu'un visiteur non connecté
+   * tente d'utiliser une fonction qui exige un compte.
+   */
+  var ancienneOuverturePaiement = window.ouvrirPaiement;
+
+  if (typeof ancienneOuverturePaiement === "function") {
+    window.ouvrirPaiement = function (id) {
+      if (!utilisateurConnecteOK()) {
+        memoriserAnnonce(id);
+      }
+
+      return ancienneOuverturePaiement.apply(this, arguments);
+    };
+  }
+
+  var ancienContactVendeur = window.ouvrirMessageVendeur;
+
+  if (typeof ancienContactVendeur === "function") {
+    window.ouvrirMessageVendeur = async function (id) {
+      if (!utilisateurConnecteOK()) {
+        memoriserAnnonce(id);
+      }
+
+      return await ancienContactVendeur.apply(this, arguments);
+    };
+  }
+
+  var ancienFavori = window.mgBasculerFavori;
+
+  if (typeof ancienFavori === "function") {
+    window.mgBasculerFavori = async function (id) {
+      if (!utilisateurConnecteOK()) {
+        memoriserAnnonce(id);
+      }
+
+      return await ancienFavori.apply(this, arguments);
+    };
+  }
+
+  /*
+   * Intercepter la connexion existante sans remplacer
+   * son fonctionnement Supabase.
+   */
+  var ancienneConnexion = window.connecterCompte;
+
+  if (typeof ancienneConnexion === "function") {
+    window.connecterCompte = async function () {
+      var resultat = await ancienneConnexion.apply(
+        this,
+        arguments
+      );
+
+      if (utilisateurConnecteOK() && lireAnnonceEnAttente()) {
+        reprendreAnnonceApresConnexion();
+      }
+
+      return resultat;
+    };
+  }
+
+  console.log(
+    "Marché Guinée : reprise de l'annonce après connexion installée."
+  );
+
+})();
+</script>
   
 </body>
 </html>
