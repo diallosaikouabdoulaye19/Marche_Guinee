@@ -23051,7 +23051,569 @@ function afficherRetourMesAnnonces() {
     "Marché Guinée : renouvellement automatique des sessions installé."
   );
 })();
+
+/* =====================================================
+   MARCHE GUINEE 🇬🇳
+   MESSAGERIE : ENVOI ET AFFICHAGE DES PHOTOS
+   Bucket privé : chat-images
+===================================================== */
+
+(function () {
+  "use strict";
+
+  const CHAT_BUCKET = "chat-images";
+  const CHAT_MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const CHAT_SIGNED_URL_SECONDS = 3600;
+
+  let chatPhotoEnCours = false;
+
+
+  /* =====================================================
+     VERIFIER LA CONVERSATION ET L'UTILISATEUR
+  ===================================================== */
+
+  function verifierChatPhoto() {
+    if (!utilisateurConnecte || !conversationActuelle) {
+      throw new Error(
+        "Ouvre une conversation avant d'envoyer une photo."
+      );
+    }
+
+    return conversationActuelle.id;
+  }
+
+
+  /* =====================================================
+     OBTENIR UNE URL TEMPORAIRE POUR UNE IMAGE PRIVEE
+  ===================================================== */
+
+  async function obtenirUrlPhotoChat(chemin) {
+    if (!chemin) return "";
+
+    // Compatibilité avec les anciennes images déjà stockées.
+    if (
+      chemin.startsWith("http://") ||
+      chemin.startsWith("https://")
+    ) {
+      return chemin;
+    }
+
+    // Le chemin doit correspondre à un objet de chat-images.
+    const cheminNettoye = chemin.replace(/^\/+/, "");
+
+    if (
+      cheminNettoye.includes("..") ||
+      cheminNettoye.startsWith("storage/")
+    ) {
+      throw new Error("Chemin de photo invalide.");
+    }
+
+    const reponse = await fetch(
+      SUPABASE_URL +
+      "/storage/v1/object/sign/" +
+      CHAT_BUCKET +
+      "/" +
+      cheminNettoye.split("/").map(encodeURIComponent).join("/") ,
+      {
+        method: "POST",
+        headers: headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify({
+          expiresIn: CHAT_SIGNED_URL_SECONDS
+        })
+      }
+    );
+
+    const texte = await reponse.text();
+
+    let resultat = {};
+
+    try {
+      resultat = texte ? JSON.parse(texte) : {};
+    } catch (e) {
+      resultat = {};
+    }
+
+    if (!reponse.ok) {
+      throw new Error(
+        resultat.message ||
+        resultat.error ||
+        "Impossible de créer le lien privé de la photo."
+      );
+    }
+
+    if (!resultat.signedURL) {
+      throw new Error(
+        "Supabase n'a pas renvoyé de lien temporaire."
+      );
+    }
+
+    if (
+      resultat.signedURL.startsWith("https://") ||
+      resultat.signedURL.startsWith("http://")
+    ) {
+      return resultat.signedURL;
+    }
+
+    return (
+      SUPABASE_URL +
+      "/storage/v1" +
+      (
+        resultat.signedURL.startsWith("/")
+          ? resultat.signedURL
+          : "/" + resultat.signedURL
+      )
+    );
+  }
+
+
+  /* =====================================================
+     ENVOYER UNE PHOTO DANS LA CONVERSATION
+  ===================================================== */
+
+  async function envoyerPhotoChat(fichier) {
+    if (chatPhotoEnCours) return;
+
+    try {
+      const conversationId = verifierChatPhoto();
+
+      if (!fichier) return;
+
+      const typesAutorises = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ];
+
+      if (!typesAutorises.includes(fichier.type)) {
+        alert(
+          "Choisis une image JPEG, PNG ou WebP."
+        );
+        return;
+      }
+
+      if (fichier.size > CHAT_MAX_FILE_SIZE) {
+        alert(
+          "La photo dépasse la limite de 5 MB."
+        );
+        return;
+      }
+
+      chatPhotoEnCours = true;
+
+      const bouton = document.getElementById(
+        "chatPhotoButton"
+      );
+
+      if (bouton) {
+        bouton.disabled = true;
+        bouton.textContent = "⏳";
+      }
+
+      const extensions = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+      };
+
+      const nomFichier =
+        Date.now() +
+        "_" +
+        Math.random().toString(36).slice(2) +
+        "." +
+        extensions[fichier.type];
+
+      const chemin =
+        conversationId +
+        "/" +
+        nomFichier;
+
+      // 1. Envoyer l'image au bucket privé.
+      const reponseUpload = await fetch(
+        SUPABASE_URL +
+        "/storage/v1/object/" +
+        CHAT_BUCKET +
+        "/" +
+        chemin.split("/").map(encodeURIComponent).join("/"),
+        {
+          method: "POST",
+          headers: headers({
+            "Content-Type": fichier.type,
+            "x-upsert": "false"
+          }),
+          body: fichier
+        }
+      );
+
+      if (!reponseUpload.ok) {
+        const erreurTexte = await reponseUpload.text();
+
+        throw new Error(
+          "Échec de l'envoi de la photo : " +
+          erreurTexte
+        );
+      }
+
+      // 2. Enregistrer le chemin dans la table messages.
+      await supabaseFetch(
+        SUPABASE_URL + "/rest/v1/messages",
+        {
+          method: "POST",
+          headers: {
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({
+            conversation_id: conversationId,
+            sender_id: utilisateurConnecte.id,
+            message: "",
+            image_url: chemin
+          })
+        }
+      );
+
+      // 3. Actualiser la conversation.
+      await chargerMessages();
+
+    } catch (erreur) {
+      alert(
+        "Impossible d'envoyer la photo : " +
+        (erreur.message || "Erreur inconnue.")
+      );
+    } finally {
+      chatPhotoEnCours = false;
+
+      const bouton = document.getElementById(
+        "chatPhotoButton"
+      );
+
+      if (bouton) {
+        bouton.disabled = false;
+        bouton.textContent = "📷";
+      }
+
+      const inputPhoto = document.getElementById(
+        "chatPhotoInput"
+      );
+
+      if (inputPhoto) {
+        inputPhoto.value = "";
+      }
+    }
+  }
+
+
+  /* =====================================================
+     AJOUTER LE BOUTON PHOTO SANS MODIFIER LE HTML
+  ===================================================== */
+
+  function initialiserBoutonPhotoChat() {
+    const inputMessage = document.getElementById(
+      "messageInput"
+    );
+
+    if (!inputMessage) return;
+
+    const zone = inputMessage.closest(".chat-input");
+
+    if (!zone) return;
+
+    if (document.getElementById("chatPhotoButton")) {
+      return;
+    }
+
+    const inputPhoto = document.createElement("input");
+
+    inputPhoto.type = "file";
+    inputPhoto.id = "chatPhotoInput";
+    inputPhoto.accept = "image/jpeg,image/png,image/webp";
+    inputPhoto.style.display = "none";
+
+    inputPhoto.addEventListener("change", function () {
+      const fichier = inputPhoto.files &&
+        inputPhoto.files[0];
+
+      if (fichier) {
+        envoyerPhotoChat(fichier);
+      }
+    });
+
+    const bouton = document.createElement("button");
+
+    bouton.type = "button";
+    bouton.id = "chatPhotoButton";
+    bouton.textContent = "📷";
+    bouton.title = "Envoyer une photo";
+    bouton.setAttribute(
+      "aria-label",
+      "Choisir une photo à envoyer"
+    );
+
+    bouton.style.cssText =
+      "flex-shrink:0;" +
+      "width:46px;" +
+      "height:46px;" +
+      "border:1px solid #dce3df;" +
+      "border-radius:14px;" +
+      "background:#ffffff;" +
+      "font-size:21px;" +
+      "cursor:pointer;";
+
+    bouton.addEventListener("click", function () {
+      if (
+        !utilisateurConnecte ||
+        !conversationActuelle
+      ) {
+        alert(
+          "Ouvre une conversation avant de choisir une photo."
+        );
+        return;
+      }
+
+      inputPhoto.click();
+    });
+
+    zone.insertBefore(inputPhoto, inputMessage);
+    zone.insertBefore(bouton, inputMessage);
+  }
+
+
+  /* =====================================================
+     AFFICHER LES MESSAGES ET LES PHOTOS PRIVEES
+  ===================================================== */
+
+  async function chargerMessagesAvecPhotos() {
+    if (!conversationActuelle) return;
+
+    const box = document.getElementById("chatBox");
+
+    if (!box) return;
+
+    try {
+      const conversationId = conversationActuelle.id;
+
+      const messages = await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/messages" +
+        "?conversation_id=eq." +
+        encodeURIComponent(conversationId) +
+        "&select=*" +
+        "&order=created_at.asc"
+      );
+
+      // Éviter d'afficher les résultats d'une autre conversation.
+      if (
+        !conversationActuelle ||
+        conversationActuelle.id !== conversationId
+      ) {
+        return;
+      }
+
+      box.innerHTML = "";
+
+      if (!messages || !messages.length) {
+        box.innerHTML =
+          '<div style="text-align:center;color:#777;padding:30px">' +
+          'Aucun message.<br>Commence la conversation 👋' +
+          '</div>';
+
+        return;
+      }
+
+      for (const msg of messages) {
+        const mine =
+          utilisateurConnecte &&
+          msg.sender_id === utilisateurConnecte.id;
+
+        const row = document.createElement("div");
+
+        row.className =
+          "message-row" + (mine ? " mine" : "");
+
+        const messageDiv = document.createElement("div");
+
+        messageDiv.className = "message";
+
+        if (msg.message) {
+          const texte = document.createElement("div");
+
+          texte.textContent = msg.message;
+
+          messageDiv.appendChild(texte);
+        }
+
+        if (msg.image_url) {
+          const conteneurImage = document.createElement("div");
+
+          conteneurImage.style.marginTop = "7px";
+
+          const image = document.createElement("img");
+
+          image.alt = "Photo envoyée dans la conversation";
+          image.style.cssText =
+            "max-width:180px;" +
+            "max-height:260px;" +
+            "width:auto;" +
+            "height:auto;" +
+            "border-radius:10px;" +
+            "display:block;";
+
+          conteneurImage.textContent = "Chargement de la photo…";
+
+          messageDiv.appendChild(conteneurImage);
+
+          try {
+            const url = await obtenirUrlPhotoChat(
+              msg.image_url
+            );
+
+            image.src = url;
+
+            image.onload = function () {
+              conteneurImage.textContent = "";
+              conteneurImage.appendChild(image);
+            };
+
+            image.onerror = function () {
+              conteneurImage.textContent =
+                "Impossible d'afficher cette photo.";
+            };
+
+          } catch (erreurImage) {
+            conteneurImage.textContent =
+              "Photo privée inaccessible. Vérifie les autorisations Storage.";
+          }
+        }
+
+        const heure = document.createElement("span");
+
+        heure.className = "message-time";
+
+        heure.textContent =
+          formatHeure(msg.created_at) +
+          (
+            mine && msg.read_at
+              ? " · Vu"
+              : ""
+          );
+
+        messageDiv.appendChild(heure);
+        row.appendChild(messageDiv);
+        box.appendChild(row);
+      }
+
+      box.scrollTop = box.scrollHeight;
+
+    } catch (erreur) {
+      box.innerHTML =
+        '<div class="error">' +
+        "Impossible de charger les messages." +
+        "</div>";
+
+      console.error(
+        "Erreur de chargement de la messagerie :",
+        erreur
+      );
+    }
+  }
+
+
+  /* =====================================================
+     CONSERVER L'ENVOI DES MESSAGES TEXTE
+  ===================================================== */
+
+  async function envoyerMessageAvecPhotos() {
+    if (
+      !utilisateurConnecte ||
+      !conversationActuelle
+    ) {
+      return;
+    }
+
+    const input = document.getElementById(
+      "messageInput"
+    );
+
+    if (!input) return;
+
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    input.disabled = true;
+
+    try {
+      await supabaseFetch(
+        SUPABASE_URL + "/rest/v1/messages",
+        {
+          method: "POST",
+          headers: {
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({
+            conversation_id: conversationActuelle.id,
+            sender_id: utilisateurConnecte.id,
+            message: message,
+            image_url: null
+          })
+        }
+      );
+
+      input.value = "";
+
+      await chargerMessagesAvecPhotos();
+
+    } catch (erreur) {
+      alert(
+        "Impossible d'envoyer le message : " +
+        erreur.message
+      );
+    } finally {
+      input.disabled = false;
+      input.focus();
+    }
+  }
+
+
+  /* =====================================================
+     ACTIVER LES NOUVELLES FONCTIONS
+  ===================================================== */
+
+  // Remplacer les fonctions globales utilisées par la messagerie.
+  window.chargerMessages = chargerMessagesAvecPhotos;
+  window.envoyerMessage = envoyerMessageAvecPhotos;
+
+  // Le champ de saisie existe normalement déjà dans le HTML.
+  function demarrerChatPhotos() {
+    initialiserBoutonPhotoChat();
+
+    // Réessayer si le HTML de la messagerie apparaît plus tard.
+    if (!document.getElementById("chatPhotoButton")) {
+      setTimeout(
+        initialiserBoutonPhotoChat,
+        500
+      );
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      demarrerChatPhotos
+    );
+  } else {
+    demarrerChatPhotos();
+  }
+
+  // Compatibilité avec les modales créées ou affichées plus tard.
+  setInterval(
+    initialiserBoutonPhotoChat,
+    1500
+  );
+
+})();
+
 </script>
-  
+
 </body>
 </html>
