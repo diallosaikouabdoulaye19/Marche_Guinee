@@ -24376,6 +24376,80 @@ function afficherRetourMesAnnonces() {
 
 })();
 </script>
+
+<!-- MARCHÉ GUINÉE — CORRECTION DES BOUTONS DE BIENVENUE -->
+<script id="mg-correction-boutons-bienvenue">
+(function () {
+  "use strict";
+
+  function ouvrirFormulaireBienvenue(type) {
+    var bienvenue = document.getElementById("mgWelcomePage");
+    var compte = document.getElementById("accountModal");
+    var formulaires = document.getElementById("accountForms");
+    var connecte = document.getElementById("accountConnected");
+    var message = document.getElementById("accountMessage");
+
+    if (!compte || !formulaires) {
+      alert("Le formulaire du compte est indisponible. Réessaie.");
+      return;
+    }
+
+    if (
+      typeof utilisateurConnecte !== "undefined" &&
+      utilisateurConnecte &&
+      utilisateurConnecte.id
+    ) {
+      if (bienvenue) bienvenue.style.display = "none";
+      compte.style.display = "none";
+      document.body.style.overflow = "";
+      return;
+    }
+
+    formulaires.classList.remove("hidden");
+
+    if (connecte) {
+      connecte.classList.add("hidden");
+    }
+
+    compte.style.display = "block";
+    compte.style.zIndex = "1000001";
+
+    if (type === "inscription") {
+      if (typeof afficherInscription === "function") {
+        afficherInscription();
+      } else {
+        alert("Le formulaire d'inscription est indisponible.");
+        return;
+      }
+    } else {
+      if (typeof afficherConnexion === "function") {
+        afficherConnexion();
+      } else {
+        alert("Le formulaire de connexion est indisponible.");
+        return;
+      }
+    }
+
+    if (message) {
+      message.innerHTML = "";
+    }
+
+    if (bienvenue) {
+      bienvenue.style.display = "none";
+    }
+
+    document.body.style.overflow = "";
+  }
+
+  window.mgWelcomeInscription = function () {
+    ouvrirFormulaireBienvenue("inscription");
+  };
+
+  window.mgWelcomeConnexion = function () {
+    ouvrirFormulaireBienvenue("connexion");
+  };
+})();
+</script>
   
 </body>
 </html>
