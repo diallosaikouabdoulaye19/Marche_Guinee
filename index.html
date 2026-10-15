@@ -8216,7 +8216,10 @@ function ouvrirPaiement(listingId){
     return;
   }
   // Vérifier que l'utilisateur est connecté
-  if(!utilisateurConnecte){
+  if (
+  typeof utilisateurConnecte === "undefined" ||
+  !utilisateurConnecte
+) {
     fermerModal("detailModal");
     alert(
       "Connecte-toi pour acheter."
@@ -8918,7 +8921,10 @@ async function ouvrirMessageVendeur(
   listingId
 ){
 
-  if(!utilisateurConnecte){
+  if (
+  typeof utilisateurConnecte === "undefined" ||
+  !utilisateurConnecte
+) {
 
     fermerModal(
       "detailModal"
