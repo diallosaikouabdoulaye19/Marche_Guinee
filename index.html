@@ -23714,7 +23714,46 @@ function afficherRetourMesAnnonces() {
   "use strict";
 
   const ancienAfficherChat = window.afficherChat;
-  const ancienRetourConversations = window.retourConversations;
+  const ancienRetourConversations = function () {
+  if (typeof intervalMessages !== "undefined" && intervalMessages) {
+    clearInterval(intervalMessages);
+    intervalMessages = null;
+  }
+
+  conversationActuelle = null;
+  annonceConversationActuelle = null;
+
+  const chatContainer = document.getElementById("chatContainer");
+  const messagesList = document.getElementById("messagesList");
+
+  if (chatContainer) {
+    chatContainer.classList.add("hidden");
+  }
+
+  if (messagesList) {
+    messagesList.classList.remove("hidden");
+  }
+
+  const enteteVert = obtenirEnteteVert();
+
+  if (enteteVert) {
+    enteteVert.style.display = "";
+  }
+
+  const zoneHaute = document.getElementById("chatConversationTop");
+
+  if (zoneHaute) {
+    zoneHaute.remove();
+  }
+
+  const panel = document.getElementById("priceOfferPanel");
+
+  if (panel) {
+    panel.remove();
+  }
+
+  chargerListeConversations();
+};
 
   function obtenirEnteteVert() {
     const modal = document.getElementById("messagesModal");
