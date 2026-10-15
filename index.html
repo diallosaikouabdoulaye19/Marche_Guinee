@@ -20393,40 +20393,49 @@ function afficherRetour() {
       });
 
     } catch (erreur) {
-      console.error(
-        "[Marché Guinée] Erreur du profil vendeur :",
-        erreur
+  console.error(
+    "[Marché Guinée] Erreur détaillée du profil vendeur :",
+    erreur
+  );
+
+  var messageErreur =
+    erreur && erreur.message
+      ? erreur.message
+      : String(erreur || "Erreur inconnue");
+
+  identite.innerHTML = `
+    <div class="mg-profil-message">
+      Impossible de charger le profil du vendeur.
+    </div>
+  `;
+
+  liste.innerHTML = `
+    <div class="mg-profil-message">
+      <strong>Erreur détectée :</strong>
+      <br><br>
+      <span style="overflow-wrap:anywhere;">
+        ${echapper(messageErreur)}
+      </span>
+      <br><br>
+      <button type="button" id="mgReessayerProfil">
+        Réessayer
+      </button>
+    </div>
+  `;
+
+  var bouton = modal.querySelector("#mgReessayerProfil");
+
+  if (bouton) {
+    bouton.onclick = function () {
+      window.mgOuvrirProfilVendeur(
+        sellerId,
+        annonceCouranteId
       );
-
-      identite.innerHTML = `
-        <div class="mg-profil-message">
-          Impossible de charger le profil du vendeur.
-        </div>
-      `;
-
-      liste.innerHTML = `
-        <div class="mg-profil-message">
-          Impossible de récupérer les annonces.
-          Vérifie la connexion puis réessaie.
-          <br><br>
-          <button type="button" id="mgReessayerProfil">
-            Réessayer
-          </button>
-        </div>
-      `;
-
-      var bouton = modal.querySelector("#mgReessayerProfil");
-
-      if (bouton) {
-        bouton.onclick = function () {
-          window.mgOuvrirProfilVendeur(
-            sellerId,
-            annonceCouranteId
-          );
-        };
-      }
-    }
-  };
+    };
+  }
+}
+  
+};
 })();
 </script>
 
