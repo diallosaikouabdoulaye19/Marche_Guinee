@@ -2996,31 +2996,35 @@ const SUPABASE_KEY = "sb_publishable_RQUvUH0EYETyddgkKFgbAQ_ZKQubV-Z";
    OUTILS SUPABASE
 ========================= */
 
-function headers(extra={}){
+function headers(extra = {}) {
+  let utilisateur = null;
+
+  try {
+    if (
+      typeof utilisateurConnecte !== "undefined" &&
+      utilisateurConnecte
+    ) {
+      utilisateur = utilisateurConnecte;
+    } else if (window.utilisateurConnecte) {
+      utilisateur = window.utilisateurConnecte;
+    }
+  } catch (e) {
+    utilisateur = window.utilisateurConnecte || null;
+  }
 
   const token =
-    utilisateurConnecte &&
-    utilisateurConnecte.accessToken
-      ? utilisateurConnecte.accessToken
+    utilisateur && utilisateur.accessToken
+      ? utilisateur.accessToken
       : SUPABASE_KEY;
 
   return {
-
-    "apikey":SUPABASE_KEY,
-
-    "Authorization":
-      "Bearer " + token,
-
-    "Content-Type":
-      "application/json",
-
+    apikey: SUPABASE_KEY,
+    Authorization: "Bearer " + token,
+    "Content-Type": "application/json",
     ...extra
-
   };
-
 }
-
-
+  
 async function supabaseFetch(url,options={}){
 
   const response =
