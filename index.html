@@ -23705,6 +23705,200 @@ function afficherRetourMesAnnonces() {
 
 })();
 
+/* ==========================================================
+   MESSAGERIE MARCHÉ GUINÉE
+   En-tête compact et négociation hors de la zone des messages
+   ========================================================== */
+
+(function () {
+  "use strict";
+
+  const ancienAfficherChat = window.afficherChat;
+  const ancienRetourConversations = window.retourConversations;
+
+  function obtenirEnteteVert() {
+    const modal = document.getElementById("messagesModal");
+    if (!modal) return null;
+
+    const boite = modal.querySelector(":scope > .modal-box");
+    if (!boite) return null;
+
+    return boite.querySelector(":scope > div");
+  }
+
+  function preparerZoneConversation() {
+    const chatContainer = document.getElementById("chatContainer");
+    const chatBox = document.getElementById("chatBox");
+    const panel = document.getElementById("priceOfferPanel");
+
+    if (!chatContainer || !chatBox) return;
+
+    chatContainer.style.display = "flex";
+    chatContainer.style.flexDirection = "column";
+    chatContainer.style.flex = "1 1 auto";
+    chatContainer.style.height = "100%";
+    chatContainer.style.minHeight = "0";
+    chatContainer.style.overflow = "hidden";
+
+    const entete = chatContainer.querySelector(
+      ":scope > div:first-child"
+    );
+
+    if (!entete) return;
+
+    let zoneHaute = document.getElementById("chatConversationTop");
+
+    if (!zoneHaute) {
+      zoneHaute = document.createElement("div");
+      zoneHaute.id = "chatConversationTop";
+
+      zoneHaute.style.cssText = [
+        "display:flex",
+        "flex-direction:column",
+        "flex:0 0 auto",
+        "width:100%",
+        "background:#ffffff",
+        "border-bottom:1px solid #e8ecea",
+        "box-sizing:border-box"
+      ].join(";");
+
+      chatContainer.insertBefore(zoneHaute, entete);
+    }
+
+    if (entete.parentElement !== zoneHaute) {
+      zoneHaute.insertBefore(entete, zoneHaute.firstChild);
+    }
+
+    entete.style.flex = "0 0 auto";
+    entete.style.width = "100%";
+    entete.style.boxSizing = "border-box";
+
+    if (panel && panel.parentElement !== zoneHaute) {
+      zoneHaute.appendChild(panel);
+    }
+
+    if (panel) {
+      panel.style.width = "100%";
+      panel.style.maxWidth = "100%";
+      panel.style.flex = "0 0 auto";
+      panel.style.boxSizing = "border-box";
+      panel.style.margin = "0";
+      panel.style.padding = "8px 12px";
+      panel.style.borderRadius = "0";
+      panel.style.boxShadow = "none";
+      panel.style.overflow = "visible";
+
+      const titre = panel.querySelector(".price-offer-title");
+      if (titre) {
+        titre.style.fontSize = "14px";
+        titre.style.marginBottom = "4px";
+      }
+
+      const texte = panel.querySelector(".price-offer-text");
+      if (texte) {
+        texte.style.fontSize = "12px";
+        texte.style.marginBottom = "5px";
+      }
+
+      panel.querySelectorAll(
+        ".price-offer-btn, .price-offer-accept, .price-offer-reject"
+      ).forEach(function (bouton) {
+        bouton.style.minHeight = "38px";
+        bouton.style.padding = "8px 12px";
+        bouton.style.borderRadius = "10px";
+      });
+    }
+
+    chatBox.style.flex = "1 1 auto";
+    chatBox.style.height = "auto";
+    chatBox.style.minHeight = "0";
+    chatBox.style.margin = "0";
+    chatBox.style.overflowY = "auto";
+    chatBox.style.overflowX = "hidden";
+    chatBox.style.webkitOverflowScrolling = "touch";
+    chatBox.style.overscrollBehavior = "contain";
+
+    const barre = chatContainer.querySelector(".chat-input");
+
+    if (barre) {
+      barre.style.flex = "0 0 auto";
+      barre.style.width = "100%";
+      barre.style.position = "relative";
+      barre.style.zIndex = "5";
+    }
+  }
+
+  if (typeof ancienAfficherChat === "function") {
+    window.afficherChat = async function () {
+      const enteteVert = obtenirEnteteVert();
+
+      if (enteteVert) {
+        enteteVert.style.display = "none";
+      }
+
+      await ancienAfficherChat();
+
+      if (!window.conversationActuelle) return;
+
+      preparerZoneConversation();
+
+      /*
+       * Évite de forcer le clavier à l'ouverture.
+       * Il s'ouvrira lorsque l'utilisateur touchera le champ.
+       */
+      const input = document.getElementById("messageInput");
+
+      if (input) {
+        input.blur();
+      }
+
+      const chatBox = document.getElementById("chatBox");
+
+      if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    };
+  }
+
+  if (typeof ancienRetourConversations === "function") {
+    window.retourConversations = function () {
+      if (typeof window.intervalMessages !== "undefined" &&
+          window.intervalMessages) {
+        clearInterval(window.intervalMessages);
+        window.intervalMessages = null;
+      }
+
+      ancienRetourConversations();
+
+      const enteteVert = obtenirEnteteVert();
+
+      if (enteteVert) {
+        enteteVert.style.display = "";
+      }
+
+      const zoneHaute = document.getElementById("chatConversationTop");
+      const chatContainer = document.getElementById("chatContainer");
+
+      if (zoneHaute && chatContainer) {
+        const entete = zoneHaute.querySelector(":scope > div");
+
+        if (entete) {
+          chatContainer.insertBefore(entete, chatContainer.firstChild);
+        }
+
+        zoneHaute.remove();
+      }
+
+      const panel = document.getElementById("priceOfferPanel");
+
+      if (panel) {
+        panel.remove();
+      }
+    };
+  }
+
+})();
+  
 </script>
 
 </body>
