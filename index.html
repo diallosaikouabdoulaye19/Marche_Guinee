@@ -24598,74 +24598,65 @@ function afficherRetourMesAnnonces() {
 })();
 </script>
 
-<!-- MARCHÉ GUINÉE : NAVIGATION ADMINISTRATEUR ET COMMANDES -->
+<!-- MARCHÉ GUINÉE — CORRECTION NAVIGATION ET COMMANDES ADMIN -->
 <style>
-#mgAdminNavigation {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin: 0 0 16px;
-}
-
-#mgAdminNavigation button {
-  min-height: 46px;
-  padding: 10px 8px;
-  border: 1px solid #dce7df;
-  border-radius: 11px;
-  background: #ffffff;
-  color: #17452b;
+#mgAdminNavigation button[data-mg-orders-button="true"] {
+  min-width: 0;
+  min-height: 54px;
+  padding: 10px;
+  border: 1px solid #e0e8e2;
+  border-radius: 13px;
+  background: #fff;
+  color: #244333;
   font-size: 13px;
   font-weight: 800;
-  cursor: pointer;
+  text-align: left;
+  overflow-wrap: anywhere;
 }
 
-#mgAdminNavigation button.active {
+#mgAdminNavigation button[data-mg-orders-button="true"][aria-selected="true"] {
   background: #087f3f;
-  color: #ffffff;
+  color: #fff;
   border-color: #087f3f;
 }
 
-#mgAdminCommandes {
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid #dce7df;
-  border-radius: 16px;
-  background: #ffffff;
-}
-
-.mg-admin-commande {
-  margin-bottom: 12px;
-  padding: 14px;
-  border: 1px solid #e0e5e2;
-  border-radius: 12px;
-  background: #f9fbfa;
+#mgAdminCommandesPanel {
+  margin-top: 0;
+  padding: 15px;
+  border: 1px solid #e0e8e2;
+  border-radius: 14px;
+  background: #fff;
   overflow-wrap: anywhere;
+}
+
+.mg-admin-commande-carte {
+  margin: 12px 0;
+  padding: 13px;
+  border: 1px solid #e0e8e2;
+  border-radius: 12px;
+  background: #f8fbf9;
   line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 
-.mg-admin-commande strong {
-  color: #17452b;
-}
-
-@media (max-width: 380px) {
-  #mgAdminNavigation button {
-    font-size: 12px;
-    padding: 9px 5px;
-  }
+.mg-admin-commande-carte strong {
+  color: #087f3f;
 }
 </style>
 
-<script>
+<script id="mg-admin-commandes-correction">
 (function () {
-  if (window.__mgAdminNavigationInstalled) return;
-  window.__mgAdminNavigationInstalled = true;
+  "use strict";
 
-  function echapperAdmin(valeur) {
+  if (window.__mgAdminCommandesCorrection) return;
+  window.__mgAdminCommandesCorrection = true;
+
+  function echapper(valeur) {
     if (typeof window.escapeHTML === "function") {
-      return window.escapeHTML(String(valeur ?? ""));
+      return window.escapeHTML(String(valeur == null ? "" : valeur));
     }
 
-    return String(valeur ?? "").replace(/[&<>"']/g, function (c) {
+    return String(valeur == null ? "" : valeur).replace(/[&<>"']/g, function (c) {
       return {
         "&": "&amp;",
         "<": "&lt;",
@@ -24676,264 +24667,240 @@ function afficherRetourMesAnnonces() {
     });
   }
 
-  function trouverSectionAdmin(element) {
-    if (!element) return "other";
-
-    if (element.id === "mgAdminCommandes") return "orders";
-
-    if (element.querySelector("#listeUtilisateursAdmin")) {
-      return "users";
-    }
-
-    if (element.querySelector("#listeAnnoncesAdmin")) {
-      return "listings";
-    }
-
-    const titre = (
-      element.querySelector("h3")?.textContent || ""
-    ).toLowerCase();
-
-    if (titre.includes("finances")) return "finances";
-    if (titre.includes("litiges")) return "disputes";
-    if (titre.includes("retraits vendeurs")) return "withdrawals";
-    if (titre.includes("historique des retraits")) return "withdrawals";
-
-    if (
-      element.querySelector('[style*="grid-template-columns"]') &&
-      !element.querySelector("h3")
-    ) {
-      return "overview";
-    }
-
-    return "other";
-  }
-
-  function installerNavigationAdmin() {
-    const container = document.getElementById("adminDashboardContent");
-    if (!container) return;
-
-    let navigation = document.getElementById("mgAdminNavigation");
-
-    if (!navigation) {
-      navigation = document.createElement("nav");
-      navigation.id = "mgAdminNavigation";
-      navigation.setAttribute("aria-label", "Navigation administrateur");
-
-      navigation.innerHTML = `
-        <button type="button" data-section="overview">📊 Vue d’ensemble</button>
-        <button type="button" data-section="users">👥 Utilisateurs</button>
-        <button type="button" data-section="listings">📦 Annonces</button>
-        <button type="button" data-section="orders">🛒 Commandes</button>
-        <button type="button" data-section="finances">💰 Finances</button>
-        <button type="button" data-section="disputes">⚠️ Litiges</button>
-        <button type="button" data-section="withdrawals">💸 Retraits</button>
-        <button type="button" data-section="other">📋 Autres informations</button>
-      `;
-
-      navigation.querySelectorAll("button").forEach(function (bouton) {
-        bouton.addEventListener("click", function () {
-          afficherSectionAdmin(bouton.dataset.section);
-        });
-      });
-    }
-
-    const ancienneSection = container.querySelector("#mgAdminCommandes");
-    if (ancienneSection) ancienneSection.remove();
-
-    const sectionCommandes = document.createElement("section");
-    sectionCommandes.id = "mgAdminCommandes";
-    sectionCommandes.dataset.mgAdminSection = "orders";
-    sectionCommandes.innerHTML = `
-      <h3 style="margin-top:0">🛒 Commandes</h3>
-      <p style="color:#647067;font-size:13px">
-        Liste des commandes enregistrées dans la plateforme.
-      </p>
-      <div id="mgAdminCommandesListe">Chargement des commandes…</div>
-      <button type="button" id="mgAdminActualiserCommandes"
-        style="width:100%;margin-top:10px;background:#087f3f;color:white">
-        🔄 Actualiser les commandes
-      </button>
-    `;
-
-    sectionCommandes.querySelector("#mgAdminActualiserCommandes")
-      .addEventListener("click", chargerCommandesAdmin);
-
-    const enfants = Array.from(container.children);
-    const boutonActualiser = enfants.find(function (element) {
-      return element.tagName === "BUTTON";
-    });
-
-    if (boutonActualiser) {
-      container.insertBefore(sectionCommandes, boutonActualiser);
-    } else {
-      container.appendChild(sectionCommandes);
-    }
-
-    enfants.forEach(function (element) {
-      if (element === navigation || element === sectionCommandes) return;
-
-      element.dataset.mgAdminSection = trouverSectionAdmin(element);
-    });
-
-    container.insertBefore(navigation, container.firstChild);
-
-    const autreSectionExiste = enfants.some(function (element) {
-      return trouverSectionAdmin(element) === "other";
-    });
-
-    let autreSection = container.querySelector("#mgAdminAutresInformations");
-
-    if (!autreSection) {
-      autreSection = document.createElement("section");
-      autreSection.id = "mgAdminAutresInformations";
-      autreSection.dataset.mgAdminSection = "other";
-      autreSection.style.cssText =
-        "margin-top:16px;padding:16px;background:white;" +
-        "border:1px solid #dce7df;border-radius:16px;";
-      autreSection.innerHTML = `
-        <h3 style="margin-top:0">📋 Autres informations</h3>
-        <p style="color:#647067">
-          Les informations complémentaires seront affichées ici lorsqu’elles
-          seront disponibles dans le tableau de bord.
-        </p>
-      `;
-      sectionCommandes.insertAdjacentElement("afterend", autreSection);
-    }
-
-    afficherSectionAdmin("overview");
-  }
-
-  function afficherSectionAdmin(section) {
-    const container = document.getElementById("adminDashboardContent");
-    if (!container) return;
-
-    container.querySelectorAll("[data-mg-admin-section]").forEach(function (element) {
-      element.style.display =
-        element.dataset.mgAdminSection === section ? "" : "none";
-    });
-
-    container.querySelectorAll("#mgAdminNavigation button").forEach(function (bouton) {
-      const actif = bouton.dataset.section === section;
-      bouton.classList.toggle("active", actif);
-      bouton.setAttribute("aria-current", actif ? "page" : "false");
-    });
-
-    if (section === "orders") {
-      chargerCommandesAdmin();
-    }
-
-    if (section === "users" && typeof window.chargerUtilisateursAdmin === "function") {
-      window.chargerUtilisateursAdmin();
-    }
-
-    if (section === "listings" && typeof window.chargerAnnoncesAdmin === "function") {
-      window.chargerAnnoncesAdmin();
-    }
-  }
-
-  async function chargerCommandesAdmin() {
-    const liste = document.getElementById("mgAdminCommandesListe");
+  function afficherErreur(message) {
+    var liste = document.getElementById("mgAdminCommandesListe");
     if (!liste) return;
 
-    liste.innerHTML = `
-      <p style="text-align:center;padding:15px">⏳ Chargement des commandes…</p>
-    `;
+    liste.innerHTML =
+      '<p style="padding:12px;color:#a11;background:#fff1f1;border-radius:10px">' +
+      echapper(message) +
+      "</p>";
+  }
+
+  async function chargerCommandes() {
+    var liste = document.getElementById("mgAdminCommandesListe");
+    if (!liste) return;
+
+    liste.innerHTML =
+      '<p style="padding:12px;text-align:center">⏳ Chargement des commandes…</p>';
 
     try {
-      if (typeof window.verifierAccesAdmin !== "function" ||
-          !(await window.verifierAccesAdmin())) {
-        liste.innerHTML = "<p>Accès administrateur refusé.</p>";
-        return;
+      if (
+        typeof window.supabaseFetch !== "function" ||
+        typeof window.SUPABASE_URL === "undefined"
+      ) {
+        throw new Error("La connexion à Supabase est indisponible.");
       }
 
-      const commandes = await window.supabaseFetch(
+      var commandes = await window.supabaseFetch(
         window.SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?select=id,order_number,listing_id,buyer_id,seller_id,product_title,price_gnf,status,delivery_status,created_at" +
-        "&order=created_at.desc"
+        "/rest/v1/orders?select=id,order_number,buyer_id,seller_id,product_title,price_gnf,status,delivery_status,created_at&order=created_at.desc"
       );
 
-      const lignes = Array.isArray(commandes) ? commandes : [];
-
-      if (!lignes.length) {
-        liste.innerHTML = `
-          <div style="padding:15px;text-align:center;color:#647067">
-            Aucune commande trouvée.
-          </div>
-        `;
+      if (!Array.isArray(commandes) || commandes.length === 0) {
+        liste.innerHTML =
+          '<p style="padding:12px">Aucune commande enregistrée.</p>';
         return;
       }
 
-      let utilisateurs = [];
+      var utilisateurs = [];
 
       try {
         utilisateurs = await window.supabaseFetch(
           window.SUPABASE_URL +
           "/rest/v1/users?select=id,full_name,phone"
         );
-      } catch (erreurProfils) {
-        console.warn("Les profils des participants n’ont pas pu être chargés.", erreurProfils);
+      } catch (e) {
+        console.warn(
+          "Les profils des acheteurs et vendeurs ne sont pas accessibles.",
+          e
+        );
       }
 
-      const profils = new Map(
-        (Array.isArray(utilisateurs) ? utilisateurs : []).map(function (u) {
-          return [String(u.id), u];
-        })
-      );
+      var profils = new Map();
 
-      liste.innerHTML = lignes.map(function (commande) {
-        const acheteur = profils.get(String(commande.buyer_id));
-        const vendeur = profils.get(String(commande.seller_id));
+      if (Array.isArray(utilisateurs)) {
+        utilisateurs.forEach(function (u) {
+          profils.set(String(u.id), u);
+        });
+      }
 
-        const date = commande.created_at
-          ? new Date(commande.created_at).toLocaleString("fr-FR")
-          : "Date inconnue";
+      liste.innerHTML = commandes.map(function (c) {
+        var acheteur = profils.get(String(c.buyer_id));
+        var vendeur = profils.get(String(c.seller_id));
 
-        const montant = Number(commande.price_gnf || 0)
-          .toLocaleString("fr-FR");
+        var date = "Date indisponible";
 
-        return `
-          <article class="mg-admin-commande">
-            <strong>📦 Commande ${echapperAdmin(commande.order_number || commande.id)}</strong>
-            <div>🛍️ Produit : ${echapperAdmin(commande.product_title || "Produit non renseigné")}</div>
-            <div>💰 Montant : ${montant} GNF</div>
-            <div>👤 Acheteur : ${echapperAdmin(acheteur?.full_name || "Nom indisponible")}</div>
-            ${acheteur?.phone ? `<div>📱 Téléphone acheteur : ${echapperAdmin(acheteur.phone)}</div>` : ""}
-            <div>🏪 Vendeur : ${echapperAdmin(vendeur?.full_name || "Nom indisponible")}</div>
-            ${vendeur?.phone ? `<div>📱 Téléphone vendeur : ${echapperAdmin(vendeur.phone)}</div>` : ""}
-            <div>📌 Statut commande : ${echapperAdmin(commande.status || "Inconnu")}</div>
-            <div>🚚 Statut livraison : ${echapperAdmin(commande.delivery_status || "Inconnu")}</div>
-            <div>📅 Date : ${echapperAdmin(date)}</div>
-          </article>
-        `;
+        if (c.created_at) {
+          var d = new Date(c.created_at);
+
+          if (!isNaN(d.getTime())) {
+            date = d.toLocaleString("fr-FR");
+          }
+        }
+
+        var montant = Number(c.price_gnf || 0).toLocaleString("fr-FR");
+
+        return (
+          '<article class="mg-admin-commande-carte">' +
+            "<strong>📦 Commande " +
+              echapper(c.order_number || c.id) +
+            "</strong>" +
+
+            "<div>🛍️ Produit : " +
+              echapper(c.product_title || "Non renseigné") +
+            "</div>" +
+
+            "<div>💰 Montant : " + montant + " GNF</div>" +
+
+            "<div>👤 Acheteur : " +
+              echapper(acheteur ? acheteur.full_name : "Nom indisponible") +
+            "</div>" +
+
+            (acheteur && acheteur.phone
+              ? "<div>📱 Téléphone acheteur : " +
+                echapper(acheteur.phone) + "</div>"
+              : "") +
+
+            "<div>🏪 Vendeur : " +
+              echapper(vendeur ? vendeur.full_name : "Nom indisponible") +
+            "</div>" +
+
+            (vendeur && vendeur.phone
+              ? "<div>📱 Téléphone vendeur : " +
+                echapper(vendeur.phone) + "</div>"
+              : "") +
+
+            "<div>📌 Statut : " +
+              echapper(c.status || "Non renseigné") +
+            "</div>" +
+
+            "<div>🚚 Livraison : " +
+              echapper(c.delivery_status || "Non renseigné") +
+            "</div>" +
+
+            "<div>📅 Date : " + echapper(date) + "</div>" +
+          "</article>"
+        );
       }).join("");
 
-    } catch (erreur) {
-      console.error("Erreur chargement commandes administrateur :", erreur);
-      liste.innerHTML = `
-        <div style="padding:14px;background:#fff1f1;color:#a11;border-radius:10px">
-          Impossible de charger les commandes.<br><br>
-          ${echapperAdmin(erreur?.message || "Erreur inconnue")}
-        </div>
-      `;
+    } catch (e) {
+      console.error("Erreur de chargement des commandes :", e);
+
+      afficherErreur(
+        "Le chargement des commandes a échoué. " +
+        (e && e.message ? e.message : "Erreur inconnue.")
+      );
     }
   }
 
-  const fonctionOriginale = window.chargerTableauAdmin;
+  function installerBoutonCommandes() {
+    var container = document.getElementById("adminDashboardContent");
+    if (!container) return;
 
-  if (typeof fonctionOriginale === "function") {
+    var menu = document.getElementById("mgAdminNavigation");
+    if (!menu) return;
+
+    var panneau = document.getElementById("mgAdminCommandesPanel");
+
+    if (!panneau) {
+      panneau = document.createElement("section");
+      panneau.id = "mgAdminCommandesPanel";
+      panneau.setAttribute("data-mg-admin-panel", "true");
+
+      panneau.innerHTML =
+        '<h3 style="margin-top:0">🛒 Commandes</h3>' +
+        '<p style="color:#647067;font-size:13px">' +
+          "Liste des commandes enregistrées dans la plateforme." +
+        "</p>" +
+        '<div id="mgAdminCommandesListe">' +
+          "Appuie sur Actualiser pour charger les commandes." +
+        "</div>" +
+        '<button type="button" id="mgAdminActualiserCommandes" ' +
+          'style="width:100%;min-height:46px;margin-top:12px;' +
+          'background:#087f3f;color:#fff;border:0;border-radius:10px;' +
+          'font-weight:800">' +
+          "🔄 Actualiser les commandes" +
+        "</button>";
+
+      container.appendChild(panneau);
+
+      document.getElementById("mgAdminActualiserCommandes")
+        .addEventListener("click", chargerCommandes);
+    }
+
+    var bouton = menu.querySelector(
+      'button[data-mg-orders-button="true"]'
+    );
+
+    if (!bouton) {
+      bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.textContent = "🛒 Commandes";
+      bouton.setAttribute("data-mg-orders-button", "true");
+      bouton.setAttribute("aria-selected", "false");
+
+      bouton.addEventListener("click", function () {
+        container.querySelectorAll(
+          '[data-mg-admin-panel="true"]'
+        ).forEach(function (section) {
+          section.style.display = section === panneau ? "" : "none";
+        });
+
+        menu.querySelectorAll("button").forEach(function (b) {
+          b.setAttribute(
+            "aria-selected",
+            b === bouton ? "true" : "false"
+          );
+        });
+
+        chargerCommandes();
+      });
+
+      menu.appendChild(bouton);
+    }
+  }
+
+  /*
+   * On retire l'ancien panneau avant le chargement.
+   * Le menu d'origine peut ainsi reconstruire ses rubriques
+   * sans créer de doublons.
+   */
+  var chargementOriginal = window.chargerTableauAdmin;
+
+  if (typeof chargementOriginal === "function") {
     window.chargerTableauAdmin = async function () {
-      await fonctionOriginale.apply(this, arguments);
-      installerNavigationAdmin();
+      var ancienPanneau =
+        document.getElementById("mgAdminCommandesPanel");
+
+      if (ancienPanneau) ancienPanneau.remove();
+
+      var resultat = await chargementOriginal.apply(this, arguments);
+
+      installerBoutonCommandes();
+
+      return resultat;
     };
   }
 
-  window.installerNavigationAdmin = installerNavigationAdmin;
-  window.afficherSectionAdmin = afficherSectionAdmin;
-  window.chargerCommandesAdmin = chargerCommandesAdmin;
+  /*
+   * Si le tableau de bord est déjà ouvert, installer
+   * également le bouton sans attendre une nouvelle ouverture.
+   */
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      installerBoutonCommandes
+    );
+  } else {
+    installerBoutonCommandes();
+  }
+
+  window.mgChargerCommandesAdmin = chargerCommandes;
+
 })();
 </script>
-<!-- FIN NAVIGATION ADMINISTRATEUR -->
+<!-- FIN CORRECTION NAVIGATION ET COMMANDES -->
   
 </body>
 </html>
