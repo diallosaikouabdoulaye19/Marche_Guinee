@@ -23940,5 +23940,231 @@ function afficherRetourMesAnnonces() {
   
 </script>
 
+<!-- =====================================================
+     MARCHÉ GUINÉE 🇬🇳 — PARTAGE DES ANNONCES
+     Partage via WhatsApp, Messenger et autres applications
+     ===================================================== -->
+
+<style>
+  .mg-detail-actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .mg-detail-share {
+    background: #e8f5ed !important;
+    color: #087f3f !important;
+    border: 1px solid #cde8d7 !important;
+  }
+
+  .mg-detail-share:active {
+    transform: scale(0.97);
+  }
+</style>
+
+<script id="mg-partage-annonces">
+(function () {
+  "use strict";
+
+  if (window.mgPartageAnnoncesInstalle) return;
+  window.mgPartageAnnoncesInstalle = true;
+
+  function trouverAnnonce(id) {
+    try {
+      if (typeof toutesLesAnnonces !== "undefined" &&
+          Array.isArray(toutesLesAnnonces)) {
+        return toutesLesAnnonces.find(function (annonce) {
+          return String(annonce.id) === String(id);
+        }) || null;
+      }
+    } catch (erreur) {
+      console.warn("Annonces momentanément indisponibles.", erreur);
+    }
+
+    return null;
+  }
+
+  function creerLienAnnonce(id) {
+    var lien = new URL(
+      window.location.pathname,
+      "https://marche-guinee.netlify.app"
+    );
+
+    lien.searchParams.set("annonce", String(id));
+
+    return lien.toString();
+  }
+
+  window.mgPartagerAnnonce = async function (id) {
+    var annonce = trouverAnnonce(id);
+
+    if (!annonce) {
+      alert("Impossible de retrouver cette annonce. Réessaie.");
+      return;
+    }
+
+    var titre = String(annonce.title || "Annonce");
+    var prix = Number(annonce.price_gnf || 0)
+      .toLocaleString("fr-FR") + " GNF";
+
+    var ville = annonce.city
+      ? "\n📍 " + annonce.city
+      : "\n📍 Guinée";
+
+    var lien = creerLienAnnonce(annonce.id);
+
+    var texte =
+      "🇬🇳 Découvre cette annonce sur Marché Guinée !\n\n" +
+      "🛍️ " + titre + "\n" +
+      "💰 Prix : " + prix +
+      ville +
+      "\n\nAcheter, vendre et échanger simplement.";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: titre + " — Marché Guinée 🇬🇳",
+          text: texte,
+          url: lien
+        });
+        return;
+      } catch (erreur) {
+        if (erreur && erreur.name === "AbortError") {
+          return;
+        }
+
+        console.warn("Partage natif indisponible :", erreur);
+      }
+    }
+
+    var message = texte + "\n\n" + lien;
+
+    var choix = window.confirm(
+      "Le menu de partage n'est pas disponible.\n\n" +
+      "Appuie sur OK pour partager via WhatsApp, " +
+      "ou sur Annuler pour afficher le lien."
+    );
+
+    if (choix) {
+      window.open(
+        "https://wa.me/?text=" + encodeURIComponent(message),
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else {
+      window.prompt(
+        "Copie le lien de cette annonce :",
+        lien
+      );
+    }
+  };
+
+  function obtenirIdAnnonce(page) {
+    var boutonAcheter = page.querySelector(
+      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
+    );
+
+    if (!boutonAcheter) return "";
+
+    var onclick = boutonAcheter.getAttribute("onclick") || "";
+    var resultat = onclick.match(
+      /ouvrirPaiement\(['"]([^'"]+)['"]\)/
+    );
+
+    return resultat ? resultat[1] : "";
+  }
+
+  function ajouterBoutonPartager() {
+    var page = document.querySelector(
+      "#detailContent .mg-detail-page"
+    );
+
+    if (!page) return;
+
+    var actions = page.querySelector(".mg-detail-actions");
+
+    if (!actions || actions.querySelector(".mg-detail-share")) {
+      return;
+    }
+
+    var bouton = document.createElement("button");
+
+    bouton.type = "button";
+    bouton.className =
+      "mg-detail-action mg-detail-share";
+
+    bouton.innerHTML = "📤<br>Partager";
+    bouton.setAttribute(
+      "aria-label",
+      "Partager cette annonce"
+    );
+    bouton.title = "Partager cette annonce";
+
+    bouton.addEventListener("click", function (event) {
+      event.stopPropagation();
+
+      var id = obtenirIdAnnonce(page);
+
+      if (!id) {
+        alert("Impossible d'identifier cette annonce.");
+        return;
+      }
+
+      window.mgPartagerAnnonce(id);
+    });
+
+    actions.appendChild(bouton);
+  }
+
+  var detail = document.getElementById("detailContent");
+
+  if (detail) {
+    var observateur = new MutationObserver(function () {
+      ajouterBoutonPartager();
+    });
+
+    observateur.observe(detail, {
+      childList: true,
+      subtree: true
+    });
+
+    ajouterBoutonPartager();
+  }
+
+  /*
+   * Ouvre automatiquement l'annonce lorsqu'un lien partagé
+   * contient ?annonce=IDENTIFIANT.
+   */
+  var identifiantPartage = new URLSearchParams(
+    window.location.search
+  ).get("annonce");
+
+  if (identifiantPartage) {
+    var tentatives = 0;
+
+    var verification = window.setInterval(function () {
+      tentatives++;
+
+      var annonce = trouverAnnonce(identifiantPartage);
+
+      if (annonce &&
+          typeof window.ouvrirDetailAnnonce === "function") {
+        window.clearInterval(verification);
+
+        window.ouvrirDetailAnnonce(annonce.id);
+        return;
+      }
+
+      if (tentatives >= 75) {
+        window.clearInterval(verification);
+        console.warn(
+          "L'annonce partagée n'a pas pu être chargée."
+        );
+      }
+    }, 400);
+  }
+
+})();
+</script>
+  
 </body>
 </html>
