@@ -9143,43 +9143,6 @@ async function afficherChat() {
 
   }
 
-  // Conserver le bouton de proposition de prix existant
-  let zonePrix = document.getElementById("zonePropositionPrix");
-
-  if (!zonePrix) {
-    zonePrix = document.createElement("div");
-    zonePrix.id = "zonePropositionPrix";
-    zonePrix.style.margin = "10px 0";
-
-    chatContainer.insertBefore(
-      zonePrix,
-      chatContainer.firstChild
-    );
-  }
-
-  zonePrix.innerHTML = "";
-
-  if (
-    utilisateurConnecte &&
-    annonceConversationActuelle &&
-    annonceConversationActuelle.seller_id === utilisateurConnecte.id
-  ) {
-
-    const bouton = document.createElement("button");
-
-    bouton.type = "button";
-    bouton.className = "btn-green";
-    bouton.style.width = "100%";
-    bouton.style.marginBottom = "8px";
-    bouton.textContent = "💰 Proposer un prix";
-
-    bouton.onclick = function() {
-      proposerPrixPrive();
-    };
-
-    zonePrix.appendChild(bouton);
-  }
-
   // Charger les messages et les propositions de prix
   await chargerMessages();
   await chargerPropositionsPrix();
