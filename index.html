@@ -375,6 +375,90 @@ footer{
   color:#777;
   padding:35px 15px;
 }
+
+/* =====================================
+   MESSAGERIE PLEIN ÉCRAN
+   Marché Guinée 🇬🇳
+   ===================================== */
+
+/* La fenêtre occupe l'écran sans défiler elle-même */
+#messagesModal {
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* Organisation générale de la fenêtre */
+#messagesModal > .modal-box {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* La liste des conversations peut défiler */
+#messagesList {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* La conversation occupe l'espace restant */
+#chatContainer:not(.hidden) {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Les messages défilent au-dessus de la saisie */
+#chatBox {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Barre de saisie toujours au bas de la colonne */
+#chatContainer .chat-input {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  padding-bottom: calc(
+    12px + env(safe-area-inset-bottom, 0px)
+  ) !important;
+  background: #ffffff !important;
+  border-top: 1px solid #e7ebe9 !important;
+  z-index: 5;
+}
+
+/* Empêcher le zoom automatique sur le champ de message */
+#messageInput {
+  font-size: 16px !important;
+  min-width: 0 !important;
+}
+
+/* Conserver la possibilité de masquer la conversation */
+#chatContainer.hidden {
+  display: none !important;
+}
+  
 </style>
 </head>
 
