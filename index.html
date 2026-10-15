@@ -8982,112 +8982,225 @@ async function ouvrirMessageVendeur(
 
 }
 
+async function afficherChat() {
 
-async function afficherChat(){
-  document.getElementById(
-    "messagesList"
-  ).classList.add(
-    "hidden"
-  );
-  document.getElementById(
-    "chatContainer"
-  ).classList.remove(
-    "hidden"
-  );
-  document.getElementById(
-    "chatTitle"
-  ).textContent =
-    annonceConversationActuelle
-      ? "💬 " +
-        annonceConversationActuelle.title
-      : "💬 Conversation";
-  /* =========================
-     ZONE PROPOSITION DE PRIX
-  ========================= */
-  const chatContainer =
-    document.getElementById(
-      "chatContainer"
-    );
-  if(chatContainer){
-    let zonePrix =
-      document.getElementById(
-        "zonePropositionPrix"
-      );
-    if(!zonePrix){
-      zonePrix =
-        document.createElement(
-          "div"
-        );
-      zonePrix.id =
-        "zonePropositionPrix";
-      zonePrix.style.margin =
-        "10px 0";
-      chatContainer.insertBefore(
-        zonePrix,
-        chatContainer.firstChild
-      );
-    }
-    zonePrix.innerHTML = "";
-    /*
-      Le bouton n'est affiché que
-      lorsque l'utilisateur connecté
-      est le vendeur de l'annonce.
-    */
-    if(
-      utilisateurConnecte &&
-      annonceConversationActuelle &&
-      annonceConversationActuelle.seller_id ===
-        utilisateurConnecte.id
-    ){
-      const bouton =
-        document.createElement(
-          "button"
-        );
-      bouton.type =
-        "button";
-      bouton.className =
-        "btn-green";
-      bouton.style.width =
-        "100%";
-      bouton.style.marginBottom =
-        "8px";
-      bouton.innerHTML =
-        "💰 Proposer un prix";
-      bouton.onclick =
-        function(){
-          proposerPrixPrive();
-        };
-      zonePrix.appendChild(
-        bouton
-      );
-    }
+  if (!conversationActuelle || !utilisateurConnecte) {
+    return;
   }
-  /* =========================
-     CHARGER LES MESSAGES
-  ========================= */
+
+  const chatContainer = document.getElementById("chatContainer");
+  const messagesList = document.getElementById("messagesList");
+  const chatTitle = document.getElementById("chatTitle");
+
+  if (!chatContainer || !messagesList || !chatTitle) {
+    return;
+  }
+
+  messagesList.classList.add("hidden");
+  chatContainer.classList.remove("hidden");
+
+  // Préparer l'en-tête
+  const zoneTitre = chatTitle.parentElement;
+  const entete = zoneTitre ? zoneTitre.parentElement : null;
+
+  if (!entete) {
+    return;
+  }
+
+  // Ajouter l'emplacement de la photo une seule fois
+  let avatar = document.getElementById("chatProfileAvatar");
+
+  if (!avatar) {
+    avatar = document.createElement("div");
+    avatar.id = "chatProfileAvatar";
+
+    avatar.style.cssText = `
+      width:46px;
+      height:46px;
+      min-width:46px;
+      border-radius:50%;
+      background:#e8f3ec;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      font-size:23px;
+      cursor:pointer;
+    `;
+
+    entete.insertBefore(avatar, zoneTitre);
+  }
+
+  // Ajouter le titre de l'annonce sous le nom
+  let sousTitre = document.getElementById("chatListingSubtitle");
+
+  if (!sousTitre) {
+    sousTitre = document.createElement("div");
+    sousTitre.id = "chatListingSubtitle";
+
+    sousTitre.style.cssText = `
+      margin-top:3px;
+      font-size:12px;
+      color:#68736c;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    `;
+
+    zoneTitre.appendChild(sousTitre);
+  }
+
+  const conversation = conversationActuelle;
+
+  const autreUtilisateurId =
+    conversation.buyer_id === utilisateurConnecte.id
+      ? conversation.seller_id
+      : conversation.buyer_id;
+
+  const roleCorrespondant =
+    conversation.buyer_id === utilisateurConnecte.id
+      ? "Vendeur"
+      : "Acheteur";
+
+  // Afficher immédiatement des informations provisoires
+  chatTitle.textContent = roleCorrespondant;
+  sousTitre.textContent =
+    annonceConversationActuelle?.title || "Conversation";
+
+  avatar.innerHTML = "👤";
+  avatar.onclick = null;
+
+  // Récupérer le vrai profil depuis la fonction Supabase
+  try {
+
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/get_chat_profile",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          p_user_id: autreUtilisateurId
+        })
+      }
+    );
+
+    const profil = Array.isArray(resultat)
+      ? resultat[0]
+      : resultat;
+
+    if (profil && profil.id) {
+
+      chatTitle.textContent =
+        profil.full_name || roleCorrespondant;
+
+      if (profil.photo_url) {
+
+        let urlPhoto = profil.photo_url;
+
+        try {
+          if (!/^https?:\/\//i.test(urlPhoto)) {
+            urlPhoto = construireImageUrl(urlPhoto);
+          }
+        } catch (erreurPhoto) {
+          urlPhoto = "";
+        }
+
+        if (urlPhoto) {
+
+          const image = document.createElement("img");
+
+          image.src = urlPhoto;
+          image.alt = "Photo de profil";
+
+          image.style.cssText = `
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          `;
+
+          image.onerror = function() {
+            avatar.innerHTML = "👤";
+          };
+
+          avatar.innerHTML = "";
+          avatar.appendChild(image);
+        }
+      }
+
+      // Préparer l'ouverture du profil.
+      // L'ouverture complète du profil sera ajoutée séparément.
+      avatar.title = "Profil de " + (profil.full_name || roleCorrespondant);
+    }
+
+  } catch (erreurProfil) {
+
+    console.warn(
+      "Impossible de charger le profil du correspondant :",
+      erreurProfil
+    );
+
+  }
+
+  // Conserver le bouton de proposition de prix existant
+  let zonePrix = document.getElementById("zonePropositionPrix");
+
+  if (!zonePrix) {
+    zonePrix = document.createElement("div");
+    zonePrix.id = "zonePropositionPrix";
+    zonePrix.style.margin = "10px 0";
+
+    chatContainer.insertBefore(
+      zonePrix,
+      chatContainer.firstChild
+    );
+  }
+
+  zonePrix.innerHTML = "";
+
+  if (
+    utilisateurConnecte &&
+    annonceConversationActuelle &&
+    annonceConversationActuelle.seller_id === utilisateurConnecte.id
+  ) {
+
+    const bouton = document.createElement("button");
+
+    bouton.type = "button";
+    bouton.className = "btn-green";
+    bouton.style.width = "100%";
+    bouton.style.marginBottom = "8px";
+    bouton.textContent = "💰 Proposer un prix";
+
+    bouton.onclick = function() {
+      proposerPrixPrive();
+    };
+
+    zonePrix.appendChild(bouton);
+  }
+
+  // Charger les messages et les propositions de prix
   await chargerMessages();
   await chargerPropositionsPrix();
-  
-  const input =
-    document.getElementById(
-      "messageInput"
-    );
-  if(input){
+
+  const input = document.getElementById("messageInput");
+
+  if (input) {
     input.focus();
   }
-  /* =========================
-     RAFRAÎCHISSEMENT AUTOMATIQUE
-  ========================= */
-  if(intervalMessages){
-    clearInterval(
-      intervalMessages
-    );
+
+  // Actualiser les messages automatiquement
+  if (intervalMessages) {
+    clearInterval(intervalMessages);
   }
-  intervalMessages =
-    setInterval(
-      chargerMessages,
-      3000
-    );
+
+  intervalMessages = setInterval(function() {
+    if (conversationActuelle &&
+        conversationActuelle.id === conversation.id) {
+      chargerMessages();
+    }
+  }, 3000);
 }
 
 async function chargerMessages(){
