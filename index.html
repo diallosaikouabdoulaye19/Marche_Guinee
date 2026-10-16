@@ -23811,10 +23811,13 @@ function afficherRetourMesAnnonces() {
         input.blur();
       }
 
+      const zoneDefilement = document.getElementById("chatConversationScroll");
       const chatBox = document.getElementById("chatBox");
 
-      if (chatBox) {
-        chatBox.scrollTop = chatBox.scrollHeight;
+      if (zoneDefilement) {
+       zoneDefilement.scrollTop = zoneDefilement.scrollHeight;
+       } else if (chatBox) {
+       chatBox.scrollTop = chatBox.scrollHeight;
       }
     };
   }
