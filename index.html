@@ -26145,25 +26145,24 @@ display: none !important;
       chat.insertBefore(actions, target || null);
     }
 
-    var leftZone = actions.querySelector(".mg-chat-actions-left");
+        var leftZone = actions.querySelector(".mg-chat-actions-left");
     var rightZone = actions.querySelector(".mg-chat-actions-right");
-
     var pricePanel = document.getElementById("priceOfferPanel");
-
-    if (pricePanel && leftZone &&
-        !leftZone.contains(pricePanel)) {
-      leftZone.appendChild(pricePanel);
+    /* RETOUR À GAUCHE */
+    var back = document.getElementById("mgChat2026Back");
+    if (back && leftZone && !leftZone.contains(back)) {
+      leftZone.appendChild(back);
+    }
+    /* PROPOSITION DE PRIX À DROITE */
+    if (pricePanel && rightZone &&
+        !rightZone.contains(pricePanel)) {
+      rightZone.appendChild(pricePanel);
       pricePanel.style.margin = "0";
       pricePanel.style.padding = "0";
       pricePanel.style.border = "0";
       pricePanel.style.background = "transparent";
       pricePanel.style.maxWidth = "100%";
       pricePanel.style.minWidth = "0";
-    }
-
-    var back = document.getElementById("mgChat2026Back");
-    if (back && rightZone && !rightZone.contains(back)) {
-      rightZone.appendChild(back);
     }
 
     if (header) {
