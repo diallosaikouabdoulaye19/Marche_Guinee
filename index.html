@@ -25597,6 +25597,886 @@ function afficherRetourMesAnnonces() {
 })();
 </script>
 <!-- FIN MESSAGERIE MODERNE 2026 -->
+
+<!-- =========================================================
+     MARCHÉ GUINÉE — MESSAGERIE MODERNE 2026
+     Photos accélérées • Aperçu plein écran • Défilement fluide
+     Recherche • En-tête compact • Accusés de lecture
+     À placer juste avant </body>
+========================================================= -->
+
+<style id="mg-messaging-2026-styles">
+  #messagesModal #mgChat2026Toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--card-bg, #fff);
+  }
+
+  #mgChat2026Search {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 16px;
+    border: 1px solid #e0e7e2;
+    border-radius: 16px;
+    background: #f5f8f6;
+    color: #17251c;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  #mgChat2026Search:focus {
+    border-color: #168348;
+    box-shadow: 0 0 0 3px rgba(22,131,72,.12);
+  }
+
+  #messagesModal #mgChat2026Actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e8eee9;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #mgChat2026Actions .mg-chat-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  #mgChat2026Actions .mg-chat-actions-right {
+    display: flex;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
+
+  #mgChat2026Back {
+    border: 1px solid #dce8df;
+    background: #f5f8f6;
+    color: #173e29;
+    border-radius: 13px;
+    min-height: 42px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  #mgChat2026Back:active {
+    transform: scale(.97);
+  }
+
+  #messagesModal #chatContainer {
+    min-height: 0;
+  }
+
+  #messagesModal #chatBox {
+    min-height: 0;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+    overflow-anchor: auto;
+  }
+
+  #messagesModal #chatBox .mg-chat-image-wrap {
+    position: relative;
+    display: block;
+    width: fit-content;
+    max-width: min(310px, 78vw);
+    margin-top: 7px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #edf2ee;
+    contain: content;
+  }
+
+  #messagesModal #chatBox .mg-chat-image-wrap::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      #edf2ee 20%,
+      #f8faf8 38%,
+      #edf2ee 58%
+    );
+    background-size: 200% 100%;
+    animation: mgPhotoLoading 1.4s linear infinite;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #messagesModal #chatBox .mg-chat-image-wrap.mg-photo-ready::before {
+    opacity: 0;
+    animation: none;
+  }
+
+  #messagesModal #chatBox .mg-chat-image {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: auto;
+    max-width: min(310px, 78vw);
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 18px;
+    cursor: zoom-in;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+
+  #messagesModal #chatBox .mg-chat-image.mg-photo-loaded {
+    opacity: 1;
+  }
+
+  #messagesModal #chatBox .mg-chat-image-error {
+    position: relative;
+    z-index: 2;
+    padding: 16px;
+    font-size: 13px;
+    color: #58645c;
+    background: #f1f5f2;
+  }
+
+  #mgChat2026PhotoViewer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(8, 13, 10, .94);
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #mgChat2026PhotoViewer.mg-viewer-open {
+    display: flex;
+  }
+
+  #mgChat2026PhotoViewer img {
+    display: block;
+    max-width: 100%;
+    max-height: 86%;
+    object-fit: contain;
+    border-radius: 14px;
+    opacity: 1;
+  }
+
+  #mgChat2026PhotoViewer button {
+    position: absolute;
+    top: max(16px, env(safe-area-inset-top));
+    right: 16px;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 50%;
+    color: white;
+    background: rgba(255,255,255,.13);
+    font-size: 26px;
+    cursor: pointer;
+  }
+
+  #mgChat2026PhotoViewer .mg-viewer-caption {
+    position: absolute;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    color: white;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  #messagesModal .mg-chat-optimized-status {
+    font-size: 11px;
+    color: #728076;
+    margin-top: 3px;
+  }
+
+  #messagesModal .conversation-item {
+    transition: background-color .15s ease;
+  }
+
+  #messagesModal .conversation-item:active {
+    background: #eef7f0;
+  }
+
+  @keyframes mgPhotoLoading {
+    from { background-position: 100% 0; }
+    to   { background-position: -100% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #messagesModal #chatBox .mg-chat-image-wrap::before {
+      animation: none;
+    }
+
+    #messagesModal *,
+    #mgChat2026PhotoViewer * {
+      scroll-behavior: auto !important;
+      transition-duration: .01ms !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #messagesModal #mgChat2026Actions {
+      padding: 8px;
+      gap: 7px;
+    }
+
+    #mgChat2026Back {
+      padding: 9px 11px;
+    }
+
+    #messagesModal #chatBox .mg-chat-image {
+      max-width: min(260px, 76vw);
+      max-height: 300px;
+    }
+  }
+</style>
+
+<script id="mg-messaging-2026">
+(function () {
+  "use strict";
+
+  if (window.__MG_MESSAGING_2026_INSTALLED__) return;
+  window.__MG_MESSAGING_2026_INSTALLED__ = true;
+
+  var signedPhotoCache = new Map();
+  var SIGNED_URL_LIFETIME = 3600;
+  var MAX_CACHE_ITEMS = 250;
+  var lastMessageSignature = "";
+  var loadingMessages = false;
+  var pendingReadMark = "";
+  var originalOpenChat = null;
+  var originalReturnChat = null;
+
+  function getCurrentUserId() {
+    try {
+      return window.utilisateurConnecte &&
+        window.utilisateurConnecte.id
+        ? String(window.utilisateurConnecte.id)
+        : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function getChatId() {
+    try {
+      return window.conversationActuelle &&
+        window.conversationActuelle.id
+        ? String(window.conversationActuelle.id)
+        : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function getSupabaseUrl() {
+    return String(window.SUPABASE_URL || "").replace(/\/+$/, "");
+  }
+
+  function safeText(value) {
+    return String(value == null ? "" : value);
+  }
+
+  function createPhotoViewer() {
+    if (document.getElementById("mgChat2026PhotoViewer")) return;
+
+    var viewer = document.createElement("div");
+    viewer.id = "mgChat2026PhotoViewer";
+    viewer.setAttribute("role", "dialog");
+    viewer.setAttribute("aria-modal", "true");
+    viewer.setAttribute("aria-label", "Photo en grand");
+
+    var close = document.createElement("button");
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", "Fermer la photo");
+
+    var image = document.createElement("img");
+    image.alt = "Photo envoyée dans la conversation";
+    image.decoding = "async";
+
+    var caption = document.createElement("div");
+    caption.className = "mg-viewer-caption";
+
+    viewer.appendChild(close);
+    viewer.appendChild(image);
+    viewer.appendChild(caption);
+    document.body.appendChild(viewer);
+
+    function closeViewer() {
+      viewer.classList.remove("mg-viewer-open");
+      image.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    close.addEventListener("click", closeViewer);
+
+    viewer.addEventListener("click", function (event) {
+      if (event.target === viewer) closeViewer();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" &&
+          viewer.classList.contains("mg-viewer-open")) {
+        closeViewer();
+      }
+    });
+
+    viewer._mgOpen = function (src, label) {
+      image.src = src;
+      caption.textContent = label || "";
+      viewer.classList.add("mg-viewer-open");
+      document.body.style.overflow = "hidden";
+    };
+  }
+
+  function openPhoto(src, label) {
+    createPhotoViewer();
+    var viewer = document.getElementById("mgChat2026PhotoViewer");
+    if (viewer && viewer._mgOpen) viewer._mgOpen(src, label);
+  }
+
+  function makeSearchToolbar() {
+    var modal = document.getElementById("messagesModal");
+    if (!modal) return;
+
+    var list = document.getElementById("messagesList");
+    if (!list) return;
+
+    var toolbar = document.getElementById("mgChat2026Toolbar");
+
+    if (!toolbar) {
+      toolbar = document.createElement("div");
+      toolbar.id = "mgChat2026Toolbar";
+
+      var input = document.createElement("input");
+      input.id = "mgChat2026Search";
+      input.type = "search";
+      input.placeholder = "Rechercher une conversation…";
+      input.autocomplete = "off";
+      input.setAttribute("aria-label", "Rechercher dans les conversations");
+
+      toolbar.appendChild(input);
+      list.parentNode.insertBefore(toolbar, list);
+
+      input.addEventListener("input", filterConversations);
+    }
+
+    return toolbar;
+  }
+
+  function filterConversations() {
+    var input = document.getElementById("mgChat2026Search");
+    var list = document.getElementById("messagesList");
+    if (!input || !list) return;
+
+    var query = safeText(input.value)
+      .toLocaleLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+    list.querySelectorAll(".conversation-item").forEach(function (item) {
+      var content = safeText(item.innerText)
+        .toLocaleLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+      item.style.display = !query || content.includes(query) ? "" : "none";
+    });
+  }
+
+  function prepareConversationLayout() {
+    var modal = document.getElementById("messagesModal");
+    var chat = document.getElementById("chatContainer");
+    var list = document.getElementById("messagesList");
+
+    if (!modal || !chat) return;
+
+    makeSearchToolbar();
+
+    var toolbar = document.getElementById("mgChat2026Toolbar");
+    var activeChat = chat.style.display !== "none" &&
+      getComputedStyle(chat).display !== "none";
+
+    if (toolbar) toolbar.style.display = activeChat ? "none" : "flex";
+    if (list) list.style.display = activeChat ? "none" : "";
+
+    if (!activeChat) {
+      var actions = document.getElementById("mgChat2026Actions");
+      if (actions) actions.remove();
+      return;
+    }
+
+    var header = chat.querySelector("#chatConversationTop > div:first-child") ||
+      chat.querySelector(":scope > div:first-child");
+
+    var actions = document.getElementById("mgChat2026Actions");
+
+    if (!actions) {
+      actions = document.createElement("div");
+      actions.id = "mgChat2026Actions";
+
+      var left = document.createElement("div");
+      left.className = "mg-chat-actions-left";
+
+      var right = document.createElement("div");
+      right.className = "mg-chat-actions-right";
+
+      var back = document.createElement("button");
+      back.id = "mgChat2026Back";
+      back.type = "button";
+      back.textContent = "← Retour";
+      back.addEventListener("click", function () {
+        if (typeof window.retourConversations === "function") {
+          window.retourConversations();
+        }
+      });
+
+      right.appendChild(back);
+      actions.appendChild(left);
+      actions.appendChild(right);
+
+      var target = header && header.parentNode === chat
+        ? header
+        : chat.firstChild;
+
+      chat.insertBefore(actions, target || null);
+    }
+
+    var leftZone = actions.querySelector(".mg-chat-actions-left");
+    var rightZone = actions.querySelector(".mg-chat-actions-right");
+
+    var pricePanel = document.getElementById("priceOfferPanel");
+
+    if (pricePanel && leftZone &&
+        !leftZone.contains(pricePanel)) {
+      leftZone.appendChild(pricePanel);
+      pricePanel.style.margin = "0";
+      pricePanel.style.padding = "0";
+      pricePanel.style.border = "0";
+      pricePanel.style.background = "transparent";
+      pricePanel.style.maxWidth = "100%";
+      pricePanel.style.minWidth = "0";
+    }
+
+    var back = document.getElementById("mgChat2026Back");
+    if (back && rightZone && !rightZone.contains(back)) {
+      rightZone.appendChild(back);
+    }
+
+    if (header) {
+      header.style.flexShrink = "0";
+      header.style.minWidth = "0";
+    }
+
+    var chatBox = document.getElementById("chatBox");
+    if (chatBox) {
+      chatBox.style.minHeight = "0";
+      chatBox.style.overflowY = "auto";
+      chatBox.style.webkitOverflowScrolling = "touch";
+    }
+  }
+
+  function normalizeSignedUrl(result) {
+    var value = result &&
+      (result.signedURL || result.signedUrl || result.signed_url);
+
+    if (!value) throw new Error("URL temporaire indisponible");
+
+    if (/^https?:\/\//i.test(value)) return value;
+
+    var base = getSupabaseUrl() + "/storage/v1";
+    return base + (value.charAt(0) === "/" ? value : "/" + value);
+  }
+
+  async function getSignedPhotoUrl(path) {
+    if (!path) throw new Error("Chemin photo manquant");
+
+    var cleanPath = String(path).replace(/^\/+/, "");
+    var cacheKey = cleanPath;
+    var cached = signedPhotoCache.get(cacheKey);
+    var now = Date.now();
+
+    if (cached && cached.expiresAt > now + 30000) {
+      return cached.url;
+    }
+
+    var base = getSupabaseUrl();
+    if (!base) throw new Error("Configuration Supabase manquante");
+
+    var endpoint = base +
+      "/storage/v1/object/sign/chat-images/" +
+      cleanPath.split("/").map(encodeURIComponent).join("/");
+
+    var requestHeaders = {};
+
+    try {
+      if (typeof window.headers === "function") {
+        requestHeaders = window.headers() || {};
+      }
+    } catch (_) {}
+
+    requestHeaders = Object.assign({}, requestHeaders, {
+      "Content-Type": "application/json"
+    });
+
+    var response = await fetch(endpoint, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify({ expiresIn: SIGNED_URL_LIFETIME }),
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Impossible de charger cette photo");
+    }
+
+    var data = await response.json();
+    var url = normalizeSignedUrl(data);
+
+    if (signedPhotoCache.size >= MAX_CACHE_ITEMS) {
+      var firstKey = signedPhotoCache.keys().next().value;
+      signedPhotoCache.delete(firstKey);
+    }
+
+    signedPhotoCache.set(cacheKey, {
+      url: url,
+      expiresAt: now + (SIGNED_URL_LIFETIME - 90) * 1000
+    });
+
+    return url;
+  }
+
+  function markIncomingMessagesRead(conversationId) {
+    var userId = getCurrentUserId();
+
+    if (!conversationId || !userId ||
+        pendingReadMark === conversationId) return;
+
+    pendingReadMark = conversationId;
+
+    (async function () {
+      try {
+        var base = getSupabaseUrl();
+        var url = base + "/rest/v1/messages" +
+          "?conversation_id=eq." + encodeURIComponent(conversationId) +
+          "&sender_id=neq." + encodeURIComponent(userId) +
+          "&read_at=is.null";
+
+        var requestHeaders = {};
+
+        if (typeof window.headers === "function") {
+          requestHeaders = window.headers({
+            Prefer: "return=minimal"
+          }) || {};
+        }
+
+        requestHeaders = Object.assign({}, requestHeaders, {
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        });
+
+        var response = await fetch(url, {
+          method: "PATCH",
+          headers: requestHeaders,
+          body: JSON.stringify({ read_at: new Date().toISOString() })
+        });
+
+        if (!response.ok) {
+          console.warn(
+            "Marché Guinée : lecture non confirmée. Vérifier la politique UPDATE de messages dans Supabase."
+          );
+        } else {
+          lastMessageSignature = "";
+        }
+      } catch (error) {
+        console.warn("Accusé de lecture non confirmé.", error);
+      } finally {
+        pendingReadMark = "";
+      }
+    })();
+  }
+
+  function getMessageSignature(messages, userId) {
+    return JSON.stringify(messages.map(function (msg) {
+      return [
+        msg.id || "",
+        msg.created_at || "",
+        msg.sender_id || "",
+        msg.message || "",
+        msg.image_url || "",
+        msg.read_at || "",
+        userId && String(msg.sender_id) === String(userId) ? 1 : 0
+      ];
+    }));
+  }
+
+  function makeMessageNode(msg, userId, signedUrl) {
+    var mine = String(msg.sender_id) === String(userId);
+    var row = document.createElement("div");
+
+    row.className = "message " + (mine ? "sent" : "received");
+    row.dataset.mgMessageId = safeText(msg.id);
+
+    var body = document.createElement("div");
+    body.className = "mg-message-body";
+
+    if (msg.message) {
+      var text = document.createElement("div");
+      text.textContent = safeText(msg.message);
+      body.appendChild(text);
+    }
+
+    if (msg.image_url) {
+      if (signedUrl) {
+        var wrap = document.createElement("div");
+        wrap.className = "mg-chat-image-wrap";
+
+        var img = document.createElement("img");
+        img.className = "mg-chat-image";
+        img.alt = "Photo envoyée dans la conversation";
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.fetchPriority = "low";
+
+        img.addEventListener("load", function () {
+          wrap.classList.add("mg-photo-ready");
+          img.classList.add("mg-photo-loaded");
+        });
+
+        img.addEventListener("error", function () {
+          wrap.classList.add("mg-photo-ready");
+          var error = document.createElement("div");
+          error.className = "mg-chat-image-error";
+          error.textContent = "Photo indisponible. Réessaie plus tard.";
+          wrap.appendChild(error);
+        });
+
+        img.addEventListener("click", function () {
+          if (img.src) openPhoto(img.src, "Photo de la conversation");
+        });
+
+        img.src = signedUrl;
+        wrap.appendChild(img);
+        body.appendChild(wrap);
+      } else {
+        var loading = document.createElement("div");
+        loading.className = "mg-chat-image-error";
+        loading.textContent = "Chargement de la photo…";
+        body.appendChild(loading);
+      }
+    }
+
+    var meta = document.createElement("div");
+    meta.className = "mg-chat-optimized-status";
+
+    var time = "";
+    try {
+      if (msg.created_at && typeof window.formatHeure === "function") {
+        time = window.formatHeure(msg.created_at);
+      } else if (msg.created_at) {
+        time = new Date(msg.created_at).toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+    } catch (_) {}
+
+    meta.textContent = time;
+
+    if (mine && msg.read_at) {
+      meta.textContent += (time ? " · " : "") + "Vu";
+    }
+
+    body.appendChild(meta);
+    row.appendChild(body);
+
+    return row;
+  }
+
+  async function loadMessagesOptimized() {
+    var conversationId = getChatId();
+    var userId = getCurrentUserId();
+    var box = document.getElementById("chatBox");
+
+    if (!conversationId || !userId || !box ||
+        typeof window.supabaseFetch !== "function") return;
+
+    if (loadingMessages) return;
+    loadingMessages = true;
+
+    try {
+      var url = getSupabaseUrl() +
+        "/rest/v1/messages?select=*&conversation_id=eq." +
+        encodeURIComponent(conversationId) +
+        "&order=created_at.asc";
+
+      var messages = await window.supabaseFetch(url);
+
+      if (!Array.isArray(messages)) return;
+      if (getChatId() !== conversationId) return;
+
+      markIncomingMessagesRead(conversationId);
+
+      var signature = getMessageSignature(messages, userId);
+
+      if (signature === lastMessageSignature) return;
+
+      var wasNearBottom =
+        box.scrollHeight - box.scrollTop - box.clientHeight < 100;
+
+      var oldScrollHeight = box.scrollHeight;
+      var oldScrollTop = box.scrollTop;
+
+      var imagePaths = Array.from(new Set(
+        messages.filter(function (msg) {
+          return !!msg.image_url;
+        }).map(function (msg) {
+          return String(msg.image_url);
+        })
+      ));
+
+      var signedResults = await Promise.all(imagePaths.map(async function (path) {
+        try {
+          return [path, await getSignedPhotoUrl(path)];
+        } catch (error) {
+          console.warn("Photo non chargée :", error);
+          return [path, null];
+        }
+      }));
+
+      if (getChatId() !== conversationId) return;
+
+      var urlMap = new Map(signedResults);
+      var fragment = document.createDocumentFragment();
+
+      messages.forEach(function (msg) {
+        fragment.appendChild(
+          makeMessageNode(
+            msg,
+            userId,
+            msg.image_url ? urlMap.get(String(msg.image_url)) : null
+          )
+        );
+      });
+
+      box.replaceChildren(fragment);
+      lastMessageSignature = signature;
+
+      requestAnimationFrame(function () {
+        if (wasNearBottom) {
+          box.scrollTop = box.scrollHeight;
+        } else {
+          box.scrollTop = Math.max(0, oldScrollTop +
+            (box.scrollHeight - oldScrollHeight));
+        }
+      });
+
+    } catch (error) {
+      console.warn("Chargement optimisé des messages impossible :", error);
+    } finally {
+      loadingMessages = false;
+    }
+  }
+
+  function installMessageLoader() {
+    if (typeof window.chargerMessages === "function" &&
+        !window.chargerMessages.__mg2026) {
+      window.chargerMessages = loadMessagesOptimized;
+      window.chargerMessages.__mg2026 = true;
+    }
+  }
+
+  function refreshLayout() {
+    try {
+      prepareConversationLayout();
+      filterConversations();
+    } catch (error) {
+      console.warn("Mise en page de la messagerie :", error);
+    }
+  }
+
+  function install() {
+    createPhotoViewer();
+    makeSearchToolbar();
+    installMessageLoader();
+    refreshLayout();
+
+    var modal = document.getElementById("messagesModal");
+
+    if (modal && !modal.dataset.mg2026Observer) {
+      modal.dataset.mg2026Observer = "1";
+
+      var observer = new MutationObserver(function () {
+        refreshLayout();
+      });
+
+      observer.observe(modal, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style", "class"]
+      });
+    }
+
+    var box = document.getElementById("chatBox");
+
+    if (box && !box.dataset.mg2026PhotoEvents) {
+      box.dataset.mg2026PhotoEvents = "1";
+
+      box.addEventListener("click", function (event) {
+        var img = event.target.closest(".mg-chat-image");
+        if (img && img.src) {
+          openPhoto(img.src, "Photo de la conversation");
+        }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+
+  window.addEventListener("load", install);
+
+  var retryCount = 0;
+  var retryTimer = setInterval(function () {
+    install();
+    retryCount++;
+
+    if (retryCount >= 12) {
+      clearInterval(retryTimer);
+    }
+  }, 1000);
+
+  window.addEventListener("focus", function () {
+    installMessageLoader();
+    refreshLayout();
+  });
+
+})();
+</script>
+<!-- FIN MESSAGERIE MODERNE 2026 -->
   
 </body>
 </html>
