@@ -25383,7 +25383,58 @@ function afficherRetourMesAnnonces() {
     #chatBox {
       scroll-behavior: auto !important;
     }
+   }
+
+    /* MARCHÉ GUINÉE — PHOTOS STYLE WHATSAPP */
+
+  /* Photos dans les bulles de conversation */
+  #messagesModal #chatBox .message img {
+    display: block;
+    max-width: min(270px, 72vw) !important;
+    max-height: 340px !important;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px !important;
+    cursor: zoom-in;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: opacity 0.2s ease;
   }
+
+  /* Visionneuse plein écran */
+  #mgChatPhotoViewer {
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+  }
+
+  #mgChatPhotoViewer.mg-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #mgChatPhotoViewer img {
+    max-width: 100%;
+    max-height: 84%;
+    object-fit: contain;
+    border-radius: 12px;
+  }
+
+  #mgChatPhotoClose {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #mgChatPhotoViewer,
+    #mgChatPhotoViewer img,
+    #messagesModal #chatBox .message img {
+      transition: none !important;
+    }
+  }
+
 </style>
 
 <script id="mg-messagerie-2026-script">
@@ -25468,42 +25519,37 @@ function afficherRetourMesAnnonces() {
   }
 
   function creerBarreRecherche() {
-    var modal = document.getElementById("messagesModal");
-    var liste = document.getElementById("messagesList");
+  var modal = document.getElementById("messagesModal");
+  var liste = document.getElementById("messagesList");
 
-    if (!modal || !liste || document.getElementById("mgChatToolbar")) {
-      return;
+  if (!modal || !liste || document.getElementById("mgChatToolbar")) {
+    return;
+  }
+
+  var toolbar = document.createElement("div");
+  toolbar.id = "mgChatToolbar";
+
+  toolbar.innerHTML =
+    '<div class="mg-chat-list-heading">' +
+      '<strong>Vos conversations</strong>' +
+      '<span class="mg-chat-count" id="mgChatCount">0 discussion</span>' +
+    '</div>';
+
+  liste.parentNode.insertBefore(toolbar, liste);
+
+  /* Aucun champ de recherche : aucun écouteur de recherche à installer. */
+
+  var observer = new MutationObserver(function () {
+    if (typeof mettreAJourCompteurConversations === "function") {
+      mettreAJourCompteurConversations();
     }
+  });
 
-    var toolbar = document.createElement("div");
-    toolbar.id = "mgChatToolbar";
-
-    toolbar.innerHTML =
-      '<div class="mg-chat-list-heading">' +
-        '<strong>Vos conversations</strong>' +
-        '<span class="mg-chat-count" id="mgChatCount">0 discussion</span>' +
-      '</div>' +
-      '<label id="mgChatSearchWrap">' +
-        '<span aria-hidden="true">🔎</span>' +
-        '<input id="mgChatSearch" type="search" ' +
-          'placeholder="Rechercher un correspondant…" ' +
-          'autocomplete="off" aria-label="Rechercher une conversation">' +
-      '</label>';
-
-    liste.parentNode.insertBefore(toolbar, liste);
-
-    var recherche = document.getElementById("mgChatSearch");
-
-    recherche.addEventListener("input", filtrerConversations);
-
-    var observer = new MutationObserver(function () {
-      filtrerConversations();
-    });
-
-    observer.observe(liste, {
-      childList: true,
-      subtree: true
-    });
+  observer.observe(liste, {
+    childList: true,
+    subtree: true
+  });
+}
 
     filtrerConversations();
   }
@@ -26478,234 +26524,5 @@ function afficherRetourMesAnnonces() {
 </script>
 <!-- FIN MESSAGERIE MODERNE 2026 -->
 
-<!-- MARCHÉ GUINÉE — DÉFILEMENT INTELLIGENT 2026 -->
-<style id="mg-smart-scroll-2026">
-  #messagesModal .mg-scroll-hide {
-    transform: translateY(-110%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  #messagesModal .mg-scroll-header {
-    transition:
-      transform 220ms ease,
-      opacity 180ms ease;
-    will-change: transform;
-  }
-
-  #messagesModal .mg-scroll-visible {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #messagesModal .mg-scroll-header {
-      transition: none;
-    }
-  }
-</style>
-
-<script id="mg-smart-scroll-2026">
-(function () {
-  "use strict";
-
-  if (window.__MG_SMART_SCROLL_2026__) return;
-  window.__MG_SMART_SCROLL_2026__ = true;
-
-  var lastListY = 0;
-  var lastChatY = 0;
-  var currentMode = "";
-  var scheduled = false;
-
-  function get(id) {
-    return document.getElementById(id);
-  }
-
-  function isVisible(el) {
-    return !!el &&
-      getComputedStyle(el).display !== "none" &&
-      el.getClientRects().length > 0;
-  }
-
-  function setHeaderState(el, show) {
-    if (!el) return;
-
-    el.classList.add("mg-scroll-header");
-    el.classList.toggle("mg-scroll-hide", !show);
-    el.classList.toggle("mg-scroll-visible", show);
-  }
-
-  function removeSearchBars() {
-    var modal = get("messagesModal");
-    if (!modal) return;
-
-    /* Supprimer la barre de recherche ajoutée par la version 2026. */
-    var toolbar = get("mgChat2026Toolbar");
-    if (toolbar) toolbar.remove();
-
-    /* Supprimer les autres champs de recherche de la messagerie. */
-    modal.querySelectorAll(
-      'input[type="search"], input[placeholder*="Rechercher" i], ' +
-      'input[aria-label*="recherche" i]'
-    ).forEach(function (input) {
-      var wrapper = input.closest("#mgChat2026Toolbar");
-
-      if (wrapper) {
-        wrapper.remove();
-      } else {
-        input.remove();
-      }
-    });
-  }
-
-  function getGreenHeader() {
-    var modal = get("messagesModal");
-    if (!modal) return null;
-
-    var box = modal.querySelector(".modal-box");
-    if (!box) return null;
-
-    /* Le bandeau vert principal, uniquement dans la liste. */
-    return Array.from(box.children).find(function (el) {
-      return el.id !== "messagesList" &&
-        el.id !== "chatContainer" &&
-        el.id !== "mgChat2026Toolbar" &&
-        el.id !== "mgChat2026Actions" &&
-        !el.classList.contains("modal-body");
-    }) || null;
-  }
-
-  function resetMode() {
-    var chat = get("chatContainer");
-    var list = get("messagesList");
-    var green = getGreenHeader();
-    var actions = get("mgChat2026Actions");
-
-    var chatOpen = isVisible(chat);
-    var mode = chatOpen ? "chat" : "list";
-
-    if (mode !== currentMode) {
-      currentMode = mode;
-      lastListY = 0;
-      lastChatY = 0;
-    }
-
-    if (mode === "list") {
-      if (green) {
-        green.classList.add("mg-scroll-header");
-        setHeaderState(green, true);
-      }
-
-      if (actions) {
-        actions.classList.remove("mg-scroll-hide");
-        actions.classList.add("mg-scroll-visible");
-      }
-
-      if (list) list.style.paddingTop = "";
-    } else {
-      /*
-       * Dans une conversation, le bandeau vert général disparaît.
-       * Le tableau de proposition de prix suit le défilement du chat.
-       */
-      if (green) {
-        green.classList.remove(
-          "mg-scroll-header",
-          "mg-scroll-hide",
-          "mg-scroll-visible"
-        );
-      }
-    }
-  }
-
-  function bindScroll() {
-    var list = get("messagesList");
-    var chatBox = get("chatBox");
-
-    if (list && !list.dataset.mgSmartScroll) {
-      list.dataset.mgSmartScroll = "1";
-
-      list.addEventListener("scroll", function () {
-        if (currentMode !== "list") return;
-
-        var y = list.scrollTop;
-        var delta = y - lastListY;
-        var green = getGreenHeader();
-
-        if (y < 25) {
-          setHeaderState(green, true);
-        } else if (delta > 3) {
-          setHeaderState(green, false);
-        } else if (delta < -3) {
-          setHeaderState(green, true);
-        }
-
-        lastListY = y;
-      }, { passive: true });
-    }
-
-    if (chatBox && !chatBox.dataset.mgSmartScroll) {
-      chatBox.dataset.mgSmartScroll = "1";
-
-      chatBox.addEventListener("scroll", function () {
-        if (currentMode !== "chat") return;
-
-        var y = chatBox.scrollTop;
-        var delta = y - lastChatY;
-        var actions = get("mgChat2026Actions");
-
-        if (y < 25) {
-          setHeaderState(actions, true);
-        } else if (delta > 3) {
-          setHeaderState(actions, false);
-        } else if (delta < -3) {
-          setHeaderState(actions, true);
-        }
-
-        lastChatY = y;
-      }, { passive: true });
-    }
-  }
-
-  function refresh() {
-    if (scheduled) return;
-    scheduled = true;
-
-    requestAnimationFrame(function () {
-      scheduled = false;
-      removeSearchBars();
-      resetMode();
-      bindScroll();
-    });
-  }
-
-  function start() {
-    refresh();
-
-    var modal = get("messagesModal");
-
-    if (modal && !modal.dataset.mgSmartScrollObserver) {
-      modal.dataset.mgSmartScrollObserver = "1";
-
-      new MutationObserver(refresh).observe(modal, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["style", "class"]
-      });
-    }
-
-    window.addEventListener("resize", refresh);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
-})();
-</script>
-<!-- FIN DÉFILEMENT INTELLIGENT 2026 -->
-  
 </body>
 </html>
