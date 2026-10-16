@@ -26686,8 +26686,9 @@ display: none !important;
 })();
 </script>
 
-<style id="mg-messages-scroll-fix">
-  /* Mode liste : le tableau vert et les conversations défilent ensemble */
+<!-- MARCHÉ GUINÉE — DÉFILEMENT DU TABLEAU VERT AVEC LA LISTE -->
+<style id="mg-messages-list-scroll">
+  /* Le mode liste défile dans la fenêtre entière */
   #messagesModal.mg-list-scroll-mode {
     height: 100vh !important;
     height: 100dvh !important;
@@ -26698,6 +26699,8 @@ display: none !important;
   }
 
   #messagesModal.mg-list-scroll-mode > .modal-box {
+    display: flex !important;
+    flex-direction: column !important;
     height: auto !important;
     min-height: 100vh !important;
     min-height: 100dvh !important;
@@ -26705,69 +26708,115 @@ display: none !important;
     flex: 0 0 auto !important;
   }
 
+  #messagesModal.mg-list-scroll-mode > .modal-box > div:first-child {
+    position: relative !important;
+    flex-shrink: 0 !important;
+  }
+
   #messagesModal.mg-list-scroll-mode #messagesList {
+    display: block !important;
     flex: 0 0 auto !important;
+    width: 100% !important;
     height: auto !important;
     min-height: 200px !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: auto !important;
   }
 </style>
 
-<script id="mg-messages-scroll-fix-script">
+<script id="mg-messages-list-scroll-script">
 (function () {
   "use strict";
 
-  function initialiserDefilementMessages() {
-    var modal = document.getElementById("messagesModal");
-    var liste = document.getElementById("messagesList");
-    var chat = document.getElementById("chatContainer");
+  if (window.__MG_MESSAGES_LIST_SCROLL_INSTALLED__) return;
+  window.__MG_MESSAGES_LIST_SCROLL_INSTALLED__ = true;
 
-    if (!modal || !liste || !chat) return;
+  function elementsMessages() {
+    return {
+      modal: document.getElementById("messagesModal"),
+      liste: document.getElementById("messagesList"),
+      chat: document.getElementById("chatContainer")
+    };
+  }
 
-    function actualiserModeDefilement() {
-      var listeVisible =
-        !liste.classList.contains("hidden") &&
-        getComputedStyle(liste).display !== "none";
+  function activerModeListe() {
+    var e = elementsMessages();
+    if (!e.modal || !e.liste || !e.chat) return;
 
-      var chatVisible =
-        !chat.classList.contains("hidden") &&
-        getComputedStyle(chat).display !== "none";
+    var listeVisible =
+      !e.liste.classList.contains("hidden") &&
+      getComputedStyle(e.liste).display !== "none";
 
-      if (listeVisible && !chatVisible) {
-        modal.classList.add("mg-list-scroll-mode");
-      } else {
-        modal.classList.remove("mg-list-scroll-mode");
+    var chatVisible =
+      !e.chat.classList.contains("hidden") &&
+      getComputedStyle(e.chat).display !== "none";
+
+    if (listeVisible && !chatVisible) {
+      e.modal.classList.add("mg-list-scroll-mode");
+    } else {
+      e.modal.classList.remove("mg-list-scroll-mode");
+    }
+  }
+
+  function installer() {
+    if (typeof window.ouvrirMessages === "function") {
+      var ouvrirMessagesOriginal = window.ouvrirMessages;
+
+      if (!ouvrirMessagesOriginal.__mgScrollWrapped) {
+        var ouvrirMessagesModifie = async function () {
+          var resultat = await ouvrirMessagesOriginal.apply(this, arguments);
+          activerModeListe();
+          return resultat;
+        };
+
+        ouvrirMessagesModifie.__mgScrollWrapped = true;
+        window.ouvrirMessages = ouvrirMessagesModifie;
       }
     }
 
-    actualiserModeDefilement();
+    if (typeof window.afficherChat === "function") {
+      var afficherChatOriginal = window.afficherChat;
 
-    var observateur = new MutationObserver(function () {
-      actualiserModeDefilement();
-    });
+      if (!afficherChatOriginal.__mgScrollWrapped) {
+        var afficherChatModifie = async function () {
+          var e = elementsMessages();
 
-    observateur.observe(liste, {
-      attributes: true,
-      attributeFilter: ["class", "style"]
-    });
+          if (e.modal) {
+            e.modal.classList.remove("mg-list-scroll-mode");
+          }
 
-    observateur.observe(chat, {
-      attributes: true,
-      attributeFilter: ["class", "style"]
-    });
+          return await afficherChatOriginal.apply(this, arguments);
+        };
 
-    modal._mgScrollObserver = observateur;
+        afficherChatModifie.__mgScrollWrapped = true;
+        window.afficherChat = afficherChatModifie;
+      }
+    }
+
+    if (typeof window.retourConversations === "function") {
+      var retourOriginal = window.retourConversations;
+
+      if (!retourOriginal.__mgScrollWrapped) {
+        var retourModifie = function () {
+          var resultat = retourOriginal.apply(this, arguments);
+
+          requestAnimationFrame(activerModeListe);
+          setTimeout(activerModeListe, 100);
+
+          return resultat;
+        };
+
+        retourModifie.__mgScrollWrapped = true;
+        window.retourConversations = retourModifie;
+      }
+    }
+
+    activerModeListe();
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initialiserDefilementMessages,
-      { once: true }
-    );
+    document.addEventListener("DOMContentLoaded", installer, { once: true });
   } else {
-    initialiserDefilementMessages();
+    installer();
   }
 })();
 </script>
