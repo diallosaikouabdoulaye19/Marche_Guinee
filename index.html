@@ -26566,5 +26566,151 @@ function afficherRetourMesAnnonces() {
 </script>
 <!-- FIN MESSAGERIE MODERNE 2026 -->
 
+<script>
+/* =====================================================
+   MARCHÉ GUINÉE 🇬🇳
+   Négociation compacte avec bouton ouvrir/fermer
+   Conserve les fonctions de prix et Supabase existantes
+   ===================================================== */
+(function () {
+  "use strict";
+
+  var ID_BOUTON = "mgPriceToggleButton";
+  var ID_PANEL = "priceOfferPanel";
+  var ID_ACTIONS = "mgChat2026Actions";
+
+  function preparerBoutonPrix() {
+    var panel = document.getElementById(ID_PANEL);
+    var actions = document.getElementById(ID_ACTIONS);
+
+    if (!panel || !actions) return;
+
+    var zone = actions.querySelector(".mg-chat-actions-left");
+    if (!zone) return;
+
+    var bouton = document.getElementById(ID_BOUTON);
+
+    if (!bouton) {
+      bouton = document.createElement("button");
+      bouton.id = ID_BOUTON;
+      bouton.type = "button";
+      bouton.setAttribute("aria-expanded", "false");
+
+      bouton.style.cssText =
+        "display:inline-flex;" +
+        "align-items:center;" +
+        "justify-content:center;" +
+        "gap:7px;" +
+        "min-height:40px;" +
+        "padding:9px 13px;" +
+        "border:1px solid #dce9df;" +
+        "border-radius:12px;" +
+        "background:#edf7ef;" +
+        "color:#087f3f;" +
+        "font-size:13px;" +
+        "font-weight:800;" +
+        "white-space:nowrap;" +
+        "cursor:pointer;";
+
+      bouton.addEventListener("click", function () {
+        var panneau = document.getElementById(ID_PANEL);
+        if (!panneau) return;
+
+        var estOuvert =
+          bouton.getAttribute("aria-expanded") === "true";
+
+        if (estOuvert) {
+          panneau.style.display = "none";
+          bouton.setAttribute("aria-expanded", "false");
+        } else {
+          panneau.style.display = "block";
+          bouton.setAttribute("aria-expanded", "true");
+        }
+      });
+    }
+
+    var boutonVendeur = !!panel.querySelector(".price-offer-btn");
+    var aUneOffre = !!panel.querySelector(
+      ".price-offer-accept, .price-offer-reject, .price-offer-price"
+    );
+
+    bouton.textContent = boutonVendeur
+      ? "💰 Proposer un prix"
+      : aUneOffre
+        ? "💰 Voir la proposition"
+        : "💰 Négociation";
+
+    /*
+      Le panneau est replié uniquement lorsqu'il vient
+      d'être créé. Son état est conservé lors des vérifications.
+    */
+    if (!panel.dataset.mgCompactReady) {
+      panel.dataset.mgCompactReady = "1";
+      panel.style.display = "none";
+      bouton.setAttribute("aria-expanded", "false");
+    }
+
+    panel.style.width = "100%";
+    panel.style.maxWidth = "100%";
+    panel.style.boxSizing = "border-box";
+
+    /*
+      Placer le bouton avant le panneau dans la zone d'actions.
+    */
+    if (bouton.parentElement !== zone) {
+      zone.appendChild(bouton);
+    }
+
+    if (panel.parentElement !== zone) {
+      zone.appendChild(panel);
+    }
+
+    if (bouton.nextElementSibling !== panel) {
+      zone.insertBefore(panel, bouton.nextElementSibling);
+    }
+  }
+
+  var minuterie = null;
+
+  function programmerVerification() {
+    if (minuterie) clearTimeout(minuterie);
+
+    minuterie = setTimeout(function () {
+      minuterie = null;
+      preparerBoutonPrix();
+    }, 100);
+  }
+
+  function installer() {
+    preparerBoutonPrix();
+
+    var modal = document.getElementById("messagesModal");
+    if (!modal || modal.dataset.mgPriceToggleInstalled) return;
+
+    modal.dataset.mgPriceToggleInstalled = "1";
+
+    var observateur = new MutationObserver(function () {
+      programmerVerification();
+    });
+
+    observateur.observe(modal, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", installer, {
+      once: true
+    });
+  } else {
+    installer();
+  }
+
+  window.addEventListener("load", installer);
+
+})();
+</script>
+  
 </body>
 </html>
