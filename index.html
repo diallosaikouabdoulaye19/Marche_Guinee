@@ -23649,107 +23649,144 @@ function afficherRetourMesAnnonces() {
   }
 
   function preparerZoneConversation() {
-    const chatContainer = document.getElementById("chatContainer");
-    const chatBox = document.getElementById("chatBox");
-    const panel = document.getElementById("priceOfferPanel");
-
-    if (!chatContainer || !chatBox) return;
-
-    chatContainer.style.display = "flex";
-    chatContainer.style.flexDirection = "column";
-    chatContainer.style.flex = "1 1 auto";
-    chatContainer.style.height = "100%";
-    chatContainer.style.minHeight = "0";
-    chatContainer.style.overflow = "hidden";
-
-    const entete = chatContainer.querySelector(
-      ":scope > div:first-child"
-    );
-
-    if (!entete) return;
-
-    let zoneHaute = document.getElementById("chatConversationTop");
-
-    if (!zoneHaute) {
-      zoneHaute = document.createElement("div");
-      zoneHaute.id = "chatConversationTop";
-
-      zoneHaute.style.cssText = [
-        "display:flex",
-        "flex-direction:column",
-        "flex:0 0 auto",
-        "width:100%",
-        "background:#ffffff",
-        "border-bottom:1px solid #e8ecea",
-        "box-sizing:border-box"
-      ].join(";");
-
-      chatContainer.insertBefore(zoneHaute, entete);
-    }
-
-    if (entete.parentElement !== zoneHaute) {
-      zoneHaute.insertBefore(entete, zoneHaute.firstChild);
-    }
-
-    entete.style.flex = "0 0 auto";
-    entete.style.width = "100%";
-    entete.style.boxSizing = "border-box";
-
-    if (panel && panel.parentElement !== zoneHaute) {
-      zoneHaute.appendChild(panel);
-    }
-
-    if (panel) {
-      panel.style.width = "100%";
-      panel.style.maxWidth = "100%";
-      panel.style.flex = "0 0 auto";
-      panel.style.boxSizing = "border-box";
-      panel.style.margin = "0";
-      panel.style.padding = "8px 12px";
-      panel.style.borderRadius = "0";
-      panel.style.boxShadow = "none";
-      panel.style.overflow = "visible";
-
-      const titre = panel.querySelector(".price-offer-title");
-      if (titre) {
-        titre.style.fontSize = "14px";
-        titre.style.marginBottom = "4px";
-      }
-
-      const texte = panel.querySelector(".price-offer-text");
-      if (texte) {
-        texte.style.fontSize = "12px";
-        texte.style.marginBottom = "5px";
-      }
-
-      panel.querySelectorAll(
-        ".price-offer-btn, .price-offer-accept, .price-offer-reject"
-      ).forEach(function (bouton) {
-        bouton.style.minHeight = "38px";
-        bouton.style.padding = "8px 12px";
-        bouton.style.borderRadius = "10px";
-      });
-    }
-
-    chatBox.style.flex = "1 1 auto";
-    chatBox.style.height = "auto";
-    chatBox.style.minHeight = "0";
-    chatBox.style.margin = "0";
-    chatBox.style.overflowY = "auto";
-    chatBox.style.overflowX = "hidden";
-    chatBox.style.webkitOverflowScrolling = "touch";
-    chatBox.style.overscrollBehavior = "contain";
-
-    const barre = chatContainer.querySelector(".chat-input");
-
-    if (barre) {
-      barre.style.flex = "0 0 auto";
-      barre.style.width = "100%";
-      barre.style.position = "relative";
-      barre.style.zIndex = "5";
-    }
+  const chatContainer = document.getElementById("chatContainer");
+  const chatBox = document.getElementById("chatBox");
+  const panel = document.getElementById("priceOfferPanel");
+  if (!chatContainer || !chatBox) return;
+  chatContainer.style.display = "flex";
+  chatContainer.style.flexDirection = "column";
+  chatContainer.style.flex = "1 1 auto";
+  chatContainer.style.height = "100%";
+  chatContainer.style.minHeight = "0";
+  chatContainer.style.overflow = "hidden";
+  const barre = chatContainer.querySelector(".chat-input");
+  const entete = chatContainer.querySelector(
+    ":scope > div:first-child"
+  );
+  if (!entete) return;
+  let zoneDefilement = document.getElementById(
+    "chatConversationScroll"
+  );
+  if (!zoneDefilement) {
+    zoneDefilement = document.createElement("div");
+    zoneDefilement.id = "chatConversationScroll";
+    zoneDefilement.style.cssText = [
+      "display:flex",
+      "flex-direction:column",
+      "flex:1 1 auto",
+      "width:100%",
+      "min-height:0",
+      "overflow-y:auto",
+      "overflow-x:hidden",
+      "-webkit-overflow-scrolling:touch",
+      "overscroll-behavior:contain",
+      "box-sizing:border-box"
+    ].join(";");
+    chatContainer.insertBefore(zoneDefilement, entete);
   }
-
+  /*
+   * L'en-tête, la négociation et les messages
+   * partagent désormais le même conteneur défilant.
+   */
+  if (entete.parentElement !== zoneDefilement) {
+    zoneDefilement.appendChild(entete);
+  }
+  entete.style.flex = "0 0 auto";
+  entete.style.width = "100%";
+  entete.style.boxSizing = "border-box";
+  if (panel && panel.parentElement !== zoneDefilement) {
+    zoneDefilement.appendChild(panel);
+  }
+  if (panel) {
+    panel.style.width = "100%";
+    panel.style.maxWidth = "100%";
+    panel.style.flex = "0 0 auto";
+    panel.style.boxSizing = "border-box";
+    panel.style.margin = "0";
+    panel.style.padding = "8px 12px";
+    panel.style.borderRadius = "0";
+    panel.style.boxShadow = "none";
+    panel.style.overflow = "visible";
+    const titre = panel.querySelector(".price-offer-title");
+    if (titre) {
+      titre.style.fontSize = "14px";
+      titre.style.marginBottom = "4px";
+    }
+    const texte = panel.querySelector(".price-offer-text");
+    if (texte) {
+      texte.style.fontSize = "12px";
+      texte.style.marginBottom = "5px";
+    }
+    panel.querySelectorAll(
+      ".price-offer-btn, .price-offer-accept, .price-offer-reject"
+    ).forEach(function (bouton) {
+      bouton.style.minHeight = "38px";
+      bouton.style.padding = "8px 12px";
+      bouton.style.borderRadius = "10px";
+    });
+  }
+  /*
+   * Le chatBox contient uniquement les messages.
+   * C'est son parent qui gère maintenant le défilement.
+   */
+  if (chatBox.parentElement !== zoneDefilement) {
+    zoneDefilement.appendChild(chatBox);
+  }
+  chatBox.style.display = "flex";
+  chatBox.style.flexDirection = "column";
+  chatBox.style.flex = "0 0 auto";
+  chatBox.style.width = "100%";
+  chatBox.style.height = "auto";
+  chatBox.style.minHeight = "0";
+  chatBox.style.margin = "0";
+  chatBox.style.overflow = "visible";
+  chatBox.style.overflowY = "visible";
+  chatBox.style.overflowX = "hidden";
+  chatBox.style.boxSizing = "border-box";
+  /*
+   * La barre de saisie reste en dehors de la zone
+   * défilante, en bas de la conversation.
+   */
+  if (barre && barre.parentElement !== chatContainer) {
+    chatContainer.appendChild(barre);
+  }
+  if (barre) {
+    barre.style.flex = "0 0 auto";
+    barre.style.width = "100%";
+    barre.style.position = "relative";
+    barre.style.zIndex = "5";
+    barre.style.boxSizing = "border-box";
+  }
+  /*
+   * Si de nouveaux messages arrivent, la zone commune
+   * suit le dernier message lorsque l'utilisateur est
+   * déjà proche du bas de la conversation.
+   */
+  if (!zoneDefilement.dataset.scrollObserverInstalle) {
+    zoneDefilement.dataset.scrollObserverInstalle = "1";
+    let etaitEnBas = true;
+    zoneDefilement.addEventListener("scroll", function () {
+      const distance =
+        zoneDefilement.scrollHeight -
+        zoneDefilement.clientHeight -
+        zoneDefilement.scrollTop;
+      etaitEnBas = distance < 100;
+    }, { passive: true });
+    const observer = new MutationObserver(function () {
+      if (etaitEnBas) {
+        requestAnimationFrame(function () {
+          zoneDefilement.scrollTop =
+            zoneDefilement.scrollHeight;
+        });
+      }
+    });
+    observer.observe(chatBox, {
+      childList: true,
+      subtree: true
+    });
+  }
+}
+  
   if (typeof ancienAfficherChat === "function") {
     window.afficherChat = async function () {
       const enteteVert = obtenirEnteteVert();
