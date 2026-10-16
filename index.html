@@ -24901,6 +24901,702 @@ function afficherRetourMesAnnonces() {
 })();
 </script>
 <!-- FIN CORRECTION NAVIGATION ET COMMANDES -->
+
+<!-- ==========================================================
+     MARCHÉ GUINÉE 🇬🇳 — MESSAGERIE MODERNE 2026
+     Interface iPhone, recherche et photos agrandies
+     Préserve les fonctions de messagerie et Supabase existantes
+========================================================== -->
+
+<style id="mg-messagerie-2026">
+  /* Fenêtre générale */
+  #messagesModal {
+    background: #f3f7f4 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+
+  #messagesModal > .modal-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;
+    background: #f3f7f4 !important;
+    box-shadow: none !important;
+  }
+
+  /* En-tête général */
+  #messagesModal > .modal-box > div:first-child {
+    flex: 0 0 auto;
+    padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+    border-radius: 0 0 22px 22px !important;
+    box-shadow: 0 5px 20px rgba(10, 65, 35, .10);
+  }
+
+  #messagesModal > .modal-box > div:first-child h2 {
+    letter-spacing: -.4px;
+  }
+
+  /* Barre de recherche et titre des conversations */
+  #mgChatToolbar {
+    flex: 0 0 auto;
+    padding: 16px 16px 10px;
+    background: #f3f7f4;
+  }
+
+  #mgChatToolbar .mg-chat-list-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  #mgChatToolbar .mg-chat-list-heading strong {
+    color: #173d2a;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -.4px;
+  }
+
+  #mgChatToolbar .mg-chat-count {
+    color: #66766c;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  #mgChatSearchWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid #e1e9e3;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(20, 60, 35, .035);
+  }
+
+  #mgChatSearchWrap span {
+    font-size: 18px;
+  }
+
+  #mgChatSearch {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #173d2a;
+    font-size: 16px !important;
+  }
+
+  #mgChatSearch:focus-visible {
+    outline: 2px solid #159447;
+    outline-offset: 2px;
+    border-radius: 5px;
+  }
+
+  /* Liste des conversations */
+  #messagesList {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 8px 14px 20px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    background: #f3f7f4 !important;
+    overscroll-behavior: contain;
+  }
+
+  #messagesList .conversation-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 0 10px !important;
+    padding: 14px !important;
+    min-height: 84px;
+    border: 1px solid #e7ede8 !important;
+    border-radius: 19px !important;
+    background: #fff !important;
+    box-shadow: 0 3px 12px rgba(20, 60, 35, .045);
+    transition: background .15s ease, transform .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #messagesList .conversation-item:active {
+    background: #edf7ef !important;
+    transform: scale(.99);
+  }
+
+  #messagesList .conversation-item img {
+    border-radius: 50%;
+  }
+
+  #messagesList .conversation-item > div:first-child {
+    flex-shrink: 0;
+    border: 2px solid #e7f4e9;
+  }
+
+  #messagesList .conversation-item > div:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #messagesList .conversation-item > div:nth-child(2) > div:first-child {
+    font-size: 15px !important;
+    font-weight: 850 !important;
+    color: #173d2a !important;
+  }
+
+  #messagesList .conversation-item > div:nth-child(2) > div:nth-child(2) {
+    margin-top: 5px !important;
+    color: #65736a !important;
+    font-size: 13px !important;
+  }
+
+  #messagesList .conversation-date {
+    font-size: 11px !important;
+    color: #89938d !important;
+  }
+
+  /* Zone de conversation */
+  #chatContainer:not(.hidden) {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: #f3f7f4 !important;
+  }
+
+  /* En-tête du correspondant */
+  #chatContainer > div:first-child {
+    flex: 0 0 auto !important;
+    min-height: 72px;
+    padding: 11px 13px !important;
+    background: rgba(255, 255, 255, .98) !important;
+    border-bottom: 1px solid #e4ebe6 !important;
+    box-shadow: 0 2px 9px rgba(20, 60, 35, .035);
+  }
+
+  #chatContainer > div:first-child > button {
+    min-height: 42px !important;
+    padding: 9px 12px !important;
+    border-radius: 13px !important;
+    font-size: 13px !important;
+    background: #edf5ef !important;
+    color: #087f3f !important;
+  }
+
+  #chatProfileAvatar {
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    border: 2px solid #e5f3e8;
+  }
+
+  #chatTitle {
+    color: #163e29 !important;
+    font-size: 16px !important;
+    font-weight: 850 !important;
+  }
+
+  #chatListingSubtitle {
+    color: #718077 !important;
+    font-size: 12px !important;
+  }
+
+  /* Historique des messages */
+  #chatBox {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 18px 13px 22px !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(8,127,63,.035) 1px, transparent 0)
+      0 0 / 18px 18px,
+      #f3f7f4 !important;
+    border-radius: 0 !important;
+    scroll-behavior: smooth;
+  }
+
+  #chatBox .message-row {
+    display: flex;
+    width: 100%;
+    margin: 9px 0 !important;
+    align-items: flex-end;
+  }
+
+  #chatBox .message-row:not(.mine) {
+    justify-content: flex-start;
+  }
+
+  #chatBox .message-row.mine {
+    justify-content: flex-end;
+  }
+
+  #chatBox .message {
+    width: fit-content;
+    max-width: min(84%, 390px) !important;
+    min-width: 42px;
+    padding: 11px 13px !important;
+    border: 1px solid #e5ebe6;
+    border-radius: 18px 18px 18px 5px !important;
+    background: #fff !important;
+    color: #20352a !important;
+    box-shadow: 0 3px 9px rgba(15, 55, 30, .055) !important;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  #chatBox .message-row.mine .message {
+    border-color: #087f3f !important;
+    border-radius: 18px 18px 5px 18px !important;
+    background: linear-gradient(145deg, #098748, #08763b) !important;
+    color: #fff !important;
+    box-shadow: 0 3px 10px rgba(8, 127, 63, .12) !important;
+  }
+
+  #chatBox .message-time {
+    display: block;
+    margin-top: 5px !important;
+    font-size: 10px !important;
+    line-height: 1.3;
+    text-align: right;
+    opacity: .75;
+  }
+
+  #chatBox .message img {
+    display: block;
+    width: auto;
+    max-width: min(270px, 68vw) !important;
+    max-height: 38dvh;
+    border-radius: 13px !important;
+    object-fit: contain;
+    cursor: zoom-in;
+    background: #eaf0ec;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  #chatBox .message img:focus-visible {
+    outline: 3px solid #f0c808;
+    outline-offset: 3px;
+  }
+
+  /* Panneau de négociation existant */
+  #priceOfferPanel {
+    border-color: #e4ebe6 !important;
+    background: #fff !important;
+  }
+
+  /* Zone d'écriture */
+  #chatContainer .chat-input {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    background: #fff !important;
+    border-top: 1px solid #e3ebe5 !important;
+    box-shadow: 0 -4px 15px rgba(20, 60, 35, .035);
+  }
+
+  #messageInput {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 47px !important;
+    height: 47px !important;
+    padding: 0 15px !important;
+    border: 1px solid #e0e8e2 !important;
+    border-radius: 17px !important;
+    outline: none !important;
+    background: #f5f8f6 !important;
+    color: #183d29 !important;
+    font-size: 16px !important;
+    box-shadow: none !important;
+  }
+
+  #messageInput:focus {
+    border-color: #159447 !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(21,148,71,.09) !important;
+  }
+
+  #messageInput::placeholder {
+    color: #87938b;
+  }
+
+  #chatPhotoButton {
+    flex: 0 0 45px !important;
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    padding: 0 !important;
+    border: 1px solid #e0e8e2 !important;
+    border-radius: 15px !important;
+    background: #f6f9f7 !important;
+    color: #087f3f !important;
+    font-size: 20px !important;
+  }
+
+  #chatContainer .chat-input button[onclick*="envoyerMessage"] {
+    flex: 0 0 auto !important;
+    min-width: 48px !important;
+    height: 46px !important;
+    padding: 0 15px !important;
+    border: 0 !important;
+    border-radius: 15px !important;
+    background: #087f3f !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 850 !important;
+    box-shadow: 0 4px 10px rgba(8,127,63,.16);
+  }
+
+  #chatContainer .chat-input button:disabled {
+    opacity: .55;
+    cursor: wait;
+  }
+
+  /* Visionneuse de photos */
+  #mgChatPhotoViewer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    padding-top: max(60px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(55px, env(safe-area-inset-bottom, 0px));
+    background: rgba(7, 15, 10, .97);
+    touch-action: manipulation;
+  }
+
+  #mgChatPhotoViewer.mg-visible {
+    display: flex;
+  }
+
+  #mgChatPhotoViewer img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 12px 45px rgba(0,0,0,.3);
+  }
+
+  #mgChatPhotoClose {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  #mgChatPhotoHelp {
+    position: absolute;
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    left: 15px;
+    right: 15px;
+    color: rgba(255,255,255,.75);
+    font-size: 12px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  @media (min-width: 700px) {
+    #messagesModal > .modal-box {
+      max-width: 760px !important;
+      margin: 0 auto !important;
+      border-left: 1px solid #e1e9e3;
+      border-right: 1px solid #e1e9e3;
+    }
+  }
+
+  @media (max-width: 380px) {
+    #messagesList {
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+
+    #mgChatToolbar {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    #chatContainer .chat-input {
+      gap: 6px !important;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+
+    #chatContainer .chat-input button[onclick*="envoyerMessage"] {
+      padding: 0 11px !important;
+      min-width: 44px !important;
+    }
+
+    #chatBox .message {
+      max-width: 88% !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #messagesList .conversation-item {
+      transition: none !important;
+    }
+
+    #chatBox {
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+
+<script id="mg-messagerie-2026-script">
+(function () {
+  "use strict";
+
+  if (window.__mgMessagerie2026Installee) return;
+  window.__mgMessagerie2026Installee = true;
+
+  var overlay;
+  var imageAgrandie;
+  var ancienOverflow = "";
+  var imageOrigine = null;
+
+  function creerVisionneuse() {
+    if (document.getElementById("mgChatPhotoViewer")) {
+      overlay = document.getElementById("mgChatPhotoViewer");
+      imageAgrandie = document.getElementById("mgChatPhotoViewerImage");
+      return;
+    }
+
+    overlay = document.createElement("div");
+    overlay.id = "mgChatPhotoViewer";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "Photo agrandie");
+
+    overlay.innerHTML =
+      '<button type="button" id="mgChatPhotoClose" ' +
+        'aria-label="Fermer la photo">×</button>' +
+      '<img id="mgChatPhotoViewerImage" alt="Photo agrandie">' +
+      '<div id="mgChatPhotoHelp">' +
+        'Touchez l’arrière-plan ou × pour fermer' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    imageAgrandie = document.getElementById("mgChatPhotoViewerImage");
+
+    document.getElementById("mgChatPhotoClose").addEventListener(
+      "click",
+      fermerPhoto
+    );
+
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) {
+        fermerPhoto();
+      }
+    });
+  }
+
+  function ouvrirPhoto(image) {
+    if (!image || !image.src) return;
+
+    creerVisionneuse();
+
+    imageOrigine = image;
+    ancienOverflow = document.body.style.overflow;
+
+    imageAgrandie.alt = image.alt || "Photo agrandie";
+    imageAgrandie.src = image.currentSrc || image.src;
+
+    overlay.classList.add("mg-visible");
+    document.body.style.overflow = "hidden";
+
+    var boutonFermer = document.getElementById("mgChatPhotoClose");
+    if (boutonFermer) boutonFermer.focus({ preventScroll: true });
+  }
+
+  function fermerPhoto() {
+    if (!overlay || !overlay.classList.contains("mg-visible")) return;
+
+    overlay.classList.remove("mg-visible");
+    imageAgrandie.removeAttribute("src");
+    document.body.style.overflow = ancienOverflow;
+
+    if (imageOrigine && imageOrigine.isConnected) {
+      imageOrigine.focus({ preventScroll: true });
+    }
+
+    imageOrigine = null;
+  }
+
+  function creerBarreRecherche() {
+    var modal = document.getElementById("messagesModal");
+    var liste = document.getElementById("messagesList");
+
+    if (!modal || !liste || document.getElementById("mgChatToolbar")) {
+      return;
+    }
+
+    var toolbar = document.createElement("div");
+    toolbar.id = "mgChatToolbar";
+
+    toolbar.innerHTML =
+      '<div class="mg-chat-list-heading">' +
+        '<strong>Vos conversations</strong>' +
+        '<span class="mg-chat-count" id="mgChatCount">0 discussion</span>' +
+      '</div>' +
+      '<label id="mgChatSearchWrap">' +
+        '<span aria-hidden="true">🔎</span>' +
+        '<input id="mgChatSearch" type="search" ' +
+          'placeholder="Rechercher un correspondant…" ' +
+          'autocomplete="off" aria-label="Rechercher une conversation">' +
+      '</label>';
+
+    liste.parentNode.insertBefore(toolbar, liste);
+
+    var recherche = document.getElementById("mgChatSearch");
+
+    recherche.addEventListener("input", filtrerConversations);
+
+    var observer = new MutationObserver(function () {
+      filtrerConversations();
+    });
+
+    observer.observe(liste, {
+      childList: true,
+      subtree: true
+    });
+
+    filtrerConversations();
+  }
+
+  function filtrerConversations() {
+    var liste = document.getElementById("messagesList");
+    var recherche = document.getElementById("mgChatSearch");
+    var compteur = document.getElementById("mgChatCount");
+
+    if (!liste) return;
+
+    var terme = recherche ? recherche.value.trim().toLocaleLowerCase("fr") : "";
+    var elements = liste.querySelectorAll(".conversation-item");
+    var visibles = 0;
+
+    elements.forEach(function (element) {
+      var correspond = !terme ||
+        element.textContent.toLocaleLowerCase("fr").includes(terme);
+
+      element.style.display = correspond ? "" : "none";
+
+      if (correspond) visibles++;
+    });
+
+    if (compteur) {
+      compteur.textContent =
+        visibles + (visibles > 1 ? " discussions" : " discussion");
+    }
+
+    var ancienMessage = document.getElementById("mgChatNoSearchResult");
+
+    if (ancienMessage) ancienMessage.remove();
+
+    if (terme && elements.length && visibles === 0) {
+      var message = document.createElement("div");
+      message.id = "mgChatNoSearchResult";
+      message.style.cssText =
+        "padding:24px 12px;text-align:center;color:#6d7b72;" +
+        "background:#fff;border:1px solid #e5ebe6;border-radius:16px;";
+      message.textContent = "Aucune conversation ne correspond à cette recherche.";
+      liste.appendChild(message);
+    }
+  }
+
+  function initialiser() {
+    creerVisionneuse();
+    creerBarreRecherche();
+  }
+
+  document.addEventListener("click", function (event) {
+    var image = event.target.closest && event.target.closest("#chatBox img");
+
+    if (image) {
+      event.preventDefault();
+      ouvrirPhoto(image);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && overlay &&
+        overlay.classList.contains("mg-visible")) {
+      fermerPhoto();
+    }
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialiser, { once: true });
+  } else {
+    initialiser();
+  }
+
+  /*
+   * Réinstaller uniquement la barre de recherche si la fenêtre
+   * de messagerie est reconstruite dynamiquement.
+   */
+  var observerFenetre = new MutationObserver(function () {
+    if (
+      document.getElementById("messagesModal") &&
+      document.getElementById("messagesList") &&
+      !document.getElementById("mgChatToolbar")
+    ) {
+      creerBarreRecherche();
+    }
+  });
+
+  observerFenetre.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+})();
+</script>
+<!-- FIN MESSAGERIE MODERNE 2026 -->
   
 </body>
 </html>
