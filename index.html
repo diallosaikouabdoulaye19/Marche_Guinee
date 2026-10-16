@@ -25970,6 +25970,113 @@ function afficherRetourMesAnnonces() {
 display: none !important;
 }
 
+/* ==========================================
+   MARCHÉ GUINÉE — MESSAGERIE ÉPURÉE 2026
+   Sans bulles • Photos plus petites • Zoom conservé
+   ========================================== */
+
+/* Retirer les fonds et les contours des bulles */
+#messagesModal #chatBox .message,
+#messagesModal #chatBox .message-row.mine .message {
+  display: block !important;
+  width: fit-content !important;
+  max-width: 90% !important;
+  min-width: 0 !important;
+
+  padding: 3px 0 !important;
+  margin: 0 !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  color: #26352d !important;
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* Tes messages : alignés à droite, sans bulle */
+#messagesModal #chatBox .message-row.mine {
+  justify-content: flex-end !important;
+  text-align: right !important;
+}
+
+#messagesModal #chatBox .message-row.mine .message {
+  color: #087f3f !important;
+}
+
+/* Messages reçus : alignés à gauche, sans bulle */
+#messagesModal #chatBox .message-row:not(.mine) {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+/* Espacement léger entre les messages */
+#messagesModal #chatBox .message-row {
+  display: flex !important;
+  width: 100% !important;
+  margin: 12px 0 !important;
+  align-items: flex-end !important;
+}
+
+/* Heure et statut de lecture toujours visibles */
+#messagesModal #chatBox .message-time,
+#messagesModal #chatBox .mg-chat-optimized-status {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #78857d !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  opacity: 1 !important;
+}
+
+/* Photos plus petites dans la conversation */
+#messagesModal #chatBox .mg-chat-image-wrap {
+  display: block !important;
+  width: fit-content !important;
+  max-width: min(190px, 55vw) !important;
+  margin-top: 5px !important;
+
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+#messagesModal #chatBox .mg-chat-image,
+#messagesModal #chatBox .message img {
+  display: block !important;
+  width: auto !important;
+  max-width: min(190px, 55vw) !important;
+  max-height: 220px !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+
+  cursor: zoom-in !important;
+}
+
+/* Garder le clic pour ouvrir la photo en grand */
+#messagesModal #chatBox .mg-chat-image,
+#messagesModal #chatBox .message img {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Conserver un historique propre sur iPhone */
+#messagesModal #chatBox {
+  padding: 14px 16px 20px !important;
+}
+  
 </style>
 
 <script id="mg-messaging-2026">
