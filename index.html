@@ -25459,6 +25459,23 @@ function afficherRetourMesAnnonces() {
   #messagesModal #messagesList .conversation-item:active {
     transform: none !important;
   }
+
+/* Marché Guinée — Le haut de la liste défile avec les conversations */
+#messagesModal #mgChatToolbar {
+  position: static !important;
+  flex: 0 0 auto !important;
+  margin-bottom: 0 !important;
+}
+#messagesModal #messagesList {
+  overflow-y: visible !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+#messagesModal #mgChatToolbar,
+#messagesModal #messagesList {
+  touch-action: pan-y;
+}
   
 </style>
 
