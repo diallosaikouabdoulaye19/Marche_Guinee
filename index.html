@@ -26400,22 +26400,28 @@ display: none !important;
       body.appendChild(loading);
     }
   }
-  var meta = document.createElement("div");
+    var meta = document.createElement("div");
   meta.className = "message-time mg-chat-optimized-status";
-  var time = "";
-  try {
-    if (msg.created_at && typeof window.formatHeure === "function") {
-      time = window.formatHeure(msg.created_at);
-    } else if (msg.created_at) {
-      time = new Date(msg.created_at).toLocaleTimeString("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit"
+  var dateHeure = "";
+  if (msg.created_at) {
+    var instant = new Date(msg.created_at);
+    if (!isNaN(instant.getTime())) {
+      var date = instant.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
       });
+      var heure = instant.toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+      dateHeure = date + " · " + heure;
     }
-  } catch (_) {}
-  meta.textContent = time;
+  }
+  meta.textContent = dateHeure;
   if (mine && msg.read_at) {
-    meta.textContent += (time ? " · " : "") + "Vu";
+    meta.textContent += (dateHeure ? " · " : "") + "Vu";
   }
   body.appendChild(meta);
   row.appendChild(body);
