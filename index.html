@@ -25435,6 +25435,31 @@ function afficherRetourMesAnnonces() {
     }
   }
 
+   /* MARCHÉ GUINÉE — DÉFILEMENT FLUIDE DES CONVERSATIONS */
+
+  #messagesModal #messagesList {
+    flex: 1 1 0% !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    scroll-behavior: auto !important;
+    scrollbar-width: thin;
+  }
+
+  #messagesModal #messagesList .conversation-item {
+    flex-shrink: 0;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #messagesModal #messagesList .conversation-item:active {
+    transform: none !important;
+  }
+  
 </style>
 
 <script id="mg-messagerie-2026-script">
