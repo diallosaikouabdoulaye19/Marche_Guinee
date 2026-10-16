@@ -26685,6 +26685,92 @@ display: none !important;
 
 })();
 </script>
+
+<style id="mg-messages-scroll-fix">
+  /* Mode liste : le tableau vert et les conversations défilent ensemble */
+  #messagesModal.mg-list-scroll-mode {
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: auto !important;
+  }
+
+  #messagesModal.mg-list-scroll-mode > .modal-box {
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+  }
+
+  #messagesModal.mg-list-scroll-mode #messagesList {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 200px !important;
+    overflow: visible !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+</style>
+
+<script id="mg-messages-scroll-fix-script">
+(function () {
+  "use strict";
+
+  function initialiserDefilementMessages() {
+    var modal = document.getElementById("messagesModal");
+    var liste = document.getElementById("messagesList");
+    var chat = document.getElementById("chatContainer");
+
+    if (!modal || !liste || !chat) return;
+
+    function actualiserModeDefilement() {
+      var listeVisible =
+        !liste.classList.contains("hidden") &&
+        getComputedStyle(liste).display !== "none";
+
+      var chatVisible =
+        !chat.classList.contains("hidden") &&
+        getComputedStyle(chat).display !== "none";
+
+      if (listeVisible && !chatVisible) {
+        modal.classList.add("mg-list-scroll-mode");
+      } else {
+        modal.classList.remove("mg-list-scroll-mode");
+      }
+    }
+
+    actualiserModeDefilement();
+
+    var observateur = new MutationObserver(function () {
+      actualiserModeDefilement();
+    });
+
+    observateur.observe(liste, {
+      attributes: true,
+      attributeFilter: ["class", "style"]
+    });
+
+    observateur.observe(chat, {
+      attributes: true,
+      attributeFilter: ["class", "style"]
+    });
+
+    modal._mgScrollObserver = observateur;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialiserDefilementMessages,
+      { once: true }
+    );
+  } else {
+    initialiserDefilementMessages();
+  }
+})();
+</script>
   
 </body>
 </html>
