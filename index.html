@@ -23770,7 +23770,7 @@ function afficherRetourMesAnnonces() {
 
       await ancienAfficherChat();
 
-      if (!window.conversationActuelle) return;
+      if (typeof conversationActuelle === "undefined" || !conversationActuelle) return;
 
       preparerZoneConversation();
 
