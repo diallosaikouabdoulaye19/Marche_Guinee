@@ -26420,6 +26420,16 @@ display: none !important;
     }
   }
   meta.textContent = dateHeure;
+  /* Contraste adapté à la couleur de chaque bulle */
+  meta.style.color = mine
+    ? "rgba(255,255,255,0.95)"
+    : "#58645c";
+  meta.style.display = "block";
+  meta.style.fontSize = "10px";
+  meta.style.lineHeight = "1.4";
+  meta.style.marginTop = "5px";
+  meta.style.textAlign = "right";
+  meta.style.opacity = "1";
   if (mine && msg.read_at) {
     meta.textContent += (dateHeure ? " · " : "") + "Vu";
   }
