@@ -26072,33 +26072,17 @@ display: none !important;
   -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Conserver un historique propre sur iPhone */
-#messagesModal #chatBox {
-  padding: 14px 16px 20px !important;
-}
 
 /* ==========================================
-   MARCHÉ GUINÉE — BANDEAU VERRE DÉPOLI 2026
-   Transparence du bandeau et de la conversation
+   MARCHÉ GUINÉE — TRANSPARENCE À 100 %
+   Téléphones, tablettes et ordinateurs
    ========================================== */
 
-/* Bandeau d'identité : verre dépoli */
-#messagesModal #chatContainer > div:first-child {
-  background: rgba(255, 255, 255, 0.58) !important;
-  background-color: rgba(255, 255, 255, 0.58) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
-  backdrop-filter: blur(14px) saturate(150%) !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid rgba(220, 235, 225, 0.35) !important;
-}
-
-/* Bandeau des actions : même effet de verre */
-#messagesModal #mgChat2026Actions {
-  background: rgba(255, 255, 255, 0.58) !important;
-  background-color: rgba(255, 255, 255, 0.58) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
-  backdrop-filter: blur(14px) saturate(150%) !important;
-  border-bottom: 1px solid rgba(220, 235, 225, 0.35) !important;
+/* Fenêtre principale de la messagerie */
+#messagesModal > .modal-box {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
   box-shadow: none !important;
 }
 
@@ -26106,14 +26090,17 @@ display: none !important;
 #messagesModal #chatContainer {
   background: transparent !important;
   background-color: transparent !important;
+  background-image: none !important;
 }
 
-/* Historique : supprimer le fond gris et le motif */
+/* Historique des messages */
 #messagesModal #chatBox {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   box-shadow: none !important;
+  border: none !important;
+  padding: 18px 24px 22px !important;
 }
 
 /* Zone de défilement */
@@ -26121,9 +26108,32 @@ display: none !important;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
+  box-shadow: none !important;
 }
 
-/* Conserver la visibilité des commandes et de la photo */
+/* Bandeau supérieur : transparence totale */
+#messagesModal #chatContainer > div:first-child {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Bandeau des actions : transparence totale */
+#messagesModal #mgChat2026Actions {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Garder les commandes et les photos visibles */
 #messagesModal #chatContainer button,
 #messagesModal #chatContainer img,
 #messagesModal #mgChat2026Actions button {
@@ -26131,16 +26141,19 @@ display: none !important;
   opacity: 1 !important;
 }
 
-/* Photo du correspondant */
+/* Photo du correspondant : grands écrans */
 #messagesModal #chatProfileAvatar {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
   flex-shrink: 0 !important;
   border-radius: 50% !important;
   overflow: hidden !important;
 }
 
-/* Nom du correspondant */
+/* Nom du correspondant : grands écrans */
 #messagesModal #chatTitle {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 800 !important;
   line-height: 1.25 !important;
   white-space: nowrap !important;
@@ -26148,38 +26161,14 @@ display: none !important;
   text-overflow: ellipsis !important;
 }
 
-/* ==========================================
-   GRANDS ÉCRANS : tablettes et ordinateurs
-   ========================================== */
-
-#messagesModal #chatBox {
-  padding: 18px 24px 22px !important;
-}
-
-#messagesModal #chatProfileAvatar {
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
-}
-
-#messagesModal #chatTitle {
-  font-size: 14px !important;
-}
-
-/* ==========================================
-   ÉCRANS MOYENS : téléphones larges et tablettes
-   ========================================== */
-
+/* Tablettes et écrans moyens */
 @media (max-width: 768px) {
   #messagesModal #chatBox {
     padding: 14px 16px 18px !important;
   }
 }
 
-/* ==========================================
-   PETITS ÉCRANS : iPhone et petits Android
-   ========================================== */
-
+/* Téléphones : iPhone et Android */
 @media (max-width: 480px) {
   #messagesModal #chatBox {
     padding: 12px 14px 18px !important;
