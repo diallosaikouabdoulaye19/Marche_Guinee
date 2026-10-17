@@ -26325,96 +26325,307 @@ display: none !important;
   }
 
   function prepareConversationLayout() {
-    var modal = document.getElementById("messagesModal");
-    var chat = document.getElementById("chatContainer");
-    var list = document.getElementById("messagesList");
+  var modal = document.getElementById("messagesModal");
+  var chat = document.getElementById("chatContainer");
+  var list = document.getElementById("messagesList");
 
-    if (!modal || !chat) return;
+  if (!modal || !chat) return;
 
-    makeSearchToolbar();
+  makeSearchToolbar();
 
-    var toolbar = document.getElementById("mgChat2026Toolbar");
-    var activeChat = chat.style.display !== "none" &&
-      getComputedStyle(chat).display !== "none";
+  var toolbar = document.getElementById("mgChat2026Toolbar");
+  var actions = document.getElementById("mgChat2026Actions");
+  var centerZone = actions
+    ? actions.querySelector(".mg-chat-actions-center")
+    : null;
 
-    if (toolbar) toolbar.style.display = activeChat ? "none" : "flex";
-    if (list) list.style.display = activeChat ? "none" : "";
+  var activeChat =
+    chat.style.display !== "none" &&
+    getComputedStyle(chat).display !== "none" &&
+    !chat.classList.contains("hidden");
 
-    if (!activeChat) {
-      var actions = document.getElementById("mgChat2026Actions");
-      if (actions) actions.remove();
-      return;
-    }
+  if (toolbar) {
+    toolbar.style.display = activeChat ? "none" : "flex";
+  }
 
-    var header = chat.querySelector("#chatConversationTop > div:first-child") ||
-      chat.querySelector(":scope > div:first-child");
+  if (list) {
+    list.style.display = activeChat ? "none" : "";
+  }
 
-    var actions = document.getElementById("mgChat2026Actions");
+  /*
+   * RESTAURER L'EN-TÊTE EN QUITTANT LA CONVERSATION
+   */
+  if (!activeChat) {
+    if (actions && centerZone) {
+      var headerToRestore = centerZone.firstElementChild;
 
-    if (!actions) {
-      actions = document.createElement("div");
-      actions.id = "mgChat2026Actions";
+      if (headerToRestore &&
+          headerToRestore.id !== "mgChat2026Back") {
 
-      var left = document.createElement("div");
-      left.className = "mg-chat-actions-left";
+        var originalParent =
+          headerToRestore.__mgOriginalParent;
 
-      var right = document.createElement("div");
-      right.className = "mg-chat-actions-right";
+        var originalNext =
+          headerToRestore.__mgOriginalNext;
 
-      var back = document.createElement("button");
-      back.id = "mgChat2026Back";
-      back.type = "button";
-      back.textContent = "← Retour";
-      back.addEventListener("click", function () {
-        if (typeof window.retourConversations === "function") {
-          window.retourConversations();
+        if (originalParent &&
+            document.contains(originalParent)) {
+
+          if (originalNext &&
+              originalNext.parentNode === originalParent) {
+            originalParent.insertBefore(
+              headerToRestore,
+              originalNext
+            );
+          } else {
+            originalParent.appendChild(headerToRestore);
+          }
+
+        } else {
+          chat.insertBefore(headerToRestore, actions);
         }
-      });
+      }
 
-      right.appendChild(back);
-      actions.appendChild(left);
-      actions.appendChild(right);
-
-      var target = header && header.parentNode === chat
-        ? header
-        : chat.firstChild;
-
-      chat.insertBefore(actions, target || null);
+      actions.remove();
     }
 
-        var leftZone = actions.querySelector(".mg-chat-actions-left");
-    var rightZone = actions.querySelector(".mg-chat-actions-right");
-    var pricePanel = document.getElementById("priceOfferPanel");
-    /* RETOUR À GAUCHE */
-    var back = document.getElementById("mgChat2026Back");
-    if (back && leftZone && !leftZone.contains(back)) {
-      leftZone.appendChild(back);
-    }
-    /* PROPOSITION DE PRIX À DROITE */
-    if (pricePanel && rightZone &&
-        !rightZone.contains(pricePanel)) {
-      rightZone.appendChild(pricePanel);
-      pricePanel.style.margin = "0";
-      pricePanel.style.padding = "0";
-      pricePanel.style.border = "0";
-      pricePanel.style.background = "transparent";
-      pricePanel.style.maxWidth = "100%";
-      pricePanel.style.minWidth = "0";
+    return;
+  }
+
+  /*
+   * RETROUVER L'EN-TÊTE EXISTANT SANS CONFONDRE
+   * CELUI-CI AVEC LA BARRE D'ACTIONS
+   */
+  var header =
+    chat.querySelector(
+      "#chatConversationTop > div:first-child"
+    ) ||
+    (centerZone && centerZone.firstElementChild) ||
+    chat.querySelector(
+      ":scope > div:not(#mgChat2026Actions):not(#chatConversationScroll)"
+    );
+
+  /*
+   * CRÉER LA BARRE UNIQUE UNE SEULE FOIS
+   */
+  if (!actions) {
+    actions = document.createElement("div");
+    actions.id = "mgChat2026Actions";
+
+    var left = document.createElement("div");
+    left.className = "mg-chat-actions-left";
+
+    var center = document.createElement("div");
+    center.className = "mg-chat-actions-center";
+
+    var right = document.createElement("div");
+    right.className = "mg-chat-actions-right";
+
+    var back = document.createElement("button");
+    back.id = "mgChat2026Back";
+    back.type = "button";
+    back.textContent = "← Retour";
+
+    back.addEventListener("click", function () {
+      if (typeof window.retourConversations === "function") {
+        window.retourConversations();
+      }
+    });
+
+    left.appendChild(back);
+    actions.appendChild(left);
+    actions.appendChild(center);
+    actions.appendChild(right);
+
+    var target = header && header.parentNode === chat
+      ? header
+      : chat.firstChild;
+
+    chat.insertBefore(actions, target || null);
+
+    centerZone = center;
+  }
+
+  var leftZone =
+    actions.querySelector(".mg-chat-actions-left");
+
+  centerZone =
+    actions.querySelector(".mg-chat-actions-center");
+
+  var rightZone =
+    actions.querySelector(".mg-chat-actions-right");
+
+  if (!leftZone || !centerZone || !rightZone) return;
+
+  /*
+   * DISPOSITION RESPONSIVE DE LA BARRE UNIQUE
+   */
+  actions.style.display = "flex";
+  actions.style.flexDirection = "row";
+  actions.style.flexWrap = "nowrap";
+  actions.style.alignItems = "center";
+  actions.style.justifyContent = "space-between";
+  actions.style.gap = "8px";
+  actions.style.width = "100%";
+  actions.style.boxSizing = "border-box";
+  actions.style.padding = "8px 10px";
+  actions.style.background = "transparent";
+  actions.style.border = "0";
+  actions.style.boxShadow = "none";
+
+  leftZone.style.display = "flex";
+  leftZone.style.flex = "0 0 auto";
+  leftZone.style.alignItems = "center";
+  leftZone.style.minWidth = "0";
+
+  centerZone.style.display = "flex";
+  centerZone.style.flex = "1 1 auto";
+  centerZone.style.flexDirection = "column";
+  centerZone.style.alignItems = "center";
+  centerZone.style.justifyContent = "center";
+  centerZone.style.minWidth = "0";
+  centerZone.style.overflow = "hidden";
+
+  rightZone.style.display = "flex";
+  rightZone.style.flex = "0 0 auto";
+  rightZone.style.alignItems = "center";
+  rightZone.style.justifyContent = "flex-end";
+  rightZone.style.minWidth = "0";
+
+  /*
+   * BOUTON RETOUR À GAUCHE
+   */
+  var backButton =
+    document.getElementById("mgChat2026Back");
+
+  if (backButton && !leftZone.contains(backButton)) {
+    leftZone.appendChild(backButton);
+  }
+
+  if (backButton) {
+    backButton.style.whiteSpace = "nowrap";
+    backButton.style.flexShrink = "0";
+  }
+
+  /*
+   * PLACER LA PHOTO ET LE NOM AU CENTRE
+   */
+  if (header && !centerZone.contains(header)) {
+    if (!header.__mgOriginalParent) {
+      header.__mgOriginalParent = header.parentNode;
+      header.__mgOriginalNext = header.nextSibling;
     }
 
-    if (header) {
-      header.style.flexShrink = "0";
-      header.style.minWidth = "0";
-    }
+    centerZone.appendChild(header);
 
-    var chatBox = document.getElementById("chatBox");
-    if (chatBox) {
-      chatBox.style.minHeight = "0";
-      chatBox.style.overflowY = "auto";
-      chatBox.style.webkitOverflowScrolling = "touch";
+    var oldWrapper =
+      document.getElementById("chatConversationTop");
+
+    if (oldWrapper &&
+        !oldWrapper.contains(header) &&
+        oldWrapper.children.length === 0) {
+      oldWrapper.remove();
     }
   }
 
+  if (header) {
+    header.style.display = "flex";
+    header.style.flexDirection = "column";
+    header.style.alignItems = "center";
+    header.style.justifyContent = "center";
+    header.style.gap = "3px";
+    header.style.flex = "0 1 auto";
+    header.style.width = "100%";
+    header.style.minWidth = "0";
+    header.style.padding = "0";
+    header.style.margin = "0";
+    header.style.background = "transparent";
+    header.style.border = "0";
+    header.style.boxShadow = "none";
+    header.style.textAlign = "center";
+    header.style.overflow = "hidden";
+
+    var avatar =
+      header.querySelector("#chatProfileAvatar");
+
+    if (avatar) {
+      avatar.style.margin = "0 auto";
+      avatar.style.flexShrink = "0";
+    }
+
+    var title =
+      header.querySelector("#chatTitle");
+
+    if (title) {
+      var titleZone = title.parentElement;
+
+      title.style.fontSize = "13px";
+      title.style.fontWeight = "800";
+      title.style.lineHeight = "1.2";
+      title.style.maxWidth = "100%";
+      title.style.textAlign = "center";
+
+      if (titleZone) {
+        titleZone.style.display = "flex";
+        titleZone.style.flexDirection = "column";
+        titleZone.style.alignItems = "center";
+        titleZone.style.flex = "0 1 auto";
+        titleZone.style.width = "100%";
+        titleZone.style.minWidth = "0";
+        titleZone.style.textAlign = "center";
+
+        var label = title.previousElementSibling;
+
+        if (label &&
+            label.textContent.trim() === "CONVERSATION") {
+          label.style.display = "none";
+        }
+      }
+    }
+
+    var subtitle =
+      header.querySelector("#chatListingSubtitle");
+
+    if (subtitle) {
+      subtitle.style.maxWidth = "100%";
+      subtitle.style.fontSize = "10px";
+      subtitle.style.textAlign = "center";
+    }
+  }
+
+  /*
+   * PROPOSITION DE PRIX À DROITE
+   * Le script existant conserve la gestion du bouton.
+   */
+  var pricePanel =
+    document.getElementById("priceOfferPanel");
+
+  if (pricePanel && !rightZone.contains(pricePanel)) {
+    rightZone.appendChild(pricePanel);
+  }
+
+  if (pricePanel) {
+    pricePanel.style.margin = "0";
+    pricePanel.style.padding = "0";
+    pricePanel.style.border = "0";
+    pricePanel.style.background = "transparent";
+    pricePanel.style.maxWidth = "100%";
+    pricePanel.style.minWidth = "0";
+    pricePanel.style.flex = "0 1 auto";
+  }
+
+  /*
+   * PRÉSERVER LE FONCTIONNEMENT DE L'HISTORIQUE
+   */
+  var chatBox = document.getElementById("chatBox");
+
+  if (chatBox) {
+    chatBox.style.minHeight = "0";
+    chatBox.style.overflowY = "auto";
+    chatBox.style.webkitOverflowScrolling = "touch";
+  }
+}
+  
   function normalizeSignedUrl(result) {
     var value = result &&
       (result.signedURL || result.signedUrl || result.signed_url);
