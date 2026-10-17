@@ -8192,347 +8192,485 @@ async function enregistrerVue(annonce){
 
 }
 
+/* =====================================================
+   MARCHÉ GUINÉE — ACHAT MULTIPLE
+   Quantité, total, commission de 3 % et commande
+   ===================================================== */
 
 /* =========================
-   PAIEMENT
+   CALCUL DE LA QUANTITÉ
 ========================= */
-function ouvrirPaiement(listingId){
-  const annonce =
-    toutesLesAnnonces.find(
-      a => a.id === listingId
+window.mgQuantiteAchat = 1;
+window.mgPrixUnitaireAchat = 0;
+
+function mettreAJourQuantiteAchat() {
+  const input = document.getElementById("mgQuantiteAchat");
+  const erreur = document.getElementById("mgQuantiteErreur");
+  const totalElement = document.getElementById("mgTotalAchat");
+  const commissionElement = document.getElementById("mgCommissionAchat");
+  const vendeurElement = document.getElementById("mgVendeurAchat");
+  const continuer = document.getElementById("mgContinuerAchat");
+
+  if (!input) return;
+
+  let quantite = Number(input.value);
+  const prixUnitaire = Number(window.mgPrixUnitaireAchat) || 0;
+
+  const afficherErreur = function(message) {
+    if (erreur) erreur.textContent = message;
+    if (continuer) continuer.disabled = true;
+  };
+
+  if (
+    !Number.isSafeInteger(quantite) ||
+    quantite < 1
+  ) {
+    afficherErreur("Saisis un nombre entier supérieur ou égal à 1.");
+    return;
+  }
+
+  const total = prixUnitaire * quantite;
+
+  if (
+    !Number.isSafeInteger(total) ||
+    total <= 0
+  ) {
+    afficherErreur(
+      "Cette quantité est trop élevée. Saisis une quantité permettant de calculer le montant correctement."
     );
-  if(!annonce){
+    return;
+  }
+
+  const commission = Math.round(total * 0.03);
+  const montantVendeur = total - commission;
+
+  window.mgQuantiteAchat = quantite;
+
+  if (erreur) erreur.textContent = "";
+  if (totalElement) totalElement.textContent = formatPrix(total);
+  if (commissionElement) commissionElement.textContent = formatPrix(commission);
+  if (vendeurElement) vendeurElement.textContent = formatPrix(montantVendeur);
+  if (continuer) continuer.disabled = false;
+
+  const moins = document.getElementById("mgQuantiteMoins");
+  const plus = document.getElementById("mgQuantitePlus");
+
+  if (moins) moins.disabled = quantite <= 1;
+  if (plus) {
+    plus.disabled =
+      !Number.isSafeInteger(prixUnitaire * (quantite + 1)) ||
+      prixUnitaire * (quantite + 1) <= 0;
+  }
+}
+
+function modifierQuantiteAchat(delta) {
+  const input = document.getElementById("mgQuantiteAchat");
+  if (!input) return;
+
+  const actuelle = Number(input.value);
+  const nouvelle = actuelle + Number(delta);
+
+  if (!Number.isSafeInteger(nouvelle) || nouvelle < 1) return;
+
+  input.value = nouvelle;
+  mettreAJourQuantiteAchat();
+}
+
+/* =========================
+   BOUTON ACHETER
+========================= */
+function ouvrirPaiement(listingId) {
+  const annonce = toutesLesAnnonces.find(
+    a => String(a.id) === String(listingId)
+  );
+
+  if (!annonce) {
     alert("Annonce introuvable.");
     return;
   }
-  // Vérifier que l'utilisateur est connecté
+
   if (
-  typeof utilisateurConnecte === "undefined" ||
-  !utilisateurConnecte
-) {
+    typeof utilisateurConnecte === "undefined" ||
+    !utilisateurConnecte
+  ) {
     fermerModal("detailModal");
-    alert(
-      "Connecte-toi pour acheter."
-    );
+    alert("Connecte-toi pour acheter.");
     ouvrirCompte();
     return;
   }
-  // Empêcher l'achat de sa propre annonce
-  if(
+
+  if (
     annonce.seller_id &&
-    annonce.seller_id === utilisateurConnecte.id
-  ){
-    alert(
-      "Tu ne peux pas acheter ta propre annonce."
-    );
+    String(annonce.seller_id) === String(utilisateurConnecte.id)
+  ) {
+    alert("Tu ne peux pas acheter ta propre annonce.");
     return;
   }
-  /*
-    PRIX À UTILISER
-    Si l'acheteur possède une proposition
-    acceptée pour cette annonce, on utilise
-    le prix négocié.
-    Sinon, on utilise le prix public.
-  */
+
   recupererPrixNegocie(annonce.id)
     .then(prixNegocie => {
-      const prix =
-        Number(
-          prixNegocie ||
-          annonce.price_gnf
-        ) || 0;
-      if(prix <= 0){
-        alert(
-          "Le prix de cette annonce est invalide."
-        );
+      const prix = Number(prixNegocie || annonce.price_gnf) || 0;
+
+      if (!Number.isSafeInteger(prix) || prix <= 0) {
+        alert("Le prix de cette annonce est invalide.");
         return;
       }
-      const prixPublic =
-        Number(
-          annonce.price_gnf
-        ) || 0;
+
+      const prixPublic = Number(annonce.price_gnf) || 0;
       const utilisePrixNegocie =
         prixNegocie &&
         Number(prixNegocie) !== prixPublic;
-      // Commission fixe de 3 %
-      const commission =
-        Math.round(
-          prix * 0.03
-        );
-      const montantVendeur =
-        prix - commission;
-      /*
-        AFFICHAGE
-      */
-      document.getElementById(
-        "paymentContent"
-      ).innerHTML = `
-        <h3>
-          ${escapeHTML(
-            annonce.title
-          )}
-        </h3>
-        ${
-          utilisePrixNegocie
-          ? `
-            <div style="
-              background:#eaf8ef;
-              border:1px solid #bde8ca;
-              color:#087f3f;
-              padding:12px;
-              border-radius:12px;
-              margin-bottom:15px;
-              font-weight:700;
-            ">
-              💰 Prix négocié accepté
+
+      window.mgQuantiteAchat = 1;
+      window.mgPrixUnitaireAchat = prix;
+
+      const contenu = document.getElementById("paymentContent");
+
+      if (!contenu) {
+        alert("Impossible d'ouvrir l'écran d'achat.");
+        return;
+      }
+
+      contenu.innerHTML = `
+        <div style="padding:8px 0;">
+          <h3 style="margin:0 0 16px;">
+            ${escapeHTML(annonce.title)}
+          </h3>
+
+          ${
+            utilisePrixNegocie
+              ? `
+                <div style="
+                  background:#eaf8ef;
+                  border:1px solid #bde8ca;
+                  color:#087f3f;
+                  padding:12px;
+                  border-radius:12px;
+                  margin-bottom:16px;
+                  font-weight:700;
+                ">
+                  💰 Prix négocié accepté
+                  <div style="margin-top:8px;font-size:13px;">
+                    Prix public :
+                    <span style="text-decoration:line-through;color:#777;">
+                      ${formatPrix(prixPublic)}
+                    </span>
+                  </div>
+                </div>
+              `
+              : ""
+          }
+
+          <div style="
+            background:#f5faf6;
+            border:1px solid #dceee1;
+            border-radius:16px;
+            padding:16px;
+            margin-bottom:16px;
+          ">
+            <div style="font-size:14px;color:#555;">
+              Prix unitaire
             </div>
-            <p>
-              Prix public :
-              <span style="
-                text-decoration:line-through;
-                color:#777;
-              ">
-                ${formatPrix(prixPublic)}
-              </span>
-            </p>
-            <p>
-              Prix négocié :
-              <strong style="
-                color:#087f3f;
-                font-size:20px;
-              ">
-                ${formatPrix(prix)}
-              </strong>
-            </p>
-          `
-          : `
-            <p>
-              Prix :
-              <strong>
-                ${formatPrix(prix)}
-              </strong>
-            </p>
-          `
-        }
-        <p>
-          Commission Marché Guinée :
-          <strong>
-            ${formatPrix(commission)}
-          </strong>
-          (3 %)
-        </p>
-        <p>
-          Montant vendeur après commission :
-          <strong>
-            ${formatPrix(montantVendeur)}
-          </strong>
-        </p>
-        <p style="
-          font-size:13px;
-          color:#666;
-          line-height:1.5;
-        ">
-          L'achat sera finalisé après
-          connexion au système de paiement
-          de Marché Guinée.
-        </p>
-        <button
-          class="btn-green"
-          onclick="continuerPaiement('${annonce.id}')"
-        >
-          Continuer
-        </button>
+
+            <div style="
+              font-size:22px;
+              font-weight:800;
+              color:#087f3f;
+              margin:4px 0 20px;
+            ">
+              ${formatPrix(prix)}
+            </div>
+
+            <label for="mgQuantiteAchat" style="
+              display:block;
+              font-weight:700;
+              margin-bottom:10px;
+            ">
+              📦 Combien de pièces veux-tu acheter ?
+            </label>
+
+            <div style="
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              gap:14px;
+              margin-bottom:12px;
+            ">
+              <button
+                id="mgQuantiteMoins"
+                type="button"
+                onclick="modifierQuantiteAchat(-1)"
+                aria-label="Diminuer la quantité"
+                style="
+                  width:46px;
+                  height:46px;
+                  border:0;
+                  border-radius:12px;
+                  background:#e2eee6;
+                  color:#087f3f;
+                  font-size:26px;
+                  font-weight:800;
+                "
+              >−</button>
+
+              <input
+                id="mgQuantiteAchat"
+                type="number"
+                inputmode="numeric"
+                min="1"
+                step="1"
+                value="1"
+                aria-label="Nombre de pièces"
+                oninput="mettreAJourQuantiteAchat()"
+                style="
+                  width:100px;
+                  height:46px;
+                  box-sizing:border-box;
+                  border:1px solid #b9d7c3;
+                  border-radius:12px;
+                  background:white;
+                  text-align:center;
+                  font-size:20px;
+                  font-weight:800;
+                "
+              >
+
+              <button
+                id="mgQuantitePlus"
+                type="button"
+                onclick="modifierQuantiteAchat(1)"
+                aria-label="Augmenter la quantité"
+                style="
+                  width:46px;
+                  height:46px;
+                  border:0;
+                  border-radius:12px;
+                  background:#087f3f;
+                  color:white;
+                  font-size:26px;
+                  font-weight:800;
+                "
+              >+</button>
+            </div>
+
+            <div style="font-size:12px;color:#666;text-align:center;">
+              Tu peux aussi saisir directement la quantité souhaitée.
+            </div>
+
+            <div
+              id="mgQuantiteErreur"
+              role="alert"
+              style="color:#b42318;font-size:13px;margin-top:10px;"
+            ></div>
+          </div>
+
+          <div style="
+            border:1px solid #e1e7e3;
+            border-radius:14px;
+            padding:15px;
+            margin-bottom:16px;
+          ">
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:12px;
+              margin-bottom:12px;
+            ">
+              <span>📦 Quantité</span>
+              <strong id="mgQuantiteResume">1 pièce</strong>
+            </div>
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:12px;
+              margin-bottom:12px;
+            ">
+              <span>💰 Total des articles</span>
+              <strong id="mgTotalAchat">${formatPrix(prix)}</strong>
+            </div>
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:12px;
+              margin-bottom:12px;
+            ">
+              <span>Commission (3 %)</span>
+              <strong id="mgCommissionAchat">${formatPrix(Math.round(prix * 0.03))}</strong>
+            </div>
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:12px;
+              border-top:1px solid #e1e7e3;
+              padding-top:12px;
+            ">
+              <span>Montant vendeur après commission</span>
+              <strong id="mgVendeurAchat">${formatPrix(prix - Math.round(prix * 0.03))}</strong>
+            </div>
+          </div>
+
+          <button
+            id="mgContinuerAchat"
+            type="button"
+            class="btn-green"
+            onclick="continuerPaiement('${String(annonce.id).replace(/'/g, "\\'")}')"
+            style="width:100%;"
+          >
+            Continuer
+          </button>
+        </div>
       `;
-      // Fermer la fenêtre de l'annonce
-      fermerModal(
-        "detailModal"
-      );
-      // Ouvrir la fenêtre de paiement
-      document.getElementById(
-        "paymentModal"
-      ).style.display = "block";
+
+      const input = document.getElementById("mgQuantiteAchat");
+      if (input) {
+        input.addEventListener("input", function() {
+          const resume = document.getElementById("mgQuantiteResume");
+          if (resume) {
+            const q = Number(input.value);
+            resume.textContent =
+              Number.isSafeInteger(q) && q > 0
+                ? q + (q === 1 ? " pièce" : " pièces")
+                : "Quantité invalide";
+          }
+        });
+      }
+
+      fermerModal("detailModal");
+      document.getElementById("paymentModal").style.display = "block";
+      mettreAJourQuantiteAchat();
     })
     .catch(erreur => {
-      console.error(
-        "Erreur récupération prix négocié :",
-        erreur
-      );
-      alert(
-        "Impossible de récupérer le prix négocié."
-      );
+      console.error("Erreur récupération prix négocié :", erreur);
+      alert("Impossible de récupérer le prix négocié.");
     });
 }
 
-// =========================
-// BOUTON « CONTINUER »
-// =========================
-async function continuerPaiement(listingId){
-  const annonce =
-    toutesLesAnnonces.find(
-      a => a.id === listingId
-    );
-  if(!annonce){
-    alert(
-      "Annonce introuvable."
-    );
+/* =========================
+   BOUTON CONTINUER
+   CRÉATION DE LA COMMANDE
+========================= */
+async function continuerPaiement(listingId) {
+  const annonce = toutesLesAnnonces.find(
+    a => String(a.id) === String(listingId)
+  );
+
+  if (!annonce) {
+    alert("Annonce introuvable.");
     return;
   }
-  if(!utilisateurConnecte){
+
+  if (!utilisateurConnecte) {
     fermerModal("paymentModal");
-    alert(
-      "Connecte-toi pour continuer."
-    );
+    alert("Connecte-toi pour continuer.");
     ouvrirCompte();
     return;
   }
-  try{
-    const user =
-      utilisateurConnecte;
-    if(!user || !user.id){
-      alert(
-        "Impossible de récupérer ton compte."
-      );
+
+  const inputQuantite = document.getElementById("mgQuantiteAchat");
+  const quantite = Number(inputQuantite ? inputQuantite.value : 1);
+
+  if (!Number.isSafeInteger(quantite) || quantite < 1) {
+    alert("Choisis une quantité entière supérieure ou égale à 1.");
+    return;
+  }
+
+  try {
+    const user = utilisateurConnecte;
+
+    if (!user || !user.id) {
+      alert("Impossible de récupérer ton compte.");
       return;
     }
-    /* =========================
-       EMPÊCHER L'ACHAT DE SA PROPRE ANNONCE
-    ========================= */
-    if(
+
+    if (
       annonce.seller_id &&
-      annonce.seller_id === user.id
-    ){
-      alert(
-        "Tu ne peux pas acheter ta propre annonce."
-      );
+      String(annonce.seller_id) === String(user.id)
+    ) {
+      alert("Tu ne peux pas acheter ta propre annonce.");
       return;
     }
-    /* =========================
-       NOM DU CLIENT
-    ========================= */
+
     const nomClient =
       user.full_name ||
       user.fullName ||
       user.name ||
       "Client";
-    /* =========================
-       RÉCUPÉRER LE PRIX NÉGOCIÉ
-    ========================= */
+
     let prixNegocie = null;
-    try{
-      prixNegocie =
-        await recupererPrixNegocie(
-          annonce.id
-        );
-    }catch(erreurPrix){
-      console.log(
-        "Aucun prix négocié récupéré :",
-        erreurPrix
-      );
-      prixNegocie = null;
+
+    try {
+      prixNegocie = await recupererPrixNegocie(annonce.id);
+    } catch (erreurPrix) {
+      console.log("Aucun prix négocié récupéré :", erreurPrix);
     }
-    /* =========================
-       PRIX FINAL
-    ========================= */
-    const prixPublic =
-      Number(
-        annonce.price_gnf
-      ) || 0;
-    const prix =
-      Number(
-        prixNegocie || prixPublic
-      ) || 0;
-    if(prix <= 0){
-      alert(
-        "Le prix de cette annonce est invalide."
-      );
+
+    const prixPublic = Number(annonce.price_gnf) || 0;
+    const prixUnitaire = Number(prixNegocie || prixPublic) || 0;
+    const prix = prixUnitaire * quantite;
+
+    if (
+      !Number.isSafeInteger(prixUnitaire) ||
+      prixUnitaire <= 0 ||
+      !Number.isSafeInteger(prix) ||
+      prix <= 0
+    ) {
+      alert("Le prix ou la quantité est invalide.");
       return;
     }
-    /* =========================
-       COMMISSION MARCHÉ GUINÉE
-       TOUJOURS 3 %
-    ========================= */
-    const commission =
-      Math.round(
-        prix * 0.03
-      );
-    const montantVendeur =
-      prix - commission;
-    /* =========================
-       NUMÉRO DE COMMANDE
-    ========================= */
-    const reponseNumero =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
-        {
-          method:"POST",
-          headers:
-            headers(),
-          body:
-            JSON.stringify({})
-        }
-      );
-    if(!reponseNumero.ok){
-      throw new Error(
-        "Impossible de générer le numéro de commande."
-      );
+
+    const commission = Math.round(prix * 0.03);
+    const montantVendeur = prix - commission;
+
+    /* NUMÉRO DE COMMANDE */
+    const reponseNumero = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
+      {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({})
+      }
+    );
+
+    if (!reponseNumero.ok) {
+      throw new Error("Impossible de générer le numéro de commande.");
     }
-    const orderNumber =
-      await reponseNumero.json(); 
-    /* =========================
-       CRÉER LA COMMANDE
-    ========================= */
+
+    const orderNumber = await reponseNumero.json();
+
+    /* CRÉER LA COMMANDE — AUCUN PAIEMENT SIMULÉ */
     const commande = {
-      order_number:
-        orderNumber,
-      buyer_id:
-        user.id,
-      seller_id:
-        annonce.seller_id,
-      listing_id:
-        annonce.id,
-      /*
-        IMPORTANT :
-        ici on enregistre le prix
-        négocié s'il existe.
-      */
-      price_gnf:
-        prix,
-      commission_gnf:
-        commission,
-      seller_amount_gnf:
-        montantVendeur,
-      status:
-        "payment_pending",
-      product_title:
-        annonce.title,
-      problem_reported:
-        false,
-      delivery_status:
-        "pending"
+      order_number: orderNumber,
+      buyer_id: user.id,
+      seller_id: annonce.seller_id,
+      listing_id: annonce.id,
+      quantity: quantite,
+      price_gnf: prix,
+      commission_gnf: commission,
+      seller_amount_gnf: montantVendeur,
+      status: "payment_pending",
+      product_title: annonce.title,
+      problem_reported: false,
+      delivery_status: "pending"
     };
-    const reponse =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/orders`,
-        {
-          method:"POST",
-          headers:
-            headers({
-              "Prefer":
-                "return=representation"
-            }),
-          body:
-            JSON.stringify(
-              commande
-            )
-        }
-      );
-    const resultat =
-      await reponse.json();
-    if(!reponse.ok){
-      console.error(
-        "Erreur création commande :",
-        resultat
-      );
+
+    const reponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/orders`,
+      {
+        method: "POST",
+        headers: headers({
+          "Prefer": "return=representation"
+        }),
+        body: JSON.stringify(commande)
+      }
+    );
+
+    const resultat = await reponse.json();
+
+    if (!reponse.ok) {
+      console.error("Erreur création commande :", resultat);
       alert(
         "Impossible de créer la commande : " +
         (
@@ -8544,74 +8682,137 @@ async function continuerPaiement(listingId){
       );
       return;
     }
-    /* =========================
-       RÉCUPÉRER L'ID DE LA COMMANDE
-    ========================= */
-    const commandeCreee =
-      Array.isArray(resultat)
-        ? resultat[0]
-        : resultat;
-    const orderId =
-      commandeCreee?.id;
-    if(!orderId){
-      console.error(
-        "Commande créée mais ID introuvable :",
-        resultat
-      );
-      alert(
-        "La commande a été créée mais son identifiant est introuvable."
-      );
+
+    const commandeCreee = Array.isArray(resultat)
+      ? resultat[0]
+      : resultat;
+
+    const orderId = commandeCreee?.id;
+
+    if (!orderId) {
+      console.error("Commande créée mais ID introuvable :", resultat);
+      alert("La commande a été créée mais son identifiant est introuvable.");
       return;
     }
-    /* =========================
-       NOTIFICATION DU VENDEUR
-       SANS CODE DE LIVRAISON
-    ========================= */
-    try{
+
+    /* NOTIFICATION DU VENDEUR — SANS CODE DE LIVRAISON */
+    try {
       const notificationMessage =
-        "👤 Client : " +
-        nomClient +
-        ". " +
-        "📦 Produit : « " +
-        annonce.title +
-        " ». " +
-        "💰 Montant : " +
-        Number(prix).toLocaleString("fr-FR") +
-        " GNF. " +
-        "🔢 Commande : " +
-        orderNumber +
-        ".";
+        "👤 Client : " + nomClient + ". " +
+        "📦 Produit : « " + annonce.title + " ». " +
+        "🔢 Quantité : " + quantite +
+        (quantite === 1 ? " pièce. " : " pièces. ") +
+        "💰 Montant total : " +
+        Number(prix).toLocaleString("fr-FR") + " GNF. " +
+        "🔢 Commande : " + orderNumber + ".";
+
       await supabaseFetch(
         `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
         {
-          method:"POST",
-          headers:
-            headers({
-              "Content-Type":
-                "application/json"
-            }),
-          body:
-            JSON.stringify({
-              p_user_id:
-                annonce.seller_id,
-              p_title:
-                "🛒 Nouvelle commande",
-              p_message:
-                notificationMessage,
-              p_type:
-                "new_order"
-            })
+          method: "POST",
+          headers: headers({
+            "Content-Type": "application/json"
+          }),
+          body: JSON.stringify({
+            p_user_id: annonce.seller_id,
+            p_title: "🛒 Nouvelle commande",
+            p_message: notificationMessage,
+            p_type: "new_order"
+          })
         }
       );
-      console.log(
-        "✅ Notification nouvelle commande envoyée au vendeur"
-      );
-    }catch(erreurNotification){
+
+      console.log("✅ Notification nouvelle commande envoyée au vendeur");
+    } catch (erreurNotification) {
       console.error(
         "⚠️ Notification vendeur non envoyée :",
         erreurNotification
       );
     }
+
+    /* RÉCAPITULATIF DE COMMANDE — PAIEMENT NON CONFIRMÉ */
+    document.getElementById("paymentContent").innerHTML = `
+      <h3>Récapitulatif de la commande</h3>
+
+      <p>
+        Article :
+        <strong>${escapeHTML(annonce.title)}</strong>
+      </p>
+
+      <p>
+        Numéro de commande :
+        <strong>${escapeHTML(String(orderNumber))}</strong>
+      </p>
+
+      <p>
+        Quantité :
+        <strong>${quantite} ${quantite === 1 ? "pièce" : "pièces"}</strong>
+      </p>
+
+      ${
+        Number(prixNegocie) > 0 &&
+        Number(prixNegocie) !== prixPublic
+          ? `
+            <div style="
+              background:#eaf8ef;
+              border:1px solid #bde8ca;
+              color:#087f3f;
+              padding:12px;
+              border-radius:12px;
+              margin:12px 0;
+            ">
+              💰 <strong>Prix négocié accepté</strong><br><br>
+              Prix public unitaire :
+              <span style="text-decoration:line-through;color:#777;">
+                ${formatPrix(prixPublic)}
+              </span>
+              <br>
+              Prix négocié unitaire :
+              <strong>${formatPrix(prixUnitaire)}</strong>
+            </div>
+          `
+          : `
+            <p>
+              Prix unitaire :
+              <strong>${formatPrix(prixUnitaire)}</strong>
+            </p>
+          `
+      }
+
+      <p>
+        Montant total des articles :
+        <strong>${formatPrix(prix)}</strong>
+      </p>
+
+      <div class="success">
+        Commission Marché Guinée :
+        <strong>${formatPrix(commission)}</strong> (3 %)
+        <br><br>
+        Montant vendeur après commission :
+        <strong>${formatPrix(montantVendeur)}</strong>
+      </div>
+
+      <p style="font-size:13px;color:#666;line-height:1.5;">
+        Statut : en attente de paiement. Aucun paiement n'a été confirmé.
+        Le paiement réel sera disponible lorsque l'intégration sera opérationnelle.
+      </p>
+    `;
+
+    console.log("Commande créée en attente de paiement :", commandeCreee);
+
+  } catch (erreur) {
+    console.error("Erreur création commande :", erreur);
+    alert(
+      "ERREUR : " +
+      (
+        erreur?.message ||
+        JSON.stringify(erreur)
+      )
+    );
+  }
+}
+
+  
     /* =========================
        CHOIX DU MOYEN DE PAIEMENT
     ========================= */
