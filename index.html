@@ -26072,17 +26072,28 @@ display: none !important;
   -webkit-tap-highlight-color: transparent !important;
 }
 
-
 /* ==========================================
-   MARCHÉ GUINÉE — TRANSPARENCE À 100 %
-   Téléphones, tablettes et ordinateurs
+   MARCHÉ GUINÉE — BANDEAU VERRE DÉPOLI 2026
+   Transparence du bandeau et de la conversation
    ========================================== */
 
-/* Fenêtre principale de la messagerie */
-#messagesModal > .modal-box {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
+/* Bandeau d'identité : verre dépoli */
+#messagesModal #chatContainer > div:first-child {
+  background: rgba(255, 255, 255, 0.58) !important;
+  background-color: rgba(255, 255, 255, 0.58) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+  backdrop-filter: blur(14px) saturate(150%) !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(220, 235, 225, 0.35) !important;
+}
+
+/* Bandeau des actions : même effet de verre */
+#messagesModal #mgChat2026Actions {
+  background: rgba(255, 255, 255, 0.58) !important;
+  background-color: rgba(255, 255, 255, 0.58) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+  backdrop-filter: blur(14px) saturate(150%) !important;
+  border-bottom: 1px solid rgba(220, 235, 225, 0.35) !important;
   box-shadow: none !important;
 }
 
@@ -26090,17 +26101,14 @@ display: none !important;
 #messagesModal #chatContainer {
   background: transparent !important;
   background-color: transparent !important;
-  background-image: none !important;
 }
 
-/* Historique des messages */
+/* Historique : supprimer le fond gris et le motif */
 #messagesModal #chatBox {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   box-shadow: none !important;
-  border: none !important;
-  padding: 18px 24px 22px !important;
 }
 
 /* Zone de défilement */
@@ -26108,32 +26116,9 @@ display: none !important;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  box-shadow: none !important;
 }
 
-/* Bandeau supérieur : transparence totale */
-#messagesModal #chatContainer > div:first-child {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-/* Bandeau des actions : transparence totale */
-#messagesModal #mgChat2026Actions {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-/* Garder les commandes et les photos visibles */
+/* Conserver la visibilité des commandes et de la photo */
 #messagesModal #chatContainer button,
 #messagesModal #chatContainer img,
 #messagesModal #mgChat2026Actions button {
@@ -26141,19 +26126,16 @@ display: none !important;
   opacity: 1 !important;
 }
 
-/* Photo du correspondant : grands écrans */
+/* Photo du correspondant */
 #messagesModal #chatProfileAvatar {
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
   flex-shrink: 0 !important;
   border-radius: 50% !important;
   overflow: hidden !important;
 }
 
-/* Nom du correspondant : grands écrans */
+/* Nom du correspondant */
 #messagesModal #chatTitle {
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 800 !important;
   line-height: 1.25 !important;
   white-space: nowrap !important;
