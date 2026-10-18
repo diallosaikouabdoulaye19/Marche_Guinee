@@ -14244,20 +14244,11 @@ function afficherPanneauCentre() {
   );
   panel.style.setProperty("z-index", "100001", "important");
 
-  /*
-   * Une nouvelle proposition reste fermée jusqu'au clic
-   * sur le bouton de négociation.
-   */
-  panel.style.setProperty("display", "none", "important");
-  panel.dataset.mgCompactReady = "1";
-
-  var boutonToggle = document.getElementById(
-    "mgPriceToggleButton"
-  );
-
-  if (boutonToggle) {
-    boutonToggle.setAttribute("aria-expanded", "false");
-  }
+/*
+ * Conserver l'état actuel du panneau.
+ * Le bouton de négociation gère son ouverture et sa fermeture.
+ */
+panel.dataset.mgCompactReady = "1";
 
   const actions = panel.querySelector(".price-offer-actions");
 
