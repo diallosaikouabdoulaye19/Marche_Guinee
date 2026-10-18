@@ -14205,60 +14205,82 @@ async function chargerPropositionsPrix(){
         offre => offre.status === "accepted"
       );
 
-      /* Présentation commune du panneau */
-      function afficherPanneauCentre() {
-        panel.style.setProperty("position", "fixed", "important");
-        panel.style.setProperty("left", "50%", "important");
-        panel.style.setProperty("top", "50%", "important");
-        panel.style.setProperty("right", "auto", "important");
-        panel.style.setProperty("bottom", "auto", "important");
-        panel.style.setProperty(
-          "transform",
-          "translate(-50%, -50%)",
-          "important"
-        );
-        panel.style.setProperty("width", "min(88vw, 420px)", "important");
-        panel.style.setProperty("max-width", "88vw", "important");
-        panel.style.setProperty("max-height", "50vh", "important");
-        panel.style.setProperty("overflow-y", "auto", "important");
-        panel.style.setProperty("overflow-x", "hidden", "important");
-        panel.style.setProperty("box-sizing", "border-box", "important");
-        panel.style.setProperty("padding", "18px", "important");
-        panel.style.setProperty("margin", "0", "important");
-        panel.style.setProperty("border", "1px solid #e1eae4", "important");
-        panel.style.setProperty("border-radius", "18px", "important");
-        panel.style.setProperty("background", "#ffffff", "important");
-        panel.style.setProperty(
-          "box-shadow",
-          "0 18px 50px rgba(0,0,0,.24)",
-          "important"
-        );
-        panel.style.setProperty("z-index", "100001", "important");
+      /* Présentation commune du panneau de négociation */
+function afficherPanneauCentre() {
+  /*
+   * IMPORTANT :
+   * Le panneau doit être présent dans le document pour
+   * que le bouton puisse le retrouver et l'afficher.
+   */
+  if (panel.parentElement !== document.body) {
+    document.body.appendChild(panel);
+  }
+
+  panel.style.setProperty("position", "fixed", "important");
+  panel.style.setProperty("left", "50%", "important");
+  panel.style.setProperty("top", "50%", "important");
+  panel.style.setProperty("right", "auto", "important");
+  panel.style.setProperty("bottom", "auto", "important");
+  panel.style.setProperty(
+    "transform",
+    "translate(-50%, -50%)",
+    "important"
+  );
+  panel.style.setProperty("width", "min(88vw, 420px)", "important");
+  panel.style.setProperty("max-width", "88vw", "important");
+  panel.style.setProperty("max-height", "70vh", "important");
+  panel.style.setProperty("overflow-y", "auto", "important");
+  panel.style.setProperty("overflow-x", "hidden", "important");
+  panel.style.setProperty("box-sizing", "border-box", "important");
+  panel.style.setProperty("padding", "16px", "important");
+  panel.style.setProperty("margin", "0", "important");
+  panel.style.setProperty("border", "1px solid #e4ebe6", "important");
+  panel.style.setProperty("border-radius", "18px", "important");
+  panel.style.setProperty("background", "#ffffff", "important");
+  panel.style.setProperty(
+    "box-shadow",
+    "0 18px 50px rgba(0,0,0,.22)",
+    "important"
+  );
+  panel.style.setProperty("z-index", "100001", "important");
+
+  /*
+   * Une nouvelle proposition reste fermée jusqu'au clic
+   * sur le bouton de négociation.
+   */
+  panel.style.setProperty("display", "none", "important");
+  panel.dataset.mgCompactReady = "1";
+
+  var boutonToggle = document.getElementById(
+    "mgPriceToggleButton"
+  );
+
+  if (boutonToggle) {
+    boutonToggle.setAttribute("aria-expanded", "false");
+  }
+
+  const actions = panel.querySelector(".price-offer-actions");
+
+  if (actions) {
+    actions.style.setProperty("display", "flex", "important");
+    actions.style.setProperty("gap", "10px", "important");
+    actions.style.setProperty("width", "100%", "important");
+    actions.style.setProperty("margin-top", "16px", "important");
+  }
+
+  panel.querySelectorAll(
+    ".price-offer-accept, .price-offer-reject"
+  ).forEach(function (button) {
+    button.style.setProperty("flex", "1 1 0", "important");
+    button.style.setProperty("min-width", "0", "important");
+    button.style.setProperty("min-height", "44px", "important");
+    button.style.setProperty("padding", "10px 8px", "important");
+    button.style.setProperty("border-radius", "10px", "important");
+    button.style.setProperty("white-space", "normal", "important");
+    button.style.setProperty("cursor", "pointer", "important");
+  });
+}
       
-        panel.dataset.mgCompactReady = "1";
-
-        const actions = panel.querySelector(".price-offer-actions");
-
-        if (actions) {
-          actions.style.setProperty("display", "flex", "important");
-          actions.style.setProperty("gap", "10px", "important");
-          actions.style.setProperty("width", "100%", "important");
-          actions.style.setProperty("margin-top", "16px", "important");
-        }
-
-        panel.querySelectorAll(
-          ".price-offer-accept, .price-offer-reject"
-        ).forEach(function (button) {
-          button.style.setProperty("flex", "1 1 0", "important");
-          button.style.setProperty("min-width", "0", "important");
-          button.style.setProperty("min-height", "44px", "important");
-          button.style.setProperty("padding", "10px 8px", "important");
-          button.style.setProperty("border-radius", "10px", "important");
-          button.style.setProperty("white-space", "normal", "important");
-          button.style.setProperty("cursor", "pointer", "important");
-        });
-      }
-
       /* Offre acceptée : aucune décision supplémentaire nécessaire */
       if (offreAcceptee) {
 
