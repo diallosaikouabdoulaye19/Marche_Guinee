@@ -26649,8 +26649,8 @@ display: none !important;
 <script>
 /* =====================================================
    MARCHÉ GUINÉE 🇬🇳
-   BOUTON DE NÉGOCIATION — VERSION CORRIGÉE
-   Bouton dans la barre d'actions, panneau centré
+   BOUTON DE NÉGOCIATION
+   Ouverture et fermeture du panneau
    ===================================================== */
 (function () {
   "use strict";
@@ -26663,10 +26663,6 @@ display: none !important;
 
   function centrerPanneau(panel) {
     if (!panel) return;
-
-    if (panel.parentElement !== document.body) {
-      document.body.appendChild(panel);
-    }
 
     panel.style.setProperty("position", "fixed", "important");
     panel.style.setProperty("left", "50%", "important");
@@ -26698,101 +26694,93 @@ display: none !important;
   }
 
   function preparerBoutonPrix() {
-  var actions = document.getElementById(ID_ACTIONS);
-  if (!actions) return;
+    var actions = document.getElementById(ID_ACTIONS);
+    if (!actions) return;
 
-  var zone = actions.querySelector(".mg-chat-actions-right");
-  if (!zone) return;
+    var zone = actions.querySelector(".mg-chat-actions-right");
+    if (!zone) return;
 
-  var bouton = document.getElementById(ID_BOUTON);
+    var bouton = document.getElementById(ID_BOUTON);
 
-  if (!bouton) {
-    bouton = document.createElement("button");
-    bouton.id = ID_BOUTON;
-    bouton.type = "button";
-    bouton.setAttribute("aria-expanded", "false");
-
-    bouton.style.cssText =
-      "display:inline-flex;" +
-      "align-items:center;" +
-      "justify-content:center;" +
-      "gap:7px;" +
-      "min-height:40px;" +
-      "padding:9px 13px;" +
-      "border:1px solid #dce9df;" +
-      "border-radius:12px;" +
-      "background:#edf7ef;" +
-      "color:#087f3f;" +
-      "font-size:13px;" +
-      "font-weight:800;" +
-      "white-space:nowrap;" +
-      "cursor:pointer;" +
-      "flex:0 0 auto;";
-  }
-
-  /*
-   * Garantir un gestionnaire de clic fonctionnel,
-   * même si le bouton existait déjà.
-   */
-  if (!bouton.dataset.mgPriceClickInstalled) {
-    var boutonPropre = bouton.cloneNode(true);
-
-    if (bouton.parentNode) {
-      bouton.parentNode.replaceChild(boutonPropre, bouton);
+    if (!bouton) {
+      bouton = document.createElement("button");
+      bouton.id = ID_BOUTON;
+      bouton.type = "button";
+      bouton.setAttribute("aria-expanded", "false");
+      bouton.style.cssText =
+        "display:inline-flex;" +
+        "align-items:center;" +
+        "justify-content:center;" +
+        "gap:7px;" +
+        "min-height:40px;" +
+        "padding:9px 13px;" +
+        "border:1px solid #dce9df;" +
+        "border-radius:12px;" +
+        "background:#edf7ef;" +
+        "color:#087f3f;" +
+        "font-size:13px;" +
+        "font-weight:800;" +
+        "white-space:nowrap;" +
+        "cursor:pointer;" +
+        "flex:0 0 auto;";
     }
 
-    bouton = boutonPropre;
-    bouton.dataset.mgPriceClickInstalled = "1";
+    if (!bouton.dataset.mgPriceClickInstalled) {
+      bouton.addEventListener("click", function () {
+        var panneau = document.getElementById(ID_PANEL);
+        if (!panneau) return;
 
-    bouton.addEventListener("click", function () {
-      var panneau = document.getElementById(ID_PANEL);
-      if (!panneau) return;
+        var estOuvert =
+          bouton.getAttribute("aria-expanded") === "true";
 
-      var estOuvert =
-        bouton.getAttribute("aria-expanded") === "true";
+        if (estOuvert) {
+          panneau.style.setProperty("display", "none", "important");
+          bouton.setAttribute("aria-expanded", "false");
+          return;
+        }
 
-      if (estOuvert) {
-        panneau.style.setProperty("display", "none", "important");
-        bouton.setAttribute("aria-expanded", "false");
-      } else {
         centrerPanneau(panneau);
         panneau.style.setProperty("display", "block", "important");
         bouton.setAttribute("aria-expanded", "true");
-      }
-    });
-  }
+      });
 
-  var panel = document.getElementById(ID_PANEL);
-
-  if (panel) {
-    var boutonVendeur = !!panel.querySelector(".price-offer-btn");
-
-    var aUneOffre = !!panel.querySelector(
-      ".price-offer-accept, .price-offer-reject, .price-offer-price"
-    );
-
-    bouton.textContent = boutonVendeur
-      ? "💰 Proposer un prix"
-      : aUneOffre
-        ? "💰 Voir la proposition"
-        : "💰 Négociation";
-
-    if (!panel.dataset.mgCompactReady) {
-      panel.dataset.mgCompactReady = "1";
-      panel.style.setProperty("display", "none", "important");
-      bouton.setAttribute("aria-expanded", "false");
+      bouton.dataset.mgPriceClickInstalled = "1";
     }
 
-    centrerPanneau(panel);
-  } else {
-    bouton.textContent = "💰 Négociation";
+    var panel = document.getElementById(ID_PANEL);
+
+    if (panel) {
+      var boutonVendeur = !!panel.querySelector(".price-offer-btn");
+      var aUneOffre = !!panel.querySelector(
+        ".price-offer-accept, .price-offer-reject, .price-offer-price"
+      );
+
+      bouton.textContent = boutonVendeur
+        ? "💰 Proposer un prix"
+        : aUneOffre
+          ? "💰 Voir la proposition"
+          : "💰 Négociation";
+
+      centrerPanneau(panel);
+
+      /*
+       * Ne pas réinitialiser display à chaque vérification :
+       * cela empêcherait le panneau de rester ouvert.
+       */
+      if (!panel.dataset.mgToggleInitialized) {
+        panel.style.setProperty("display", "none", "important");
+        panel.dataset.mgToggleInitialized = "1";
+        bouton.setAttribute("aria-expanded", "false");
+      }
+    } else {
+      bouton.textContent = "💰 Négociation";
+    }
+
+    if (bouton.parentElement !== zone) {
+      zone.appendChild(bouton);
+    }
   }
 
-  if (bouton.parentElement !== zone) {
-    zone.appendChild(bouton);
-  }
-}
-  
   function programmerVerification() {
     if (minuterie) clearTimeout(minuterie);
 
@@ -26826,7 +26814,6 @@ display: none !important;
   }
 
   window.addEventListener("load", installer);
-
 })();
 </script>
   
