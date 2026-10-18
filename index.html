@@ -8551,7 +8551,7 @@ function ouvrirPaiement(listingId) {
 /* =========================================================
    MARCHÉ GUINÉE 🇬🇳
    CRÉATION SÉCURISÉE DES COMMANDES
-   Protection contre les clics répétés
+   Utilise Supabase : create_order_secure()
    Commission : 3 %
    Aucun paiement simulé
 ========================================================= */
@@ -8566,24 +8566,32 @@ async function continuerPaiement(listingId) {
     return;
   }
 
-  if (!utilisateurConnecte) {
+  if (
+    typeof utilisateurConnecte === "undefined" ||
+    !utilisateurConnecte
+  ) {
     fermerModal("paymentModal");
     alert("Connecte-toi pour continuer.");
     ouvrirCompte();
     return;
   }
 
-  const inputQuantite = document.getElementById("mgQuantiteAchat");
-  const quantite = Number(inputQuantite ? inputQuantite.value : 1);
+  const inputQuantite =
+    document.getElementById("mgQuantiteAchat");
+
+  const quantite = Number(
+    inputQuantite ? inputQuantite.value : 1
+  );
 
   if (!Number.isSafeInteger(quantite) || quantite < 1) {
-    alert("Choisis une quantité entière supérieure ou égale à 1.");
+    alert(
+      "Choisis une quantité entière supérieure ou égale à 1."
+    );
     return;
   }
 
   /*
    * PROTECTION CONTRE LES CLICS RÉPÉTÉS
-   * Le verrou est conservé pendant toute la requête.
    */
   if (!(window.mgCommandesEnCours instanceof Set)) {
     window.mgCommandesEnCours = new Set();
@@ -8601,7 +8609,9 @@ async function continuerPaiement(listingId) {
 
   window.mgCommandesEnCours.add(cleCommande);
 
-  const boutonContinuer = document.getElementById("mgContinuerAchat");
+  const boutonContinuer =
+    document.getElementById("mgContinuerAchat");
+
   const texteBoutonOriginal = boutonContinuer
     ? boutonContinuer.textContent
     : "Continuer";
@@ -8618,16 +8628,18 @@ async function continuerPaiement(listingId) {
     const user = utilisateurConnecte;
 
     if (!user || !user.id) {
-      alert("Impossible de récupérer ton compte.");
-      return;
+      throw new Error(
+        "Impossible de récupérer ton compte."
+      );
     }
 
     if (
       annonce.seller_id &&
       String(annonce.seller_id) === String(user.id)
     ) {
-      alert("Tu ne peux pas acheter ta propre annonce.");
-      return;
+      throw new Error(
+        "Tu ne peux pas acheter ta propre annonce."
+      );
     }
 
     const nomClient =
@@ -8637,115 +8649,35 @@ async function continuerPaiement(listingId) {
       "Client";
 
     /*
-     * RÉCUPÉRER LE PRIX NÉGOCIÉ SI DISPONIBLE
+     * CRÉER LA COMMANDE CÔTÉ SUPABASE
+     *
+     * Le serveur contrôle :
+     * - la disponibilité de l'annonce ;
+     * - l'identité de l'acheteur ;
+     * - le prix public ou négocié accepté ;
+     * - la quantité ;
+     * - le total et la commission ;
+     * - le numéro de commande.
+     *
+     * Le déclencheur existant réserve l'annonce.
+     * Aucun paiement n'est simulé ou confirmé.
      */
-    let prixNegocie = null;
-
-    try {
-      prixNegocie = await recupererPrixNegocie(annonce.id);
-    } catch (erreurPrix) {
-      console.log(
-        "Aucun prix négocié récupéré :",
-        erreurPrix
-      );
-    }
-
-    const prixPublic = Number(annonce.price_gnf) || 0;
-    const prixUnitaire = Number(prixNegocie || prixPublic) || 0;
-    const prix = prixUnitaire * quantite;
-
-    if (
-      !Number.isSafeInteger(prixUnitaire) ||
-      prixUnitaire <= 0 ||
-      !Number.isSafeInteger(prix) ||
-      prix <= 0
-    ) {
-      alert("Le prix ou la quantité est invalide.");
-      return;
-    }
-
-    /*
-     * CALCUL DE LA COMMISSION
-     * Taux fixe : 3 %
-     */
-    const commission = Math.round(prix * 0.03);
-    const montantVendeur = prix - commission;
-
-    /*
-     * GÉNÉRER LE NUMÉRO DE COMMANDE
-     */
-    const reponseNumero = await fetch(
-      `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
-      {
-        method: "POST",
-        headers: headers(),
-        body: JSON.stringify({})
-      }
-    );
-
-    if (!reponseNumero.ok) {
-      let detailsNumero = "";
-
-      try {
-        const erreurNumero = await reponseNumero.json();
-
-        detailsNumero =
-          erreurNumero.message ||
-          erreurNumero.error_description ||
-          erreurNumero.hint ||
-          "";
-      } catch (_) {}
-
-      throw new Error(
-        detailsNumero ||
-        "Impossible de générer le numéro de commande."
-      );
-    }
-
-    const orderNumber = await reponseNumero.json();
-
-    if (
-      orderNumber === null ||
-      orderNumber === undefined ||
-      String(orderNumber).trim() === ""
-    ) {
-      throw new Error(
-        "Le numéro de commande reçu est invalide."
-      );
-    }
-
-    /*
-     * CRÉER LA COMMANDE
-     * Le statut reste payment_pending.
-     * AUCUN PAIEMENT N'EST SIMULÉ OU CONFIRMÉ.
-     */
-    const commande = {
-      order_number: orderNumber,
-      buyer_id: user.id,
-      seller_id: annonce.seller_id,
-      listing_id: annonce.id,
-      quantity: quantite,
-      price_gnf: prix,
-      commission_gnf: commission,
-      seller_amount_gnf: montantVendeur,
-      status: "payment_pending",
-      product_title: annonce.title,
-      problem_reported: false,
-      delivery_status: "pending"
-    };
 
     const reponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/orders`,
+      `${SUPABASE_URL}/rest/v1/rpc/create_order_secure`,
       {
         method: "POST",
         headers: headers({
-          "Prefer": "return=representation"
+          "Content-Type": "application/json"
         }),
-        body: JSON.stringify(commande)
+        body: JSON.stringify({
+          p_listing_id: listingId,
+          p_quantity: quantite
+        })
       }
     );
 
-    let resultat;
+    let resultat = null;
 
     try {
       resultat = await reponse.json();
@@ -8755,7 +8687,7 @@ async function continuerPaiement(listingId) {
 
     if (!reponse.ok) {
       console.error(
-        "Erreur création commande :",
+        "Erreur création sécurisée de commande :",
         resultat
       );
 
@@ -8763,50 +8695,106 @@ async function continuerPaiement(listingId) {
         resultat?.message ||
         resultat?.error_description ||
         resultat?.hint ||
-        "Erreur Supabase";
+        resultat?.details ||
+        "Impossible de créer la commande.";
 
-      alert(
-        "Impossible de créer la commande : " +
-        messageErreur
-      );
-
-      return;
+      throw new Error(messageErreur);
     }
 
-    const commandeCreee = Array.isArray(resultat)
-      ? resultat[0]
-      : resultat;
+    /*
+     * La fonction SQL retourne :
+     * {
+     *   success: true,
+     *   order: { ... }
+     * }
+     */
 
-    const orderId = commandeCreee?.id;
+    const commandeCreee = resultat?.order;
 
-    if (!orderId) {
+    if (
+      resultat?.success !== true ||
+      !commandeCreee ||
+      !commandeCreee.id ||
+      !commandeCreee.order_number
+    ) {
       console.error(
-        "Commande créée mais ID introuvable :",
+        "Réponse inattendue de create_order_secure :",
         resultat
       );
 
-      alert(
-        "La commande semble avoir été créée, " +
-        "mais son identifiant n'a pas été reçu. " +
-        "Ne relance pas immédiatement la demande : " +
-        "vérifie d'abord tes commandes."
+      throw new Error(
+        "La réponse de Supabase est incomplète. " +
+        "Vérifie tes commandes avant de réessayer."
+      );
+    }
+
+    /*
+     * UTILISER LES VALEURS RETOURNÉES PAR SUPABASE
+     */
+
+    const orderId = commandeCreee.id;
+    const orderNumber = commandeCreee.order_number;
+
+    const prix = Number(commandeCreee.price_gnf);
+    const quantiteCreee = Number(commandeCreee.quantity);
+
+    const commission = Number(
+      commandeCreee.commission_gnf
+    );
+
+    const montantVendeur = Number(
+      commandeCreee.seller_amount_gnf
+    );
+
+    const prixUnitaire =
+      quantiteCreee > 0
+        ? prix / quantiteCreee
+        : 0;
+
+    const prixPublic = Number(annonce.price_gnf) || 0;
+
+    const prixNegocie =
+      prixUnitaire !== prixPublic;
+
+    if (
+      !Number.isSafeInteger(prix) ||
+      prix <= 0 ||
+      !Number.isSafeInteger(quantiteCreee) ||
+      quantiteCreee < 1 ||
+      !Number.isSafeInteger(commission) ||
+      !Number.isSafeInteger(montantVendeur)
+    ) {
+      console.error(
+        "Montants retournés par Supabase invalides :",
+        commandeCreee
       );
 
-      return;
+      throw new Error(
+        "Les montants de la commande reçue sont invalides. " +
+        "Vérifie tes commandes avant de réessayer."
+      );
     }
 
     /*
      * NOTIFICATION DU VENDEUR
-     * Aucun code de livraison dans cette notification.
+     *
+     * Aucun code de livraison dans la notification.
+     * Une erreur de notification ne doit pas annuler
+     * une commande déjà créée.
      */
+
     try {
       const notificationMessage =
         "👤 Client : " + nomClient + ". " +
         "📦 Produit : « " + annonce.title + " ». " +
-        "🔢 Quantité : " + quantite +
-        (quantite === 1 ? " pièce. " : " pièces. ") +
+        "🔢 Quantité : " + quantiteCreee +
+        (
+          quantiteCreee === 1
+            ? " pièce. "
+            : " pièces. "
+        ) +
         "💰 Montant total : " +
-        Number(prix).toLocaleString("fr-FR") +
+        prix.toLocaleString("fr-FR") +
         " GNF. " +
         "🔢 Commande : " + orderNumber + ".";
 
@@ -8827,14 +8815,10 @@ async function continuerPaiement(listingId) {
       );
 
       console.log(
-        "Notification nouvelle commande traitée :",
+        "Notification vendeur traitée :",
         reponseNotification
       );
     } catch (erreurNotification) {
-      /*
-       * Une erreur de notification ne doit pas
-       * transformer une commande créée en échec.
-       */
       console.error(
         "Notification vendeur non envoyée :",
         erreurNotification
@@ -8843,9 +8827,12 @@ async function continuerPaiement(listingId) {
 
     /*
      * RÉCAPITULATIF DE COMMANDE
+     *
      * Le paiement réel n'est pas encore intégré.
      */
-    const paymentContent = document.getElementById("paymentContent");
+
+    const paymentContent =
+      document.getElementById("paymentContent");
 
     if (paymentContent) {
       paymentContent.innerHTML = `
@@ -8864,14 +8851,13 @@ async function continuerPaiement(listingId) {
         <p>
           Quantité :
           <strong>
-            ${quantite}
-            ${quantite === 1 ? "pièce" : "pièces"}
+            ${quantiteCreee}
+            ${quantiteCreee === 1 ? "pièce" : "pièces"}
           </strong>
         </p>
 
         ${
-          Number(prixNegocie) > 0 &&
-          Number(prixNegocie) !== prixPublic
+          prixNegocie
             ? `
               <div style="
                 background:#eaf8ef;
@@ -8883,7 +8869,6 @@ async function continuerPaiement(listingId) {
               ">
                 💰 <strong>Prix négocié accepté</strong>
                 <br><br>
-
                 Prix public unitaire :
                 <span style="
                   text-decoration:line-through;
@@ -8892,7 +8877,6 @@ async function continuerPaiement(listingId) {
                   ${formatPrix(prixPublic)}
                 </span>
                 <br>
-
                 Prix négocié unitaire :
                 <strong>${formatPrix(prixUnitaire)}</strong>
               </div>
@@ -8914,7 +8898,6 @@ async function continuerPaiement(listingId) {
           Commission Marché Guinée :
           <strong>${formatPrix(commission)}</strong> (3 %)
           <br><br>
-
           Montant vendeur après commission :
           <strong>${formatPrix(montantVendeur)}</strong>
         </div>
@@ -8931,11 +8914,9 @@ async function continuerPaiement(listingId) {
         ">
           <strong>⏳ En attente de paiement</strong>
           <br><br>
-
           Ta commande est enregistrée.
           Aucun paiement n'a été confirmé.
           <br><br>
-
           Le paiement réel sera disponible
           lorsque l'intégration sera opérationnelle.
         </div>
@@ -8944,7 +8925,14 @@ async function continuerPaiement(listingId) {
 
     console.log(
       "Commande créée en attente de paiement :",
-      commandeCreee
+      {
+        orderId,
+        orderNumber,
+        prix,
+        quantite: quantiteCreee,
+        commission,
+        montantVendeur
+      }
     );
 
   } catch (erreur) {
@@ -8963,9 +8951,9 @@ async function continuerPaiement(listingId) {
 
   } finally {
     /*
-     * TOUJOURS LIBÉRER LE VERROU
-     * ET RESTAURER LE BOUTON SI CELUI-CI EXISTE ENCORE.
+     * LIBÉRER LE VERROU ET RESTAURER LE BOUTON
      */
+
     if (
       window.mgCommandesEnCours instanceof Set
     ) {
