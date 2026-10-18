@@ -26989,60 +26989,69 @@ display: none !important;
      Utilisation du véritable HTML existant.
      ========================================= */
 
-  function trouverBoutonAcheter() {
-    return document.querySelector(
-      '#detailContent button[onclick*="ouvrirPaiement"]'
+      function trouverBoutonAcheter() {
+  var contenu = document.getElementById("detailContent");
+
+  if (!contenu) return null;
+
+  return contenu.querySelector(
+    'button[onclick*="ouvrirPaiement"]'
+  );
+}
+
+function trouverZoneDetail() {
+  return document.getElementById("detailContent");
+}
+
+/* =========================================
+   CRÉATION DU MESSAGE DANS LA FICHE
+   ========================================= */
+
+function creerMessage() {
+  var zone = trouverZoneDetail();
+
+  if (!zone) {
+    console.warn(
+      "Marché Guinée : zone de détail introuvable."
     );
+    return null;
   }
 
-  function trouverZoneDetail() {
-    return document.getElementById("detailContent");
+  var box = document.getElementById(
+    "mgReservationCountdownBox"
+  );
+
+  if (box && !zone.contains(box)) {
+    box.remove();
+    box = null;
   }
 
-  /* =========================================
-     CRÉATION DU BLOC D'AFFICHAGE
-     ========================================= */
+  if (!box) {
+    box = document.createElement("div");
 
-  function creerMessage() {
-    var zone = trouverZoneDetail();
+    box.id = "mgReservationCountdownBox";
+    box.className = "mg-reservation-box";
 
-    if (!zone) return null;
-
-    var box = document.getElementById(
-      "mgReservationCountdownBox"
+    var description = zone.querySelector(
+      ".mg-detail-description"
     );
 
-    if (box && !zone.contains(box)) {
-      box.remove();
-      box = null;
+    var premierExtra = zone.querySelector(
+      ".mg-detail-extra"
+    );
+
+    if (description) {
+      zone.insertBefore(box, description);
+    } else if (premierExtra) {
+      zone.insertBefore(box, premierExtra);
+    } else {
+      zone.appendChild(box);
     }
-
-    if (!box) {
-      box = document.createElement("div");
-
-      box.id = "mgReservationCountdownBox";
-      box.className = "mg-reservation-box";
-
-      var boutonAcheter = trouverBoutonAcheter();
-
-      if (
-        boutonAcheter &&
-        boutonAcheter.parentElement &&
-        zone.contains(boutonAcheter.parentElement)
-      ) {
-        // Affiche le compteur juste avant la zone des boutons.
-        zone.insertBefore(
-          box,
-          boutonAcheter.parentElement
-        );
-      } else {
-        zone.appendChild(box);
-      }
-    }
-
-    return box;
   }
 
+  return box;
+}
+      
   /* =========================================
      AFFICHER UNE INDISPONIBILITÉ
      ========================================= */
