@@ -14234,8 +14234,7 @@ async function chargerPropositionsPrix(){
           "important"
         );
         panel.style.setProperty("z-index", "100001", "important");
-        panel.style.setProperty("display", "block", "important");
-
+      
         panel.dataset.mgCompactReady = "1";
 
         const actions = panel.querySelector(".price-offer-actions");
@@ -14258,17 +14257,6 @@ async function chargerPropositionsPrix(){
           button.style.setProperty("white-space", "normal", "important");
           button.style.setProperty("cursor", "pointer", "important");
         });
-
-        const chatBox = document.getElementById("chatBox");
-
-        if (
-          chatBox &&
-          typeof chatContainer !== "undefined" &&
-          chatContainer.contains(chatBox) &&
-          panel.parentElement !== chatContainer
-        ) {
-          chatContainer.insertBefore(panel, chatBox);
-        }
       }
 
       /* Offre acceptée : aucune décision supplémentaire nécessaire */
