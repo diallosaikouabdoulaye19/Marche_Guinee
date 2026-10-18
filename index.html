@@ -8548,10 +8548,14 @@ function ouvrirPaiement(listingId) {
     });
 }
 
-/* =========================
-   BOUTON CONTINUER
-   CRÉATION DE LA COMMANDE
-========================= */
+/* =========================================================
+   MARCHÉ GUINÉE 🇬🇳
+   CRÉATION SÉCURISÉE DES COMMANDES
+   Protection contre les clics répétés
+   Commission : 3 %
+   Aucun paiement simulé
+========================================================= */
+
 async function continuerPaiement(listingId) {
   const annonce = toutesLesAnnonces.find(
     a => String(a.id) === String(listingId)
@@ -8577,6 +8581,39 @@ async function continuerPaiement(listingId) {
     return;
   }
 
+  /*
+   * PROTECTION CONTRE LES CLICS RÉPÉTÉS
+   * Le verrou est conservé pendant toute la requête.
+   */
+  if (!(window.mgCommandesEnCours instanceof Set)) {
+    window.mgCommandesEnCours = new Set();
+  }
+
+  const cleCommande = String(listingId);
+
+  if (window.mgCommandesEnCours.has(cleCommande)) {
+    alert(
+      "Ta demande est déjà en cours de traitement. " +
+      "Patiente quelques instants avant de réessayer."
+    );
+    return;
+  }
+
+  window.mgCommandesEnCours.add(cleCommande);
+
+  const boutonContinuer = document.getElementById("mgContinuerAchat");
+  const texteBoutonOriginal = boutonContinuer
+    ? boutonContinuer.textContent
+    : "Continuer";
+
+  if (boutonContinuer) {
+    boutonContinuer.disabled = true;
+    boutonContinuer.textContent = "Traitement en cours…";
+    boutonContinuer.setAttribute("aria-busy", "true");
+    boutonContinuer.style.opacity = "0.7";
+    boutonContinuer.style.cursor = "wait";
+  }
+
   try {
     const user = utilisateurConnecte;
 
@@ -8599,12 +8636,18 @@ async function continuerPaiement(listingId) {
       user.name ||
       "Client";
 
+    /*
+     * RÉCUPÉRER LE PRIX NÉGOCIÉ SI DISPONIBLE
+     */
     let prixNegocie = null;
 
     try {
       prixNegocie = await recupererPrixNegocie(annonce.id);
     } catch (erreurPrix) {
-      console.log("Aucun prix négocié récupéré :", erreurPrix);
+      console.log(
+        "Aucun prix négocié récupéré :",
+        erreurPrix
+      );
     }
 
     const prixPublic = Number(annonce.price_gnf) || 0;
@@ -8621,10 +8664,16 @@ async function continuerPaiement(listingId) {
       return;
     }
 
+    /*
+     * CALCUL DE LA COMMISSION
+     * Taux fixe : 3 %
+     */
     const commission = Math.round(prix * 0.03);
     const montantVendeur = prix - commission;
 
-    /* NUMÉRO DE COMMANDE */
+    /*
+     * GÉNÉRER LE NUMÉRO DE COMMANDE
+     */
     const reponseNumero = await fetch(
       `${SUPABASE_URL}/rest/v1/rpc/prochain_numero_commande`,
       {
@@ -8635,12 +8684,41 @@ async function continuerPaiement(listingId) {
     );
 
     if (!reponseNumero.ok) {
-      throw new Error("Impossible de générer le numéro de commande.");
+      let detailsNumero = "";
+
+      try {
+        const erreurNumero = await reponseNumero.json();
+
+        detailsNumero =
+          erreurNumero.message ||
+          erreurNumero.error_description ||
+          erreurNumero.hint ||
+          "";
+      } catch (_) {}
+
+      throw new Error(
+        detailsNumero ||
+        "Impossible de générer le numéro de commande."
+      );
     }
 
     const orderNumber = await reponseNumero.json();
 
-    /* CRÉER LA COMMANDE — AUCUN PAIEMENT SIMULÉ */
+    if (
+      orderNumber === null ||
+      orderNumber === undefined ||
+      String(orderNumber).trim() === ""
+    ) {
+      throw new Error(
+        "Le numéro de commande reçu est invalide."
+      );
+    }
+
+    /*
+     * CRÉER LA COMMANDE
+     * Le statut reste payment_pending.
+     * AUCUN PAIEMENT N'EST SIMULÉ OU CONFIRMÉ.
+     */
     const commande = {
       order_number: orderNumber,
       buyer_id: user.id,
@@ -8667,19 +8745,31 @@ async function continuerPaiement(listingId) {
       }
     );
 
-    const resultat = await reponse.json();
+    let resultat;
+
+    try {
+      resultat = await reponse.json();
+    } catch (_) {
+      resultat = null;
+    }
 
     if (!reponse.ok) {
-      console.error("Erreur création commande :", resultat);
+      console.error(
+        "Erreur création commande :",
+        resultat
+      );
+
+      const messageErreur =
+        resultat?.message ||
+        resultat?.error_description ||
+        resultat?.hint ||
+        "Erreur Supabase";
+
       alert(
         "Impossible de créer la commande : " +
-        (
-          resultat.message ||
-          resultat.error_description ||
-          resultat.hint ||
-          "erreur Supabase"
-        )
+        messageErreur
       );
+
       return;
     }
 
@@ -8690,12 +8780,25 @@ async function continuerPaiement(listingId) {
     const orderId = commandeCreee?.id;
 
     if (!orderId) {
-      console.error("Commande créée mais ID introuvable :", resultat);
-      alert("La commande a été créée mais son identifiant est introuvable.");
+      console.error(
+        "Commande créée mais ID introuvable :",
+        resultat
+      );
+
+      alert(
+        "La commande semble avoir été créée, " +
+        "mais son identifiant n'a pas été reçu. " +
+        "Ne relance pas immédiatement la demande : " +
+        "vérifie d'abord tes commandes."
+      );
+
       return;
     }
 
-    /* NOTIFICATION DU VENDEUR — SANS CODE DE LIVRAISON */
+    /*
+     * NOTIFICATION DU VENDEUR
+     * Aucun code de livraison dans cette notification.
+     */
     try {
       const notificationMessage =
         "👤 Client : " + nomClient + ". " +
@@ -8703,10 +8806,11 @@ async function continuerPaiement(listingId) {
         "🔢 Quantité : " + quantite +
         (quantite === 1 ? " pièce. " : " pièces. ") +
         "💰 Montant total : " +
-        Number(prix).toLocaleString("fr-FR") + " GNF. " +
+        Number(prix).toLocaleString("fr-FR") +
+        " GNF. " +
         "🔢 Commande : " + orderNumber + ".";
 
-      await supabaseFetch(
+      const reponseNotification = await supabaseFetch(
         `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
         {
           method: "POST",
@@ -8722,93 +8826,162 @@ async function continuerPaiement(listingId) {
         }
       );
 
-      console.log("✅ Notification nouvelle commande envoyée au vendeur");
+      console.log(
+        "Notification nouvelle commande traitée :",
+        reponseNotification
+      );
     } catch (erreurNotification) {
+      /*
+       * Une erreur de notification ne doit pas
+       * transformer une commande créée en échec.
+       */
       console.error(
-        "⚠️ Notification vendeur non envoyée :",
+        "Notification vendeur non envoyée :",
         erreurNotification
       );
     }
 
-    /* RÉCAPITULATIF DE COMMANDE — PAIEMENT NON CONFIRMÉ */
-    document.getElementById("paymentContent").innerHTML = `
-      <h3>Récapitulatif de la commande</h3>
+    /*
+     * RÉCAPITULATIF DE COMMANDE
+     * Le paiement réel n'est pas encore intégré.
+     */
+    const paymentContent = document.getElementById("paymentContent");
 
-      <p>
-        Article :
-        <strong>${escapeHTML(annonce.title)}</strong>
-      </p>
+    if (paymentContent) {
+      paymentContent.innerHTML = `
+        <h3>Récapitulatif de la commande</h3>
 
-      <p>
-        Numéro de commande :
-        <strong>${escapeHTML(String(orderNumber))}</strong>
-      </p>
+        <p>
+          Article :
+          <strong>${escapeHTML(annonce.title)}</strong>
+        </p>
 
-      <p>
-        Quantité :
-        <strong>${quantite} ${quantite === 1 ? "pièce" : "pièces"}</strong>
-      </p>
+        <p>
+          Numéro de commande :
+          <strong>${escapeHTML(String(orderNumber))}</strong>
+        </p>
 
-      ${
-        Number(prixNegocie) > 0 &&
-        Number(prixNegocie) !== prixPublic
-          ? `
-            <div style="
-              background:#eaf8ef;
-              border:1px solid #bde8ca;
-              color:#087f3f;
-              padding:12px;
-              border-radius:12px;
-              margin:12px 0;
-            ">
-              💰 <strong>Prix négocié accepté</strong><br><br>
-              Prix public unitaire :
-              <span style="text-decoration:line-through;color:#777;">
-                ${formatPrix(prixPublic)}
-              </span>
-              <br>
-              Prix négocié unitaire :
-              <strong>${formatPrix(prixUnitaire)}</strong>
-            </div>
-          `
-          : `
-            <p>
-              Prix unitaire :
-              <strong>${formatPrix(prixUnitaire)}</strong>
-            </p>
-          `
-      }
+        <p>
+          Quantité :
+          <strong>
+            ${quantite}
+            ${quantite === 1 ? "pièce" : "pièces"}
+          </strong>
+        </p>
 
-      <p>
-        Montant total des articles :
-        <strong>${formatPrix(prix)}</strong>
-      </p>
+        ${
+          Number(prixNegocie) > 0 &&
+          Number(prixNegocie) !== prixPublic
+            ? `
+              <div style="
+                background:#eaf8ef;
+                border:1px solid #bde8ca;
+                color:#087f3f;
+                padding:12px;
+                border-radius:12px;
+                margin:12px 0;
+              ">
+                💰 <strong>Prix négocié accepté</strong>
+                <br><br>
 
-      <div class="success">
-        Commission Marché Guinée :
-        <strong>${formatPrix(commission)}</strong> (3 %)
-        <br><br>
-        Montant vendeur après commission :
-        <strong>${formatPrix(montantVendeur)}</strong>
-      </div>
+                Prix public unitaire :
+                <span style="
+                  text-decoration:line-through;
+                  color:#777;
+                ">
+                  ${formatPrix(prixPublic)}
+                </span>
+                <br>
 
-      <p style="font-size:13px;color:#666;line-height:1.5;">
-        Statut : en attente de paiement. Aucun paiement n'a été confirmé.
-        Le paiement réel sera disponible lorsque l'intégration sera opérationnelle.
-      </p>
-    `;
+                Prix négocié unitaire :
+                <strong>${formatPrix(prixUnitaire)}</strong>
+              </div>
+            `
+            : `
+              <p>
+                Prix unitaire :
+                <strong>${formatPrix(prixUnitaire)}</strong>
+              </p>
+            `
+        }
 
-    console.log("Commande créée en attente de paiement :", commandeCreee);
+        <p>
+          Montant total des articles :
+          <strong>${formatPrix(prix)}</strong>
+        </p>
+
+        <div class="success">
+          Commission Marché Guinée :
+          <strong>${formatPrix(commission)}</strong> (3 %)
+          <br><br>
+
+          Montant vendeur après commission :
+          <strong>${formatPrix(montantVendeur)}</strong>
+        </div>
+
+        <div style="
+          background:#fff8e6;
+          border:1px solid #f0d58a;
+          color:#704d00;
+          padding:12px;
+          border-radius:10px;
+          margin-top:12px;
+          font-size:13px;
+          line-height:1.6;
+        ">
+          <strong>⏳ En attente de paiement</strong>
+          <br><br>
+
+          Ta commande est enregistrée.
+          Aucun paiement n'a été confirmé.
+          <br><br>
+
+          Le paiement réel sera disponible
+          lorsque l'intégration sera opérationnelle.
+        </div>
+      `;
+    }
+
+    console.log(
+      "Commande créée en attente de paiement :",
+      commandeCreee
+    );
 
   } catch (erreur) {
-    console.error("Erreur création commande :", erreur);
+    console.error(
+      "Erreur création commande :",
+      erreur
+    );
+
     alert(
-      "ERREUR : " +
+      "Erreur lors de la création de la commande : " +
       (
         erreur?.message ||
-        JSON.stringify(erreur)
+        "Une erreur inattendue est survenue."
       )
     );
+
+  } finally {
+    /*
+     * TOUJOURS LIBÉRER LE VERROU
+     * ET RESTAURER LE BOUTON SI CELUI-CI EXISTE ENCORE.
+     */
+    if (
+      window.mgCommandesEnCours instanceof Set
+    ) {
+      window.mgCommandesEnCours.delete(cleCommande);
+    }
+
+    if (
+      boutonContinuer &&
+      boutonContinuer.isConnected
+    ) {
+      boutonContinuer.disabled = false;
+      boutonContinuer.textContent = texteBoutonOriginal;
+      boutonContinuer.removeAttribute("aria-busy");
+      boutonContinuer.style.opacity = "";
+      boutonContinuer.style.cursor = "";
+    }
   }
 }
  
