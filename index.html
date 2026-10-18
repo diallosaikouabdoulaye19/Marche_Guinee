@@ -26659,11 +26659,11 @@ display: none !important;
 </script>
 <!-- FIN MESSAGERIE MODERNE 2026 -->
 
-  <script>
+<script>
 /* =====================================================
    MARCHÉ GUINÉE 🇬🇳
-   Négociation compacte avec bouton ouvrir/fermer
-   Conserve les fonctions de prix et Supabase existantes
+   PREMIÈRE FENÊTRE DE NÉGOCIATION — CENTRAGE
+   Ne modifie pas le formulaire central existant.
    ===================================================== */
 (function () {
   "use strict";
@@ -26671,6 +26671,38 @@ display: none !important;
   var ID_BOUTON = "mgPriceToggleButton";
   var ID_PANEL = "priceOfferPanel";
   var ID_ACTIONS = "mgChat2026Actions";
+
+  function centrerPanneau(panel) {
+    if (!panel) return;
+
+    panel.style.setProperty("position", "fixed", "important");
+    panel.style.setProperty("left", "50%", "important");
+    panel.style.setProperty("top", "50%", "important");
+    panel.style.setProperty("right", "auto", "important");
+    panel.style.setProperty("bottom", "auto", "important");
+    panel.style.setProperty(
+      "transform",
+      "translate(-50%, -50%)",
+      "important"
+    );
+    panel.style.setProperty("width", "min(88vw, 420px)", "important");
+    panel.style.setProperty("max-width", "88vw", "important");
+    panel.style.setProperty("max-height", "50vh", "important");
+    panel.style.setProperty("overflow-y", "auto", "important");
+    panel.style.setProperty("overflow-x", "hidden", "important");
+    panel.style.setProperty("box-sizing", "border-box", "important");
+    panel.style.setProperty("padding", "16px", "important");
+    panel.style.setProperty("margin", "0", "important");
+    panel.style.setProperty("border", "1px solid #e4ebe6", "important");
+    panel.style.setProperty("border-radius", "18px", "important");
+    panel.style.setProperty("background", "#ffffff", "important");
+    panel.style.setProperty(
+      "box-shadow",
+      "0 18px 50px rgba(0,0,0,.22)",
+      "important"
+    );
+    panel.style.setProperty("z-index", "100001", "important");
+  }
 
   function preparerBoutonPrix() {
     var panel = document.getElementById(ID_PANEL);
@@ -26713,10 +26745,11 @@ display: none !important;
           bouton.getAttribute("aria-expanded") === "true";
 
         if (estOuvert) {
-          panneau.style.display = "none";
+          panneau.style.setProperty("display", "none", "important");
           bouton.setAttribute("aria-expanded", "false");
         } else {
-          panneau.style.display = "block";
+          centrerPanneau(panneau);
+          panneau.style.setProperty("display", "block", "important");
           bouton.setAttribute("aria-expanded", "true");
         }
       });
@@ -26735,25 +26768,21 @@ display: none !important;
 
     if (!panel.dataset.mgCompactReady) {
       panel.dataset.mgCompactReady = "1";
-      panel.style.display = "none";
+      panel.style.setProperty("display", "none", "important");
       bouton.setAttribute("aria-expanded", "false");
     }
 
-    panel.style.width = "100%";
-    panel.style.maxWidth = "100%";
-    panel.style.boxSizing = "border-box";
+    centrerPanneau(panel);
 
     if (bouton.parentElement !== zone) {
       zone.appendChild(bouton);
     }
 
-    if (panel.parentElement !== zone) {
-      zone.appendChild(panel);
-    }
-
-    if (bouton.nextElementSibling !== panel) {
-      zone.insertBefore(panel, bouton.nextElementSibling);
-    }
+    /*
+     * IMPORTANT :
+     * Ne pas déplacer le panneau dans la barre d'actions.
+     * Son positionnement fixe le centre sur l'écran.
+     */
   }
 
   var minuterie = null;
