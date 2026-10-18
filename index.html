@@ -26752,7 +26752,8 @@ display: none !important;
 <!-- =====================================================
      MARCHÉ GUINÉE 🇬🇳
      RÉSERVATION TEMPORAIRE — COMPTE À REBOURS
-     Préserve les fonctions existantes et les 4 boutons.
+     Version corrigée : sélecteurs réels + vérifications isolées
+     Préserve les autres fonctions et les boutons existants.
      ===================================================== -->
 <script id="mg-reservation-countdown">
 (function () {
@@ -26762,13 +26763,17 @@ display: none !important;
   window.mgReservationCountdownInstalled = true;
 
   var ancienneOuverture = window.ouvrirDetailAnnonce;
+
   var timerAffichage = null;
   var timerVerification = null;
   var generation = 0;
+
   var heureServeur = null;
   var instantLocalReference = 0;
   var annonceCourante = null;
-  var verificationEnCours = false;
+
+  // Chaque annonce possède sa propre vérification.
+  var verificationsEnCours = new Set();
 
   if (typeof ancienneOuverture !== "function") {
     console.warn(
@@ -26777,9 +26782,15 @@ display: none !important;
     return;
   }
 
+  /* =========================================
+     STYLE DU COMPTE À REBOURS
+     ========================================= */
+
   var style = document.createElement("style");
+
   style.textContent = `
     .mg-reservation-box {
+      display: block;
       margin: 14px 0;
       padding: 16px;
       border: 1px solid #f1d48a;
@@ -26787,6 +26798,8 @@ display: none !important;
       background: linear-gradient(135deg, #fff9e8, #fffdf7);
       color: #594313;
       line-height: 1.5;
+      box-sizing: border-box;
+      width: 100%;
     }
 
     .mg-reservation-title {
@@ -26803,10 +26816,11 @@ display: none !important;
     .mg-reservation-countdown {
       display: block;
       margin: 12px 0 8px;
-      font-size: 22px;
+      font-size: clamp(19px, 5vw, 24px);
       font-weight: 900;
       color: #087f3f;
       letter-spacing: .3px;
+      overflow-wrap: anywhere;
     }
 
     .mg-reservation-note {
@@ -26820,17 +26834,23 @@ display: none !important;
       color: #812b2b;
     }
 
-    .mg-reservation-box.is-unavailable .mg-reservation-title {
+    .mg-reservation-box.is-unavailable
+    .mg-reservation-title {
       color: #a32121;
     }
 
-    .mg-detail-buy:disabled {
+    #detailContent button[onclick*="ouvrirPaiement"]:disabled {
       opacity: .55 !important;
       cursor: not-allowed !important;
       filter: grayscale(.25);
     }
   `;
+
   document.head.appendChild(style);
+
+  /* =========================================
+     CONNEXION SUPABASE
+     ========================================= */
 
   function obtenirBaseSupabase() {
     try {
@@ -26847,17 +26867,27 @@ display: none !important;
       throw new Error("Connexion Supabase indisponible.");
     }
 
-    return await window.supabaseFetch(url, options || {});
+    return await window.supabaseFetch(
+      url,
+      options || {}
+    );
   }
+
+  /* =========================================
+     CHARGER L'ÉTAT ACTUEL DE L'ANNONCE
+     ========================================= */
 
   async function chargerEtatAnnonce(id) {
     var base = obtenirBaseSupabase();
 
     if (!base) {
-      throw new Error("Configuration Supabase indisponible.");
+      throw new Error(
+        "Configuration Supabase indisponible."
+      );
     }
 
-    var url = base +
+    var url =
+      base +
       "/rest/v1/listings" +
       "?select=id,status,paused_at,pause_reason,pause_order_id" +
       "&id=eq." + encodeURIComponent(id) +
@@ -26866,17 +26896,25 @@ display: none !important;
     var lignes = await requete(url);
 
     if (!Array.isArray(lignes) || !lignes.length) {
-      throw new Error("Annonce introuvable ou indisponible.");
+      throw new Error(
+        "Annonce introuvable ou indisponible."
+      );
     }
 
     return lignes[0];
   }
 
+  /* =========================================
+     HEURE DU SERVEUR
+     ========================================= */
+
   async function obtenirHeureServeur() {
     var base = obtenirBaseSupabase();
 
     if (!base) {
-      throw new Error("Configuration Supabase indisponible.");
+      throw new Error(
+        "Configuration Supabase indisponible."
+      );
     }
 
     var resultat = await requete(
@@ -26908,7 +26946,9 @@ display: none !important;
     var date = new Date(valeur);
 
     if (!valeur || isNaN(date.getTime())) {
-      throw new Error("Heure du serveur indisponible.");
+      throw new Error(
+        "Heure du serveur indisponible."
+      );
     }
 
     heureServeur = date.getTime();
@@ -26918,44 +26958,54 @@ display: none !important;
   }
 
   function maintenantServeurEstime() {
-    if (heureServeur === null) return null;
+    if (heureServeur === null) {
+      return null;
+    }
 
-    return heureServeur +
-      (Date.now() - instantLocalReference);
+    return (
+      heureServeur +
+      (Date.now() - instantLocalReference)
+    );
   }
 
+  /* =========================================
+     GESTION DES MINUTERIES
+     ========================================= */
+
   function arreterMinuteries() {
-    if (timerAffichage) {
+    if (timerAffichage !== null) {
       clearInterval(timerAffichage);
       timerAffichage = null;
     }
 
-    if (timerVerification) {
+    if (timerVerification !== null) {
       clearInterval(timerVerification);
       timerVerification = null;
     }
   }
 
+  /* =========================================
+     SÉLECTEURS CORRIGÉS
+     Utilisation du véritable HTML existant.
+     ========================================= */
+
   function trouverBoutonAcheter() {
-    var page = document.querySelector(
-      "#detailContent .mg-detail-page"
-    );
-
-    if (!page) return null;
-
-    return page.querySelector(
-      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
+    return document.querySelector(
+      '#detailContent button[onclick*="ouvrirPaiement"]'
     );
   }
 
   function trouverZoneDetail() {
-    return document.querySelector(
-      "#detailContent .mg-detail-scroll"
-    );
+    return document.getElementById("detailContent");
   }
+
+  /* =========================================
+     CRÉATION DU BLOC D'AFFICHAGE
+     ========================================= */
 
   function creerMessage() {
     var zone = trouverZoneDetail();
+
     if (!zone) return null;
 
     var box = document.getElementById(
@@ -26969,15 +27019,22 @@ display: none !important;
 
     if (!box) {
       box = document.createElement("div");
+
       box.id = "mgReservationCountdownBox";
       box.className = "mg-reservation-box";
 
-      var description = zone.querySelector(
-        ".mg-detail-description"
-      );
+      var boutonAcheter = trouverBoutonAcheter();
 
-      if (description) {
-        zone.insertBefore(box, description);
+      if (
+        boutonAcheter &&
+        boutonAcheter.parentElement &&
+        zone.contains(boutonAcheter.parentElement)
+      ) {
+        // Affiche le compteur juste avant la zone des boutons.
+        zone.insertBefore(
+          box,
+          boutonAcheter.parentElement
+        );
       } else {
         zone.appendChild(box);
       }
@@ -26986,60 +27043,99 @@ display: none !important;
     return box;
   }
 
+  /* =========================================
+     AFFICHER UNE INDISPONIBILITÉ
+     ========================================= */
+
   function afficherIndisponible(message) {
     var bouton = trouverBoutonAcheter();
 
     if (bouton) {
       bouton.disabled = true;
-      bouton.setAttribute("aria-disabled", "true");
-      bouton.title = "Cette annonce n'est pas disponible.";
+
+      bouton.setAttribute(
+        "aria-disabled",
+        "true"
+      );
+
+      bouton.title =
+        "Cette annonce n'est pas disponible.";
     }
 
     var box = creerMessage();
+
     if (!box) return;
 
     box.className =
       "mg-reservation-box is-unavailable";
 
-    box.innerHTML = "";
+    box.replaceChildren();
 
     var titre = document.createElement("div");
+
     titre.className = "mg-reservation-title";
-    titre.textContent = "📦 Annonce indisponible";
+    titre.textContent =
+      "📦 Annonce indisponible";
 
     var texte = document.createElement("div");
-    texte.className = "mg-reservation-description";
+
+    texte.className =
+      "mg-reservation-description";
+
     texte.textContent = message;
 
     box.appendChild(titre);
     box.appendChild(texte);
   }
 
+  /* =========================================
+     FORMAT DU TEMPS RESTANT
+     ========================================= */
+
   function formaterTemps(secondes) {
-    secondes = Math.max(0, Math.floor(secondes));
+    secondes = Math.max(
+      0,
+      Math.floor(secondes)
+    );
 
-    var heures = Math.floor(secondes / 3600);
-    var minutes = Math.floor((secondes % 3600) / 60);
-    var secondesRestantes = secondes % 60;
+    var heures = Math.floor(
+      secondes / 3600
+    );
 
-    return String(heures).padStart(2, "0") +
+    var minutes = Math.floor(
+      (secondes % 3600) / 60
+    );
+
+    var secondesRestantes =
+      secondes % 60;
+
+    return (
+      String(heures).padStart(2, "0") +
       " h " +
       String(minutes).padStart(2, "0") +
       " min " +
       String(secondesRestantes).padStart(2, "0") +
-      " s";
+      " s"
+    );
   }
+
+  /* =========================================
+     AFFICHER LE COMPTE À REBOURS
+     ========================================= */
 
   function afficherCompteARebours(dateLimite) {
     var box = creerMessage();
+
     if (!box) return;
 
-    var maintenant = maintenantServeurEstime();
+    var maintenant =
+      maintenantServeurEstime();
 
     if (maintenant === null) {
       afficherIndisponible(
         "Vérification de la disponibilité en cours. Réessaie dans quelques instants."
       );
+
       return;
     }
 
@@ -27049,14 +27145,21 @@ display: none !important;
 
     if (secondes <= 0) {
       box.className = "mg-reservation-box";
-      box.innerHTML = "";
+      box.replaceChildren();
 
       var titre = document.createElement("div");
-      titre.className = "mg-reservation-title";
-      titre.textContent = "⏳ Vérification de disponibilité";
+
+      titre.className =
+        "mg-reservation-title";
+
+      titre.textContent =
+        "⏳ Vérification de disponibilité";
 
       var texte = document.createElement("div");
-      texte.className = "mg-reservation-description";
+
+      texte.className =
+        "mg-reservation-description";
+
       texte.textContent =
         "Le délai est écoulé. Nous vérifions si l'annonce est de nouveau disponible.";
 
@@ -27067,77 +27170,147 @@ display: none !important;
 
       if (bouton) {
         bouton.disabled = true;
-        bouton.setAttribute("aria-disabled", "true");
+
+        bouton.setAttribute(
+          "aria-disabled",
+          "true"
+        );
       }
 
       return;
     }
 
     box.className = "mg-reservation-box";
-    box.innerHTML = "";
+    box.replaceChildren();
 
     var titre = document.createElement("div");
-    titre.className = "mg-reservation-title";
-    titre.textContent = "⏳ Bientôt disponible";
 
-    var description = document.createElement("div");
-    description.className = "mg-reservation-description";
+    titre.className =
+      "mg-reservation-title";
+
+    titre.textContent =
+      "⏳ Bientôt disponible";
+
+    var description =
+      document.createElement("div");
+
+    description.className =
+      "mg-reservation-description";
+
     description.textContent =
       "Cet article est temporairement réservé.";
 
-    var compteur = document.createElement("span");
-    compteur.className = "mg-reservation-countdown";
-    compteur.textContent = formaterTemps(secondes);
-    compteur.setAttribute("aria-live", "off");
+    var compteur =
+      document.createElement("span");
+
+    compteur.className =
+      "mg-reservation-countdown";
+
+    compteur.textContent =
+      formaterTemps(secondes);
+
+    compteur.setAttribute(
+      "aria-live",
+      "off"
+    );
 
     var note = document.createElement("div");
-    note.className = "mg-reservation-note";
+
+    note.className =
+      "mg-reservation-note";
+
     note.textContent =
-      "Reste attentif : si la commande n'aboutit pas, tu pourras tenter de l'acheter.";
+      "Si la commande n'aboutit pas et qu'aucun paiement réel n'est confirmé, l'annonce pourra être libérée automatiquement après le délai prévu.";
 
     box.appendChild(titre);
     box.appendChild(description);
     box.appendChild(compteur);
     box.appendChild(note);
 
-    var boutonAcheter = trouverBoutonAcheter();
+    var boutonAcheter =
+      trouverBoutonAcheter();
 
     if (boutonAcheter) {
       boutonAcheter.disabled = true;
-      boutonAcheter.setAttribute("aria-disabled", "true");
+
+      boutonAcheter.setAttribute(
+        "aria-disabled",
+        "true"
+      );
+
       boutonAcheter.title =
         "Article temporairement réservé.";
     }
   }
 
-  async function verifierDisponibilite(id, numeroGeneration) {
-    if (verificationEnCours) return;
-    verificationEnCours = true;
+  /* =========================================
+     VÉRIFIER LA DISPONIBILITÉ
+     Les vérifications de différentes annonces
+     ne se bloquent plus mutuellement.
+     ========================================= */
+
+  async function verifierDisponibilite(
+    id,
+    numeroGeneration
+  ) {
+    var cleVerification =
+      String(numeroGeneration) +
+      "::" +
+      String(id);
+
+    if (
+      verificationsEnCours.has(
+        cleVerification
+      )
+    ) {
+      return;
+    }
+
+    verificationsEnCours.add(
+      cleVerification
+    );
 
     try {
-      var etat = await chargerEtatAnnonce(id);
+      var etat =
+        await chargerEtatAnnonce(id);
 
-      if (numeroGeneration !== generation) return;
+      if (numeroGeneration !== generation) {
+        return;
+      }
+
+      /* ANNONCE ACTIVE */
 
       if (etat.status === "active") {
         arreterMinuteries();
 
-        var box = document.getElementById(
-          "mgReservationCountdownBox"
-        );
+        var boxActive =
+          document.getElementById(
+            "mgReservationCountdownBox"
+          );
 
-        if (box) box.remove();
+        if (boxActive) {
+          boxActive.remove();
+        }
 
-        var bouton = trouverBoutonAcheter();
+        var boutonActif =
+          trouverBoutonAcheter();
 
-        if (bouton) {
-          bouton.disabled = false;
-          bouton.removeAttribute("aria-disabled");
-          bouton.removeAttribute("title");
+        if (boutonActif) {
+          boutonActif.disabled = false;
+
+          boutonActif.removeAttribute(
+            "aria-disabled"
+          );
+
+          boutonActif.removeAttribute(
+            "title"
+          );
         }
 
         return;
       }
+
+      /* ANNONCE VENDUE */
 
       if (etat.status === "sold") {
         arreterMinuteries();
@@ -27149,58 +27322,91 @@ display: none !important;
         return;
       }
 
+      /* RÉSERVATION TEMPORAIRE VALIDE */
+
       if (
         etat.status === "paused" &&
         etat.pause_reason === "pending_order" &&
-        etat.paused_at
+        etat.paused_at &&
+        etat.pause_order_id
       ) {
-        var debut = new Date(etat.paused_at).getTime();
+        var debut =
+          new Date(
+            etat.paused_at
+          ).getTime();
 
         if (isNaN(debut)) {
           afficherIndisponible(
-            "La réservation est en cours de vérification."
+            "La date de réservation est invalide. La disponibilité doit être vérifiée."
           );
+
           return;
         }
 
         try {
           await obtenirHeureServeur();
 
-          if (numeroGeneration !== generation) return;
+          if (numeroGeneration !== generation) {
+            return;
+          }
 
-          var limite = debut + 10 * 60 * 60 * 1000;
+          var limite =
+            debut +
+            10 * 60 * 60 * 1000;
 
           afficherCompteARebours(limite);
 
-          if (!timerAffichage) {
-            timerAffichage = setInterval(function () {
-              if (numeroGeneration !== generation) {
-                arreterMinuteries();
-                return;
-              }
+          if (timerAffichage === null) {
+            timerAffichage = setInterval(
+              function () {
+                if (
+                  numeroGeneration !== generation
+                ) {
+                  arreterMinuteries();
+                  return;
+                }
 
-              afficherCompteARebours(limite);
-            }, 1000);
+                afficherCompteARebours(
+                  limite
+                );
+              },
+              1000
+            );
           }
 
-          if (!timerVerification) {
-            timerVerification = setInterval(function () {
-              verifierDisponibilite(id, numeroGeneration);
-            }, 15000);
+          if (timerVerification === null) {
+            timerVerification = setInterval(
+              function () {
+                verifierDisponibilite(
+                  id,
+                  numeroGeneration
+                );
+              },
+              15000
+            );
           }
         } catch (erreurHeure) {
-          afficherIndisponible(
-            "Impossible de vérifier l'heure du serveur. L'achat reste bloqué jusqu'à confirmation de disponibilité."
+          console.warn(
+            "Heure du serveur indisponible :",
+            erreurHeure
           );
+
+          if (numeroGeneration === generation) {
+            afficherIndisponible(
+              "Impossible de vérifier l'heure du serveur. L'achat reste bloqué jusqu'à confirmation de disponibilité."
+            );
+          }
         }
 
         return;
       }
 
+      /* PAUSE VOLONTAIRE OU DONNÉES INCOMPLÈTES */
+
       arreterMinuteries();
 
       afficherIndisponible(
-        "Cette annonce est en pause ou n'est pas disponible pour le moment."
+        "Cette annonce est en pause ou n'a pas de réservation valide enregistrée."
       );
 
     } catch (erreur) {
@@ -27214,41 +27420,77 @@ display: none !important;
           "La disponibilité n'a pas pu être vérifiée. Réessaie dans quelques instants."
         );
       }
+
     } finally {
-      verificationEnCours = false;
+      verificationsEnCours.delete(
+        cleVerification
+      );
     }
   }
 
+  /* =========================================
+     OUVERTURE DE LA FICHE D'ANNONCE
+     Préserve la fonction d'origine.
+     ========================================= */
+
   window.ouvrirDetailAnnonce = async function (id) {
     generation++;
+
     var numeroGeneration = generation;
 
     arreterMinuteries();
+
     heureServeur = null;
     annonceCourante = id;
 
-    await ancienneOuverture.apply(this, arguments);
+    // Exécute la fonction d'origine sans la remplacer.
+    await ancienneOuverture.apply(
+      this,
+      arguments
+    );
 
-    if (numeroGeneration !== generation) return;
+    if (numeroGeneration !== generation) {
+      return;
+    }
 
-    await verifierDisponibilite(id, numeroGeneration);
+    await verifierDisponibilite(
+      id,
+      numeroGeneration
+    );
   };
 
-  document.addEventListener("visibilitychange", function () {
-    if (
-      !document.hidden &&
-      annonceCourante &&
-      document.getElementById("detailModal") &&
-      document.getElementById("detailModal").style.display !== "none"
-    ) {
-      heureServeur = null;
-      verifierDisponibilite(annonceCourante, generation);
+  /* =========================================
+     RETOUR DANS L'APPLICATION
+     ========================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    function () {
+      var modal =
+        document.getElementById(
+          "detailModal"
+        );
+
+      if (
+        !document.hidden &&
+        annonceCourante &&
+        modal &&
+        modal.style.display !== "none"
+      ) {
+        heureServeur = null;
+
+        verifierDisponibilite(
+          annonceCourante,
+          generation
+        );
+      }
     }
-  });
+  );
 
   console.log(
-    "Marché Guinée : contrôle de réservation et compte à rebours installés."
+    "Marché Guinée : compte à rebours corrigé et contrôle de réservation installés."
   );
+
 })();
 </script>
   
