@@ -26640,17 +26640,22 @@ display: none !important;
 <script>
 /* =====================================================
    MARCHÉ GUINÉE 🇬🇳
-   BOUTON DE NÉGOCIATION
-   Ouverture et fermeture du panneau
+   NÉGOCIATION — CORRECTION DU CLIC
+   Bouton stable, panneau centré et affichage contrôlé
    ===================================================== */
 (function () {
   "use strict";
 
+  if (window.__MG_PRICE_TOGGLE_V2__) return;
+  window.__MG_PRICE_TOGGLE_V2__ = true;
+
   var ID_BOUTON = "mgPriceToggleButton";
   var ID_PANEL = "priceOfferPanel";
   var ID_ACTIONS = "mgChat2026Actions";
-  var minuterie = null;
+
   var observateur = null;
+  var minuterie = null;
+  var chargementEnCours = false;
 
   function centrerPanneau(panel) {
     if (!panel) return;
@@ -26660,11 +26665,13 @@ display: none !important;
     panel.style.setProperty("top", "50%", "important");
     panel.style.setProperty("right", "auto", "important");
     panel.style.setProperty("bottom", "auto", "important");
+
     panel.style.setProperty(
       "transform",
       "translate(-50%, -50%)",
       "important"
     );
+
     panel.style.setProperty("width", "min(88vw, 420px)", "important");
     panel.style.setProperty("max-width", "88vw", "important");
     panel.style.setProperty("max-height", "70vh", "important");
@@ -26676,12 +26683,32 @@ display: none !important;
     panel.style.setProperty("border", "1px solid #e4ebe6", "important");
     panel.style.setProperty("border-radius", "18px", "important");
     panel.style.setProperty("background", "#ffffff", "important");
+
     panel.style.setProperty(
       "box-shadow",
       "0 18px 50px rgba(0,0,0,.22)",
       "important"
     );
+
     panel.style.setProperty("z-index", "100001", "important");
+  }
+
+  function obtenirTexteBouton(panel) {
+    if (!panel) return "💰 Négociation";
+
+    if (panel.querySelector(".price-offer-btn")) {
+      return "💰 Proposer un prix";
+    }
+
+    if (
+      panel.querySelector(
+        ".price-offer-accept, .price-offer-reject, .price-offer-price"
+      )
+    ) {
+      return "💰 Voir la proposition";
+    }
+
+    return "💰 Négociation";
   }
 
   function preparerBoutonPrix() {
@@ -26695,9 +26722,11 @@ display: none !important;
 
     if (!bouton) {
       bouton = document.createElement("button");
+
       bouton.id = ID_BOUTON;
       bouton.type = "button";
       bouton.setAttribute("aria-expanded", "false");
+
       bouton.style.cssText =
         "display:inline-flex;" +
         "align-items:center;" +
@@ -26716,60 +26745,113 @@ display: none !important;
         "flex:0 0 auto;";
     }
 
-    if (!bouton.dataset.mgPriceClickInstalled) {
-      bouton.addEventListener("click", function () {
-        var panneau = document.getElementById(ID_PANEL);
-        if (!panneau) return;
-
-        var estOuvert =
-          bouton.getAttribute("aria-expanded") === "true";
-
-        if (estOuvert) {
-          panneau.style.setProperty("display", "none", "important");
-          bouton.setAttribute("aria-expanded", "false");
-          return;
-        }
-
-        centrerPanneau(panneau);
-        panneau.style.setProperty("display", "block", "important");
-        bouton.setAttribute("aria-expanded", "true");
-      });
-
-      bouton.dataset.mgPriceClickInstalled = "1";
-    }
-
     var panel = document.getElementById(ID_PANEL);
 
+    var nouveauTexte = obtenirTexteBouton(panel);
+
+    /*
+     * Ne modifier le texte que s'il a réellement changé.
+     * Cela évite de relancer continuellement l'observateur.
+     */
+    if (bouton.textContent !== nouveauTexte) {
+      bouton.textContent = nouveauTexte;
+    }
+
+    /*
+     * Le panneau est initialement fermé.
+     * Ne pas réinitialiser son état à chaque vérification.
+     */
+    if (panel && !panel.dataset.mgToggleInitialized) {
+      panel.style.setProperty("display", "none", "important");
+      panel.dataset.mgToggleInitialized = "1";
+      bouton.setAttribute("aria-expanded", "false");
+    }
+
     if (panel) {
-      var boutonVendeur = !!panel.querySelector(".price-offer-btn");
-      var aUneOffre = !!panel.querySelector(
-        ".price-offer-accept, .price-offer-reject, .price-offer-price"
-      );
-
-      bouton.textContent = boutonVendeur
-        ? "💰 Proposer un prix"
-        : aUneOffre
-          ? "💰 Voir la proposition"
-          : "💰 Négociation";
-
       centrerPanneau(panel);
-
-      /*
-       * Ne pas réinitialiser display à chaque vérification :
-       * cela empêcherait le panneau de rester ouvert.
-       */
-      if (!panel.dataset.mgToggleInitialized) {
-        panel.style.setProperty("display", "none", "important");
-        panel.dataset.mgToggleInitialized = "1";
-        bouton.setAttribute("aria-expanded", "false");
-      }
-    } else {
-      bouton.textContent = "💰 Négociation";
     }
 
     if (bouton.parentElement !== zone) {
       zone.appendChild(bouton);
     }
+  }
+
+  async function basculerPanneau(bouton) {
+    if (!bouton) return;
+
+    var panel = document.getElementById(ID_PANEL);
+
+    /*
+     * Si le panneau n'existe pas encore, tenter de charger
+     * la proposition avec la fonction déjà présente dans l'app.
+     */
+    if (!panel && !chargementEnCours) {
+      if (typeof window.chargerPropositionsPrix === "function") {
+        chargementEnCours = true;
+
+        try {
+          await window.chargerPropositionsPrix();
+        } catch (error) {
+          console.error(
+            "Erreur de chargement de la négociation :",
+            error
+          );
+        } finally {
+          chargementEnCours = false;
+        }
+
+        panel = document.getElementById(ID_PANEL);
+      }
+    }
+
+    if (!panel) {
+      preparerBoutonPrix();
+      return;
+    }
+
+    /*
+     * Lire l'état réel du panneau plutôt que de se fier
+     * uniquement à aria-expanded.
+     */
+    var estVisible =
+      window.getComputedStyle(panel).display !== "none" &&
+      window.getComputedStyle(panel).visibility !== "hidden";
+
+    if (estVisible) {
+      panel.style.setProperty("display", "none", "important");
+      bouton.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    centrerPanneau(panel);
+    panel.style.setProperty("display", "block", "important");
+    bouton.setAttribute("aria-expanded", "true");
+  }
+
+  /*
+   * Gestionnaire délégué : il fonctionne même si le bouton
+   * est déplacé ou recréé par la mise en page de la messagerie.
+   */
+  if (!document.documentElement.dataset.mgPriceDelegatedClick) {
+    document.documentElement.dataset.mgPriceDelegatedClick = "1";
+
+    document.addEventListener("click", function (event) {
+      var cible = event.target;
+
+      if (!cible || typeof cible.closest !== "function") return;
+
+      var bouton = cible.closest("#" + ID_BOUTON);
+      if (!bouton) return;
+
+      event.preventDefault();
+
+      basculerPanneau(bouton).catch(function (error) {
+        console.error(
+          "Erreur lors de l'ouverture de la négociation :",
+          error
+        );
+      });
+    });
   }
 
   function programmerVerification() {
@@ -26778,7 +26860,7 @@ display: none !important;
     minuterie = setTimeout(function () {
       minuterie = null;
       preparerBoutonPrix();
-    }, 150);
+    }, 200);
   }
 
   function installer() {
@@ -26805,6 +26887,7 @@ display: none !important;
   }
 
   window.addEventListener("load", installer);
+
 })();
 </script>
   
