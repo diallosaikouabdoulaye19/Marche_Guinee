@@ -27000,7 +27000,9 @@ display: none !important;
 }
 
 function trouverZoneDetail() {
-  return document.getElementById("detailContent");
+  return document.querySelector(
+    "#detailContent .mg-detail-scroll"
+  );
 }
 
 /* =========================================
