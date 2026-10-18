@@ -26639,8 +26639,8 @@ display: none !important;
 <script>
 /* =====================================================
    MARCHÉ GUINÉE 🇬🇳
-   PREMIÈRE FENÊTRE DE NÉGOCIATION — CENTRAGE
-   Ne modifie pas le formulaire central existant.
+   BOUTON DE NÉGOCIATION — VERSION CORRIGÉE
+   Bouton dans la barre d'actions, panneau centré
    ===================================================== */
 (function () {
   "use strict";
@@ -26648,9 +26648,15 @@ display: none !important;
   var ID_BOUTON = "mgPriceToggleButton";
   var ID_PANEL = "priceOfferPanel";
   var ID_ACTIONS = "mgChat2026Actions";
+  var minuterie = null;
+  var observateur = null;
 
   function centrerPanneau(panel) {
     if (!panel) return;
+
+    if (panel.parentElement !== document.body) {
+      document.body.appendChild(panel);
+    }
 
     panel.style.setProperty("position", "fixed", "important");
     panel.style.setProperty("left", "50%", "important");
@@ -26664,7 +26670,7 @@ display: none !important;
     );
     panel.style.setProperty("width", "min(88vw, 420px)", "important");
     panel.style.setProperty("max-width", "88vw", "important");
-    panel.style.setProperty("max-height", "50vh", "important");
+    panel.style.setProperty("max-height", "70vh", "important");
     panel.style.setProperty("overflow-y", "auto", "important");
     panel.style.setProperty("overflow-x", "hidden", "important");
     panel.style.setProperty("box-sizing", "border-box", "important");
@@ -26682,10 +26688,8 @@ display: none !important;
   }
 
   function preparerBoutonPrix() {
-    var panel = document.getElementById(ID_PANEL);
     var actions = document.getElementById(ID_ACTIONS);
-
-    if (!panel || !actions) return;
+    if (!actions) return;
 
     var zone = actions.querySelector(".mg-chat-actions-right");
     if (!zone) return;
@@ -26712,7 +26716,8 @@ display: none !important;
         "font-size:13px;" +
         "font-weight:800;" +
         "white-space:nowrap;" +
-        "cursor:pointer;";
+        "cursor:pointer;" +
+        "flex:0 0 auto;";
 
       bouton.addEventListener("click", function () {
         var panneau = document.getElementById(ID_PANEL);
@@ -26732,37 +26737,36 @@ display: none !important;
       });
     }
 
-    var boutonVendeur = !!panel.querySelector(".price-offer-btn");
-    var aUneOffre = !!panel.querySelector(
-      ".price-offer-accept, .price-offer-reject, .price-offer-price"
-    );
+    var panel = document.getElementById(ID_PANEL);
 
-    bouton.textContent = boutonVendeur
-      ? "💰 Proposer un prix"
-      : aUneOffre
-        ? "💰 Voir la proposition"
-        : "💰 Négociation";
+    if (panel) {
+      var boutonVendeur = !!panel.querySelector(".price-offer-btn");
+      var aUneOffre = !!panel.querySelector(
+        ".price-offer-accept, .price-offer-reject, .price-offer-price"
+      );
 
-    if (!panel.dataset.mgCompactReady) {
-      panel.dataset.mgCompactReady = "1";
-      panel.style.setProperty("display", "none", "important");
+      bouton.textContent = boutonVendeur
+        ? "💰 Proposer un prix"
+        : aUneOffre
+          ? "💰 Voir la proposition"
+          : "💰 Négociation";
+
+      if (!panel.dataset.mgCompactReady) {
+        panel.dataset.mgCompactReady = "1";
+        panel.style.setProperty("display", "none", "important");
+        bouton.setAttribute("aria-expanded", "false");
+      }
+
+      centrerPanneau(panel);
+    } else {
+      bouton.textContent = "💰 Négociation";
       bouton.setAttribute("aria-expanded", "false");
     }
-
-    centrerPanneau(panel);
 
     if (bouton.parentElement !== zone) {
       zone.appendChild(bouton);
     }
-
-    /*
-     * IMPORTANT :
-     * Ne pas déplacer le panneau dans la barre d'actions.
-     * Son positionnement fixe le centre sur l'écran.
-     */
   }
-
-  var minuterie = null;
 
   function programmerVerification() {
     if (minuterie) clearTimeout(minuterie);
@@ -26770,22 +26774,19 @@ display: none !important;
     minuterie = setTimeout(function () {
       minuterie = null;
       preparerBoutonPrix();
-    }, 100);
+    }, 150);
   }
 
   function installer() {
     preparerBoutonPrix();
 
-    var modal = document.getElementById("messagesModal");
-    if (!modal || modal.dataset.mgPriceToggleInstalled) return;
+    if (observateur || !document.body) return;
 
-    modal.dataset.mgPriceToggleInstalled = "1";
-
-    var observateur = new MutationObserver(function () {
+    observateur = new MutationObserver(function () {
       programmerVerification();
     });
 
-    observateur.observe(modal, {
+    observateur.observe(document.body, {
       childList: true,
       subtree: true
     });
