@@ -8920,9 +8920,77 @@ async function continuerPaiement(listingId) {
           Le paiement réel sera disponible
           lorsque l'intégration sera opérationnelle.
         </div>
-      `;
-    }
 
+     `;
+      /*
+       * COMPTE À REBOURS DE RÉSERVATION
+       * Aucun paiement n'est simulé.
+       */
+      const zoneCompteARebours = document.createElement("div");
+      zoneCompteARebours.id = "mgCommandeReservationTimer";
+      zoneCompteARebours.style.cssText =
+        "margin-top:14px;padding:15px;border:1px solid #f0d58a;border-radius:12px;background:#fff8e6;color:#704d00;line-height:1.6;";
+      zoneCompteARebours.innerHTML = `
+        <strong>⏳ Réservation de l'annonce</strong>
+        <div style="margin-top:8px;font-size:13px">
+          Temps restant avant la fin du délai :
+        </div>
+        <div
+          id="mgCommandeReservationTemps"
+          style="font-size:23px;font-weight:900;color:#087f3f;margin:8px 0"
+        >
+          Calcul du temps restant…
+        </div>
+        <div style="font-size:12px">
+          La libération effective dépend des vérifications Supabase.
+          Aucun paiement n'a été confirmé.
+        </div>
+      `;
+      paymentContent.appendChild(zoneCompteARebours);
+      const affichageTemps =
+        document.getElementById("mgCommandeReservationTemps");
+      const debutCommande = Date.parse(
+        commandeCreee?.created_at || ""
+      );
+      if (window.mgCommandeReservationInterval) {
+        clearInterval(window.mgCommandeReservationInterval);
+        window.mgCommandeReservationInterval = null;
+      }
+      if (
+        Number.isFinite(debutCommande) &&
+        affichageTemps
+      ) {
+        const finDelai =
+          debutCommande + 10 * 60 * 60 * 1000;
+        function actualiserTempsReservation() {
+          const restant = Math.max(
+            0,
+            Math.ceil((finDelai - Date.now()) / 1000)
+          );
+          const heures = Math.floor(restant / 3600);
+          const minutes = Math.floor((restant % 3600) / 60);
+          const secondes = restant % 60;
+          affichageTemps.textContent =
+            String(heures).padStart(2, "0") + " h " +
+            String(minutes).padStart(2, "0") + " min " +
+            String(secondes).padStart(2, "0") + " s";
+          if (restant <= 0) {
+            clearInterval(window.mgCommandeReservationInterval);
+            window.mgCommandeReservationInterval = null;
+            affichageTemps.textContent =
+              "Délai écoulé — vérification Supabase";
+          }
+        }
+        actualiserTempsReservation();
+        window.mgCommandeReservationInterval = setInterval(
+          actualiserTempsReservation,
+          1000
+        );
+      } else if (affichageTemps) {
+        affichageTemps.textContent =
+          "Heure de départ indisponible";
+      }
+    }
     console.log(
       "Commande créée en attente de paiement :",
       {
