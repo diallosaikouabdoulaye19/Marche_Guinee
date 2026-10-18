@@ -23358,48 +23358,13 @@ function afficherRetourMesAnnonces() {
     ].join(";");
     chatContainer.insertBefore(zoneDefilement, entete);
   }
-  /*
-   * L'en-tête, la négociation et les messages
-   * partagent désormais le même conteneur défilant.
-   */
-  if (entete.parentElement !== zoneDefilement) {
-    zoneDefilement.appendChild(entete);
-  }
-  entete.style.flex = "0 0 auto";
-  entete.style.width = "100%";
-  entete.style.boxSizing = "border-box";
-  if (panel && panel.parentElement !== zoneDefilement) {
-    zoneDefilement.appendChild(panel);
-  }
-  if (panel) {
-    panel.style.width = "100%";
-    panel.style.maxWidth = "100%";
-    panel.style.flex = "0 0 auto";
-    panel.style.boxSizing = "border-box";
-    panel.style.margin = "0";
-    panel.style.padding = "8px 12px";
-    panel.style.borderRadius = "0";
-    panel.style.boxShadow = "none";
-    panel.style.overflow = "visible";
-    const titre = panel.querySelector(".price-offer-title");
-    if (titre) {
-      titre.style.fontSize = "14px";
-      titre.style.marginBottom = "4px";
-    }
-    const texte = panel.querySelector(".price-offer-text");
-    if (texte) {
-      texte.style.fontSize = "12px";
-      texte.style.marginBottom = "5px";
-    }
-    panel.querySelectorAll(
-      ".price-offer-btn, .price-offer-accept, .price-offer-reject"
-    ).forEach(function (bouton) {
-      bouton.style.minHeight = "38px";
-      bouton.style.padding = "8px 12px";
-      bouton.style.borderRadius = "10px";
-    });
-  }
-  /*
+      /*
+   * Le panneau de négociation est géré séparément.
+   * Ne pas le déplacer dans la zone de défilement.
+  */
+ 
+    
+    /*
    * Le chatBox contient uniquement les messages.
    * C'est son parent qui gère maintenant le défilement.
    */
