@@ -26267,27 +26267,11 @@ display: none !important;
     }
   }
 
-   /*
+    /*
    * PROPOSITION DE PRIX
-   * Ne pas déplacer le panneau dans la barre supérieure.
-   * Le script dédié gère le bouton et le panneau centré.
+   * Le panneau reste indépendant de la barre supérieure.
+   * Le bouton est géré par le script dédié.
    */
-  var pricePanel =
-    document.getElementById("priceOfferPanel");
-
-  if (pricePanel && !rightZone.contains(pricePanel)) {
-    rightZone.appendChild(pricePanel);
-  }
-
-  if (pricePanel) {
-    pricePanel.style.margin = "0";
-    pricePanel.style.padding = "0";
-    pricePanel.style.border = "0";
-    pricePanel.style.background = "transparent";
-    pricePanel.style.maxWidth = "100%";
-    pricePanel.style.minWidth = "0";
-    pricePanel.style.flex = "0 1 auto";
-  }
 
   /*
    * PRÉSERVER LE FONCTIONNEMENT DE L'HISTORIQUE
