@@ -27560,6 +27560,659 @@ function creerMessage() {
 
 })();
 </script>
+
+ <!-- =====================================================
+     MARCHÉ GUINÉE 🇬🇳
+     NÉGOCIATION CENTRÉE — CORRECTIF UNIQUE
+     Réutilise les RPC Supabase existantes.
+     ===================================================== -->
+
+<style id="mg-price-modal-style">
+  #mgPriceModalOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(12, 20, 16, .62);
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+  }
+
+  #mgPriceModalOverlay.mg-price-modal-visible {
+    display: flex;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 82%;
+    max-height: 82dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    color: #17221d;
+    border-radius: 22px;
+    padding: 23px;
+    box-sizing: border-box;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .25);
+    animation: mgPriceModalEnter .18s ease-out;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 17px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-title {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-subtitle {
+    margin: 8px 0 0;
+    color: #68756e;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-close {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    background: #f0f3f1;
+    color: #17221d;
+    font-size: 23px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-public {
+    padding: 13px;
+    background: #f3f7f4;
+    border-radius: 12px;
+    margin-bottom: 17px;
+    color: #56635b;
+    font-size: 14px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-public strong {
+    display: block;
+    color: #087f3f;
+    font-size: 19px;
+    margin-top: 5px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    padding: 13px;
+    box-sizing: border-box;
+    border: 1px solid #ccd7cf;
+    border-radius: 12px;
+    font-size: 18px !important;
+    outline: none;
+    margin-bottom: 16px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-input:focus {
+    border-color: #087f3f;
+    box-shadow: 0 0 0 3px rgba(8, 127, 63, .12);
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-actions button {
+    flex: 1 1 130px;
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-primary {
+    background: #087f3f;
+    color: #fff;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-danger {
+    background: #c62828;
+    color: #fff;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-secondary {
+    background: #edf1ee;
+    color: #26332b;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-message {
+    display: none;
+    margin-top: 13px;
+    padding: 11px;
+    border-radius: 10px;
+    background: #fff0f0;
+    color: #a32121;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  #mgPriceModalOverlay .mg-price-modal-message.mg-price-message-success {
+    background: #eaf7ef;
+    color: #087f3f;
+  }
+
+  #mgPriceModalOverlay button:disabled {
+    opacity: .6;
+    cursor: wait;
+  }
+
+  @keyframes mgPriceModalEnter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (max-width: 380px) {
+    #mgPriceModalOverlay {
+      padding: 12px;
+    }
+
+    #mgPriceModalOverlay .mg-price-modal {
+      padding: 18px;
+      border-radius: 18px;
+    }
+
+    #mgPriceModalOverlay .mg-price-modal-title {
+      font-size: 19px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #mgPriceModalOverlay .mg-price-modal {
+      animation: none;
+    }
+  }
+</style>
+
+<script id="mg-price-modal-correctif">
+(function () {
+  "use strict";
+
+  /* Évite d'installer deux fois ce correctif. */
+  if (window.mgPriceModalCorrectifInstalled) return;
+  window.mgPriceModalCorrectifInstalled = true;
+
+  var overlay = null;
+  var titre = null;
+  var sousTitre = null;
+  var contenu = null;
+  var message = null;
+  var ancienFocus = null;
+  var traitementEnCours = false;
+
+  function creerFenetre() {
+    /* Réutilise la fenêtre si elle existe déjà. */
+    var existante = document.getElementById("mgPriceModalOverlay");
+
+    if (existante) {
+      overlay = existante;
+      titre = overlay.querySelector("#mgPriceModalTitle");
+      sousTitre = overlay.querySelector("#mgPriceModalSubtitle");
+      contenu = overlay.querySelector("#mgPriceModalContent");
+      message = overlay.querySelector("#mgPriceModalMessage");
+      return;
+    }
+
+    overlay = document.createElement("div");
+    overlay.id = "mgPriceModalOverlay";
+    overlay.setAttribute("role", "presentation");
+
+    overlay.innerHTML = `
+      <section
+        class="mg-price-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mgPriceModalTitle"
+      >
+        <div class="mg-price-modal-header">
+          <div>
+            <h2 class="mg-price-modal-title" id="mgPriceModalTitle">
+              💰 Négociation
+            </h2>
+            <p class="mg-price-modal-subtitle" id="mgPriceModalSubtitle"></p>
+          </div>
+          <button
+            type="button"
+            class="mg-price-modal-close"
+            id="mgPriceModalClose"
+            aria-label="Fermer"
+          >×</button>
+        </div>
+        <div id="mgPriceModalContent"></div>
+        <div
+          id="mgPriceModalMessage"
+          class="mg-price-modal-message"
+          role="status"
+          aria-live="polite"
+        ></div>
+      </section>
+    `;
+
+    document.body.appendChild(overlay);
+
+    titre = overlay.querySelector("#mgPriceModalTitle");
+    sousTitre = overlay.querySelector("#mgPriceModalSubtitle");
+    contenu = overlay.querySelector("#mgPriceModalContent");
+    message = overlay.querySelector("#mgPriceModalMessage");
+
+    overlay.querySelector("#mgPriceModalClose")
+      .addEventListener("click", fermerFenetre);
+
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay && !traitementEnCours) {
+        fermerFenetre();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (
+        event.key === "Escape" &&
+        overlay.classList.contains("mg-price-modal-visible") &&
+        !traitementEnCours
+      ) {
+        fermerFenetre();
+      }
+    });
+  }
+
+  function afficherFenetre(titreTexte, sousTitreTexte) {
+    creerFenetre();
+
+    ancienFocus = document.activeElement;
+    traitementEnCours = false;
+
+    titre.textContent = titreTexte;
+    sousTitre.textContent = sousTitreTexte || "";
+    contenu.replaceChildren();
+
+    message.textContent = "";
+    message.style.display = "none";
+    message.classList.remove("mg-price-message-success");
+
+    overlay.classList.add("mg-price-modal-visible");
+    document.body.style.overflow = "hidden";
+  }
+
+  function fermerFenetre() {
+    if (!overlay || traitementEnCours) return;
+
+    overlay.classList.remove("mg-price-modal-visible");
+    document.body.style.overflow = "";
+
+    if (ancienFocus && ancienFocus.isConnected) {
+      try {
+        ancienFocus.focus({ preventScroll: true });
+      } catch (e) {}
+    }
+  }
+
+  function afficherMessage(texte, succes) {
+    message.textContent = texte;
+    message.style.display = "block";
+    message.classList.toggle(
+      "mg-price-message-success",
+      !!succes
+    );
+  }
+
+  function creerBouton(texte, classe, action) {
+    var bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.className = classe;
+    bouton.textContent = texte;
+    bouton.addEventListener("click", action);
+    return bouton;
+  }
+
+  function bloquerBoutons(bloquer) {
+    if (!overlay) return;
+
+    overlay.querySelectorAll("button, input").forEach(function (element) {
+      element.disabled = bloquer;
+    });
+
+    traitementEnCours = bloquer;
+  }
+
+  function rafraichirConversation() {
+    if (typeof window.chargerPropositionsPrix === "function") {
+      return window.chargerPropositionsPrix();
+    }
+  }
+
+  function fermerEtRafraichir() {
+    if (overlay) {
+      overlay.classList.remove("mg-price-modal-visible");
+    }
+
+    document.body.style.overflow = "";
+    traitementEnCours = false;
+
+    Promise.resolve()
+      .then(rafraichirConversation)
+      .catch(function (erreur) {
+        console.warn("Actualisation de la négociation impossible :", erreur);
+      });
+  }
+
+  function formaterErreur(erreur, defaut) {
+    return (
+      erreur && erreur.message
+        ? erreur.message
+        : defaut
+    );
+  }
+
+  /* =====================================================
+     VENDEUR : OUVRIR LE FORMULAIRE AU CENTRE
+     ===================================================== */
+
+  window.proposerPrixPrive = async function () {
+    if (!window.utilisateurConnecte || !window.conversationActuelle) {
+      alert("Connecte-toi pour continuer.");
+      return;
+    }
+
+    if (
+      window.conversationActuelle.seller_id !==
+      window.utilisateurConnecte.id
+    ) {
+      alert("Seul le vendeur peut proposer un prix.");
+      return;
+    }
+
+    var annonce = window.annonceConversationActuelle;
+
+    if (!annonce) {
+      alert("Annonce introuvable.");
+      return;
+    }
+
+    var prixPublic = Number(annonce.price_gnf || 0);
+
+    if (!Number.isFinite(prixPublic) || prixPublic <= 0) {
+      alert("Le prix public de l'annonce est invalide.");
+      return;
+    }
+
+    afficherFenetre(
+      "💰 Proposer un prix",
+      "Saisis le prix privé que tu souhaites proposer à cet acheteur."
+    );
+
+    var prixPublicBox = document.createElement("div");
+    prixPublicBox.className = "mg-price-modal-public";
+    prixPublicBox.textContent = "Prix public de l'annonce";
+
+    var valeurPublique = document.createElement("strong");
+    valeurPublique.textContent =
+      formatPrix(prixPublic) + " GNF";
+
+    prixPublicBox.appendChild(valeurPublique);
+    contenu.appendChild(prixPublicBox);
+
+    var label = document.createElement("label");
+    label.className = "mg-price-modal-label";
+    label.htmlFor = "mgPriceOfferAmount";
+    label.textContent = "Ton prix proposé (GNF)";
+
+    var input = document.createElement("input");
+    input.id = "mgPriceOfferAmount";
+    input.className = "mg-price-modal-input";
+    input.type = "number";
+    input.inputMode = "numeric";
+    input.min = "1";
+    input.step = "1";
+    input.placeholder = "Ex. : 70000";
+    input.autocomplete = "off";
+
+    contenu.appendChild(label);
+    contenu.appendChild(input);
+
+    var actions = document.createElement("div");
+    actions.className = "mg-price-modal-actions";
+
+    var boutonAnnuler = creerBouton(
+      "Annuler",
+      "mg-price-modal-secondary",
+      fermerFenetre
+    );
+
+    var boutonEnvoyer = creerBouton(
+      "Envoyer la proposition",
+      "mg-price-modal-primary",
+      envoyerProposition
+    );
+
+    actions.appendChild(boutonAnnuler);
+    actions.appendChild(boutonEnvoyer);
+    contenu.appendChild(actions);
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        envoyerProposition();
+      }
+    });
+
+    setTimeout(function () {
+      if (overlay.classList.contains("mg-price-modal-visible")) {
+        input.focus({ preventScroll: true });
+      }
+    }, 80);
+
+    async function envoyerProposition() {
+      if (traitementEnCours) return;
+
+      var saisie = String(input.value || "").trim();
+      var prix = Number(saisie);
+
+      if (!saisie || !Number.isFinite(prix) || prix <= 0) {
+        afficherMessage("Entre un prix valide supérieur à zéro.", false);
+        input.focus();
+        return;
+      }
+
+      if (!Number.isSafeInteger(Math.round(prix))) {
+        afficherMessage("Le montant saisi est trop élevé.", false);
+        return;
+      }
+
+      bloquerBoutons(true);
+      afficherMessage("Envoi de la proposition…", true);
+
+      try {
+        var resultat = await supabaseFetch(
+          SUPABASE_URL + "/rest/v1/rpc/create_price_offer",
+          {
+            method: "POST",
+            headers: headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_listing_id: annonce.id,
+              p_buyer_id: window.conversationActuelle.buyer_id,
+              p_proposed_price_gnf: Math.round(prix)
+            })
+          }
+        );
+
+        if (!resultat) {
+          throw new Error("La proposition n'a pas été créée.");
+        }
+
+        try {
+          await creerNotification(
+            window.conversationActuelle.buyer_id,
+            "💰 Nouvelle proposition de prix",
+            "Le vendeur vous propose " +
+              formatPrix(Math.round(prix)) +
+              " GNF pour « " +
+              annonce.title +
+              " ». Ouvrez la conversation pour accepter ou refuser.",
+            "price_offer"
+          );
+        } catch (erreurNotification) {
+          console.warn(
+            "La notification n'a pas été envoyée :",
+            erreurNotification
+          );
+        }
+
+        afficherMessage("✅ Proposition envoyée avec succès.", true);
+
+        /* Une seule création Supabase par clic confirmé. */
+        fermerEtRafraichir();
+
+      } catch (erreur) {
+        bloquerBoutons(false);
+        afficherMessage(
+          "Impossible d'envoyer la proposition : " +
+            formaterErreur(erreur, "erreur Supabase inconnue."),
+          false
+        );
+      }
+    }
+  };
+
+  /* =====================================================
+     ACHETEUR : CONFIRMATION CENTRÉE
+     ===================================================== */
+
+  window.repondrePropositionPrix = async function (offerId, action) {
+    if (!window.utilisateurConnecte || !window.utilisateurConnecte.id) {
+      alert("Connecte-toi pour continuer.");
+      return;
+    }
+
+    if (action !== "accepted" && action !== "rejected") {
+      return;
+    }
+
+    var accepter = action === "accepted";
+
+    afficherFenetre(
+      accepter ? "✅ Accepter le prix ?" : "❌ Refuser le prix ?",
+      accepter
+        ? "Confirme ton accord avec le prix proposé par le vendeur."
+        : "Confirme que tu refuses cette proposition."
+    );
+
+    var explication = document.createElement("p");
+    explication.style.cssText =
+      "font-size:15px;line-height:1.6;margin:12px 0;color:#4d5b52;";
+    explication.textContent = accepter
+      ? "Une fois confirmé, ta réponse sera enregistrée dans Marché Guinée."
+      : "Le vendeur pourra voir que tu as refusé cette proposition.";
+
+    contenu.appendChild(explication);
+
+    var actions = document.createElement("div");
+    actions.className = "mg-price-modal-actions";
+
+    var boutonAnnuler = creerBouton(
+      "Annuler",
+      "mg-price-modal-secondary",
+      fermerFenetre
+    );
+
+    var boutonConfirmer = creerBouton(
+      accepter ? "Confirmer l'acceptation" : "Confirmer le refus",
+      accepter
+        ? "mg-price-modal-primary"
+        : "mg-price-modal-danger",
+      confirmerReponse
+    );
+
+    actions.appendChild(boutonAnnuler);
+    actions.appendChild(boutonConfirmer);
+    contenu.appendChild(actions);
+
+    async function confirmerReponse() {
+      if (traitementEnCours) return;
+
+      bloquerBoutons(true);
+      afficherMessage("Enregistrement de ta réponse…", true);
+
+      try {
+        var resultat = await supabaseFetch(
+          SUPABASE_URL + "/rest/v1/rpc/respond_price_offer",
+          {
+            method: "POST",
+            headers: headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_offer_id: offerId,
+              p_action: action
+            })
+          }
+        );
+
+        if (!resultat) {
+          throw new Error("La réponse n'a pas été enregistrée.");
+        }
+
+        afficherMessage(
+          accepter
+            ? "✅ Proposition acceptée."
+            : "❌ Proposition refusée.",
+          true
+        );
+
+        fermerEtRafraichir();
+
+      } catch (erreur) {
+        bloquerBoutons(false);
+        afficherMessage(
+          "Impossible d'enregistrer la réponse : " +
+            formaterErreur(erreur, "erreur Supabase inconnue."),
+          false
+        );
+      }
+    }
+  };
+
+})();
+</script>
+<!-- FIN DU CORRECTIF NÉGOCIATION CENTRÉE -->
   
 </body>
 </html>
