@@ -14273,7 +14273,7 @@ panel.dataset.mgCompactReady = "1";
 }
       
       /* Offre acceptée : aucune décision supplémentaire nécessaire */
-      if (offreAcceptee) {
+      if (offreAcceptee && !offreEnAttente) {
 
         panel.innerHTML = `
           <div class="price-offer-title">
