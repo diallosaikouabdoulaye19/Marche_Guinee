@@ -8280,12 +8280,9 @@ function modifierQuantiteAchat(delta) {
    BOUTON ACHETER
 ========================= */
 async function ouvrirPaiement(listingId) {
-  alert("Le bouton Acheter répond !");
   const annonce = toutesLesAnnonces.find(
     a => String(a.id) === String(listingId)
   );
-
-  alert("TEST A : recherche terminée. Annonce trouvée : " + Boolean(annonce));
 
   if (!annonce) {
     alert("Annonce introuvable.");
@@ -8310,252 +8307,245 @@ async function ouvrirPaiement(listingId) {
     return;
   }
 
-    alert("TEST B : vérifications terminées, lancement de la récupération du prix.");
+  let resultatPrix = null;
 
-      const resultatPrix = await Promise.race([
-        recupererPrixNegocie(annonce.id),
-        new Promise(resolve => {
-          setTimeout(() => resolve(null), 4000);
-        })
-      ]);
-  
-     alert("TEST C : récupération terminée. Résultat : " +
-        String(resultatPrix)
-      );
+  try {
+    resultatPrix = await Promise.race([
+      recupererPrixNegocie(annonce.id),
+      new Promise(resolve => {
+        setTimeout(() => resolve(null), 4000);
+      })
+    ]);
+  } catch (erreur) {
+    console.error("Erreur récupération du prix :", erreur);
+    resultatPrix = null;
+  }
 
-      const prixNegocie = resultatPrix;
-      const prix = Number(prixNegocie || annonce.price_gnf) || 0;
+  const prixNegocie = resultatPrix;
+  const prix = Number(prixNegocie || annonce.price_gnf) || 0;
 
-      if (!Number.isSafeInteger(prix) || prix <= 0) {
-        alert("Le prix de cette annonce est invalide.");
-        return;
-      }
-      const prixPublic = Number(annonce.price_gnf) || 0;
-      const utilisePrixNegocie =
-        prixNegocie &&
-        Number(prixNegocie) !== prixPublic;
+  if (!Number.isSafeInteger(prix) || prix <= 0) {
+    alert("Le prix de cette annonce est invalide.");
+    return;
+  }
 
-      window.mgQuantiteAchat = 1;
-      window.mgPrixUnitaireAchat = prix;
+  const prixPublic = Number(annonce.price_gnf) || 0;
+  const utilisePrixNegocie =
+    Boolean(prixNegocie) &&
+    Number(prixNegocie) !== prixPublic;
 
-      const contenu = document.getElementById("paymentContent");
+  window.mgQuantiteAchat = 1;
+  window.mgPrixUnitaireAchat = prix;
 
-      if (!contenu) {
-        alert("Impossible d'ouvrir l'écran d'achat.");
-        return;
-      }
+  const contenu = document.getElementById("paymentContent");
+  const modalPaiement = document.getElementById("paymentModal");
 
-      contenu.innerHTML = `
-        <div style="padding:8px 0;">
-          <h3 style="margin:0 0 16px;">
-            ${escapeHTML(annonce.title)}
-          </h3>
+  if (!contenu || !modalPaiement) {
+    alert("Impossible d'ouvrir l'écran d'achat.");
+    return;
+  }
 
-          ${
-            utilisePrixNegocie
-              ? `
-                <div style="
-                  background:#eaf8ef;
-                  border:1px solid #bde8ca;
-                  color:#087f3f;
-                  padding:12px;
-                  border-radius:12px;
-                  margin-bottom:16px;
-                  font-weight:700;
-                ">
-                  💰 Prix négocié accepté
-                  <div style="margin-top:8px;font-size:13px;">
-                    Prix public :
-                    <span style="text-decoration:line-through;color:#777;">
-                      ${formatPrix(prixPublic)}
-                    </span>
-                  </div>
-                </div>
-              `
-              : ""
-          }
+  contenu.innerHTML = `
+    <div style="padding:8px 0;">
+      <h3 style="margin:0 0 16px;">
+        ${escapeHTML(annonce.title)}
+      </h3>
 
-          <div style="
-            background:#f5faf6;
-            border:1px solid #dceee1;
-            border-radius:16px;
-            padding:16px;
-            margin-bottom:16px;
-          ">
-            <div style="font-size:14px;color:#555;">
-              Prix unitaire
-            </div>
-
+      ${
+        utilisePrixNegocie
+          ? `
             <div style="
-              font-size:22px;
-              font-weight:800;
+              background:#eaf8ef;
+              border:1px solid #bde8ca;
               color:#087f3f;
-              margin:4px 0 20px;
-            ">
-              ${formatPrix(prix)}
-            </div>
-
-            <label for="mgQuantiteAchat" style="
-              display:block;
+              padding:12px;
+              border-radius:12px;
+              margin-bottom:16px;
               font-weight:700;
-              margin-bottom:10px;
             ">
-              📦 Combien de pièces veux-tu acheter ?
-            </label>
-
-            <div style="
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              gap:14px;
-              margin-bottom:12px;
-            ">
-              <button
-                id="mgQuantiteMoins"
-                type="button"
-                onclick="modifierQuantiteAchat(-1)"
-                aria-label="Diminuer la quantité"
-                style="
-                  width:46px;
-                  height:46px;
-                  border:0;
-                  border-radius:12px;
-                  background:#e2eee6;
-                  color:#087f3f;
-                  font-size:26px;
-                  font-weight:800;
-                "
-              >−</button>
-
-              <input
-                id="mgQuantiteAchat"
-                type="number"
-                inputmode="numeric"
-                min="1"
-                step="1"
-                value="1"
-                aria-label="Nombre de pièces"
-                oninput="mettreAJourQuantiteAchat()"
-                style="
-                  width:100px;
-                  height:46px;
-                  box-sizing:border-box;
-                  border:1px solid #b9d7c3;
-                  border-radius:12px;
-                  background:white;
-                  text-align:center;
-                  font-size:20px;
-                  font-weight:800;
-                "
-              >
-
-              <button
-                id="mgQuantitePlus"
-                type="button"
-                onclick="modifierQuantiteAchat(1)"
-                aria-label="Augmenter la quantité"
-                style="
-                  width:46px;
-                  height:46px;
-                  border:0;
-                  border-radius:12px;
-                  background:#087f3f;
-                  color:white;
-                  font-size:26px;
-                  font-weight:800;
-                "
-              >+</button>
+              💰 Prix négocié accepté
+              <div style="margin-top:8px;font-size:13px;">
+                Prix public :
+                <span style="text-decoration:line-through;color:#777;">
+                  ${formatPrix(prixPublic)}
+                </span>
+              </div>
             </div>
+          `
+          : ""
+      }
 
-            <div style="font-size:12px;color:#666;text-align:center;">
-              Tu peux aussi saisir directement la quantité souhaitée.
-            </div>
+      <div style="
+        background:#f5faf6;
+        border:1px solid #dceee1;
+        border-radius:16px;
+        padding:16px;
+        margin-bottom:16px;
+      ">
+        <div style="font-size:14px;color:#555;">
+          Prix unitaire
+        </div>
 
-            <div
-              id="mgQuantiteErreur"
-              role="alert"
-              style="color:#b42318;font-size:13px;margin-top:10px;"
-            ></div>
-          </div>
+        <div style="
+          font-size:22px;
+          font-weight:800;
+          color:#087f3f;
+          margin:4px 0 20px;
+        ">
+          ${formatPrix(prix)}
+        </div>
 
-          <div style="
-            border:1px solid #e1e7e3;
-            border-radius:14px;
-            padding:15px;
-            margin-bottom:16px;
-          ">
-            <div style="
-              display:flex;
-              justify-content:space-between;
-              gap:12px;
-              margin-bottom:12px;
-            ">
-              <span>📦 Quantité</span>
-              <strong id="mgQuantiteResume">1 pièce</strong>
-            </div>
+        <label for="mgQuantiteAchat" style="
+          display:block;
+          font-weight:700;
+          margin-bottom:10px;
+        ">
+          📦 Combien de pièces veux-tu acheter ?
+        </label>
 
-            <div style="
-              display:flex;
-              justify-content:space-between;
-              gap:12px;
-              margin-bottom:12px;
-            ">
-              <span>💰 Total des articles</span>
-              <strong id="mgTotalAchat">${formatPrix(prix)}</strong>
-            </div>
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:14px;
+          margin-bottom:12px;
+        ">
+          <button
+            id="mgQuantiteMoins"
+            type="button"
+            onclick="modifierQuantiteAchat(-1)"
+            aria-label="Diminuer la quantité"
+            style="
+              width:46px;
+              height:46px;
+              border:0;
+              border-radius:12px;
+              background:#e2eee6;
+              color:#087f3f;
+              font-size:26px;
+              font-weight:800;
+            "
+          >−</button>
 
-            <div style="
-              display:flex;
-              justify-content:space-between;
-              gap:12px;
-              margin-bottom:12px;
-            ">
-              <span>Commission (3 %)</span>
-              <strong id="mgCommissionAchat">${formatPrix(Math.round(prix * 0.03))}</strong>
-            </div>
-
-            <div style="
-              display:flex;
-              justify-content:space-between;
-              gap:12px;
-              border-top:1px solid #e1e7e3;
-              padding-top:12px;
-            ">
-              <span>Montant vendeur après commission</span>
-              <strong id="mgVendeurAchat">${formatPrix(prix - Math.round(prix * 0.03))}</strong>
-            </div>
-          </div>
+          <input
+            id="mgQuantiteAchat"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            value="1"
+            aria-label="Nombre de pièces"
+            oninput="mettreAJourQuantiteAchat()"
+            style="
+              width:100px;
+              height:46px;
+              box-sizing:border-box;
+              border:1px solid #b9d7c3;
+              border-radius:12px;
+              background:white;
+              text-align:center;
+              font-size:20px;
+              font-weight:800;
+            "
+          >
 
           <button
-            id="mgContinuerAchat"
+            id="mgQuantitePlus"
             type="button"
-            class="btn-green"
-            onclick="continuerPaiement('${String(annonce.id).replace(/'/g, "\\'")}')"
-            style="width:100%;"
-          >
-            Continuer
-          </button>
+            onclick="modifierQuantiteAchat(1)"
+            aria-label="Augmenter la quantité"
+            style="
+              width:46px;
+              height:46px;
+              border:0;
+              border-radius:12px;
+              background:#087f3f;
+              color:white;
+              font-size:26px;
+              font-weight:800;
+            "
+          >+</button>
         </div>
-      `;
 
-      const input = document.getElementById("mgQuantiteAchat");
-      if (input) {
-        input.addEventListener("input", function() {
-          const resume = document.getElementById("mgQuantiteResume");
-          if (resume) {
-            const q = Number(input.value);
-            resume.textContent =
-              Number.isSafeInteger(q) && q > 0
-                ? q + (q === 1 ? " pièce" : " pièces")
-                : "Quantité invalide";
-          }
-        });
-      }
+        <div style="font-size:12px;color:#666;text-align:center;">
+          Tu peux aussi saisir directement la quantité souhaitée.
+        </div>
 
-      fermerModal("detailModal");
-      document.getElementById("paymentModal").style.display = "block";
-      mettreAJourQuantiteAchat();
-    }
+        <div
+          id="mgQuantiteErreur"
+          role="alert"
+          style="color:#b42318;font-size:13px;margin-top:10px;"
+        ></div>
+      </div>
+
+      <div style="
+        border:1px solid #e1e7e3;
+        border-radius:14px;
+        padding:15px;
+        margin-bottom:16px;
+      ">
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:12px;
+          margin-bottom:12px;
+        ">
+          <span>📦 Quantité</span>
+          <strong id="mgQuantiteResume">1 pièce</strong>
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:12px;
+          margin-bottom:12px;
+        ">
+          <span>💰 Total des articles</span>
+          <strong id="mgTotalAchat">${formatPrix(prix)}</strong>
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:12px;
+          margin-bottom:12px;
+        ">
+          <span>Commission (3 %)</span>
+          <strong id="mgCommissionAchat">
+            ${formatPrix(Math.round(prix * 0.03))}
+          </strong>
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:12px;
+          border-top:1px solid #e1e7e3;
+          padding-top:12px;
+        ">
+          <span>Montant vendeur après commission</span>
+          <strong id="mgVendeurAchat">
+            ${formatPrix(prix - Math.round(prix * 0.03))}
+          </strong>
+        </div>
+      </div>
+
+      <button
+        id="mgContinuerAchat"
+        type="button"
+        class="btn-green"
+        onclick="continuerPaiement('${String(annonce.id).replace(/'/g, "\\'")}')"
+        style="width:100%;"
+      >
+        Continuer
+      </button>
+    </div>
+  `;
+
+  fermerModal("detailModal");
+  modalPaiement.style.display = "block";
+  mettreAJourQuantiteAchat();
+}
 
 /* =========================================================
    MARCHÉ GUINÉE 🇬🇳
