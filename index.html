@@ -28814,17 +28814,17 @@ function creerMessage() {
     try {
       var offres = await chargerOffresAcheteur();
 
-      var acceptee = offres.find(function (offre) {
-        return offre.status === "accepted";
-      });
-
       var attente = offres.find(function (offre) {
-        return offre.status === "pending";
-      });
+  return String(offre.status).toLowerCase() === "pending";
+});
+
+var acceptee = offres.find(function (offre) {
+  return String(offre.status).toLowerCase() === "accepted";
+});
 
       contenu.replaceChildren();
 
-      if (acceptee) {
+         if (acceptee && !attente) {
         titre.textContent = "✅ Prix négocié accepté";
         sousTitre.textContent =
           "Le prix accepté pour cette annonce est :";
