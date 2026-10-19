@@ -8279,7 +8279,7 @@ function modifierQuantiteAchat(delta) {
 /* =========================
    BOUTON ACHETER
 ========================= */
-function ouvrirPaiement(listingId) {
+async function ouvrirPaiement(listingId) {
   alert("Le bouton Acheter répond !");
   const annonce = toutesLesAnnonces.find(
     a => String(a.id) === String(listingId)
@@ -8310,16 +8310,20 @@ function ouvrirPaiement(listingId) {
     return;
   }
 
-     alert("TEST B : vérifications terminées, lancement de la récupération du prix.");
+    alert("TEST B : vérifications terminées, lancement de la récupération du prix.");
+
+      const resultatPrix = await Promise.race([
+        recupererPrixNegocie(annonce.id),
+        new Promise(resolve => {
+          setTimeout(() => resolve(null), 4000);
+        })
+      ]);
   
-        Promise.race([
-    recupererPrixNegocie(annonce.id),
-    new Promise(resolve => {
-      setTimeout(() => resolve(null), 4000);
-    })
-  ])
-    .then(prixNegocie => {
-      alert("TEST 2 : le prix négocié a été récupéré !");
+     alert("TEST C : récupération terminée. Résultat : " +
+        String(resultatPrix)
+      );
+
+      const prixNegocie = resultatPrix;
       const prix = Number(prixNegocie || annonce.price_gnf) || 0;
 
       if (!Number.isSafeInteger(prix) || prix <= 0) {
