@@ -27424,14 +27424,88 @@ function creerMessage() {
     );
 
     try {
-      var etat =
-        await chargerEtatAnnonce(id);
+
+      var etat = await chargerEtatAnnonce(id);
+
+if (numeroGeneration !== generation) {
+  return;
+}
+
+/* LIBÉRER UNE RÉSERVATION EXPIRÉE */
+if (
+  etat.status === "paused" &&
+  etat.pause_reason === "pending_order" &&
+  etat.paused_at &&
+  etat.pause_order_id
+) {
+  var dateReservation = new Date(etat.paused_at).getTime();
+
+  if (!Number.isFinite(dateReservation)) {
+    afficherIndisponible(
+      "La date de réservation est invalide. La disponibilité doit être vérifiée."
+    );
+    return;
+  }
+
+  var heureActuelleServeur = await obtenirHeureServeur();
+
+  if (numeroGeneration !== generation) {
+    return;
+  }
+
+  var delaiEcoule =
+    heureActuelleServeur - dateReservation >= 10 * 60 * 60 * 1000;
+
+  if (delaiEcoule) {
+    var resultatLiberation = await requete(
+      obtenirBaseSupabase() +
+        "/rest/v1/rpc/release_expired_listing_reservation",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          p_listing_id: id
+        })
+      }
+    );
+
+       var liberationReussie =
+      resultatLiberation &&
+      resultatLiberation.success === true;
+
+    if (numeroGeneration !== generation) {
+      return;
+    }
+
+    if (liberationReussie) {
+      etat = await chargerEtatAnnonce(id);
 
       if (numeroGeneration !== generation) {
         return;
       }
+    } else {
+      console.warn(
+        "La réservation n'a pas été libérée :",
+        resultatLiberation
+      );
 
-      /* ANNONCE ACTIVE */
+      // Ne jamais autoriser l'achat sans vérifier
+      // que l'annonce est réellement disponible.
+      etat = await chargerEtatAnnonce(id);
+
+      if (numeroGeneration !== generation) {
+        return;
+      }
+   
+    }
+  
+  }
+     
+}
+  
+  /* ANNONCE ACTIVE */
 
       if (etat.status === "active") {
         arreterMinuteries();
