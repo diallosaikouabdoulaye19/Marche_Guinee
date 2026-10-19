@@ -28345,18 +28345,24 @@ function creerMessage() {
   }
 
   function prixFormate(valeur) {
-    var prix = Number(valeur);
+  var prix = Number(valeur);
 
-    if (!Number.isFinite(prix)) return "—";
+  if (!Number.isFinite(prix)) return "—";
 
-    if (typeof window.formatPrix === "function") {
-      try {
-        return window.formatPrix(prix) + " GNF";
-      } catch (e) {}
-    }
+  if (typeof window.formatPrix === "function") {
+    try {
+      var resultat = String(window.formatPrix(prix)).trim();
 
-    return new Intl.NumberFormat("fr-FR").format(prix) + " GNF";
+      if (/\bGNF\b/i.test(resultat)) {
+        return resultat;
+      }
+
+      return resultat + " GNF";
+    } catch (e) {}
   }
+
+  return new Intl.NumberFormat("fr-FR").format(prix) + " GNF";
+}
 
   function creerBouton(texte, classe, action) {
     var bouton = document.createElement("button");
