@@ -29045,6 +29045,347 @@ var acceptee = offres.find(function (offre) {
 
 })();
 </script>
+
+<script>
+/* =========================================================
+   MARCHÉ GUINÉE 🇬🇳
+   CORRECTIF : OUVRIR LA COMMANDE DEPUIS UNE NOTIFICATION
+   ========================================================= */
+
+/*
+ * 1. Charger les notifications avec order_id.
+ * Les notifications restent limitées à l'utilisateur connecté.
+ */
+async function chargerNotifications() {
+  const liste = document.getElementById("notificationsList");
+
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    mettreAJourBadgeNotifications(0);
+
+    if (liste) {
+      liste.innerHTML = `
+        <div class="notifications-vide">
+          🔐 Connectez-vous pour voir vos notifications.
+        </div>
+      `;
+    }
+    return;
+  }
+
+  try {
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/notifications" +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&select=id,user_id,title,message,type,is_read,created_at,order_id" +
+      "&order=created_at.desc";
+
+    const response = await supabaseFetch(url);
+
+    let notifications = response;
+
+    if (response && Array.isArray(response.data)) {
+      notifications = response.data;
+    }
+
+    if (!Array.isArray(notifications)) {
+      throw new Error("Format des notifications invalide.");
+    }
+
+    afficherNotifications(notifications);
+
+    const nonLues = notifications.filter(
+      notification => notification.is_read === false
+    );
+
+    mettreAJourBadgeNotifications(nonLues.length);
+
+  } catch (erreur) {
+    console.error("Erreur chargement notifications :", erreur);
+
+    if (liste) {
+      liste.innerHTML = `
+        <div class="notifications-vide">
+          ⚠️ Impossible de charger les notifications.<br><br>
+          ${escapeHTML(erreur.message || String(erreur))}
+        </div>
+      `;
+    }
+
+    mettreAJourBadgeNotifications(0);
+  }
+}
+
+
+/*
+ * 2. Afficher les notifications et associer chaque clic
+ * à la notification correspondante.
+ */
+function afficherNotifications(notifications) {
+  const liste = document.getElementById("notificationsList");
+
+  if (!liste) return;
+
+  if (!Array.isArray(notifications) || notifications.length === 0) {
+    liste.innerHTML = `
+      <div class="notifications-vide">
+        🔕 Aucune notification pour le moment.
+      </div>
+    `;
+    return;
+  }
+
+  liste.innerHTML = notifications.map(notification => {
+    const classe = notification.is_read
+      ? "notification-item"
+      : "notification-item non-lue";
+
+    const id = escapeHTML(String(notification.id || ""));
+    const orderId = escapeHTML(String(notification.order_id || ""));
+    const type = escapeHTML(String(notification.type || ""));
+
+    return `
+      <div
+        class="${classe}"
+        data-notification-id="${id}"
+        data-order-id="${orderId}"
+        data-notification-type="${type}"
+        role="button"
+        tabindex="0"
+        style="cursor:pointer;"
+      >
+        <h3>${escapeHTML(notification.title || "Notification")}</h3>
+
+        <p>${escapeHTML(notification.message || "")}</p>
+
+        <div class="notification-date">
+          ${formatDate(notification.created_at)}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  liste.querySelectorAll("[data-notification-id]").forEach(element => {
+    const ouvrir = () => {
+      gererClicNotification(
+        element.dataset.notificationId,
+        element.dataset.orderId,
+        element.dataset.notificationType
+      );
+    };
+
+    element.addEventListener("click", ouvrir);
+
+    element.addEventListener("keydown", evenement => {
+      if (evenement.key === "Enter" || evenement.key === " ") {
+        evenement.preventDefault();
+        ouvrir();
+      }
+    });
+  });
+}
+
+
+/*
+ * 3. Marquer une notification comme lue.
+ * Le filtre user_id empêche de viser la notification d'un autre compte.
+ */
+async function marquerNotificationLue(notificationId) {
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    return false;
+  }
+
+  try {
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/notifications" +
+      "?id=eq." +
+      encodeURIComponent(notificationId) +
+      "&user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id);
+
+    await supabaseFetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        is_read: true
+      })
+    });
+
+    await chargerNotifications();
+    return true;
+
+  } catch (erreur) {
+    console.error("Erreur marquage notification lue :", erreur);
+    return false;
+  }
+}
+
+
+/*
+ * 4. Gérer le clic.
+ * Une nouvelle commande ouvre directement la vente associée.
+ * Les autres notifications gardent leur comportement habituel.
+ */
+async function gererClicNotification(
+  notificationId,
+  orderId,
+  type
+) {
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    alert("Connecte-toi pour consulter tes notifications.");
+    return;
+  }
+
+  const estNouvelleCommande =
+    type === "new_order" && Boolean(orderId);
+
+  const notificationLue =
+    await marquerNotificationLue(notificationId);
+
+  if (!notificationLue) {
+    alert(
+      "Impossible de mettre à jour cette notification. " +
+      "Vérifie ta connexion puis réessaie."
+    );
+    return;
+  }
+
+  if (estNouvelleCommande) {
+    const modalNotifications =
+      document.getElementById("notificationsModal");
+
+    if (modalNotifications) {
+      modalNotifications.style.display = "none";
+    }
+
+    await ouvrirMesVentes(orderId);
+  }
+}
+
+
+/*
+ * 5. Ouvrir Mes ventes.
+ * Si un order_id est fourni, vérifier côté Supabase que la
+ * commande appartient au vendeur connecté avant de l'afficher.
+ *
+ * Sans order_id, le comportement normal est conservé.
+ */
+async function ouvrirMesVentes(orderIdCible) {
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    alert("Connecte-toi pour voir tes ventes.");
+    ouvrirCompte();
+    return;
+  }
+
+  const modal = document.getElementById("mesVentesModal");
+
+  if (!modal) {
+    console.error("Fenêtre Mes ventes introuvable.");
+    alert("Impossible d'ouvrir Mes ventes pour le moment.");
+    return;
+  }
+
+  let commandeCible = null;
+
+  if (orderIdCible) {
+    try {
+      const url =
+        SUPABASE_URL +
+        "/rest/v1/orders" +
+        "?id=eq." +
+        encodeURIComponent(orderIdCible) +
+        "&seller_id=eq." +
+        encodeURIComponent(utilisateurConnecte.id) +
+        "&select=id,order_number,product_title" +
+        "&limit=1";
+
+      const resultat = await supabaseFetch(url);
+
+      if (!Array.isArray(resultat) || resultat.length === 0) {
+        alert(
+          "Cette commande est introuvable dans tes ventes " +
+          "ou tu n'es pas autorisé à la consulter."
+        );
+        return;
+      }
+
+      commandeCible = resultat[0];
+
+    } catch (erreur) {
+      console.error("Vérification de la commande impossible :", erreur);
+
+      alert(
+        "Impossible de vérifier cette commande. " +
+        "Réessaie après avoir vérifié ta connexion."
+      );
+      return;
+    }
+  }
+
+  modal.style.display = "flex";
+
+  /*
+   * On recharge la liste existante du vendeur.
+   * Aucun statut de commande n'est modifié.
+   */
+  await chargerMesVentes();
+
+  if (!commandeCible) {
+    return;
+  }
+
+  /*
+   * Repérer la carte correspondant à la commande vérifiée.
+   * La liste affichée reste celle des ventes du vendeur connecté.
+   */
+  const container = document.getElementById("listeMesVentes");
+
+  if (!container) return;
+
+  const numeroCommande = String(commandeCible.order_number || "");
+
+  const cartes = Array.from(container.children);
+
+  const carteCible = cartes.find(carte => {
+    const texte = carte.textContent || "";
+
+    return (
+      numeroCommande !== "" &&
+      texte.includes(numeroCommande)
+    );
+  });
+
+  if (!carteCible) {
+    alert(
+      "La commande existe, mais sa carte n'a pas été retrouvée " +
+      "dans la liste. Actualise Mes ventes puis réessaie."
+    );
+    return;
+  }
+
+  /*
+   * Mise en évidence temporaire et défilement vers la commande.
+   */
+  carteCible.style.outline = "3px solid #087f3f";
+  carteCible.style.background = "#ecfdf5";
+  carteCible.style.borderRadius = "14px";
+
+  carteCible.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  setTimeout(() => {
+    carteCible.style.outline = "";
+    carteCible.style.background = "";
+  }, 5000);
+}
+</script>
   
 </body>
 </html>
