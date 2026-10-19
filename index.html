@@ -9796,24 +9796,19 @@ function gererToucheMessage(event){
 }
 
 
-async function ouvrirMessages(){
+var intervalMessages = null;
 
+async function ouvrirMessages(){
   if(!utilisateurConnecte){
 
-    fermerModal(
-      "accountModal"
-    );
+    fermerModal("accountModal");
 
-    alert(
-      "Connecte-toi pour accéder à ta messagerie."
-    );
+    alert("Connecte-toi pour accéder à ta messagerie.");
 
     ouvrirCompte();
 
     return;
-
   }
-
 
   fermerModal(
     "accountModal"
