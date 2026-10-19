@@ -8555,12 +8555,7 @@ async function ouvrirPaiement(listingId) {
       fermerModal("detailModal");
       document.getElementById("paymentModal").style.display = "block";
       mettreAJourQuantiteAchat();
-    })
-    .catch(erreur => {
-      console.error("Erreur récupération prix négocié :", erreur);
-      alert("Impossible de récupérer le prix négocié.");
-    });
-}
+    }
 
 /* =========================================================
    MARCHÉ GUINÉE 🇬🇳
