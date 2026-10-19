@@ -8308,16 +8308,20 @@ function ouvrirPaiement(listingId) {
     return;
   }
 
-  recupererPrixNegocie(annonce.id)
+        Promise.race([
+    recupererPrixNegocie(annonce.id),
+    new Promise(resolve => {
+      setTimeout(() => resolve(null), 4000);
+    })
+  ])
     .then(prixNegocie => {
-    alert("TEST 2 : le prix négocié a été récupéré !");
+      alert("TEST 2 : le prix négocié a été récupéré !");
       const prix = Number(prixNegocie || annonce.price_gnf) || 0;
 
       if (!Number.isSafeInteger(prix) || prix <= 0) {
         alert("Le prix de cette annonce est invalide.");
         return;
       }
-
       const prixPublic = Number(annonce.price_gnf) || 0;
       const utilisePrixNegocie =
         prixNegocie &&
