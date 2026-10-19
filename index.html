@@ -8774,47 +8774,30 @@ async function continuerPaiement(listingId) {
       );
     }
 
-    /*
-     * NOTIFICATION DU VENDEUR
+        /*
+     * NOTIFICATION SÉCURISÉE DU VENDEUR
      *
-     * Aucun code de livraison dans la notification.
-     * Une erreur de notification ne doit pas annuler
-     * une commande déjà créée.
+     * Le serveur vérifie l'acheteur et récupère le vendeur
+     * depuis la commande. Aucun code de livraison ici.
+     * Aucun paiement n'est confirmé par cette notification.
      */
 
     try {
-      const notificationMessage =
-        "👤 Client : " + nomClient + ". " +
-        "📦 Produit : « " + annonce.title + " ». " +
-        "🔢 Quantité : " + quantiteCreee +
-        (
-          quantiteCreee === 1
-            ? " pièce. "
-            : " pièces. "
-        ) +
-        "💰 Montant total : " +
-        prix.toLocaleString("fr-FR") +
-        " GNF. " +
-        "🔢 Commande : " + orderNumber + ".";
-
       const reponseNotification = await supabaseFetch(
-        `${SUPABASE_URL}/rest/v1/rpc/creer_notification_systeme`,
+        `${SUPABASE_URL}/rest/v1/rpc/notifier_vendeur_nouvelle_commande`,
         {
           method: "POST",
           headers: headers({
             "Content-Type": "application/json"
           }),
           body: JSON.stringify({
-            p_user_id: annonce.seller_id,
-            p_title: "🛒 Nouvelle commande",
-            p_message: notificationMessage,
-            p_type: "new_order"
+            p_order_id: orderId
           })
         }
       );
 
       console.log(
-        "Notification vendeur traitée :",
+        "Notification sécurisée du vendeur :",
         reponseNotification
       );
     } catch (erreurNotification) {
@@ -8824,6 +8807,7 @@ async function continuerPaiement(listingId) {
       );
     }
 
+    
     /*
      * RÉCAPITULATIF DE COMMANDE
      *
