@@ -28299,6 +28299,689 @@ function creerMessage() {
 })();
 </script>
 <!-- FIN DU CORRECTIF NÉGOCIATION CENTRÉE -->
+
+ <!-- =========================================================
+     MARCHÉ GUINÉE 🇬🇳
+     NÉGOCIATION UNIFIÉE — GESTIONNAIRE CENTRAL
+     Remplace le comportement des anciens mécanismes
+     sans supprimer les fonctions existantes nécessaires.
+========================================================= -->
+<script id="mg-negociation-unifiee">
+(function () {
+  "use strict";
+
+  if (window.__MG_NEGOCIATION_UNIFIEE__) return;
+  window.__MG_NEGOCIATION_UNIFIEE__ = true;
+
+  var overlay = null;
+  var contenu = null;
+  var titre = null;
+  var sousTitre = null;
+  var message = null;
+  var ancienOverflow = "";
+  var operationEnCours = false;
+
+  function utilisateur() {
+    return window.utilisateurConnecte || null;
+  }
+
+  function conversation() {
+    return window.conversationActuelle || null;
+  }
+
+  function annonce() {
+    return window.annonceConversationActuelle || null;
+  }
+
+  function estVendeur() {
+    var u = utilisateur();
+    var c = conversation();
+
+    return !!(
+      u &&
+      c &&
+      String(c.seller_id) === String(u.id)
+    );
+  }
+
+  function prixFormate(valeur) {
+    var prix = Number(valeur);
+
+    if (!Number.isFinite(prix)) return "—";
+
+    if (typeof window.formatPrix === "function") {
+      try {
+        return window.formatPrix(prix) + " GNF";
+      } catch (e) {}
+    }
+
+    return new Intl.NumberFormat("fr-FR").format(prix) + " GNF";
+  }
+
+  function creerBouton(texte, classe, action) {
+    var bouton = document.createElement("button");
+
+    bouton.type = "button";
+    bouton.className = classe;
+    bouton.textContent = texte;
+    bouton.addEventListener("click", action);
+
+    return bouton;
+  }
+
+  function afficherMessage(texte, succes) {
+    if (!message) return;
+
+    message.textContent = texte;
+    message.style.display = "block";
+    message.classList.toggle(
+      "mg-price-message-success",
+      !!succes
+    );
+  }
+
+  function creerFenetre() {
+    if (overlay && overlay.isConnected) return;
+
+    overlay = document.createElement("div");
+    overlay.id = "mgPriceModalOverlay";
+    overlay.setAttribute("role", "presentation");
+
+    overlay.innerHTML = `
+      <section
+        class="mg-price-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mgPriceModalTitle"
+      >
+        <div class="mg-price-modal-header">
+          <div>
+            <h2
+              class="mg-price-modal-title"
+              id="mgPriceModalTitle"
+            >💰 Négociation</h2>
+
+            <p
+              class="mg-price-modal-subtitle"
+              id="mgPriceModalSubtitle"
+            ></p>
+          </div>
+
+          <button
+            type="button"
+            class="mg-price-modal-close"
+            id="mgPriceModalClose"
+            aria-label="Fermer"
+          >×</button>
+        </div>
+
+        <div id="mgPriceModalContent"></div>
+
+        <div
+          id="mgPriceModalMessage"
+          class="mg-price-modal-message"
+          role="status"
+          aria-live="polite"
+        ></div>
+      </section>
+    `;
+
+    document.body.appendChild(overlay);
+
+    contenu = overlay.querySelector("#mgPriceModalContent");
+    titre = overlay.querySelector("#mgPriceModalTitle");
+    sousTitre = overlay.querySelector("#mgPriceModalSubtitle");
+    message = overlay.querySelector("#mgPriceModalMessage");
+
+    overlay.querySelector("#mgPriceModalClose")
+      .addEventListener("click", fermerFenetre);
+
+    overlay.addEventListener("click", function (event) {
+      if (
+        event.target === overlay &&
+        !operationEnCours
+      ) {
+        fermerFenetre();
+      }
+    });
+  }
+
+  function ouvrirFenetre(titreTexte, sousTitreTexte) {
+    creerFenetre();
+
+    ancienOverflow = document.body.style.overflow;
+    operationEnCours = false;
+
+    titre.textContent = titreTexte;
+    sousTitre.textContent = sousTitreTexte || "";
+
+    contenu.replaceChildren();
+
+    message.textContent = "";
+    message.style.display = "none";
+    message.classList.remove("mg-price-message-success");
+
+    overlay.classList.add("mg-price-modal-visible");
+    document.body.style.overflow = "hidden";
+  }
+
+  function fermerFenetre() {
+    if (!overlay || operationEnCours) return;
+
+    overlay.classList.remove("mg-price-modal-visible");
+    document.body.style.overflow = ancienOverflow;
+  }
+
+  function ajouterActions(parent, boutons) {
+    var actions = document.createElement("div");
+    actions.className = "mg-price-modal-actions";
+
+    boutons.forEach(function (bouton) {
+      actions.appendChild(bouton);
+    });
+
+    parent.appendChild(actions);
+  }
+
+  function afficherChargement(texte) {
+    ouvrirFenetre("💰 Négociation", "Chargement des propositions…");
+
+    var p = document.createElement("p");
+    p.textContent = texte || "Veuillez patienter…";
+    p.style.cssText = "line-height:1.6;color:#59665e;";
+
+    contenu.appendChild(p);
+  }
+
+  async function chargerOffresAcheteur() {
+    var u = utilisateur();
+    var c = conversation();
+    var a = annonce();
+
+    if (!u || !c || !a) {
+      throw new Error(
+        "La conversation ou l'annonce n'est pas disponible."
+      );
+    }
+
+    var listingId = c.listing_id || a.id;
+
+    if (!listingId) {
+      throw new Error("Impossible d'identifier l'annonce.");
+    }
+
+    var resultat = await window.supabaseFetch(
+      window.SUPABASE_URL +
+        "/rest/v1/rpc/get_buyer_price_offers",
+      {
+        method: "POST",
+        headers: window.headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify({
+          p_listing_id: listingId
+        })
+      }
+    );
+
+    return Array.isArray(resultat) ? resultat : [];
+  }
+
+  function afficherPrixPublic(prix) {
+    var bloc = document.createElement("div");
+    bloc.className = "mg-price-modal-public";
+    bloc.textContent = "Prix public de l'annonce";
+
+    var valeur = document.createElement("strong");
+    valeur.textContent = prixFormate(prix);
+
+    bloc.appendChild(valeur);
+    contenu.appendChild(bloc);
+  }
+
+  async function ouvrirFormulaireVendeur() {
+    var u = utilisateur();
+    var c = conversation();
+    var a = annonce();
+
+    if (!u || !c) {
+      alert("Connecte-toi pour continuer.");
+      return;
+    }
+
+    if (!estVendeur()) {
+      alert("Seul le vendeur peut proposer un prix.");
+      return;
+    }
+
+    if (!a || !a.id) {
+      alert("Annonce introuvable.");
+      return;
+    }
+
+    var prixPublic = Number(a.price_gnf || 0);
+
+    if (!Number.isFinite(prixPublic) || prixPublic <= 0) {
+      alert("Le prix public de l'annonce est invalide.");
+      return;
+    }
+
+    ouvrirFenetre(
+      "💰 Proposer un prix",
+      "Ta proposition sera envoyée en privé à cet acheteur."
+    );
+
+    afficherPrixPublic(prixPublic);
+
+    var label = document.createElement("label");
+    label.className = "mg-price-modal-label";
+    label.htmlFor = "mgUnifiedPriceInput";
+    label.textContent = "Prix proposé (GNF)";
+
+    var input = document.createElement("input");
+    input.id = "mgUnifiedPriceInput";
+    input.className = "mg-price-modal-input";
+    input.type = "number";
+    input.inputMode = "numeric";
+    input.min = "1";
+    input.step = "1";
+    input.placeholder = "Ex. : 70000";
+    input.autocomplete = "off";
+
+    contenu.appendChild(label);
+    contenu.appendChild(input);
+
+    var annuler = creerBouton(
+      "Annuler",
+      "mg-price-modal-secondary",
+      fermerFenetre
+    );
+
+    var envoyer = creerBouton(
+      "Envoyer la proposition",
+      "mg-price-modal-primary",
+      envoyerProposition
+    );
+
+    ajouterActions(contenu, [annuler, envoyer]);
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        envoyerProposition();
+      }
+    });
+
+    setTimeout(function () {
+      if (overlay && overlay.classList.contains("mg-price-modal-visible")) {
+        input.focus({ preventScroll: true });
+      }
+    }, 80);
+
+    async function envoyerProposition() {
+      if (operationEnCours) return;
+
+      var saisie = String(input.value || "").trim();
+      var prix = Number(saisie);
+
+      if (
+        !saisie ||
+        !Number.isSafeInteger(prix) ||
+        prix <= 0
+      ) {
+        afficherMessage(
+          "Entre un montant entier valide supérieur à zéro.",
+          false
+        );
+        input.focus();
+        return;
+      }
+
+      operationEnCours = true;
+      envoyer.disabled = true;
+      annuler.disabled = true;
+
+      afficherMessage("Envoi de la proposition…", true);
+
+      try {
+        var resultat = await window.supabaseFetch(
+          window.SUPABASE_URL +
+            "/rest/v1/rpc/create_price_offer",
+          {
+            method: "POST",
+            headers: window.headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_listing_id: a.id,
+              p_buyer_id: c.buyer_id,
+              p_proposed_price_gnf: prix
+            })
+          }
+        );
+
+        if (resultat === false || resultat === null) {
+          throw new Error("La proposition n'a pas été créée.");
+        }
+
+        try {
+          if (typeof window.creerNotification === "function") {
+            await window.creerNotification(
+              c.buyer_id,
+              "💰 Nouvelle proposition de prix",
+              "Le vendeur vous propose " +
+                prixFormate(prix) +
+                " pour « " +
+                (a.title || "votre annonce") +
+                " ». Ouvrez la conversation pour répondre.",
+              "price_offer"
+            );
+          }
+        } catch (e) {
+          console.warn("Notification non envoyée :", e);
+        }
+
+        operationEnCours = false;
+
+        fermerFenetre();
+
+        if (typeof window.chargerPropositionsPrix === "function") {
+          await window.chargerPropositionsPrix();
+        }
+
+        alert("✅ Proposition envoyée : " + prixFormate(prix) + ".");
+
+      } catch (erreur) {
+        operationEnCours = false;
+        envoyer.disabled = false;
+        annuler.disabled = false;
+
+        afficherMessage(
+          "Impossible d'envoyer la proposition : " +
+            (erreur && erreur.message
+              ? erreur.message
+              : "erreur inconnue."),
+          false
+        );
+      }
+    }
+  }
+
+  async function repondreAOffre(offreId, action) {
+    if (operationEnCours) return;
+
+    if (action !== "accepted" && action !== "rejected") return;
+
+    var accepter = action === "accepted";
+
+    ouvrirFenetre(
+      accepter ? "✅ Accepter le prix ?" : "❌ Refuser le prix ?",
+      "Confirme ton choix avant de l'enregistrer."
+    );
+
+    var explication = document.createElement("p");
+    explication.style.cssText =
+      "font-size:15px;line-height:1.6;color:#4d5b52;";
+    explication.textContent = accepter
+      ? "Le prix négocié sera enregistré comme accepté."
+      : "Ta décision de refuser cette proposition sera enregistrée.";
+
+    contenu.appendChild(explication);
+
+    var annuler = creerBouton(
+      "Annuler",
+      "mg-price-modal-secondary",
+      fermerFenetre
+    );
+
+    var confirmer = creerBouton(
+      accepter ? "Confirmer l'acceptation" : "Confirmer le refus",
+      accepter
+        ? "mg-price-modal-primary"
+        : "mg-price-modal-danger",
+      confirmerReponse
+    );
+
+    ajouterActions(contenu, [annuler, confirmer]);
+
+    async function confirmerReponse() {
+      if (operationEnCours) return;
+
+      operationEnCours = true;
+      annuler.disabled = true;
+      confirmer.disabled = true;
+
+      afficherMessage("Enregistrement de ta réponse…", true);
+
+      try {
+        var resultat = await window.supabaseFetch(
+          window.SUPABASE_URL +
+            "/rest/v1/rpc/respond_price_offer",
+          {
+            method: "POST",
+            headers: window.headers({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+              p_offer_id: offreId,
+              p_action: action
+            })
+          }
+        );
+
+        if (resultat === false || resultat === null) {
+          throw new Error("La réponse n'a pas été enregistrée.");
+        }
+
+        operationEnCours = false;
+        fermerFenetre();
+
+        if (typeof window.chargerPropositionsPrix === "function") {
+          await window.chargerPropositionsPrix();
+        }
+
+        alert(
+          accepter
+            ? "✅ Proposition acceptée."
+            : "❌ Proposition refusée."
+        );
+
+      } catch (erreur) {
+        operationEnCours = false;
+        annuler.disabled = false;
+        confirmer.disabled = false;
+
+        afficherMessage(
+          "Impossible d'enregistrer la réponse : " +
+            (erreur && erreur.message
+              ? erreur.message
+              : "erreur inconnue."),
+          false
+        );
+      }
+    }
+  }
+
+  async function ouvrirNegociationAcheteur() {
+    afficherChargement("Recherche des propositions de prix…");
+
+    try {
+      var offres = await chargerOffresAcheteur();
+
+      var acceptee = offres.find(function (offre) {
+        return offre.status === "accepted";
+      });
+
+      var attente = offres.find(function (offre) {
+        return offre.status === "pending";
+      });
+
+      contenu.replaceChildren();
+
+      if (acceptee) {
+        titre.textContent = "✅ Prix négocié accepté";
+        sousTitre.textContent =
+          "Le prix accepté pour cette annonce est :";
+
+        afficherPrixPublic(acceptee.original_price_gnf);
+
+        var prixAccepte = document.createElement("div");
+        prixAccepte.className = "mg-price-modal-public";
+
+        var valeur = document.createElement("strong");
+        valeur.textContent = prixFormate(
+          acceptee.proposed_price_gnf
+        );
+
+        prixAccepte.appendChild(valeur);
+        contenu.appendChild(prixAccepte);
+
+        var badge = document.createElement("p");
+        badge.textContent = "Prix négocié accepté 💰";
+        badge.style.cssText =
+          "color:#087f3f;font-weight:800;line-height:1.5;";
+
+        contenu.appendChild(badge);
+        return;
+      }
+
+      if (attente) {
+        titre.textContent = "💰 Nouvelle proposition de prix";
+        sousTitre.textContent =
+          "Le vendeur attend ta réponse.";
+
+        afficherPrixPublic(attente.original_price_gnf);
+
+        var prixPropose = document.createElement("div");
+        prixPropose.className = "mg-price-modal-public";
+
+        var montant = document.createElement("strong");
+        montant.textContent = prixFormate(
+          attente.proposed_price_gnf
+        );
+
+        prixPropose.appendChild(montant);
+        contenu.appendChild(prixPropose);
+
+        var idOffre = attente.id;
+
+        ajouterActions(contenu, [
+          creerBouton(
+            "❌ Refuser",
+            "mg-price-modal-danger",
+            function () {
+              repondreAOffre(idOffre, "rejected");
+            }
+          ),
+          creerBouton(
+            "✅ Accepter",
+            "mg-price-modal-primary",
+            function () {
+              repondreAOffre(idOffre, "accepted");
+            }
+          )
+        ]);
+
+        return;
+      }
+
+      titre.textContent = "💰 Négociation";
+      sousTitre.textContent = "Tes propositions de prix";
+
+      var vide = document.createElement("p");
+      vide.textContent =
+        "Aucune proposition en attente pour cette annonce.";
+      vide.style.cssText =
+        "line-height:1.6;color:#59665e;";
+
+      contenu.appendChild(vide);
+
+    } catch (erreur) {
+      contenu.replaceChildren();
+
+      var erreurTexte = document.createElement("p");
+      erreurTexte.style.cssText =
+        "line-height:1.6;color:#a32121;";
+      erreurTexte.textContent =
+        "Impossible de charger les propositions : " +
+        (erreur && erreur.message
+          ? erreur.message
+          : "erreur inconnue.");
+
+      contenu.appendChild(erreurTexte);
+    }
+  }
+
+  async function ouvrirNegociation() {
+    if (!utilisateur() || !conversation()) {
+      alert("Ouvre d'abord une conversation pour négocier un prix.");
+      return;
+    }
+
+    if (!annonce()) {
+      alert("L'annonce liée à cette conversation est introuvable.");
+      return;
+    }
+
+    if (estVendeur()) {
+      await ouvrirFormulaireVendeur();
+    } else {
+      await ouvrirNegociationAcheteur();
+    }
+  }
+
+  /*
+   * Un seul gestionnaire pour les clics du bouton.
+   * Il intercepte l'ancien gestionnaire avant qu'il ouvre
+   * le panneau priceOfferPanel.
+   */
+  document.addEventListener("click", function (event) {
+    var cible = event.target;
+
+    if (!cible || typeof cible.closest !== "function") return;
+
+    var bouton = cible.closest("#mgPriceToggleButton");
+
+    if (!bouton) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    ouvrirNegociation().catch(function (erreur) {
+      console.error("Erreur de négociation :", erreur);
+      alert("Impossible d'ouvrir la négociation pour le moment.");
+    });
+  }, true);
+
+  /*
+   * Le chargement automatique ne doit plus recréer
+   * l'ancien panneau visible dans la conversation.
+   * Le prix négocié accepté reste récupérable grâce
+   * à recupererPrixNegocie(), qui n'est pas modifiée.
+   */
+  window.chargerPropositionsPrix = async function () {
+    var ancien = document.getElementById("priceOfferPanel");
+
+    if (ancien) ancien.remove();
+
+    return true;
+  };
+
+  /*
+   * Ces fonctions globales sont désormais pilotées
+   * par le gestionnaire unifié.
+   */
+  window.proposerPrixPrive = ouvrirFormulaireVendeur;
+
+  window.repondrePropositionPrix = function (offerId, action) {
+    return repondreAOffre(offerId, action);
+  };
+
+  console.log("✅ Gestionnaire de négociation unifiée installé.");
+
+})();
+</script>
   
 </body>
 </html>
