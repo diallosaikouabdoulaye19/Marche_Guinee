@@ -29225,12 +29225,6 @@ async function marquerNotificationLue(notificationId) {
   }
 }
 
-
-/*
- * 4. Gérer le clic.
- * Une nouvelle commande ouvre directement la vente associée.
- * Les autres notifications gardent leur comportement habituel.
- */
 async function gererClicNotification(
   notificationId,
   orderId,
@@ -29241,29 +29235,387 @@ async function gererClicNotification(
     return;
   }
 
-  const estNouvelleCommande =
-    type === "new_order" && Boolean(orderId);
+  let notification = null;
+  let commande = null;
+  let annonceAssociee = null;
 
-  const notificationLue =
-    await marquerNotificationLue(notificationId);
+  const fermerNotifications = function () {
+    const modal = document.getElementById("notificationsModal");
+    if (modal) modal.style.display = "none";
+  };
 
-  if (!notificationLue) {
-    alert(
-      "Impossible de mettre à jour cette notification. " +
-      "Vérifie ta connexion puis réessaie."
-    );
-    return;
-  }
+  try {
+    // Récupérer la notification appartenant au compte connecté.
+    const urlNotification =
+      SUPABASE_URL +
+      "/rest/v1/notifications" +
+      "?id=eq." + encodeURIComponent(notificationId) +
+      "&user_id=eq." + encodeURIComponent(utilisateurConnecte.id) +
+      "&select=*";
 
-  if (estNouvelleCommande) {
-    const modalNotifications =
-      document.getElementById("notificationsModal");
+    const resultatsNotification =
+      await supabaseFetch(urlNotification);
 
-    if (modalNotifications) {
-      modalNotifications.style.display = "none";
+    if (
+      Array.isArray(resultatsNotification) &&
+      resultatsNotification.length > 0
+    ) {
+      notification = resultatsNotification[0];
     }
 
-    await ouvrirMesVentes(orderId);
+    if (!notification) {
+      alert("Cette notification est introuvable. Actualise la page puis réessaie.");
+      return;
+    }
+
+    // Marquer la notification comme lue avec la fonction existante.
+    try {
+      await marquerNotificationLue(notificationId);
+    } catch (erreurLecture) {
+      console.warn(
+        "Impossible de marquer la notification comme lue :",
+        erreurLecture
+      );
+    }
+
+    const identifiantCommande =
+      notification.order_id || orderId || null;
+
+    const typeNotification =
+      String(notification.type || type || "").toLowerCase();
+
+    const messageNotification =
+      String(notification.message || "");
+
+    // Vérifier si la commande appartient à l'acheteur ou au vendeur.
+    if (identifiantCommande) {
+      try {
+        const urlCommande =
+          SUPABASE_URL +
+          "/rest/v1/orders" +
+          "?id=eq." + encodeURIComponent(identifiantCommande) +
+          "&select=id,order_number,product_title,buyer_id,seller_id";
+
+        const resultatCommande =
+          await supabaseFetch(urlCommande);
+
+        if (
+          Array.isArray(resultatCommande) &&
+          resultatCommande.length > 0
+        ) {
+          commande = resultatCommande[0];
+        }
+      } catch (erreurCommande) {
+        console.warn(
+          "Détails de la commande indisponibles :",
+          erreurCommande
+        );
+      }
+    }
+
+    // Rechercher l'annonce associée lorsque son titre est identifiable.
+    let titreAnnonce = "";
+
+    const correspondanceAnnonce =
+      messageNotification.match(
+        /Annonce\s*:\s*«\s*([^»]+)\s*»/i
+      );
+
+    if (correspondanceAnnonce) {
+      titreAnnonce = correspondanceAnnonce[1].trim();
+    }
+
+    if (
+      titreAnnonce &&
+      (
+        typeNotification.includes("listing") ||
+        typeNotification.includes("report")
+      )
+    ) {
+      try {
+        const urlAnnonce =
+          SUPABASE_URL +
+          "/rest/v1/listings" +
+          "?title=eq." + encodeURIComponent(titreAnnonce) +
+          "&select=id,title" +
+          "&limit=2";
+
+        const resultatsAnnonces =
+          await supabaseFetch(urlAnnonce);
+
+        // Ne proposer une destination directe que si le titre
+        // correspond à une seule annonce.
+        if (
+          Array.isArray(resultatsAnnonces) &&
+          resultatsAnnonces.length === 1
+        ) {
+          annonceAssociee = resultatsAnnonces[0];
+        }
+      } catch (erreurAnnonce) {
+        console.warn(
+          "Annonce associée introuvable :",
+          erreurAnnonce
+        );
+      }
+    }
+
+    // Créer une seule fenêtre de détails réutilisable.
+    let modalDetails =
+      document.getElementById("mgNotificationDetailsModal");
+
+    if (!modalDetails) {
+      modalDetails = document.createElement("div");
+      modalDetails.id = "mgNotificationDetailsModal";
+
+      modalDetails.style.cssText =
+        "position:fixed;inset:0;z-index:50000;" +
+        "display:none;align-items:center;justify-content:center;" +
+        "padding:18px;background:rgba(0,0,0,.55);" +
+        "box-sizing:border-box;";
+
+      modalDetails.innerHTML = `
+        <section style="
+          width:100%;
+          max-width:480px;
+          max-height:85%;
+          overflow-y:auto;
+          background:#fff;
+          color:#17221d;
+          border-radius:18px;
+          padding:22px;
+          box-sizing:border-box;
+          box-shadow:0 12px 40px rgba(0,0,0,.2);
+        ">
+          <div style="
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:16px;
+          ">
+            <h2
+              id="mgNotificationDetailsTitle"
+              style="margin:0;font-size:20px;line-height:1.4;"
+            ></h2>
+
+            <button
+              id="mgNotificationDetailsClose"
+              type="button"
+              aria-label="Fermer les détails"
+              style="
+                min-width:42px;
+                min-height:42px;
+                border-radius:10px;
+                background:#f0f3f1;
+                color:#17221d;
+                font-size:22px;
+              "
+            >×</button>
+          </div>
+
+          <div
+            id="mgNotificationDetailsMessage"
+            style="
+              white-space:pre-wrap;
+              overflow-wrap:anywhere;
+              font-size:15px;
+              line-height:1.7;
+              color:#39453e;
+            "
+          ></div>
+
+          <div
+            id="mgNotificationDetailsDate"
+            style="
+              margin-top:15px;
+              color:#758078;
+              font-size:12px;
+            "
+          ></div>
+
+          <div
+            id="mgNotificationDetailsActions"
+            style="
+              display:flex;
+              flex-direction:column;
+              gap:9px;
+              margin-top:22px;
+            "
+          ></div>
+        </section>
+      `;
+
+      document.body.appendChild(modalDetails);
+
+      document.getElementById(
+        "mgNotificationDetailsClose"
+      ).addEventListener("click", function () {
+        modalDetails.style.display = "none";
+      });
+
+      modalDetails.addEventListener("click", function (event) {
+        if (event.target === modalDetails) {
+          modalDetails.style.display = "none";
+        }
+      });
+    }
+
+    const titreElement = document.getElementById(
+      "mgNotificationDetailsTitle"
+    );
+
+    const messageElement = document.getElementById(
+      "mgNotificationDetailsMessage"
+    );
+
+    const dateElement = document.getElementById(
+      "mgNotificationDetailsDate"
+    );
+
+    const actionsElement = document.getElementById(
+      "mgNotificationDetailsActions"
+    );
+
+    titreElement.textContent =
+      notification.title || "🔔 Notification";
+
+    messageElement.textContent =
+      notification.message || "Aucun détail supplémentaire disponible.";
+
+    dateElement.textContent =
+      notification.created_at
+        ? "Reçue le " + formatDate(notification.created_at)
+        : "";
+
+    actionsElement.replaceChildren();
+
+    function ajouterBouton(texte, action) {
+      const bouton = document.createElement("button");
+
+      bouton.type = "button";
+      bouton.textContent = texte;
+
+      bouton.style.cssText =
+        "width:100%;min-height:46px;padding:12px;" +
+        "border:0;border-radius:11px;" +
+        "background:#087f3f;color:#fff;" +
+        "font-size:14px;font-weight:800;cursor:pointer;";
+
+      bouton.addEventListener("click", async function () {
+        bouton.disabled = true;
+
+        try {
+          await action();
+        } catch (erreur) {
+          console.error("Erreur ouverture notification :", erreur);
+          alert("Impossible d'ouvrir cet élément pour le moment.");
+        } finally {
+          bouton.disabled = false;
+        }
+      });
+
+      actionsElement.appendChild(bouton);
+    }
+
+    // Une commande ouvre l'espace correspondant au rôle réel du compte.
+    if (commande) {
+      if (commande.seller_id === utilisateurConnecte.id) {
+        ajouterBouton("📦 Ouvrir la vente concernée", async function () {
+          modalDetails.style.display = "none";
+          fermerNotifications();
+
+          await ouvrirMesVentes(commande.id);
+        });
+      } else if (commande.buyer_id === utilisateurConnecte.id) {
+        ajouterBouton("🛒 Ouvrir mes achats", async function () {
+          modalDetails.style.display = "none";
+          fermerNotifications();
+
+          ouvrirMesAchats();
+
+          // Mettre en évidence la commande après le chargement de la liste.
+          if (commande.order_number) {
+            let tentatives = 0;
+
+            const minuterie = setInterval(function () {
+              tentatives++;
+
+              const liste =
+                document.getElementById("listeMesAchats");
+
+              if (liste) {
+                const cartes = Array.from(liste.children);
+
+                const carte = cartes.find(function (element) {
+                  return (element.textContent || "").includes(
+                    commande.order_number
+                  );
+                });
+
+                if (carte) {
+                  clearInterval(minuterie);
+
+                  carte.style.outline = "3px solid #087f3f";
+                  carte.style.borderRadius = "12px";
+
+                  carte.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                  });
+
+                  setTimeout(function () {
+                    carte.style.outline = "";
+                  }, 5000);
+                }
+              }
+
+              if (tentatives >= 15) {
+                clearInterval(minuterie);
+              }
+            }, 400);
+          }
+        });
+      }
+    }
+
+    // Ouvrir une annonce si une correspondance unique a été trouvée.
+    if (
+      annonceAssociee &&
+      typeof window.ouvrirDetailAnnonce === "function"
+    ) {
+      ajouterBouton("🏷️ Voir l'annonce concernée", async function () {
+        modalDetails.style.display = "none";
+        fermerNotifications();
+
+        await window.ouvrirDetailAnnonce(annonceAssociee.id);
+      });
+    }
+
+    // Les notifications de messagerie ouvrent la messagerie existante.
+    if (
+      typeNotification.includes("message") ||
+      typeNotification.includes("chat")
+    ) {
+      ajouterBouton("💬 Ouvrir la messagerie", async function () {
+        modalDetails.style.display = "none";
+        fermerNotifications();
+
+        await ouvrirMessages();
+      });
+    }
+
+    modalDetails.style.display = "flex";
+
+  } catch (erreur) {
+    console.error(
+      "Erreur ouverture détails notification :",
+      erreur
+    );
+
+    alert(
+      "Impossible d'afficher les détails de cette notification. " +
+      "Vérifie ta connexion puis réessaie."
+    );
   }
 }
 
