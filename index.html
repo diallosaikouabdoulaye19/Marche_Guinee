@@ -26503,17 +26503,39 @@ async function loadMessagesOptimized() {
   var box = document.getElementById("chatBox");
 
   if (
-    !conversationId ||
-    !userId ||
-    !box ||
-    typeof window.supabaseFetch !== "function"
-  ) {
-    return;
-  }
+  !conversationId ||
+  !userId ||
+  !box ||
+  typeof window.supabaseFetch !== "function"
+) {
+  return;
+}
 
-  if (loadingMessages) return;
-  loadingMessages = true;
+/*
+ * IMPORTANT :
+ * Quand on change de conversation, supprimer les anciennes
+ * bulles avant d'afficher les messages de la nouvelle.
+ * Cela évite de mélanger les messages de deux personnes.
+ */
+var idConversationAffichee = String(conversationId);
 
+if (box.dataset.mgConversationId !== idConversationAffichee) {
+  box.replaceChildren();
+  box.dataset.mgConversationId = idConversationAffichee;
+  lastMessageSignature = "";
+}
+
+if (loadingMessages) {
+  setTimeout(function () {
+    if (getChatId() === conversationId) {
+      loadMessagesOptimized();
+    }
+  }, 300);
+  return;
+}
+
+loadingMessages = true;
+  
   try {
     var scroller =
       document.getElementById("chatConversationScroll") || box;
