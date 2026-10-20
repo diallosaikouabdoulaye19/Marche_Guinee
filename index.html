@@ -23068,7 +23068,7 @@ function afficherRetourMesAnnonces() {
       );
 
       // 3. Actualiser la conversation.
-      await chargerMessages();
+      await window.chargerMessages();
 
     } catch (erreur) {
       alert(
@@ -23356,7 +23356,7 @@ function afficherRetourMesAnnonces() {
 
       input.value = "";
 
-      await chargerMessagesAvecPhotos();
+      await window.chargerMessages();
 
     } catch (erreur) {
       alert(
