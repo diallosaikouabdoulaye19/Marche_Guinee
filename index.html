@@ -25108,26 +25108,20 @@ function afficherRetourMesAnnonces() {
     transform: none !important;
   }
 
-/* Marché Guinée — Le haut de la liste défile avec les conversations */
+/* Marché Guinée — Barre fixe et liste à défilement indépendant */
 #messagesModal #mgChatToolbar {
   position: static !important;
   flex: 0 0 auto !important;
   margin-bottom: 0 !important;
 }
-#messagesModal #messagesList {
-  overflow-y: visible !important;
-  flex: 0 0 auto !important;
-  height: auto !important;
-  min-height: auto !important;
-}
-#messagesModal #mgChatToolbar,
-#messagesModal #messagesList {
+
+#messagesModal #mgChatToolbar {
   touch-action: pan-y;
 }
-  
+
 </style>
 
-<script id="mg-messagerie-2026-script">
+  <script id="mg-messagerie-2026-script">
 (function () {
   "use strict";
 
