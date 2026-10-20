@@ -26392,45 +26392,59 @@ display: none !important;
 
   function makeMessageNode(msg, userId, signedUrl) {
   var mine = String(msg.sender_id) === String(userId);
+
   var row = document.createElement("div");
   row.className = "message-row" + (mine ? " mine" : "");
   row.dataset.mgMessageId = safeText(msg.id);
+
   var body = document.createElement("div");
   body.className = "message";
+
   if (msg.message) {
     var text = document.createElement("div");
     text.textContent = safeText(msg.message);
     body.appendChild(text);
   }
+
   if (msg.image_url) {
     if (signedUrl) {
       var wrap = document.createElement("div");
       wrap.className = "mg-chat-image-wrap";
+
       var img = document.createElement("img");
       img.className = "mg-chat-image";
       img.alt = "Photo envoyée dans la conversation";
       img.loading = "lazy";
       img.decoding = "async";
       img.fetchPriority = "low";
+
       img.addEventListener("load", function () {
         wrap.classList.add("mg-photo-ready");
         img.classList.add("mg-photo-loaded");
       });
+
       img.addEventListener("error", function () {
         wrap.classList.add("mg-photo-ready");
-        var error = document.createElement("div");
-        error.className = "mg-chat-image-error";
-        error.textContent = "Photo indisponible. Réessaie plus tard.";
-        wrap.appendChild(error);
-      });
-      img.addEventListener("click", function () {
-        if (img.src) {
-          openPhoto(img.src, "Photo de la conversation");
+
+        if (!wrap.querySelector(".mg-chat-image-error")) {
+          var error = document.createElement("div");
+          error.className = "mg-chat-image-error";
+          error.textContent = "Photo indisponible. Réessaie plus tard.";
+          wrap.appendChild(error);
         }
       });
+
+      /*
+       * IMPORTANT :
+       * Aucun clic directement attaché à l'image.
+       * Le gestionnaire délégué existant dans la messagerie
+       * s'occupe déjà d'ouvrir la photo.
+       */
+
       img.src = signedUrl;
       wrap.appendChild(img);
       body.appendChild(wrap);
+
     } else {
       var loading = document.createElement("div");
       loading.className = "mg-chat-image-error";
@@ -26438,41 +26452,48 @@ display: none !important;
       body.appendChild(loading);
     }
   }
-    var meta = document.createElement("div");
+
+  var meta = document.createElement("div");
   meta.className = "message-time mg-chat-optimized-status";
+
   var dateHeure = "";
+
   if (msg.created_at) {
     var instant = new Date(msg.created_at);
+
     if (!isNaN(instant.getTime())) {
       var date = instant.toLocaleDateString("fr-FR", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric"
       });
+
       var heure = instant.toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false
       });
+
       dateHeure = date + " · " + heure;
     }
   }
+
   meta.textContent = dateHeure;
-  /* Contraste adapté à la couleur de chaque bulle */
-  meta.style.color = mine
-    ? "rgba(255,255,255,0.95)"
-    : "#58645c";
+  meta.style.color = mine ? "rgba(255,255,255,0.95)" : "#58645c";
   meta.style.display = "block";
   meta.style.fontSize = "10px";
   meta.style.lineHeight = "1.4";
   meta.style.marginTop = "5px";
   meta.style.textAlign = "right";
   meta.style.opacity = "1";
+
   if (mine && msg.read_at) {
     meta.textContent += (dateHeure ? " · " : "") + "Vu";
   }
+
   body.appendChild(meta);
   row.appendChild(body);
+
   return row;
 }
   
