@@ -23315,10 +23315,9 @@ function afficherRetourMesAnnonces() {
     return boite.querySelector(":scope > div");
   }
 
-  function preparerZoneConversation() {
+function preparerZoneConversation() {
   const chatContainer = document.getElementById("chatContainer");
   const chatBox = document.getElementById("chatBox");
-  const panel = document.getElementById("priceOfferPanel");
   if (!chatContainer || !chatBox) return;
   chatContainer.style.display = "flex";
   chatContainer.style.flexDirection = "column";
@@ -23327,9 +23326,15 @@ function afficherRetourMesAnnonces() {
   chatContainer.style.minHeight = "0";
   chatContainer.style.overflow = "hidden";
   const barre = chatContainer.querySelector(".chat-input");
-  const entete = chatContainer.querySelector(
-    ":scope > div:first-child"
-  );
+  /*
+   * Repérer d'abord la véritable barre supérieure.
+   * Ne jamais prendre la zone de défilement pour l'en-tête.
+   */
+  const entete =
+    chatContainer.querySelector(":scope > #mgChat2026Actions") ||
+    chatContainer.querySelector(
+      ":scope > div:not(#chatConversationScroll)"
+    );
   if (!entete) return;
   let zoneDefilement = document.getElementById(
     "chatConversationScroll"
@@ -23337,29 +23342,40 @@ function afficherRetourMesAnnonces() {
   if (!zoneDefilement) {
     zoneDefilement = document.createElement("div");
     zoneDefilement.id = "chatConversationScroll";
-    zoneDefilement.style.cssText = [
-      "display:flex",
-      "flex-direction:column",
-      "flex:1 1 auto",
-      "width:100%",
-      "min-height:0",
-      "overflow-y:auto",
-      "overflow-x:hidden",
-      "-webkit-overflow-scrolling:touch",
-      "overscroll-behavior:contain",
-      "box-sizing:border-box"
-    ].join(";");
-    chatContainer.insertBefore(zoneDefilement, entete.nextSibling);
   }
-      /*
-   * Le panneau de négociation est géré séparément.
-   * Ne pas le déplacer dans la zone de défilement.
-  */
- 
-    
-    /*
-   * Le chatBox contient uniquement les messages.
-   * C'est son parent qui gère maintenant le défilement.
+  /*
+   * Configurer la zone qui contient uniquement les messages.
+   */
+  zoneDefilement.style.cssText = [
+    "display:flex",
+    "flex-direction:column",
+    "flex:1 1 0%",
+    "width:100%",
+    "height:0",
+    "min-height:0",
+    "overflow-y:auto",
+    "overflow-x:hidden",
+    "-webkit-overflow-scrolling:touch",
+    "overscroll-behavior-y:contain",
+    "touch-action:pan-y",
+    "box-sizing:border-box"
+  ].join(";");
+  /*
+   * IMPORTANT :
+   * Repositionner la zone même si elle existe déjà.
+   * La barre supérieure reste au-dessus des messages.
+   */
+  if (
+    zoneDefilement.parentElement !== chatContainer ||
+    zoneDefilement.previousElementSibling !== entete
+  ) {
+    chatContainer.insertBefore(
+      zoneDefilement,
+      entete.nextSibling
+    );
+  }
+  /*
+   * Le contenu des messages défile avec son parent.
    */
   if (chatBox.parentElement !== zoneDefilement) {
     zoneDefilement.appendChild(chatBox);
@@ -23376,8 +23392,8 @@ function afficherRetourMesAnnonces() {
   chatBox.style.overflowX = "hidden";
   chatBox.style.boxSizing = "border-box";
   /*
-   * La barre de saisie reste en dehors de la zone
-   * défilante, en bas de la conversation.
+   * La barre de saisie reste en bas,
+   * hors de la zone de défilement.
    */
   if (barre && barre.parentElement !== chatContainer) {
     chatContainer.appendChild(barre);
@@ -23390,20 +23406,23 @@ function afficherRetourMesAnnonces() {
     barre.style.boxSizing = "border-box";
   }
   /*
-   * Si de nouveaux messages arrivent, la zone commune
-   * suit le dernier message lorsque l'utilisateur est
-   * déjà proche du bas de la conversation.
+   * Suivre les nouveaux messages uniquement lorsque
+   * l'utilisateur se trouve déjà près du bas.
    */
   if (!zoneDefilement.dataset.scrollObserverInstalle) {
     zoneDefilement.dataset.scrollObserverInstalle = "1";
     let etaitEnBas = true;
-    zoneDefilement.addEventListener("scroll", function () {
-      const distance =
-        zoneDefilement.scrollHeight -
-        zoneDefilement.clientHeight -
-        zoneDefilement.scrollTop;
-      etaitEnBas = distance < 100;
-    }, { passive: true });
+    zoneDefilement.addEventListener(
+      "scroll",
+      function () {
+        const distance =
+          zoneDefilement.scrollHeight -
+          zoneDefilement.clientHeight -
+          zoneDefilement.scrollTop;
+        etaitEnBas = distance < 100;
+      },
+      { passive: true }
+    );
     const observer = new MutationObserver(function () {
       if (etaitEnBas) {
         requestAnimationFrame(function () {
