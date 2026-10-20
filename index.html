@@ -376,12 +376,11 @@ footer{
   padding:35px 15px;
 }
 
-/* =====================================
+  /* =====================================
    MESSAGERIE PLEIN ÉCRAN
    Marché Guinée 🇬🇳
+   Défilement indépendant et fluide
    ===================================== */
-
-/* La fenêtre occupe l'écran sans défiler elle-même */
 #messagesModal {
   height: 100vh !important;
   height: 100dvh !important;
@@ -390,8 +389,6 @@ footer{
   overflow: hidden !important;
   overscroll-behavior: none;
 }
-
-/* Organisation générale de la fenêtre */
 #messagesModal > .modal-box {
   display: flex !important;
   flex-direction: column !important;
@@ -401,40 +398,58 @@ footer{
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
-
-/* La liste des conversations peut défiler */
-#messagesList {
-  flex: 1 1 auto;
+/* Liste des conversations */
+#messagesModal #messagesList {
+  flex: 1 1 0% !important;
+  height: 0 !important;
   min-height: 0 !important;
+  overflow-x: hidden !important;
   overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
 }
-
-/* La conversation occupe l'espace restant */
-#chatContainer:not(.hidden) {
+/* Conteneur de la conversation */
+#messagesModal #chatContainer:not(.hidden) {
   display: flex !important;
-  flex: 1 1 auto !important;
+  flex: 1 1 0% !important;
   flex-direction: column !important;
-  height: auto !important;
+  height: 0 !important;
   min-height: 0 !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
-
-/* Les messages défilent au-dessus de la saisie */
-#chatBox {
-  flex: 1 1 auto !important;
+/* Une seule zone gère le défilement des messages */
+#messagesModal #chatConversationScroll {
+  display: flex !important;
+  flex: 1 1 0% !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  box-sizing: border-box !important;
+}
+/* Le contenu des messages ne défile pas lui-même */
+#messagesModal #chatBox {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column !important;
+  width: 100% !important;
   height: auto !important;
   min-height: 0 !important;
   margin: 0 !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overflow: visible !important;
+  box-sizing: border-box !important;
 }
-
-/* Barre de saisie toujours au bas de la colonne */
-#chatContainer .chat-input {
+/* La saisie reste sous les messages */
+#messagesModal #chatContainer .chat-input {
   position: relative !important;
   flex: 0 0 auto !important;
   width: 100% !important;
@@ -443,19 +458,18 @@ footer{
   padding-bottom: calc(
     12px + env(safe-area-inset-bottom, 0px)
   ) !important;
-  background: #ffffff !important;
+  background: #fff !important;
   border-top: 1px solid #e7ebe9 !important;
-  z-index: 5;
+  box-sizing: border-box !important;
+  z-index: 5 !important;
 }
-
-/* Empêcher le zoom automatique sur le champ de message */
-#messageInput {
-  font-size: 16px !important;
+/* Évite le zoom automatique d'iOS */
+#messagesModal #messageInput {
   min-width: 0 !important;
+  font-size: 16px !important;
 }
-
-/* Conserver la possibilité de masquer la conversation */
-#chatContainer.hidden {
+/* Conserver le masquage de la conversation */
+#messagesModal #chatContainer.hidden {
   display: none !important;
 }
   
