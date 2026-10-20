@@ -26497,91 +26497,154 @@ display: none !important;
   return row;
 }
   
-  async function loadMessagesOptimized() {
-    var conversationId = getChatId();
-    var userId = getCurrentUserId();
-    var box = document.getElementById("chatBox");
+async function loadMessagesOptimized() {
+  var conversationId = getChatId();
+  var userId = getCurrentUserId();
+  var box = document.getElementById("chatBox");
 
-    if (!conversationId || !userId || !box ||
-        typeof window.supabaseFetch !== "function") return;
+  if (
+    !conversationId ||
+    !userId ||
+    !box ||
+    typeof window.supabaseFetch !== "function"
+  ) {
+    return;
+  }
 
-    if (loadingMessages) return;
-    loadingMessages = true;
+  if (loadingMessages) return;
+  loadingMessages = true;
 
-    try {
-      var url = getSupabaseUrl() +
-        "/rest/v1/messages?select=*&conversation_id=eq." +
-        encodeURIComponent(conversationId) +
-        "&order=created_at.asc";
+  try {
+    /*
+     * La zone de défilement est le conteneur extérieur.
+     * chatBox contient les bulles, mais ne doit pas
+     * recevoir les commandes de défilement.
+     */
+    var scroller =
+      document.getElementById("chatConversationScroll") || box;
 
-      var messages = await window.supabaseFetch(url);
+    var ancienScrollTop = scroller.scrollTop;
 
-      if (!Array.isArray(messages)) return;
-      if (getChatId() !== conversationId) return;
+    var distanceDuBas =
+      scroller.scrollHeight -
+      scroller.scrollTop -
+      scroller.clientHeight;
 
-      markIncomingMessagesRead(conversationId);
+    var etaitEnBas = distanceDuBas < 100;
 
-      var signature = getMessageSignature(messages, userId);
+    var url =
+      getSupabaseUrl() +
+      "/rest/v1/messages?select=*&conversation_id=eq." +
+      encodeURIComponent(conversationId) +
+      "&order=created_at.asc";
 
-      if (signature === lastMessageSignature) return;
+    var messages = await window.supabaseFetch(url);
 
-      var wasNearBottom =
-        box.scrollHeight - box.scrollTop - box.clientHeight < 100;
+    if (!Array.isArray(messages)) return;
+    if (getChatId() !== conversationId) return;
 
-      var oldScrollHeight = box.scrollHeight;
-      var oldScrollTop = box.scrollTop;
+    markIncomingMessagesRead(conversationId);
 
-      var imagePaths = Array.from(new Set(
-        messages.filter(function (msg) {
-          return !!msg.image_url;
-        }).map(function (msg) {
-          return String(msg.image_url);
-        })
-      ));
+    var signature = getMessageSignature(messages, userId);
 
-      var signedResults = await Promise.all(imagePaths.map(async function (path) {
+    /*
+     * Ne pas reconstruire les bulles si rien n'a changé.
+     * Cela évite des rafraîchissements inutiles.
+     */
+    if (signature === lastMessageSignature) return;
+
+    /*
+     * Préparer les URL des photos.
+     */
+    var imagePaths = Array.from(
+      new Set(
+        messages
+          .filter(function (msg) {
+            return !!msg.image_url;
+          })
+          .map(function (msg) {
+            return String(msg.image_url);
+          })
+      )
+    );
+
+    var signedResults = await Promise.all(
+      imagePaths.map(async function (path) {
         try {
           return [path, await getSignedPhotoUrl(path)];
         } catch (error) {
           console.warn("Photo non chargée :", error);
           return [path, null];
         }
-      }));
+      })
+    );
 
+    if (getChatId() !== conversationId) return;
+
+    var urlMap = new Map(signedResults);
+    var fragment = document.createDocumentFragment();
+
+    messages.forEach(function (msg) {
+      fragment.appendChild(
+        makeMessageNode(
+          msg,
+          userId,
+          msg.image_url
+            ? urlMap.get(String(msg.image_url))
+            : null
+        )
+      );
+    });
+
+    /*
+     * Remplacer uniquement le contenu des messages.
+     * Le conteneur qui défile reste en place.
+     */
+    box.replaceChildren(fragment);
+    lastMessageSignature = signature;
+
+    requestAnimationFrame(function () {
       if (getChatId() !== conversationId) return;
 
-      var urlMap = new Map(signedResults);
-      var fragment = document.createDocumentFragment();
+      var zoneActuelle =
+        document.getElementById("chatConversationScroll");
 
-      messages.forEach(function (msg) {
-        fragment.appendChild(
-          makeMessageNode(
-            msg,
-            userId,
-            msg.image_url ? urlMap.get(String(msg.image_url)) : null
-          )
+      var zoneDefilement = zoneActuelle || box;
+
+      if (etaitEnBas) {
+        /*
+         * Si l'utilisateur lisait les derniers messages,
+         * rester en bas après l'actualisation.
+         */
+        zoneDefilement.scrollTop =
+          zoneDefilement.scrollHeight;
+      } else {
+        /*
+         * Sinon, conserver sa position de lecture.
+         * Ne pas ajouter la différence de hauteur :
+         * elle peut provoquer des sauts de défilement.
+         */
+        var maximum =
+          zoneDefilement.scrollHeight -
+          zoneDefilement.clientHeight;
+
+        zoneDefilement.scrollTop = Math.min(
+          ancienScrollTop,
+          Math.max(0, maximum)
         );
-      });
+      }
+    });
 
-      box.replaceChildren(fragment);
-      lastMessageSignature = signature;
-
-      requestAnimationFrame(function () {
-        if (wasNearBottom) {
-          box.scrollTop = box.scrollHeight;
-        } else {
-          box.scrollTop = Math.max(0, oldScrollTop +
-            (box.scrollHeight - oldScrollHeight));
-        }
-      });
-
-    } catch (error) {
-      console.warn("Chargement optimisé des messages impossible :", error);
-    } finally {
-      loadingMessages = false;
-    }
+  } catch (error) {
+    console.warn(
+      "Chargement optimisé des messages impossible :",
+      error
+    );
+  } finally {
+    loadingMessages = false;
   }
-
+}
+  
   function installMessageLoader() {
     if (typeof window.chargerMessages === "function" &&
         !window.chargerMessages.__mg2026) {
