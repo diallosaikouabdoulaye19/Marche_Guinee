@@ -9532,10 +9532,9 @@ async function afficherChat() {
 
   }
 
-  // Charger les messages et les propositions de prix
-  await chargerMessages();
-  await chargerPropositionsPrix();
-
+ // Charger les messages et les propositions de prix
+await window.chargerMessages();
+await chargerPropositionsPrix();
   const input = document.getElementById("messageInput");
 
   if (input) {
