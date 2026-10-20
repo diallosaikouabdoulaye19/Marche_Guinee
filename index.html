@@ -9549,7 +9549,7 @@ await chargerPropositionsPrix();
   intervalMessages = setInterval(function() {
     if (conversationActuelle &&
         conversationActuelle.id === conversation.id) {
-      chargerMessages();
+      window.chargerMessages();
     }
   }, 3000);
 }
