@@ -21946,104 +21946,317 @@ function afficherRetour() {
   }
 </style>
 
+<style id="mg-welcome-style">
+  #mgWelcomePage {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding:
+      calc(env(safe-area-inset-top, 0px) + 20px)
+      20px
+      calc(env(safe-area-inset-bottom, 0px) + 16px);
+    background-color: #17221d;
+    background-image: url("https://raw.githubusercontent.com/diallosaikouabdoulaye19/Marche_Guinee/main/71CE610A-0329-481B-A1EE-BFD1B19816FA.png");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ffffff;
+    isolation: isolate;
+  }
+
+  #mgWelcomePage *,
+  #mgWelcomePage *::before,
+  #mgWelcomePage *::after {
+    box-sizing: border-box;
+  }
+
+  #mgWelcomePage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 25, 14, 0.50) 0%,
+      rgba(0, 25, 14, 0.20) 35%,
+      rgba(0, 15, 8, 0.08) 53%,
+      rgba(0, 0, 0, 0.30) 70%,
+      rgba(0, 0, 0, 0.78) 100%
+    );
+  }
+
+  #mgWelcomePage .mgw-container {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Aucun logo répété en haut */
+  #mgWelcomePage .mgw-brand {
+    display: none !important;
+  }
+
+  /* Présentation centrale sur la photo */
+  #mgWelcomePage .mgw-welcome-card {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: clamp(12px, 3vh, 30px) 4px 18px;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: #ffffff;
+  }
+
+  #mgWelcomePage .mgw-welcome-card::-webkit-scrollbar {
+    display: none;
+  }
+
+  #mgWelcomePage .mgw-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    margin: 0 auto 22px;
+    padding: 10px 17px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.17);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  #mgWelcomePage .mgw-title {
+    margin: 0 auto 17px;
+    color: #ffffff;
+    font-size: clamp(34px, 8vw, 46px);
+    line-height: 1.08;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.32);
+  }
+
+  #mgWelcomePage .mgw-title .mgw-yellow {
+    color: #ffd629;
+  }
+
+  #mgWelcomePage .mgw-description {
+    max-width: 360px;
+    margin: 0 auto 16px;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.55;
+    font-weight: 600;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+  }
+
+  #mgWelcomePage .mgw-tagline {
+    margin: 0 auto 12px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 9px rgba(0, 0, 0, 0.75);
+  }
+
+  /* Les boutons restent en bas de l'écran */
+  #mgWelcomePage .mgw-actions {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  #mgWelcomePage .mgw-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 58px;
+    margin: 0;
+    padding: 15px 18px;
+    border-radius: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    font-weight: 900;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: transform 0.15s ease;
+  }
+
+  #mgWelcomePage .mgw-register {
+    background: #08b94e;
+    border: 1px solid #08b94e;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  #mgWelcomePage .mgw-login {
+    background: #087bff;
+    border: 1px solid #087bff;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  #mgWelcomePage .mgw-button:active {
+    transform: scale(0.98);
+  }
+
+  #mgWelcomePage .mgw-message {
+    display: none;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #fff5df;
+    color: #75510b;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* Suppression de l'explication et du pied de page */
+  #mgWelcomePage .mgw-how-card,
+  #mgWelcomePage .mgw-footer {
+    display: none !important;
+  }
+
+  @media (max-width: 380px) {
+    #mgWelcomePage {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    #mgWelcomePage .mgw-badge {
+      margin-bottom: 17px;
+      font-size: 12px;
+    }
+
+    #mgWelcomePage .mgw-title {
+      font-size: 34px;
+    }
+
+    #mgWelcomePage .mgw-description {
+      font-size: 15px;
+    }
+
+    #mgWelcomePage .mgw-button {
+      min-height: 55px;
+      font-size: 16px;
+    }
+  }
+
+  @media (max-height: 700px) {
+    #mgWelcomePage {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    }
+
+    #mgWelcomePage .mgw-welcome-card {
+      padding-top: 8px;
+    }
+
+    #mgWelcomePage .mgw-badge {
+      margin-bottom: 12px;
+      padding: 8px 13px;
+    }
+
+    #mgWelcomePage .mgw-title {
+      font-size: clamp(30px, 7vw, 38px);
+      margin-bottom: 10px;
+    }
+
+    #mgWelcomePage .mgw-description {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    #mgWelcomePage .mgw-actions {
+      gap: 9px;
+      padding-top: 8px;
+    }
+
+    #mgWelcomePage .mgw-button {
+      min-height: 49px;
+      padding: 12px 15px;
+    }
+  }
+</style>
+
 <div id="mgWelcomePage" role="main" aria-label="Bienvenue sur Marché Guinée">
   <div class="mgw-container">
 
-    <header class="mgw-brand">
-      <div class="mgw-logo">🇬🇳 Marché Guinée</div>
-      <div class="mgw-slogan">
-        Achetez et vendez en Guinée.
-      </div>
-    </header>
-
     <section class="mgw-welcome-card">
-      <div class="mgw-badge">🇬🇳 Marketplace guinéenne</div>
+
+      <div class="mgw-badge">
+        🇬🇳 Marketplace guinéenne
+      </div>
 
       <h1 class="mgw-title">
-        Bienvenue sur<br>Marché Guinée !
+        Bienvenue sur<br>
+        Marché <span class="mgw-yellow">Guinée</span>
       </h1>
 
       <p class="mgw-description">
-        Achetez, vendez et échangez simplement.
-        Découvrez des produits et publiez vos annonces
-        gratuitement.
+        L’application qui connecte les acheteurs et les vendeurs en Guinée.
+        Trouve facilement ce qu’il te faut, près de chez toi.
       </p>
+
+      <p class="mgw-tagline">
+        SIMPLE&nbsp; • &nbsp;RAPIDE&nbsp; • &nbsp;SÉCURISÉ
+      </p>
+
+      <div id="mgWelcomeMessage" class="mgw-message"></div>
+
+    </section>
+
+    <div class="mgw-actions">
 
       <button
         type="button"
         class="mgw-button mgw-register"
         onclick="mgWelcomeInscription()">
-        ✨ Créer un compte gratuitement
+        Inscription gratuite
       </button>
 
       <button
         type="button"
         class="mgw-button mgw-login"
         onclick="mgWelcomeConnexion()">
-        👤 Se connecter
+        Connecte-toi
       </button>
 
-      <div id="mgWelcomeMessage" class="mgw-message"></div>
-    </section>
-
-    <section class="mgw-how-card">
-      <h2 class="mgw-how-title">🛡️ Comment fonctionne Marché Guinée ?</h2>
-
-      <p class="mgw-how-intro">
-        Notre objectif est de rendre les achats et les ventes
-        plus simples et plus sûrs en Guinée.
-      </p>
-
-      <div class="mgw-step">
-        <div class="mgw-step-icon">🛍️</div>
-        <div class="mgw-step-text">
-          <strong>1. Choisissez votre produit</strong>
-          Parcourez les annonces et sélectionnez ce qui vous intéresse.
-        </div>
-      </div>
-
-      <div class="mgw-step">
-        <div class="mgw-step-icon">💰</div>
-        <div class="mgw-step-text">
-          <strong>2. Le paiement prévu</strong>
-          Le système prévu doit permettre de conserver le paiement
-          en attente au lieu de le verser immédiatement au vendeur.
-        </div>
-      </div>
-
-      <div class="mgw-step">
-        <div class="mgw-step-icon">📦</div>
-        <div class="mgw-step-text">
-          <strong>3. Recevez votre colis</strong>
-          Le vendeur organise la livraison du produit à l’acheteur.
-        </div>
-      </div>
-
-      <div class="mgw-step">
-        <div class="mgw-step-icon">✅</div>
-        <div class="mgw-step-text">
-          <strong>4. Confirmez la réception</strong>
-          Après réception et confirmation du colis, le versement au
-          vendeur devra être effectué selon les conditions prévues.
-        </div>
-      </div>
-
-      <div class="mgw-important">
-        <strong>À retenir :</strong> le paiement sécurisé et son
-        versement automatique au vendeur nécessitent une intégration
-        technique opérationnelle. Cette explication présente le
-        fonctionnement prévu de Marché Guinée.
-      </div>
-    </section>
-
-    <footer class="mgw-footer">
-      <strong>🇬🇳 Marché Guinée</strong><br>
-      Le commerce guinéen à portée de main.
-    </footer>
+    </div>
 
   </div>
 </div>
-
+ 
 <script id="mg-welcome-script">
 (function () {
   "use strict";
