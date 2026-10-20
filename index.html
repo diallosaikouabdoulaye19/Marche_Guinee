@@ -474,6 +474,201 @@ footer{
 }
   
 </style>
+
+<!-- MARCHÉ GUINÉE — STYLE MODERNE INSCRIPTION ET CONNEXION -->
+<style id="mg-auth-modern-style">
+
+  /* Présentation réservée aux formulaires d'authentification */
+  #accountModal:has(#accountForms:not(.hidden)) {
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    background: rgba(10, 25, 17, 0.65) !important;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) > .modal-box {
+    width: 100% !important;
+    max-width: 520px !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
+  }
+
+  /* En-tête */
+  #accountModal:has(#accountForms:not(.hidden))
+  > .modal-box > div:first-child {
+    padding: 28px 22px 25px !important;
+    background: linear-gradient(135deg, #087f3f, #10a653) !important;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) #accountTitle {
+    max-width: 90%;
+    font-size: 27px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px;
+  }
+
+  /* Zone des formulaires */
+  #accountModal:has(#accountForms:not(.hidden))
+  > .modal-box > div:nth-child(2) {
+    padding: 24px 22px !important;
+    background: #ffffff !important;
+  }
+
+  /* Onglets Inscription / Connexion */
+  #accountModal:has(#accountForms:not(.hidden)) .account-tabs {
+    display: flex !important;
+    gap: 8px !important;
+    padding: 5px !important;
+    margin-bottom: 25px !important;
+    background: #f0f5f1 !important;
+    border: 1px solid #e5ece7;
+    border-radius: 16px !important;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) .account-tabs button {
+    flex: 1 1 0 !important;
+    min-width: 0;
+    min-height: 46px;
+    padding: 11px 8px !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    transition: background 0.2s ease;
+  }
+
+  /* Champs */
+  #accountModal:has(#accountForms:not(.hidden)) .form-group {
+    margin-bottom: 21px !important;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) .form-group label {
+    display: block;
+    margin-bottom: 9px !important;
+    color: #24352b !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) .form-group input {
+    display: block;
+    width: 100% !important;
+    min-height: 54px;
+    padding: 15px 16px !important;
+    border: 1.5px solid #dfe8e2 !important;
+    border-radius: 14px !important;
+    outline: none !important;
+    background: #f9fbf9 !important;
+    color: #17221d !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px !important;
+    line-height: 1.4;
+    box-shadow: none !important;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden))
+  .form-group input::placeholder {
+    color: #929e96 !important;
+    opacity: 1;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden))
+  .form-group input:focus {
+    border-color: #0a9848 !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(10, 152, 72, 0.10) !important;
+  }
+
+  /* Bouton principal d'inscription */
+  #accountModal:has(#accountForms:not(.hidden))
+  #signupForm > button {
+    width: 100% !important;
+    min-height: 56px;
+    margin-top: 5px;
+    padding: 15px 18px !important;
+    border: 0 !important;
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, #087f3f, #10a653) !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 7px 18px rgba(8, 127, 63, 0.20);
+  }
+
+  /* Bouton principal de connexion */
+  #accountModal:has(#accountForms:not(.hidden))
+  #loginForm > button {
+    width: 100% !important;
+    min-height: 56px;
+    margin-top: 5px;
+    padding: 15px 18px !important;
+    border: 0 !important;
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, #0866d9, #1685ff) !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 7px 18px rgba(8, 102, 217, 0.20);
+  }
+
+  #accountModal:has(#accountForms:not(.hidden))
+  #signupForm > button:active,
+  #accountModal:has(#accountForms:not(.hidden))
+  #loginForm > button:active {
+    transform: scale(0.99);
+  }
+
+  /* Messages d'erreur et de réussite */
+  #accountModal:has(#accountForms:not(.hidden)) #accountMessage {
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
+
+  #accountModal:has(#accountForms:not(.hidden)) #accountMessage .error,
+  #accountModal:has(#accountForms:not(.hidden)) #accountMessage .success {
+    padding: 13px !important;
+    border-radius: 12px !important;
+    line-height: 1.5;
+  }
+
+  /* Petits écrans */
+  @media (max-width: 380px) {
+    #accountModal:has(#accountForms:not(.hidden))
+    > .modal-box > div:first-child {
+      padding: 24px 18px 21px !important;
+    }
+
+    #accountModal:has(#accountForms:not(.hidden))
+    > .modal-box > div:nth-child(2) {
+      padding: 20px 17px !important;
+    }
+
+    #accountModal:has(#accountForms:not(.hidden)) #accountTitle {
+      font-size: 24px !important;
+    }
+
+    #accountModal:has(#accountForms:not(.hidden)) .account-tabs button {
+      font-size: 13px !important;
+    }
+  }
+
+</style>
+  
 </head>
 
 <body>
