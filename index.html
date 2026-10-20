@@ -26515,22 +26515,13 @@ async function loadMessagesOptimized() {
   loadingMessages = true;
 
   try {
-    /*
-     * La zone de défilement est le conteneur extérieur.
-     * chatBox contient les bulles, mais ne doit pas
-     * recevoir les commandes de défilement.
-     */
     var scroller =
       document.getElementById("chatConversationScroll") || box;
 
-    var ancienScrollTop = scroller.scrollTop;
-
-    var distanceDuBas =
+    var etaitEnBas =
       scroller.scrollHeight -
       scroller.scrollTop -
-      scroller.clientHeight;
-
-    var etaitEnBas = distanceDuBas < 100;
+      scroller.clientHeight < 100;
 
     var url =
       getSupabaseUrl() +
@@ -26545,20 +26536,79 @@ async function loadMessagesOptimized() {
 
     markIncomingMessagesRead(conversationId);
 
-    var signature = getMessageSignature(messages, userId);
+    /*
+     * Indexer les bulles existantes.
+     * On les conserve pour éviter le clignotement
+     * des photos et les sauts de mise en page.
+     */
+    var lignesExistantes = new Map();
+
+    Array.from(box.querySelectorAll(".message-row")).forEach(
+      function (ligne) {
+        var id = ligne.dataset.mgMessageId;
+        if (id) lignesExistantes.set(String(id), ligne);
+      }
+    );
 
     /*
-     * Ne pas reconstruire les bulles si rien n'a changé.
-     * Cela évite des rafraîchissements inutiles.
+     * Les messages déjà affichés ne sont pas recréés.
+     * On actualise seulement leur statut de lecture.
      */
-    if (signature === lastMessageSignature) return;
+    messages.forEach(function (msg) {
+      var ligne = lignesExistantes.get(String(msg.id));
+
+      if (!ligne) return;
+
+      var meta = ligne.querySelector(".mg-chat-optimized-status");
+
+      if (!meta) return;
+
+      var dateHeure = "";
+
+      if (msg.created_at) {
+        var instant = new Date(msg.created_at);
+
+        if (!isNaN(instant.getTime())) {
+          dateHeure =
+            instant.toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }) +
+            " · " +
+            instant.toLocaleTimeString("fr-FR", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false
+            });
+        }
+      }
+
+      meta.textContent =
+        dateHeure +
+        (
+          String(msg.sender_id) === String(userId) && msg.read_at
+            ? (dateHeure ? " · " : "") + "Vu"
+            : ""
+        );
+    });
 
     /*
-     * Préparer les URL des photos.
+     * Ne charger les photos que pour les nouveaux messages.
+     * Les photos déjà affichées restent en place.
      */
+    var nouveauxMessages = messages.filter(function (msg) {
+      return !lignesExistantes.has(String(msg.id));
+    });
+
+    if (!nouveauxMessages.length) {
+      lastMessageSignature = getMessageSignature(messages, userId);
+      return;
+    }
+
     var imagePaths = Array.from(
       new Set(
-        messages
+        nouveauxMessages
           .filter(function (msg) {
             return !!msg.image_url;
           })
@@ -26584,7 +26634,7 @@ async function loadMessagesOptimized() {
     var urlMap = new Map(signedResults);
     var fragment = document.createDocumentFragment();
 
-    messages.forEach(function (msg) {
+    nouveauxMessages.forEach(function (msg) {
       fragment.appendChild(
         makeMessageNode(
           msg,
@@ -26597,41 +26647,21 @@ async function loadMessagesOptimized() {
     });
 
     /*
-     * Remplacer uniquement le contenu des messages.
-     * Le conteneur qui défile reste en place.
+     * Ajouter les nouvelles bulles sans supprimer
+     * les anciennes ni reconstruire les photos.
      */
-    box.replaceChildren(fragment);
-    lastMessageSignature = signature;
+    box.appendChild(fragment);
+
+    lastMessageSignature = getMessageSignature(messages, userId);
 
     requestAnimationFrame(function () {
       if (getChatId() !== conversationId) return;
 
-      var zoneActuelle =
-        document.getElementById("chatConversationScroll");
-
-      var zoneDefilement = zoneActuelle || box;
+      var zone =
+        document.getElementById("chatConversationScroll") || box;
 
       if (etaitEnBas) {
-        /*
-         * Si l'utilisateur lisait les derniers messages,
-         * rester en bas après l'actualisation.
-         */
-        zoneDefilement.scrollTop =
-          zoneDefilement.scrollHeight;
-      } else {
-        /*
-         * Sinon, conserver sa position de lecture.
-         * Ne pas ajouter la différence de hauteur :
-         * elle peut provoquer des sauts de défilement.
-         */
-        var maximum =
-          zoneDefilement.scrollHeight -
-          zoneDefilement.clientHeight;
-
-        zoneDefilement.scrollTop = Math.min(
-          ancienScrollTop,
-          Math.max(0, maximum)
-        );
+        zone.scrollTop = zone.scrollHeight;
       }
     });
 
