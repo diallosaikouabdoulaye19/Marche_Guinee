@@ -774,91 +774,142 @@ footer{
   padding: 18px;
 }
 
-/* HERO */
-
+/* HERO — PHOTO MARCHÉ GUINÉE */
 .mg-hero {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 22px;
   min-height: 245px;
-  padding: 30px;
+  padding: 27px 30px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background:
-    linear-gradient(135deg, #087f3f 0%, #10a653 55%, #f0c808 150%);
-  color: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.58) 48%,
+      rgba(0, 0, 0, 0.22) 100%
+    ),
+    url("https://raw.githubusercontent.com/diallosaikouabdoulaye19/Marche_Guinee/main/IMG_1789.jpeg");
+  background-size: cover;
+  background-position: center 48%;
+  background-repeat: no-repeat;
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
-
 .mg-hero::after {
-  content: "🇬🇳";
-  position: absolute;
-  right: -10px;
-  bottom: -35px;
-  font-size: 145px;
-  opacity: 0.13;
-  transform: rotate(-10deg);
+  content: none;
 }
-
 .mg-hero-content {
   position: relative;
   z-index: 2;
-  max-width: 650px;
+  width: 100%;
+  max-width: 600px;
 }
-
 .mg-hero-small {
   display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  background: rgba(255,255,255,0.17);
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 7px 12px;
   border-radius: 30px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  color: #ffffff;
 }
-
 .mg-hero h1 {
   margin: 0 0 10px;
-  font-size: clamp(28px, 6vw, 44px);
-  line-height: 1.08;
+  font-size: clamp(27px, 4vw, 39px);
+  line-height: 1.12;
   font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-
 .mg-hero p {
-  margin: 0 0 20px;
-  max-width: 570px;
-  font-size: 15px;
-  line-height: 1.55;
-  opacity: 0.96;
+  margin: 0 0 16px;
+  max-width: 500px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #ffffff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
 }
-
 .mg-hero-buttons {
   display: flex;
-  gap: 10px;
+  gap: 9px;
   flex-wrap: wrap;
 }
-
 .mg-primary-btn,
 .mg-secondary-btn {
-  border: 0;
-  border-radius: 12px;
-  padding: 13px 18px;
-  font-size: 14px;
+  border-radius: 11px;
+  padding: 12px 15px;
+  min-height: 43px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }
-
 .mg-primary-btn {
   background: #ffffff;
   color: #087f3f;
+  border: 1px solid #ffffff;
 }
-
 .mg-secondary-btn {
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+/* ADAPTATION IPHONE */
+@media (max-width: 600px) {
+  .mg-hero {
+    min-height: 265px;
+    padding: 22px 18px;
+    border-radius: 19px;
+    background-position: center center;
+  }
+  .mg-hero-small {
+    font-size: 11px;
+    margin-bottom: 9px;
+    padding: 6px 10px;
+  }
+  .mg-hero h1 {
+    font-size: 27px;
+    line-height: 1.12;
+  }
+  .mg-hero p {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+  .mg-hero-buttons {
+    gap: 8px;
+  }
+  .mg-primary-btn,
+  .mg-secondary-btn {
+    min-height: 42px;
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 380px) {
+  .mg-hero {
+    min-height: 275px;
+    padding: 19px 15px;
+  }
+  .mg-hero h1 {
+    font-size: 25px;
+  }
+  .mg-hero-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mg-primary-btn,
+  .mg-secondary-btn {
+    width: 100%;
+  }
 }
 
+  
 /* RACCOURCIS */
 
 .mg-shortcuts {
