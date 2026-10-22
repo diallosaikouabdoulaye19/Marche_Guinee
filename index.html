@@ -30843,6 +30843,78 @@ async function ouvrirMesVentes(orderIdCible) {
 </script>
 
 <!-- FIN DU CORRECTIF MES VENTES -->
+
+<script>
+(function () {
+  "use strict";
+  async function actualiserBadgeMessagesNonLus() {
+    const badge = document.getElementById("messageUnreadBadge");
+    if (!badge) return;
+    const utilisateur =
+      window.utilisateurConnecte ||
+      window.utilisateur ||
+      null;
+    const userId =
+      utilisateur && utilisateur.id
+        ? String(utilisateur.id)
+        : "";
+    if (!userId) {
+      badge.style.display = "none";
+      return;
+    }
+    if (
+      typeof window.supabaseFetch !== "function" ||
+      !window.SUPABASE_URL
+    ) {
+      return;
+    }
+    try {
+      const url =
+        window.SUPABASE_URL +
+        "/rest/v1/messages?select=id" +
+        "&sender_id=neq." +
+        encodeURIComponent(userId) +
+        "&read_at=is.null";
+      const messages = await window.supabaseFetch(url);
+      if (!Array.isArray(messages)) return;
+      const nombre = messages.length;
+      badge.textContent = nombre > 99 ? "99+" : String(nombre);
+      badge.style.display = nombre > 0 ? "block" : "none";
+      badge.setAttribute(
+        "aria-label",
+        nombre + " message(s) non lu(s)"
+      );
+    } catch (erreur) {
+      console.warn(
+        "Impossible d'actualiser le compteur des messages non lus.",
+        erreur
+      );
+    }
+  }
+  window.actualiserBadgeMessagesNonLus =
+    actualiserBadgeMessagesNonLus;
+  function demarrerCompteurMessages() {
+    actualiserBadgeMessagesNonLus();
+    window.setInterval(
+      actualiserBadgeMessagesNonLus,
+      20000
+    );
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        actualiserBadgeMessagesNonLus();
+      }
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      demarrerCompteurMessages
+    );
+  } else {
+    demarrerCompteurMessages();
+  }
+})();
+</script>
   
 </body>
 </html>
