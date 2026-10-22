@@ -1220,14 +1220,38 @@ footer{
         <span id="notificationBadge" class="notification-badge">0</span>
       </button>
       <!-- BOUTON MES MESSAGES -->
-      <button
-        class="mg-icon-btn"
-        onclick="ouvrirMessages()"
-        aria-label="Mes messages"
-        title="Mes messages"
-      >
-        💬
-      </button>
+<button
+  id="messageHeaderButton"
+  class="mg-icon-btn"
+  onclick="ouvrirMessages()"
+  aria-label="Mes messages"
+  title="Mes messages"
+  type="button"
+  style="position:relative;"
+>
+  💬
+  <span
+    id="messageUnreadBadge"
+    style="
+      display:none;
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      min-width:19px;
+      height:19px;
+      padding:0 5px;
+      border-radius:12px;
+      background:#e53935;
+      color:#ffffff;
+      font-size:11px;
+      font-weight:800;
+      line-height:19px;
+      text-align:center;
+      border:2px solid #ffffff;
+      box-sizing:content-box;
+    "
+  >0</span>
+</button>
 
       <!-- BOUTON LIVRAISON -->
       <button
