@@ -5521,1149 +5521,25 @@ async function confirmerReceptionAchat(
   }
 
 }
-/* =========================
-   COMPTE DE PAIEMENT VENDEUR
-========================= */
-
-function ouvrirComptePaiement(){
-
-  if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour gérer ton compte de paiement."
-    );
-
-    ouvrirCompte();
-
-    return;
-
-  }
-
-  let modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
-
-  if(!modal){
-
-    modal =
-      document.createElement(
-        "div"
-      );
-
-    modal.id =
-      "payoutAccountModal";
-
-    modal.style.cssText =
-      "display:none;" +
-      "position:fixed;" +
-      "inset:0;" +
-      "background:rgba(0,0,0,.65);" +
-      "z-index:16000;" +
-      "padding:15px;" +
-      "box-sizing:border-box;" +
-      "overflow-y:auto;";
-
-    modal.innerHTML = `
-
-      <div style="
-        background:white;
-        width:100%;
-        max-width:500px;
-        margin:30px auto;
-        border-radius:20px;
-        padding:20px;
-        box-sizing:border-box;
-      ">
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:10px;
-        ">
-
-          <h2 style="
-            margin:0;
-            font-size:22px;
-          ">
-            🏦 Compte de paiement
-          </h2>
-
-          <button
-            onclick="fermerComptePaiement()"
-            style="
-              border:none;
-              background:#eee;
-              border-radius:10px;
-              padding:9px 13px;
-              font-size:18px;
-            ">
-            ✕
-          </button>
-
-        </div>
-
-        <p style="
-          color:#666;
-          font-size:14px;
-          line-height:1.5;
-          margin-top:15px;
-        ">
-          Enregistre le numéro sur lequel tu souhaites recevoir
-          tes paiements vendeur.
-        </p>
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Opérateur
-        </label>
-
-        <select
-          id="payoutProvider"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-            background:white;
-          "
-        >
-
-          <option value="orange_money">
-            🟠 Orange Money
-          </option>
-
-          <option value="mobile_money">
-            🔵 Mobile Money
-          </option>
-
-        </select>
-
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Numéro de paiement
-        </label>
-
-        <input
-          id="payoutPhone"
-          type="tel"
-          inputmode="numeric"
-          maxlength="15"
-          placeholder="Exemple : 621 22 23 24"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-          "
-        />
-
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Nom du titulaire
-        </label>
-
-        <input
-          id="payoutAccountName"
-          type="text"
-          maxlength="100"
-          placeholder="Nom complet du titulaire"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-          "
-        />
-
-
-        <div
-          id="payoutAccountMessage"
-          style="
-            margin-top:15px;
-            display:none;
-            padding:12px;
-            border-radius:10px;
-            font-size:14px;
-          "
-        ></div>
-
-
-        <button
-          onclick="enregistrerComptePaiement()"
-          style="
-            width:100%;
-            margin-top:18px;
-            padding:14px;
-            border:none;
-            border-radius:12px;
-            background:#16a34a;
-            color:white;
-            font-size:16px;
-            font-weight:bold;
-            cursor:pointer;
-          "
-        >
-          💾 Enregistrer
-        </button>
-
-
-        <div
-          style="
-            margin-top:15px;
-            padding:12px;
-            background:#f8f8f8;
-            border-radius:10px;
-            color:#777;
-            font-size:12px;
-            line-height:1.5;
-          "
-        >
-          🔐 Tes informations sont utilisées pour préparer
-          les futurs versements de tes ventes.
-        </div>
-
-      </div>
-
-    `;
-
-    document.body.appendChild(
-      modal
-    );
-
-  }
-
-  modal.style.display =
-    "block";
-
-  chargerComptePaiement();
-
-}
-
-
-function fermerComptePaiement(){
-
-  const modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
-
-  if(modal){
-
-    modal.style.display =
-      "none";
-
-  }
-
-}
-
-
-async function chargerComptePaiement(){
-
-  if(!utilisateurConnecte)
-    return;
-
-  try{
-
-    const comptes =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id,provider,phone,account_name" +
-        "&order=created_at.desc" +
-        "&limit=1"
-
-      );
-
-    if(
-      !Array.isArray(comptes) ||
-      !comptes.length
-    ){
-
-      return;
-
-    }
-
-    const compte =
-      comptes[0];
-
-    const provider =
-      document.getElementById(
-        "payoutProvider"
-      );
-
-    const phone =
-      document.getElementById(
-        "payoutPhone"
-      );
-
-    const accountName =
-      document.getElementById(
-        "payoutAccountName"
-      );
-
-    if(provider)
-      provider.value =
-        compte.provider || "orange_money";
-
-    if(phone)
-      phone.value =
-        compte.phone || "";
-
-    if(accountName)
-      accountName.value =
-        compte.account_name || "";
-
-  }catch(error){
-
-    console.error(
-      "Erreur chargement compte paiement :",
-      error
-    );
-
-  }
-
-}
-
-
-async function enregistrerComptePaiement(){
-
-  if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
-    return;
-
-  }
-
-  const provider =
-    document.getElementById(
-      "payoutProvider"
-    )?.value;
-
-  const phone =
-    document.getElementById(
-      "payoutPhone"
-    )?.value
-    .trim();
-
-  const accountName =
-    document.getElementById(
-      "payoutAccountName"
-    )?.value
-    .trim();
-
-  if(!provider){
-
-    alert(
-      "Sélectionne ton opérateur."
-    );
-
-    return;
-
-  }
-
-  if(!phone){
-
-    alert(
-      "Entre ton numéro de paiement."
-    );
-
-    return;
-
-  }
-
-  if(!/^\d{9}$/.test(phone)){
-
-    alert(
-      "Le numéro doit contenir exactement 9 chiffres.\n\nExemple : 621222324"
-    );
-
-    return;
-
-  }
-
-  if(!accountName){
-
-    alert(
-      "Entre le nom du titulaire du compte."
-    );
-
-    return;
-
-  }
-
-  const message =
-    document.getElementById(
-      "payoutAccountMessage"
-    );
-
-  try{
-
-    if(message){
-
-      message.style.display =
-        "block";
-
-      message.style.background =
-        "#fff7ed";
-
-      message.style.color =
-        "#9a3412";
-
-      message.textContent =
-        "⏳ Enregistrement en cours...";
-
-    }
-
-    const anciens =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id"
-
-      );
-
-    if(
-      Array.isArray(anciens) &&
-      anciens.length
-    ){
-
-      for(
-        const ancien of anciens
-      ){
-
-        await supabaseFetch(
-
-          SUPABASE_URL +
-          "/rest/v1/payout_accounts" +
-          "?id=eq." +
-          encodeURIComponent(
-            ancien.id
-          ),
-
-          {
-            method:"PATCH",
-
-            body:
-              JSON.stringify({
-
-                status:"inactive",
-
-                updated_at:
-                  new Date().toISOString()
-
-              })
-
-          }
-
-        );
-
-      }
-
-    }
-
-
-    await supabaseFetch(
-
-      SUPABASE_URL +
-      "/rest/v1/payout_accounts",
-
-      {
-        method:"POST",
-
-        body:
-          JSON.stringify({
-
-            user_id:
-              utilisateurConnecte.id,
-
-            provider:
-              provider,
-
-            phone:
-              phone,
-
-            account_name:
-              accountName,
-
-            status:
-              "active"
-
-          })
-
-      }
-
-    );
-
-
-    if(message){
-
-      message.style.background =
-        "#ecfdf5";
-
-      message.style.color =
-        "#166534";
-
-      message.textContent =
-        "✅ Compte de paiement enregistré avec succès.";
-
-    }
-
-    alert(
-      "✅ Ton compte de paiement a été enregistré."
-    );
-
-  }catch(error){
-
-    console.error(
-      "Erreur enregistrement compte paiement :",
-      error
-    );
-
-    if(message){
-
-      message.style.background =
-        "#fef2f2";
-
-      message.style.color =
-        "#991b1b";
-
-      message.textContent =
-        "❌ Impossible d'enregistrer le compte de paiement.";
-
-    }
-
-    alert(
-      "Impossible d'enregistrer le compte de paiement.\n\n" +
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
-    );
-
-  }
-
-}
 
 /* =========================
    COMPTE DE PAIEMENT VENDEUR
+   VERSION UNIQUE — MARCHÉ GUINÉE 🇬🇳
 ========================= */
 
-function ouvrirComptePaiement(){
-
-  if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour gérer ton compte de paiement."
-    );
-
-    ouvrirCompte();
-
-    return;
-
-  }
-
-  let modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
-
-  if(!modal){
-
-    modal =
-      document.createElement(
-        "div"
-      );
-
-    modal.id =
-      "payoutAccountModal";
-
-    modal.style.cssText =
-      "display:none;" +
-      "position:fixed;" +
-      "inset:0;" +
-      "background:rgba(0,0,0,.65);" +
-      "z-index:16000;" +
-      "padding:15px;" +
-      "box-sizing:border-box;" +
-      "overflow-y:auto;";
-
-    modal.innerHTML = `
-
-      <div style="
-        background:white;
-        width:100%;
-        max-width:500px;
-        margin:30px auto;
-        border-radius:20px;
-        padding:20px;
-        box-sizing:border-box;
-      ">
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:10px;
-        ">
-
-          <h2 style="
-            margin:0;
-            font-size:22px;
-          ">
-            🏦 Compte de paiement
-          </h2>
-
-          <button
-            onclick="fermerComptePaiement()"
-            style="
-              border:none;
-              background:#eee;
-              border-radius:10px;
-              padding:9px 13px;
-              font-size:18px;
-            ">
-            ✕
-          </button>
-
-        </div>
-
-        <p style="
-          color:#666;
-          font-size:14px;
-          line-height:1.5;
-          margin-top:15px;
-        ">
-          Enregistre le numéro sur lequel tu souhaites recevoir
-          tes paiements vendeur.
-        </p>
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Opérateur
-        </label>
-
-        <select
-          id="payoutProvider"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-            background:white;
-          "
-        >
-
-          <option value="orange_money">
-            🟠 Orange Money
-          </option>
-
-          <option value="mobile_money">
-            🔵 Mobile Money
-          </option>
-
-        </select>
-
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Numéro de paiement
-        </label>
-
-        <input
-          id="payoutPhone"
-          type="tel"
-          inputmode="numeric"
-          maxlength="15"
-          placeholder="Exemple : 621 22 23 24"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-          "
-        />
-
-
-        <label style="
-          display:block;
-          margin-top:18px;
-          font-weight:bold;
-        ">
-          Nom du titulaire
-        </label>
-
-        <input
-          id="payoutAccountName"
-          type="text"
-          maxlength="100"
-          placeholder="Nom complet du titulaire"
-          style="
-            width:100%;
-            margin-top:7px;
-            padding:13px;
-            border:1px solid #ddd;
-            border-radius:10px;
-            box-sizing:border-box;
-            font-size:16px;
-          "
-        />
-
-
-        <div
-          id="payoutAccountMessage"
-          style="
-            margin-top:15px;
-            display:none;
-            padding:12px;
-            border-radius:10px;
-            font-size:14px;
-          "
-        ></div>
-
-
-        <button
-          onclick="enregistrerComptePaiement()"
-          style="
-            width:100%;
-            margin-top:18px;
-            padding:14px;
-            border:none;
-            border-radius:12px;
-            background:#16a34a;
-            color:white;
-            font-size:16px;
-            font-weight:bold;
-            cursor:pointer;
-          "
-        >
-          💾 Enregistrer
-        </button>
-
-
-        <div
-          style="
-            margin-top:15px;
-            padding:12px;
-            background:#f8f8f8;
-            border-radius:10px;
-            color:#777;
-            font-size:12px;
-            line-height:1.5;
-          "
-        >
-          🔐 Tes informations sont utilisées pour préparer
-          les futurs versements de tes ventes.
-        </div>
-
-      </div>
-
-    `;
-
-    document.body.appendChild(
-      modal
-    );
-
-  }
-
-  modal.style.display =
-    "block";
-
-  chargerComptePaiement();
-
-}
-
-
-function fermerComptePaiement(){
-
-  const modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
-
-  if(modal){
-
-    modal.style.display =
-      "none";
-
-  }
-
-}
-
-
-async function chargerComptePaiement(){
-
-  if(!utilisateurConnecte)
-    return;
-
-  try{
-
-    const comptes =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id,provider,phone,account_name" +
-        "&order=created_at.desc" +
-        "&limit=1"
-
-      );
-
-    if(
-      !Array.isArray(comptes) ||
-      !comptes.length
-    ){
-
-      return;
-
-    }
-
-    const compte =
-      comptes[0];
-
-    const provider =
-      document.getElementById(
-        "payoutProvider"
-      );
-
-    const phone =
-      document.getElementById(
-        "payoutPhone"
-      );
-
-    const accountName =
-      document.getElementById(
-        "payoutAccountName"
-      );
-
-    if(provider)
-      provider.value =
-        compte.provider || "orange_money";
-
-    if(phone)
-      phone.value =
-        compte.phone || "";
-
-    if(accountName)
-      accountName.value =
-        compte.account_name || "";
-
-  }catch(error){
-
-    console.error(
-      "Erreur chargement compte paiement :",
-      error
-    );
-
-  }
-
-}
-
-
-async function enregistrerComptePaiement(){
-
-  if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
-    return;
-
-  }
-
-  const provider =
-    document.getElementById(
-      "payoutProvider"
-    )?.value;
-
-  const phone =
-    document.getElementById(
-      "payoutPhone"
-    )?.value
-    .trim();
-
-  const accountName =
-    document.getElementById(
-      "payoutAccountName"
-    )?.value
-    .trim();
-
-  if(!provider){
-
-    alert(
-      "Sélectionne ton opérateur."
-    );
-
-    return;
-
-  }
-
-  if(!phone){
-
-    alert(
-      "Entre ton numéro de paiement."
-    );
-
-    return;
-
-  }
-
-  if(!/^\d{9}$/.test(phone)){
-
-    alert(
-      "Le numéro doit contenir exactement 9 chiffres.\n\nExemple : 621222324"
-    );
-
-    return;
-
-  }
-
-  if(!accountName){
-
-    alert(
-      "Entre le nom du titulaire du compte."
-    );
-
-    return;
-
-  }
-
-  const message =
-    document.getElementById(
-      "payoutAccountMessage"
-    );
-
-  try{
-
-    if(message){
-
-      message.style.display =
-        "block";
-
-      message.style.background =
-        "#fff7ed";
-
-      message.style.color =
-        "#9a3412";
-
-      message.textContent =
-        "⏳ Enregistrement en cours...";
-
-    }
-
-    const anciens =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id"
-
-      );
-
-    if(
-      Array.isArray(anciens) &&
-      anciens.length
-    ){
-
-      for(
-        const ancien of anciens
-      ){
-
-        await supabaseFetch(
-
-          SUPABASE_URL +
-          "/rest/v1/payout_accounts" +
-          "?id=eq." +
-          encodeURIComponent(
-            ancien.id
-          ),
-
-          {
-            method:"PATCH",
-
-            body:
-              JSON.stringify({
-
-                status:"inactive",
-
-                updated_at:
-                  new Date().toISOString()
-
-              })
-
-          }
-
-        );
-
-      }
-
-    }
-
-
-    await supabaseFetch(
-
-      SUPABASE_URL +
-      "/rest/v1/payout_accounts",
-
-      {
-        method:"POST",
-
-        body:
-          JSON.stringify({
-
-            user_id:
-              utilisateurConnecte.id,
-
-            provider:
-              provider,
-
-            phone:
-              phone,
-
-            account_name:
-              accountName,
-
-            status:
-              "active"
-
-          })
-
-      }
-
-    );
-
-
-    if(message){
-
-      message.style.background =
-        "#ecfdf5";
-
-      message.style.color =
-        "#166534";
-
-      message.textContent =
-        "✅ Compte de paiement enregistré avec succès.";
-
-    }
-
-    alert(
-      "✅ Ton compte de paiement a été enregistré."
-    );
-
-  }catch(error){
-
-    console.error(
-      "Erreur enregistrement compte paiement :",
-      error
-    );
-
-    if(message){
-
-      message.style.background =
-        "#fef2f2";
-
-      message.style.color =
-        "#991b1b";
-
-      message.textContent =
-        "❌ Impossible d'enregistrer le compte de paiement.";
-
-    }
-
-    alert(
-      "Impossible d'enregistrer le compte de paiement.\n\n" +
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
-    );
-
-  }
-
-}
-
-  /* =========================
-   COMPTE DE PAIEMENT VENDEUR
-========================= */
-
-function ouvrirComptePaiement(){
-  if(!utilisateurConnecte){
-    alert(
-      "Connecte-toi pour gérer ton compte de paiement."
-    );
+function ouvrirComptePaiement() {
+  if (!utilisateurConnecte) {
+    alert("Connecte-toi pour gérer ton compte de paiement.");
     ouvrirCompte();
     return;
   }
-  let modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
-  if(!modal){
-    modal =
-      document.createElement(
-        "div"
-      );
-    modal.id =
-      "payoutAccountModal";
+
+  let modal = document.getElementById("payoutAccountModal");
+
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "payoutAccountModal";
+
     modal.style.cssText =
       "display:none;" +
       "position:fixed;" +
@@ -6675,6 +5551,7 @@ function ouvrirComptePaiement(){
       "padding:12px;" +
       "box-sizing:border-box;" +
       "overflow-y:auto;";
+
     modal.innerHTML = `
       <section style="
         background:#f7faf8;
@@ -6692,6 +5569,7 @@ function ouvrirComptePaiement(){
           color:#fff;
         ">
           <button
+            type="button"
             onclick="fermerComptePaiement()"
             aria-label="Fermer"
             style="
@@ -6707,31 +5585,28 @@ function ouvrirComptePaiement(){
               font-size:22px;
               cursor:pointer;
             "
-          >
-            ×
-          </button>
-          <small style="
-            font-weight:700;
-            opacity:.86;
-          ">
+          >×</button>
+
+          <small style="font-weight:700;opacity:.9">
             🇬🇳 Marché Guinée
           </small>
+
           <h2 style="
-            margin:6px 0 0;
+            margin:8px 45px 0 0;
             font-size:24px;
             font-weight:900;
-          ">
-            🏦 Compte de paiement
-          </h2>
+          ">🏦 Compte de paiement</h2>
+
           <p style="
             margin:7px 0 0;
             font-size:13px;
             opacity:.9;
-            line-height:1.4;
+            line-height:1.5;
           ">
             Configure le compte qui recevra tes paiements vendeur.
           </p>
         </header>
+
         <main style="padding:18px;">
           <div style="
             padding:14px;
@@ -6744,15 +5619,15 @@ function ouvrirComptePaiement(){
           ">
             💡 Utilise un numéro de paiement auquel tu as accès.
           </div>
-          <label style="
+
+          <label for="payoutProvider" style="
             display:block;
             margin-top:18px;
             font-weight:800;
             font-size:14px;
             color:#26352d;
-          ">
-            Opérateur
-          </label>
+          ">Opérateur</label>
+
           <select
             id="payoutProvider"
             style="
@@ -6763,28 +5638,23 @@ function ouvrirComptePaiement(){
               border:1px solid #d9e2dc;
               border-radius:14px;
               box-sizing:border-box;
-              font-size:15px;
+              font-size:16px;
               background:#fff;
               color:#26352d;
-              outline:none;
             "
           >
-            <option value="orange_money">
-              🟠 Orange Money
-            </option>
-            <option value="mobile_money">
-              🔵 Mobile Money
-            </option>
+            <option value="orange_money">🟠 Orange Money</option>
+            <option value="mobile_money">🔵 Mobile Money</option>
           </select>
-          <label style="
+
+          <label for="payoutPhone" style="
             display:block;
             margin-top:18px;
             font-weight:800;
             font-size:14px;
             color:#26352d;
-          ">
-            Numéro de paiement
-          </label>
+          ">Numéro de paiement</label>
+
           <input
             id="payoutPhone"
             type="tel"
@@ -6799,20 +5669,19 @@ function ouvrirComptePaiement(){
               border:1px solid #d9e2dc;
               border-radius:14px;
               box-sizing:border-box;
-              font-size:15px;
+              font-size:16px;
               background:#fff;
-              outline:none;
             "
           >
-          <label style="
+
+          <label for="payoutAccountName" style="
             display:block;
             margin-top:18px;
             font-weight:800;
             font-size:14px;
             color:#26352d;
-          ">
-            Nom du titulaire
-          </label>
+          ">Nom du titulaire</label>
+
           <input
             id="payoutAccountName"
             type="text"
@@ -6826,27 +5695,33 @@ function ouvrirComptePaiement(){
               border:1px solid #d9e2dc;
               border-radius:14px;
               box-sizing:border-box;
-              font-size:15px;
+              font-size:16px;
               background:#fff;
-              outline:none;
             "
           >
+
           <div
             id="payoutAccountMessage"
+            role="status"
+            aria-live="polite"
             style="
               margin-top:15px;
               display:none;
               padding:12px;
               border-radius:13px;
               font-size:13px;
-              line-height:1.4;
+              line-height:1.5;
+              overflow-wrap:anywhere;
             "
           ></div>
+
           <button
+            id="payoutSaveButton"
+            type="button"
             onclick="enregistrerComptePaiement()"
             style="
               width:100%;
-              height:48px;
+              min-height:48px;
               margin-top:18px;
               border:0;
               border-radius:14px;
@@ -6860,6 +5735,7 @@ function ouvrirComptePaiement(){
           >
             💾 Enregistrer mon compte
           </button>
+
           <div style="
             margin-top:14px;
             padding:12px;
@@ -6869,511 +5745,277 @@ function ouvrirComptePaiement(){
             font-size:12px;
             line-height:1.5;
           ">
-            🔐 Tes informations servent à préparer les futurs versements de tes ventes.
+            🔐 Tes informations servent à préparer les futurs
+            versements de tes ventes. L'enregistrement du compte
+            ne signifie pas que les paiements réels sont activés.
           </div>
         </main>
       </section>
     `;
-    document.body.appendChild(
-      modal
-    );
+
+    document.body.appendChild(modal);
   }
-  modal.style.display =
-    "block";
+
+  modal.style.display = "block";
   chargerComptePaiement();
 }
 
-function fermerComptePaiement(){
 
-  const modal =
-    document.getElementById(
-      "payoutAccountModal"
-    );
+/* =========================
+   FERMER LE COMPTE DE PAIEMENT
+========================= */
 
-  if(modal){
+function fermerComptePaiement() {
+  const modal = document.getElementById("payoutAccountModal");
 
-    modal.style.display =
-      "none";
-
+  if (modal) {
+    modal.style.display = "none";
   }
-
 }
 
 
-async function chargerComptePaiement(){
+/* =========================
+   CHARGER LE COMPTE ACTIF
+========================= */
 
-  if(!utilisateurConnecte)
+async function chargerComptePaiement() {
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
     return;
+  }
 
-  try{
+  const providerInput = document.getElementById("payoutProvider");
+  const phoneInput = document.getElementById("payoutPhone");
+  const nameInput = document.getElementById("payoutAccountName");
+  const message = document.getElementById("payoutAccountMessage");
 
-    const comptes =
-      await supabaseFetch(
+  if (!providerInput || !phoneInput || !nameInput) {
+    return;
+  }
 
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id,provider,phone,account_name" +
-        "&order=created_at.desc" +
-        "&limit=1"
+  try {
+    const comptes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/payout_accounts" +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&status=eq.active" +
+      "&select=id,provider,phone,account_name" +
+      "&order=created_at.desc" +
+      "&limit=1"
+    );
 
-      );
-
-    if(
-      !Array.isArray(comptes) ||
-      !comptes.length
-    ){
-
+    if (!Array.isArray(comptes) || comptes.length === 0) {
+      providerInput.value = "orange_money";
+      phoneInput.value = "";
+      nameInput.value = "";
       return;
-
     }
 
-    const compte =
-      comptes[0];
+    const compte = comptes[0];
 
-    const provider =
-      document.getElementById(
-        "payoutProvider"
-      );
+    providerInput.value = compte.provider || "orange_money";
+    phoneInput.value = compte.phone || "";
+    nameInput.value = compte.account_name || "";
 
-    const phone =
-      document.getElementById(
-        "payoutPhone"
-      );
+  } catch (error) {
+    console.error("Erreur chargement compte paiement :", error);
 
-    const accountName =
-      document.getElementById(
-        "payoutAccountName"
-      );
-
-    if(provider)
-      provider.value =
-        compte.provider || "orange_money";
-
-    if(phone)
-      phone.value =
-        compte.phone || "";
-
-    if(accountName)
-      accountName.value =
-        compte.account_name || "";
-
-  }catch(error){
-
-    console.error(
-      "Erreur chargement compte paiement :",
-      error
-    );
-
+    if (message) {
+      message.style.display = "block";
+      message.style.background = "#fef2f2";
+      message.style.color = "#991b1b";
+      message.textContent =
+        "Impossible de charger ton compte. Réessaie dans un instant.";
+    }
   }
-
 }
 
-async function enregistrerComptePaiement(){
 
-  if(!utilisateurConnecte){
+/* =========================
+   ENREGISTRER LE COMPTE
+========================= */
 
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
+async function enregistrerComptePaiement() {
+  if (!utilisateurConnecte || !utilisateurConnecte.id) {
+    alert("Connecte-toi pour continuer.");
     return;
-
   }
 
-  const provider =
-    document.getElementById(
-      "payoutProvider"
-    )?.value;
+  const providerInput = document.getElementById("payoutProvider");
+  const phoneInput = document.getElementById("payoutPhone");
+  const nameInput = document.getElementById("payoutAccountName");
+  const message = document.getElementById("payoutAccountMessage");
+  const saveButton = document.getElementById("payoutSaveButton");
 
-  const phone =
-    document.getElementById(
-      "payoutPhone"
-    )?.value
-    .trim();
-
-  const accountName =
-    document.getElementById(
-      "payoutAccountName"
-    )?.value
-    .trim();
-
-  if(!provider){
-
-    alert(
-      "Sélectionne ton opérateur."
-    );
-
+  if (!providerInput || !phoneInput || !nameInput) {
+    alert("Le formulaire du compte de paiement est indisponible.");
     return;
-
   }
 
-  if(!phone){
+  const provider = providerInput.value;
+  const phone = phoneInput.value.trim().replace(/[\s-]/g, "");
+  const accountName = nameInput.value.trim();
 
-    alert(
-      "Entre ton numéro de paiement."
-    );
-
+  if (!["orange_money", "mobile_money"].includes(provider)) {
+    alert("Sélectionne un opérateur valide.");
     return;
-
   }
 
-  if(!/^\d{9}$/.test(phone)){
-
+  if (!/^\d{9}$/.test(phone)) {
     alert(
       "Le numéro doit contenir exactement 9 chiffres.\n\n" +
       "Exemple : 621222324"
     );
-
     return;
-
   }
 
-  if(!accountName){
-
-    alert(
-      "Entre le nom du titulaire du compte."
-    );
-
+  if (!accountName) {
+    alert("Entre le nom du titulaire du compte.");
     return;
-
   }
 
-  const message =
-    document.getElementById(
-      "payoutAccountMessage"
+  function afficherMessage(texte, succes) {
+    if (!message) return;
+
+    message.style.display = "block";
+    message.style.background = succes ? "#ecfdf5" : "#fef2f2";
+    message.style.color = succes ? "#166534" : "#991b1b";
+    message.textContent = texte;
+  }
+
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.style.opacity = "0.65";
+    saveButton.textContent = "⏳ Enregistrement...";
+  }
+
+  afficherMessage("Vérification du compte...", true);
+
+  try {
+    const baseUrl =
+      SUPABASE_URL + "/rest/v1/payout_accounts";
+
+    /* Rechercher le même compte, actif ou inactif. */
+    const comptesExistants = await supabaseFetch(
+      baseUrl +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&provider=eq." +
+      encodeURIComponent(provider) +
+      "&phone=eq." +
+      encodeURIComponent(phone) +
+      "&select=id,status" +
+      "&order=created_at.desc"
     );
 
-  try{
+    let compteId = null;
 
-    if(message){
-
-      message.style.display =
-        "block";
-
-      message.style.background =
-        "#fff7ed";
-
-      message.style.color =
-        "#9a3412";
-
-      message.textContent =
-        "⏳ Vérification du compte...";
-
+    if (
+      Array.isArray(comptesExistants) &&
+      comptesExistants.length > 0
+    ) {
+      compteId = comptesExistants[0].id;
     }
 
-    /* =========================
-       RECHERCHER LE COMPTE EXISTANT
-    ========================= */
+    /* Récupérer les comptes actuellement actifs. */
+    const comptesActifs = await supabaseFetch(
+      baseUrl +
+      "?user_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&status=eq.active" +
+      "&select=id"
+    );
 
-    const comptesExistants =
+    /*
+      Si le compte existe déjà, le mettre à jour.
+      Sinon, créer le nouveau compte avant de désactiver
+      les anciens : une erreur de création ne doit pas
+      supprimer immédiatement le compte actif existant.
+    */
+
+    if (compteId) {
       await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&provider=eq." +
-        encodeURIComponent(
-          provider
-        ) +
-        "&phone=eq." +
-        encodeURIComponent(
-          phone
-        ) +
-        "&select=id,status"
-
-      );
-
-    /* =========================
-       SI LE COMPTE EXISTE DÉJÀ
-    ========================= */
-
-    if(
-      Array.isArray(
-        comptesExistants
-      ) &&
-      comptesExistants.length
-    ){
-
-      const compteExistant =
-        comptesExistants[0];
-
-      /* Réactiver / mettre à jour */
-
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?id=eq." +
-        encodeURIComponent(
-          compteExistant.id
-        ),
-
+        baseUrl + "?id=eq." + encodeURIComponent(compteId),
         {
-          method:"PATCH",
-
-          body:
-            JSON.stringify({
-
-              account_name:
-                accountName,
-
-              status:
-                "active",
-
-              updated_at:
-                new Date().toISOString()
-
-            })
-
-        }
-
-      );
-
-      /* Désactiver les autres comptes actifs */
-
-      const autresComptes =
-        await supabaseFetch(
-
-          SUPABASE_URL +
-          "/rest/v1/payout_accounts" +
-          "?user_id=eq." +
-          encodeURIComponent(
-            utilisateurConnecte.id
-          ) +
-          "&status=eq.active" +
-          "&select=id"
-
-        );
-
-      if(
-        Array.isArray(
-          autresComptes
-        )
-      ){
-
-        for(
-          const autre
-          of autresComptes
-        ){
-
-          if(
-            autre.id !==
-            compteExistant.id
-          ){
-
-            await supabaseFetch(
-
-              SUPABASE_URL +
-              "/rest/v1/payout_accounts" +
-              "?id=eq." +
-              encodeURIComponent(
-                autre.id
-              ),
-
-              {
-                method:"PATCH",
-
-                body:
-                  JSON.stringify({
-
-                    status:
-                      "inactive",
-
-                    updated_at:
-                      new Date().toISOString()
-
-                  })
-
-              }
-
-            );
-
-          }
-
-        }
-
-      }
-
-      if(message){
-
-        message.style.background =
-          "#ecfdf5";
-
-        message.style.color =
-          "#166534";
-
-        message.textContent =
-          "✅ Ton compte de paiement existe déjà et est maintenant actif.";
-
-      }
-
-      alert(
-
-        "✅ Ton compte de paiement est déjà enregistré.\n\n" +
-        "Il est maintenant actif pour recevoir tes paiements."
-
-      );
-
-      return;
-
-    }
-
-    /* =========================
-       DÉSACTIVER LES AUTRES COMPTES
-    ========================= */
-
-    const anciens =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payout_accounts" +
-        "?user_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.active" +
-        "&select=id"
-
-      );
-
-    if(
-      Array.isArray(
-        anciens
-      )
-    ){
-
-      for(
-        const ancien
-        of anciens
-      ){
-
-        await supabaseFetch(
-
-          SUPABASE_URL +
-          "/rest/v1/payout_accounts" +
-          "?id=eq." +
-          encodeURIComponent(
-            ancien.id
-          ),
-
-          {
-            method:"PATCH",
-
-            body:
-              JSON.stringify({
-
-                status:
-                  "inactive",
-
-                updated_at:
-                  new Date().toISOString()
-
-              })
-
-          }
-
-        );
-
-      }
-
-    }
-
-    /* =========================
-       CRÉER LE NOUVEAU COMPTE
-    ========================= */
-
-    await supabaseFetch(
-
-      SUPABASE_URL +
-      "/rest/v1/payout_accounts",
-
-      {
-        method:"POST",
-
-        body:
-          JSON.stringify({
-
-            user_id:
-              utilisateurConnecte.id,
-
-            provider:
-              provider,
-
-            phone:
-              phone,
-
-            account_name:
-              accountName,
-
-            status:
-              "active"
-
+          method: "PATCH",
+          body: JSON.stringify({
+            account_name: accountName,
+            status: "active",
+            updated_at: new Date().toISOString()
           })
+        }
+      );
+    } else {
+      await supabaseFetch(
+        baseUrl,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            user_id: utilisateurConnecte.id,
+            provider: provider,
+            phone: phone,
+            account_name: accountName,
+            status: "active"
+          })
+        }
+      );
+    }
 
+    /*
+      Une fois le compte enregistré avec succès,
+      désactiver les autres comptes actifs.
+    */
+    if (Array.isArray(comptesActifs)) {
+      for (const ancien of comptesActifs) {
+        if (!ancien || !ancien.id || ancien.id === compteId) {
+          continue;
+        }
+
+        await supabaseFetch(
+          baseUrl + "?id=eq." + encodeURIComponent(ancien.id),
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              status: "inactive",
+              updated_at: new Date().toISOString()
+            })
+          }
+        );
       }
-
-    );
-
-    if(message){
-
-      message.style.background =
-        "#ecfdf5";
-
-      message.style.color =
-        "#166534";
-
-      message.textContent =
-        "✅ Compte de paiement enregistré avec succès.";
-
     }
 
-    alert(
-      "✅ Ton compte de paiement a été enregistré."
+    afficherMessage(
+      "✅ Ton compte de paiement a été enregistré.",
+      true
     );
 
-  }catch(error){
+    alert("✅ Ton compte de paiement a été enregistré.");
 
-    console.error(
-      "Erreur enregistrement compte paiement :",
-      error
+    await chargerComptePaiement();
+
+  } catch (error) {
+    console.error("Erreur enregistrement compte paiement :", error);
+
+    afficherMessage(
+      "❌ Impossible d'enregistrer le compte de paiement. " +
+      (error.message || "Réessaie dans un instant."),
+      false
     );
 
-    if(message){
-
-      message.style.background =
-        "#fef2f2";
-
-      message.style.color =
-        "#991b1b";
-
-      message.textContent =
-        "❌ Impossible d'enregistrer le compte de paiement.";
-
-    }
-
     alert(
-
       "Impossible d'enregistrer le compte de paiement.\n\n" +
-
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
-
+      (error.message || "Erreur Supabase inconnue.")
     );
 
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.style.opacity = "1";
+      saveButton.textContent = "💾 Enregistrer mon compte";
+    }
   }
-
 }
-
+  
 /* =========================
    MES VENTES
 ========================= */
