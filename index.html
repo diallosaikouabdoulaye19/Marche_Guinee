@@ -1198,9 +1198,7 @@ footer{
 
 </style>
 
-
 <div class="mg-home">
-
  <!-- HEADER -->
 <header class="mg-header">
   <div class="mg-header-top">
@@ -1208,14 +1206,29 @@ footer{
       🇬🇳 Marché Guinée
     </div>
     <div class="mg-header-actions">
+      <!-- BOUTON NOTIFICATIONS -->
+      <button
+        id="notificationHeaderButton"
+        class="mg-icon-btn"
+        onclick="ouvrirNotifications()"
+        aria-label="Notifications"
+        title="Notifications"
+        type="button"
+        style="position:relative;"
+      >
+        🔔
+        <span id="notificationBadge" class="notification-badge">0</span>
+      </button>
       <!-- BOUTON MES MESSAGES -->
       <button
         class="mg-icon-btn"
         onclick="ouvrirMessages()"
         aria-label="Mes messages"
-        title="Mes messages">
+        title="Mes messages"
+      >
         💬
       </button>
+
       <!-- BOUTON LIVRAISON -->
       <button
         class="mg-icon-btn"
