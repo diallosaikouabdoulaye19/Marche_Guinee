@@ -6019,32 +6019,6 @@ async function enregistrerComptePaiement() {
 /* =========================
    MES VENTES
 ========================= */
-
-function ouvrirMesVentes(){
-
-  if(!utilisateurConnecte){
-
-    alert(
-      "Connecte-toi pour voir tes ventes."
-    );
-
-    ouvrirCompte();
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    "mesVentesModal"
-  ).style.display = "flex";
-
-
-  chargerMesVentes();
-
-}
-
-
 function fermerMesVentes(){
 
   document.getElementById(
@@ -6052,7 +6026,6 @@ function fermerMesVentes(){
   ).style.display = "none";
 
 }
-
 
 function statutCommandeTexte(status){
 
@@ -6096,23 +6069,16 @@ function statutCommandeTexte(status){
     status ||
     "Inconnu"
   );
-
 }
 
-
 function livraisonTexte(status){
-
   const statuts = {
-
     pending:
       "En attente",
-
     delivered:
       "Livrée"
 
   };
-
-
   return (
     statuts[status] ||
     status ||
