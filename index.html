@@ -25103,16 +25103,16 @@ display: none !important;
       : chat.firstChild;
 
     chat.insertBefore(actions, target || null);
-
     centerZone = center;
   }
-
+    // Garder la barre d'actions en haut.
+  if (actions.parentElement !== chat || actions !== chat.firstElementChild) {
+    chat.insertBefore(actions, chat.firstChild);
+  }  
   var leftZone =
     actions.querySelector(".mg-chat-actions-left");
-
   centerZone =
     actions.querySelector(".mg-chat-actions-center");
-
   var rightZone =
     actions.querySelector(".mg-chat-actions-right");
 
