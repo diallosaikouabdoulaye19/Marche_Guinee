@@ -3971,7 +3971,6 @@ async function connecterCompte(){
 
     }
 
-
     utilisateurConnecte = {
 
       id:userId,
@@ -3990,7 +3989,6 @@ async function connecterCompte(){
 
     };
 
-
     localStorage.setItem(
       "marche_guinee_session",
       JSON.stringify(
@@ -3998,27 +3996,14 @@ async function connecterCompte(){
       )
     );
 
-
     box.innerHTML =
       '<div class="success">' +
       'Connexion réussie.' +
       '</div>';
 
-
-    ouvrirCompte();
-
-
-    setTimeout(
-      ()=>{
-        fermerModal(
-          "accountModal"
-        );
-      },
-      700
-    );
-
-
-  }catch(error){
+    masquerBienvenue();
+    fermerModal("accountModal");
+   }catch(error){
 
     console.error(error);
 
@@ -4028,11 +4013,9 @@ async function connecterCompte(){
         error.message
       ) +
       '</div>';
-
   }
 
 }
-
 
 function deconnecter(){
 
