@@ -20982,6 +20982,48 @@ function afficherRetour() {
     initialiserBienvenue();
   }
 
+    /*
+    Synchroniser l'écran au retour dans l'application.
+    Une session sauvegardée signifie que l'utilisateur
+    reste connecté ; sans session, afficher la bienvenue.
+  */
+  function synchroniserBienvenueAuRetour() {
+    try {
+      var sauvegarde = localStorage.getItem(
+        "marche_guinee_session"
+      );
+
+      if (sauvegarde) {
+        var session = JSON.parse(sauvegarde);
+
+        if (session && session.id) {
+          utilisateurConnecte = session;
+          masquerBienvenue();
+          return;
+        }
+      }
+
+      utilisateurConnecte = null;
+      afficherBienvenue();
+
+    } catch (e) {
+      console.warn(
+        "Vérification de la bienvenue impossible :",
+        e
+      );
+    }
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      synchroniserBienvenueAuRetour();
+    }
+  });
+
+  window.addEventListener("pageshow", function () {
+    synchroniserBienvenueAuRetour();
+  });
+  
   /*
     Après une connexion réussie, la fonction existante
     doit avoir renseigné utilisateurConnecte.
