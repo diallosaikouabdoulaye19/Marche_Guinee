@@ -21609,78 +21609,7 @@ function afficherRetourMesAnnonces() {
 </script>
 <!-- FIN — HARMONISATION DU MENU MARCHÉ GUINÉE -->
 
-<script id="mg-correctif-mes-annonces">
-(function () {
-  "use strict";
-  if (window.mgCorrectifMesAnnoncesInstalle) return;
-  window.mgCorrectifMesAnnoncesInstalle = true;
-  function obtenir(id) {
-    return document.getElementById(id);
-  }
-  function ouvrirPageMesAnnonces(event) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof event.stopImmediatePropagation === "function") {
-        event.stopImmediatePropagation();
-      }
-    }
-    var utilisateur =
-      typeof window.utilisateurConnecte !== "undefined"
-        ? window.utilisateurConnecte
-        : null;
-    var page = obtenir("mgMesAnnoncesModal");
-    var compte = obtenir("accountModal");
-    if (!utilisateur || !utilisateur.id) {
-      alert("Connecte-toi pour consulter tes annonces.");
-      if (typeof window.ouvrirCompte === "function") {
-        window.ouvrirCompte();
-      }
-      return;
-    }
-    if (!page) {
-      console.error(
-        "Marché Guinée : la fenêtre mgMesAnnoncesModal est introuvable."
-      );
-      alert("La page Mes annonces est introuvable. Recharge l’application.");
-      return;
-    }
-    if (compte) compte.style.display = "none";
-    page.style.display = "block";
-    page.style.visibility = "visible";
-    page.scrollTop = 0;
-    var filtres = page.querySelectorAll(".mg-ma-filter");
-    filtres.forEach(function (filtre) {
-      var actif = filtre.getAttribute("data-filter") === "all";
-      filtre.classList.toggle("active", actif);
-      filtre.setAttribute("aria-pressed", actif ? "true" : "false");
-    });
-    if (typeof window.chargerMesAnnonces === "function") {
-      Promise.resolve(window.chargerMesAnnonces()).catch(function (erreur) {
-        console.error("Erreur de chargement des annonces :", erreur);
-      });
-    } else {
-      console.error("La fonction chargerMesAnnonces est introuvable.");
-      alert("Le chargement de tes annonces n’est pas disponible.");
-    }
-
-  }
-  document.addEventListener(
-    "click",
-    function (event) {
-      var cible = event.target;
-      if (!cible || typeof cible.closest !== "function") return;
-      var bouton = cible.closest("#mgBoutonMesAnnonces");
-      if (!bouton) return;
-      ouvrirPageMesAnnonces(event);
-    },
-    true
-  );
-  console.log("Correctif Mes annonces installé.");
-})();
-</script>
-
-<script id="mg-session-auto-refresh">
+  <script id="mg-session-auto-refresh">
 (function () {
   "use strict";
   if (window.mgSessionAutoRefreshInstalled) return;
