@@ -17351,15 +17351,35 @@ function afficherRetour() {
       '<span class="mg-menu-label">Mes annonces</span>' +
       '<span class="mg-menu-arrow">›</span>';
 
-    bouton.addEventListener("click", function () {
-      if (typeof window.fermerModal === "function") {
-        window.fermerModal("accountModal");
-      } else {
-        element("accountModal").style.display = "none";
-      }
+  bouton.addEventListener("click", function (event) {
+  event.preventDefault();
+  event.stopPropagation();
 
-      window.ouvrirMesAnnonces();
-    });
+  var compte = document.getElementById("accountModal");
+  var page = document.getElementById("mgMesAnnoncesModal");
+
+  if (
+    typeof utilisateurConnecte === "undefined" ||
+    !utilisateurConnecte ||
+    !utilisateurConnecte.id
+  ) {
+    alert("Connecte-toi pour consulter tes annonces.");
+    if (typeof window.ouvrirCompte === "function") {
+      window.ouvrirCompte();
+    }
+    return;
+  }
+
+  if (!page) {
+    console.error("La page Mes annonces est introuvable.");
+    alert("Impossible d'ouvrir Mes annonces. Recharge l'application.");
+    return;
+  }
+
+  if (compte) compte.style.display = "none";
+
+  window.ouvrirMesAnnonces();
+});
 
     var boutonVentes = actions.querySelector(
       'button[onclick*="ouvrirMesVentes"]'
