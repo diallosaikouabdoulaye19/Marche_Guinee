@@ -8756,25 +8756,26 @@ async function chargerListeConversations() {
   `;
 
   try {
-    // 1. Récupérer les conversations de l'acheteur.
-    const buyerRows = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/conversations" +
-      "?buyer_id=eq." +
-      encodeURIComponent(utilisateurId) +
-      "&select=*" +
-      "&order=created_at.desc"
-    );
+       // Récupérer les conversations acheteur et vendeur simultanément.
+const [buyerRows, sellerRows] = await Promise.all([
+  supabaseFetch(
+    SUPABASE_URL +
+    "/rest/v1/conversations" +
+    "?buyer_id=eq." +
+    encodeURIComponent(utilisateurId) +
+    "&select=*" +
+    "&order=created_at.desc"
+  ),
 
-    // 2. Récupérer les conversations du vendeur.
-    const sellerRows = await supabaseFetch(
-      SUPABASE_URL +
-      "/rest/v1/conversations" +
-      "?seller_id=eq." +
-      encodeURIComponent(utilisateurId) +
-      "&select=*" +
-      "&order=created_at.desc"
-    );
+  supabaseFetch(
+    SUPABASE_URL +
+    "/rest/v1/conversations" +
+    "?seller_id=eq." +
+    encodeURIComponent(utilisateurId) +
+    "&select=*" +
+    "&order=created_at.desc"
+  )
+]);
 
     // 3. Fusionner les conversations sans doublons.
     const map = new Map();
@@ -8809,13 +8810,13 @@ async function chargerListeConversations() {
             ? conversation.seller_id
             : conversation.buyer_id;
 
-        let profil = null;
+                let profil = null;
         let dernierMessage = null;
         let nombreNonLus = 0;
 
-        // Charger le profil du correspondant.
-        try {
-          const resultat = await supabaseFetch(
+        // Charger le profil, le dernier message et les messages non lus simultanément.
+        const resultats = await Promise.allSettled([
+          supabaseFetch(
             SUPABASE_URL + "/rest/v1/rpc/get_chat_profile",
             {
               method: "POST",
@@ -8826,24 +8827,9 @@ async function chargerListeConversations() {
                 p_user_id: autreUtilisateurId
               })
             }
-          );
+          ),
 
-          profil = Array.isArray(resultat)
-            ? resultat[0] || null
-            : resultat && resultat.id
-              ? resultat
-              : null;
-
-        } catch (erreurProfil) {
-          console.warn(
-            "Profil du correspondant indisponible :",
-            erreurProfil
-          );
-        }
-
-        // Charger le dernier message de cette conversation.
-        try {
-          const derniersMessages = await supabaseFetch(
+          supabaseFetch(
             SUPABASE_URL +
             "/rest/v1/messages" +
             "?select=id,message,image_url,created_at,sender_id,read_at" +
@@ -8851,26 +8837,9 @@ async function chargerListeConversations() {
             encodeURIComponent(conversation.id) +
             "&order=created_at.desc" +
             "&limit=1"
-          );
+          ),
 
-          if (
-            Array.isArray(derniersMessages) &&
-            derniersMessages.length
-          ) {
-            dernierMessage = derniersMessages[0];
-          }
-
-        } catch (erreurDernierMessage) {
-          console.warn(
-            "Impossible de récupérer le dernier message :",
-            erreurDernierMessage
-          );
-        }
-
-        // Compter uniquement les messages reçus et encore non lus
-        // par l'utilisateur actuellement connecté.
-        try {
-          const messagesNonLus = await supabaseFetch(
+          supabaseFetch(
             SUPABASE_URL +
             "/rest/v1/messages" +
             "?select=id" +
@@ -8879,19 +8848,55 @@ async function chargerListeConversations() {
             "&sender_id=neq." +
             encodeURIComponent(utilisateurId) +
             "&read_at=is.null"
+          )
+        ]);
+
+        // Résultat du profil.
+        if (resultats[0].status === "fulfilled") {
+          const resultat = resultats[0].value;
+
+          profil = Array.isArray(resultat)
+            ? resultat[0] || null
+            : resultat && resultat.id
+              ? resultat
+              : null;
+        } else {
+          console.warn(
+            "Profil du correspondant indisponible :",
+            resultats[0].reason
           );
+        }
+
+        // Résultat du dernier message.
+        if (resultats[1].status === "fulfilled") {
+          const derniersMessages = resultats[1].value;
+
+          if (
+            Array.isArray(derniersMessages) &&
+            derniersMessages.length
+          ) {
+            dernierMessage = derniersMessages[0];
+          }
+        } else {
+          console.warn(
+            "Impossible de récupérer le dernier message :",
+            resultats[1].reason
+          );
+        }
+
+        // Résultat des messages non lus.
+        if (resultats[2].status === "fulfilled") {
+          const messagesNonLus = resultats[2].value;
 
           if (Array.isArray(messagesNonLus)) {
             nombreNonLus = messagesNonLus.length;
           }
-
-        } catch (erreurNonLus) {
+        } else {
           console.warn(
             "Impossible de compter les messages non lus :",
-            erreurNonLus
+            resultats[2].reason
           );
         }
-
         const annonce = (toutesLesAnnonces || []).find(function(a) {
           return String(a.id) === String(conversation.listing_id);
         });
