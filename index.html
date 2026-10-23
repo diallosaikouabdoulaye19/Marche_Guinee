@@ -4001,9 +4001,13 @@ async function connecterCompte(){
       'Connexion réussie.' +
       '</div>';
 
-    masquerBienvenue();
-    fermerModal("accountModal");
-   }catch(error){
+        ouvrirCompte();
+
+    setTimeout(function () {
+      fermerModal("accountModal");
+    }, 0);
+ 
+  }catch(error){
 
     console.error(error);
 
