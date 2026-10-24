@@ -25053,7 +25053,7 @@ display: none !important;
     return;
   }
 
-  /*
+    /*
    * RETROUVER L'EN-TÊTE EXISTANT SANS CONFONDRE
    * CELUI-CI AVEC LA BARRE D'ACTIONS
    */
@@ -25063,7 +25063,7 @@ display: none !important;
     ) ||
     (centerZone && centerZone.firstElementChild) ||
     chat.querySelector(
-      ":scope > div:not(#mgChat2026Actions):not(#chatConversationScroll)"
+      ":scope > div:not(#mgChat2026Actions):not(#chatConversationScroll):not(.chat-input):not(#chatBox)"
     );
 
   /*
@@ -25101,7 +25101,6 @@ display: none !important;
     var target = header && header.parentNode === chat
       ? header
       : chat.firstChild;
-
     chat.insertBefore(actions, target || null);
     centerZone = center;
   }
