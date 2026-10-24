@@ -25705,7 +25705,12 @@ loadingMessages = true;
       return;
     }
 
-        var imagePaths = Array.from(
+            /*
+     * AFFICHAGE RAPIDE :
+     * Afficher immédiatement les messages et leurs textes.
+     * Les URL des photos seront chargées en arrière-plan.
+     */
+    var imagePaths = Array.from(
       new Set(
         nouveauxMessages
           .filter(function (msg) {
@@ -25717,56 +25722,21 @@ loadingMessages = true;
       )
     );
 
-    var urlMap;
-
-    try {
-      urlMap = await getSignedPhotoUrls(imagePaths);
-    } catch (error) {
-      console.warn(
-        "Chargement groupé des photos impossible :",
-        error
-      );
-
-      urlMap = new Map();
-
-      await Promise.all(
-        imagePaths.map(async function (path) {
-          try {
-            var signedUrl =
-              await getSignedPhotoUrlIndividuelle(path);
-
-            urlMap.set(String(path), signedUrl);
-          } catch (photoError) {
-            console.warn("Photo non chargée :", photoError);
-            urlMap.set(String(path), null);
-          }
-        })
-      );
-    }
-
-    if (getChatId() !== conversationId) return;
-
+    /* 1. Afficher toutes les bulles immédiatement */
     var fragment = document.createDocumentFragment();
+
     nouveauxMessages.forEach(function (msg) {
       fragment.appendChild(
-        makeMessageNode(
-          msg,
-          userId,
-          msg.image_url
-            ? urlMap.get(String(msg.image_url))
-            : null
-        )
+        makeMessageNode(msg, userId, null)
       );
     });
 
-    /*
-     * Ajouter les nouvelles bulles sans supprimer
-     * les anciennes ni reconstruire les photos.
-     */
     box.appendChild(fragment);
 
+    /* 2. Enregistrer immédiatement les messages affichés */
     lastMessageSignature = getMessageSignature(messages, userId);
 
+    /* 3. Garder le défilement vers le bas si nécessaire */
     requestAnimationFrame(function () {
       if (getChatId() !== conversationId) return;
 
@@ -25777,6 +25747,78 @@ loadingMessages = true;
         zone.scrollTop = zone.scrollHeight;
       }
     });
+
+    /*
+     * 4. Charger les photos indépendamment de l'affichage
+     * des messages texte.
+     */
+    if (imagePaths.length) {
+      (async function chargerPhotosEnArrierePlan() {
+        var urlMap = new Map();
+
+        try {
+          urlMap = await getSignedPhotoUrls(imagePaths);
+        } catch (error) {
+          console.warn(
+            "Chargement groupé des photos impossible :",
+            error
+          );
+
+          await Promise.all(
+            imagePaths.map(async function (path) {
+              try {
+                var signedUrl =
+                  await getSignedPhotoUrlIndividuelle(path);
+
+                urlMap.set(String(path), signedUrl);
+              } catch (photoError) {
+                console.warn(
+                  "Photo non chargée :",
+                  photoError
+                );
+
+                urlMap.set(String(path), null);
+              }
+            })
+          );
+        }
+
+        /* Ne jamais modifier une autre conversation */
+        if (getChatId() !== conversationId) return;
+
+        nouveauxMessages.forEach(function (msg) {
+          if (!msg.image_url) return;
+
+          var ligne = Array.from(
+            box.querySelectorAll(".message-row")
+          ).find(function (element) {
+            return String(element.dataset.mgMessageId) ===
+              String(msg.id);
+          });
+
+          if (!ligne) return;
+
+          var urlPhoto = urlMap.get(String(msg.image_url));
+
+          /*
+           * Remplacer uniquement la bulle qui contient
+           * cette photo, sans supprimer les autres messages.
+           */
+          var nouvelleLigne = makeMessageNode(
+            msg,
+            userId,
+            urlPhoto || null
+          );
+
+          ligne.replaceWith(nouvelleLigne);
+        });
+      })().catch(function (error) {
+        console.warn(
+          "Erreur de chargement des photos en arrière-plan :",
+          error
+        );
+      });
+    }
 
   } catch (error) {
     console.warn(
