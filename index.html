@@ -25202,210 +25202,222 @@ display: none !important;
     return base + (value.charAt(0) === "/" ? value : "/" + value);
   }
 
- async function getSignedPhotoUrl(path) {
+ async function getSignedPhotoUrls(paths) {
+  var uniquePaths = Array.from(new Set(
+    (paths || [])
+      .filter(Boolean)
+      .map(function (path) {
+        return String(path).replace(/^\/+/, "");
+      })
+  ));
+
+  var urlMap = new Map();
+  var pathsToFetch = [];
+  var now = Date.now();
+
+  uniquePaths.forEach(function (path) {
+    var cached = signedPhotoCache.get(path);
+
+    if (cached && cached.expiresAt > now + 30000) {
+      urlMap.set(path, cached.url);
+    } else {
+      pathsToFetch.push(path);
+    }
+  });
+
+  if (!pathsToFetch.length) {
+    return urlMap;
+  }
+
+  var base = getSupabaseUrl();
+
+  if (!base) {
+    throw new Error("Configuration Supabase manquante");
+  }
+
+  var requestHeaders = {};
+
+  try {
+    if (typeof window.headers === "function") {
+      requestHeaders = window.headers() || {};
+    }
+  } catch (_) {}
+
+  requestHeaders = Object.assign({}, requestHeaders, {
+    "Content-Type": "application/json"
+  });
+
+  var response = await fetch(
+    base + "/storage/v1/object/sign/chat-images",
+    {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify({
+        expiresIn: SIGNED_URL_LIFETIME,
+        paths: pathsToFetch
+      }),
+      cache: "no-store"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Erreur lors du chargement groupé des photos : HTTP " +
+      response.status
+    );
+  }
+
+  var results = await response.json();
+
+  if (!Array.isArray(results)) {
+    throw new Error("Réponse Supabase des photos invalide");
+  }
+
+  var failedPaths = new Set();
+
+  results.forEach(function (item) {
+    if (!item || !item.path) return;
+
+    var path = String(item.path).replace(/^\/+/, "");
+
+    if (item.error || !(
+      item.signedURL || item.signedUrl || item.signed_url
+    )) {
+      failedPaths.add(path);
+      return;
+    }
+
+    try {
+      var signedUrl = normalizeSignedUrl(item);
+
+      if (signedPhotoCache.size >= MAX_CACHE_ITEMS) {
+        var firstKey = signedPhotoCache.keys().next().value;
+
+        if (firstKey !== undefined) {
+          signedPhotoCache.delete(firstKey);
+        }
+      }
+
+      signedPhotoCache.set(path, {
+        url: signedUrl,
+        expiresAt:
+          Date.now() + (SIGNED_URL_LIFETIME - 90) * 1000
+      });
+
+      urlMap.set(path, signedUrl);
+    } catch (error) {
+      failedPaths.add(path);
+    }
+  });
+
+  pathsToFetch.forEach(function (path) {
+    if (!urlMap.has(path)) {
+      failedPaths.add(path);
+    }
+  });
+
+  for (var path of failedPaths) {
+    try {
+      var url = await getSignedPhotoUrlIndividuelle(path);
+
+      if (url) {
+        urlMap.set(path, url);
+      }
+    } catch (error) {
+      console.warn("Photo non chargée :", path, error);
+      urlMap.set(path, null);
+    }
+  }
+
+  return urlMap;
+}
+
+
+async function getSignedPhotoUrlIndividuelle(path) {
   if (!path) {
     throw new Error("Chemin photo manquant");
   }
 
   var cleanPath = String(path).replace(/^\/+/, "");
-  var cacheKey = cleanPath;
+  var cached = signedPhotoCache.get(cleanPath);
   var now = Date.now();
-
-  // 1. Réutiliser une URL signée encore valide.
-  var cached = signedPhotoCache.get(cacheKey);
 
   if (cached && cached.expiresAt > now + 30000) {
     return cached.url;
   }
 
-  if (!getSupabaseUrl()) {
+  var base = getSupabaseUrl();
+
+  if (!base) {
     throw new Error("Configuration Supabase manquante");
   }
 
-  // 2. Préparer la file des photos à signer ensemble.
-  if (!getSignedPhotoUrl._queue) {
-    getSignedPhotoUrl._queue = [];
-  }
+  var endpoint = base +
+    "/storage/v1/object/sign/chat-images/" +
+    cleanPath.split("/").map(encodeURIComponent).join("/");
 
-  if (!getSignedPhotoUrl._timer) {
-    getSignedPhotoUrl._timer = null;
-  }
+  var requestHeaders = {};
 
-  if (typeof getSignedPhotoUrl._flushing !== "boolean") {
-    getSignedPhotoUrl._flushing = false;
-  }
-
-  // 3. Fonction commune de génération groupée.
-  async function flushSignedPhotoQueue() {
-    if (getSignedPhotoUrl._flushing) {
-      return;
+  try {
+    if (typeof window.headers === "function") {
+      requestHeaders = window.headers() || {};
     }
+  } catch (_) {}
 
-    var queue = getSignedPhotoUrl._queue;
-
-    if (!queue || !queue.length) {
-      return;
-    }
-
-    getSignedPhotoUrl._flushing = true;
-
-    // Capturer les demandes présentes au début du traitement.
-    var demandes = queue.splice(0);
-
-    try {
-      // Ne signer qu'une fois chaque chemin distinct.
-      var chemins = Array.from(
-        new Set(
-          demandes.map(function (demande) {
-            return demande.path;
-          })
-        )
-      );
-
-      var headersRequete = {};
-
-      if (typeof window.headers === "function") {
-        headersRequete = window.headers() || {};
-      }
-
-      headersRequete = Object.assign({}, headersRequete, {
-        "Content-Type": "application/json"
-      });
-
-      // UNE requête pour toutes les photos de ce groupe.
-      var reponse = await fetch(
-        getSupabaseUrl() +
-          "/storage/v1/object/sign/chat-images",
-        {
-          method: "POST",
-          headers: headersRequete,
-          body: JSON.stringify({
-            expiresIn: SIGNED_URL_LIFETIME,
-            paths: chemins
-          }),
-          cache: "no-store"
-        }
-      );
-
-      if (!reponse.ok) {
-        throw new Error(
-          "Supabase n'a pas pu générer les URL des photos."
-        );
-      }
-
-      var resultats = await reponse.json();
-
-      if (!Array.isArray(resultats)) {
-        throw new Error(
-          "Réponse invalide lors du chargement des photos."
-        );
-      }
-
-      // Associer chaque chemin à son résultat.
-      var resultatsParChemin = new Map();
-
-      resultats.forEach(function (resultat) {
-        if (resultat && resultat.path) {
-          resultatsParChemin.set(
-            String(resultat.path).replace(/^\/+/, ""),
-            resultat
-          );
-        }
-      });
-
-      var maintenant = Date.now();
-
-      // Mettre les URL en cache et résoudre les demandes.
-      demandes.forEach(function (demande) {
-        try {
-          var resultat = resultatsParChemin.get(
-            demande.path
-          );
-
-          if (
-            !resultat ||
-            resultat.error ||
-            !(
-              resultat.signedURL ||
-              resultat.signedUrl ||
-              resultat.signed_url
-            )
-          ) {
-            throw new Error(
-              "URL indisponible pour cette photo."
-            );
-          }
-
-          var urlSignee = normalizeSignedUrl(resultat);
-
-          if (signedPhotoCache.size >= MAX_CACHE_ITEMS) {
-            var premiereCle =
-              signedPhotoCache.keys().next().value;
-
-            signedPhotoCache.delete(premiereCle);
-          }
-
-          signedPhotoCache.set(demande.path, {
-            url: urlSignee,
-            expiresAt:
-              maintenant +
-              (SIGNED_URL_LIFETIME - 90) * 1000
-          });
-
-          demande.resolve(urlSignee);
-
-        } catch (erreurPhoto) {
-          demande.reject(erreurPhoto);
-        }
-      });
-
-    } catch (erreur) {
-      demandes.forEach(function (demande) {
-        demande.reject(erreur);
-      });
-
-    } finally {
-      getSignedPhotoUrl._flushing = false;
-
-      // Traiter les demandes arrivées pendant le chargement.
-      if (
-        getSignedPhotoUrl._queue &&
-        getSignedPhotoUrl._queue.length &&
-        !getSignedPhotoUrl._timer
-      ) {
-        getSignedPhotoUrl._timer = setTimeout(function () {
-          getSignedPhotoUrl._timer = null;
-          getSignedPhotoUrl._flush();
-        }, 0);
-      }
-    }
-  }
-
-  // Garder une seule fonction de traitement partagée.
-  if (!getSignedPhotoUrl._flush) {
-    getSignedPhotoUrl._flush = flushSignedPhotoQueue;
-  }
-
-  // 4. Ajouter la demande à la file commune.
-  return new Promise(function (resolve, reject) {
-    getSignedPhotoUrl._queue.push({
-      path: cleanPath,
-      resolve: resolve,
-      reject: reject
-    });
-
-    // Laisser les autres photos rejoindre le même groupe.
-    if (
-      !getSignedPhotoUrl._timer &&
-      !getSignedPhotoUrl._flushing
-    ) {
-      getSignedPhotoUrl._timer = setTimeout(function () {
-        getSignedPhotoUrl._timer = null;
-        getSignedPhotoUrl._flush();
-      }, 0);
-    }
+  requestHeaders = Object.assign({}, requestHeaders, {
+    "Content-Type": "application/json"
   });
+
+  var response = await fetch(endpoint, {
+    method: "POST",
+    headers: requestHeaders,
+    body: JSON.stringify({
+      expiresIn: SIGNED_URL_LIFETIME
+    }),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de charger cette photo");
+  }
+
+  var data = await response.json();
+  var url = normalizeSignedUrl(data);
+
+  if (signedPhotoCache.size >= MAX_CACHE_ITEMS) {
+    var firstKey = signedPhotoCache.keys().next().value;
+
+    if (firstKey !== undefined) {
+      signedPhotoCache.delete(firstKey);
+    }
+  }
+
+  signedPhotoCache.set(cleanPath, {
+    url: url,
+    expiresAt:
+      Date.now() + (SIGNED_URL_LIFETIME - 90) * 1000
+  });
+
+  return url;
 }
+
+
+async function getSignedPhotoUrl(path) {
+  var cleanPath = String(path || "").replace(/^\/+/, "");
+
+  if (!cleanPath) {
+    throw new Error("Chemin photo manquant");
+  }
+
+  var cached = signedPhotoCache.get(cleanPath);
+
+  if (cached && cached.expiresAt > Date.now() + 30000) {
+    return cached.url;
+  }
+
+  return getSignedPhotoUrlIndividuelle(cleanPath);
+}
+  
   function markIncomingMessagesRead(conversationId) {
     var userId = getCurrentUserId();
 
