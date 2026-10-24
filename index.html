@@ -8756,39 +8756,46 @@ async function chargerListeConversations() {
   `;
 
   try {
-       // Récupérer les conversations acheteur et vendeur simultanément.
-const [buyerRows, sellerRows] = await Promise.all([
-  supabaseFetch(
-    SUPABASE_URL +
-    "/rest/v1/conversations" +
-    "?buyer_id=eq." +
-    encodeURIComponent(utilisateurId) +
-    "&select=*" +
-    "&order=created_at.desc"
-  ),
 
-  supabaseFetch(
-    SUPABASE_URL +
-    "/rest/v1/conversations" +
-    "?seller_id=eq." +
-    encodeURIComponent(utilisateurId) +
-    "&select=*" +
-    "&order=created_at.desc"
-  )
-]);
-
-    // 3. Fusionner les conversations sans doublons.
-    const map = new Map();
-
-    [...(buyerRows || []), ...(sellerRows || [])].forEach(function(c) {
-      if (c && c.id) {
-        map.set(String(c.id), c);
+        // Récupérer toutes les conversations en un seul appel RPC.
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/get_my_chat_list",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
       }
+    );
+
+    // Vérifier la réponse de Supabase.
+    if (!Array.isArray(resultat)) {
+      throw new Error(
+        "La réponse de Supabase est invalide."
+      );
+    }
+
+    // Transformer les données pour conserver
+    // le fonctionnement actuel de l'affichage.
+    const conversationsPreparees = resultat.map(function(item) {
+      return {
+        conversation: item.conversation,
+        annonce: item.annonce,
+        profil: item.profil,
+        dernierMessage: item.dernierMessage,
+        nombreNonLus: Number(item.nombreNonLus) || 0,
+        dateActivite:
+          item.dateActivite ||
+          (item.conversation
+            ? item.conversation.created_at
+            : null)
+      };
     });
 
-    const conversations = Array.from(map.values());
-
-    if (!conversations.length) {
+    // Conserver le message affiché lorsqu'il n'y a
+    // aucune conversation.
+    if (!conversationsPreparees.length) {
       container.innerHTML = `
         <div class="empty">
           Aucune conversation pour le moment.
@@ -8801,119 +8808,6 @@ const [buyerRows, sellerRows] = await Promise.all([
       `;
       return;
     }
-
-    // 4. Préparer les informations de chaque conversation.
-    const conversationsPreparees = await Promise.all(
-      conversations.map(async function(conversation) {
-        const autreUtilisateurId =
-          String(conversation.buyer_id) === utilisateurId
-            ? conversation.seller_id
-            : conversation.buyer_id;
-
-                let profil = null;
-        let dernierMessage = null;
-        let nombreNonLus = 0;
-
-        // Charger le profil, le dernier message et les messages non lus simultanément.
-        const resultats = await Promise.allSettled([
-          supabaseFetch(
-            SUPABASE_URL + "/rest/v1/rpc/get_chat_profile",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                p_user_id: autreUtilisateurId
-              })
-            }
-          ),
-
-          supabaseFetch(
-            SUPABASE_URL +
-            "/rest/v1/messages" +
-            "?select=id,message,image_url,created_at,sender_id,read_at" +
-            "&conversation_id=eq." +
-            encodeURIComponent(conversation.id) +
-            "&order=created_at.desc" +
-            "&limit=1"
-          ),
-
-          supabaseFetch(
-            SUPABASE_URL +
-            "/rest/v1/messages" +
-            "?select=id" +
-            "&conversation_id=eq." +
-            encodeURIComponent(conversation.id) +
-            "&sender_id=neq." +
-            encodeURIComponent(utilisateurId) +
-            "&read_at=is.null"
-          )
-        ]);
-
-        // Résultat du profil.
-        if (resultats[0].status === "fulfilled") {
-          const resultat = resultats[0].value;
-
-          profil = Array.isArray(resultat)
-            ? resultat[0] || null
-            : resultat && resultat.id
-              ? resultat
-              : null;
-        } else {
-          console.warn(
-            "Profil du correspondant indisponible :",
-            resultats[0].reason
-          );
-        }
-
-        // Résultat du dernier message.
-        if (resultats[1].status === "fulfilled") {
-          const derniersMessages = resultats[1].value;
-
-          if (
-            Array.isArray(derniersMessages) &&
-            derniersMessages.length
-          ) {
-            dernierMessage = derniersMessages[0];
-          }
-        } else {
-          console.warn(
-            "Impossible de récupérer le dernier message :",
-            resultats[1].reason
-          );
-        }
-
-        // Résultat des messages non lus.
-        if (resultats[2].status === "fulfilled") {
-          const messagesNonLus = resultats[2].value;
-
-          if (Array.isArray(messagesNonLus)) {
-            nombreNonLus = messagesNonLus.length;
-          }
-        } else {
-          console.warn(
-            "Impossible de compter les messages non lus :",
-            resultats[2].reason
-          );
-        }
-        const annonce = (toutesLesAnnonces || []).find(function(a) {
-          return String(a.id) === String(conversation.listing_id);
-        });
-
-        return {
-          conversation: conversation,
-          annonce: annonce,
-          profil: profil,
-          dernierMessage: dernierMessage,
-          nombreNonLus: nombreNonLus,
-          dateActivite:
-            dernierMessage && dernierMessage.created_at
-              ? dernierMessage.created_at
-              : conversation.created_at
-        };
-      })
-    );
 
     // 5. Afficher les conversations les plus récentes en premier.
     conversationsPreparees.sort(function(a, b) {
