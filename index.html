@@ -25516,7 +25516,7 @@ async function getSignedPhotoUrl(path) {
       img.alt = "Photo envoyée dans la conversation";
       img.loading = "lazy";
       img.decoding = "async";
-      img.fetchPriority = "low";
+      img.fetchPriority = "auto";
 
       img.addEventListener("load", function () {
         wrap.classList.add("mg-photo-ready");
