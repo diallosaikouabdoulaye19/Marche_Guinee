@@ -8413,19 +8413,48 @@ await chargerPropositionsPrix();
     input.focus();
   }
 
-  // Actualiser les messages automatiquement
+  // Actualisation automatique intelligente des messages
   if (intervalMessages) {
     clearInterval(intervalMessages);
+    intervalMessages = null;
   }
 
-  intervalMessages = setInterval(function() {
-    if (conversationActuelle &&
-        conversationActuelle.id === conversation.id) {
-      window.chargerMessages();
-    }
-  }, 3000);
-}
+  intervalMessages = setInterval(async function () {
+    try {
+      // Suspendre les actualisations en arrière-plan.
+      if (document.hidden) return;
 
+      // Vérifier que la conversation existe.
+      if (
+        !conversationActuelle ||
+        !conversation ||
+        String(conversationActuelle.id) !== String(conversation.id)
+      ) {
+        return;
+      }
+
+      // Vérifier que la messagerie est affichée.
+      const modalMessages = document.getElementById("messagesModal");
+      const conteneurChat = document.getElementById("chatContainer");
+
+      if (
+        !modalMessages ||
+        !conteneurChat ||
+        getComputedStyle(modalMessages).display === "none" ||
+        conteneurChat.classList.contains("hidden")
+      ) {
+        return;
+      }
+
+      // Actualiser les messages sans supprimer la fonction existante.
+      if (typeof window.chargerMessages === "function") {
+        await window.chargerMessages();
+      }
+    } catch (erreurActualisation) {
+      console.warn("Actualisation des messages reportée :", erreurActualisation);
+    }
+  }, 4000);
+}
 async function chargerMessages(){
 
   if(!conversationActuelle)
