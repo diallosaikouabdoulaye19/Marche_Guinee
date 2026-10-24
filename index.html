@@ -25814,40 +25814,6 @@ async function loadMessagesOptimized() {
         }
 
         /*
-         * Compléter les URL manquantes individuellement.
-         */
-        await Promise.all(
-          imagePaths.map(async function (path) {
-            var cle = String(path);
-            var urlExistante = urlMap.get(cle);
-
-            if (
-              typeof urlExistante === "string" &&
-              urlExistante.length > 0
-            ) {
-              return;
-            }
-
-            try {
-              var urlIndividuelle =
-                await getSignedPhotoUrlIndividuelle(path);
-
-              if (
-                typeof urlIndividuelle === "string" &&
-                urlIndividuelle.length > 0
-              ) {
-                urlMap.set(cle, urlIndividuelle);
-              } else {
-                urlMap.set(cle, null);
-              }
-            } catch (error) {
-              console.warn("Photo non chargée :", error);
-              urlMap.set(cle, null);
-            }
-          })
-        );
-
-        /*
          * Ne jamais modifier une autre conversation.
          */
         if (
