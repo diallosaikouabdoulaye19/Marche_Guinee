@@ -25574,40 +25574,39 @@ async function loadMessagesOptimized() {
   var box = document.getElementById("chatBox");
 
   if (
-  !conversationId ||
-  !userId ||
-  !box ||
-  typeof window.supabaseFetch !== "function"
-) {
-  return;
-}
+    !conversationId ||
+    !userId ||
+    !box ||
+    typeof window.supabaseFetch !== "function"
+  ) {
+    return;
+  }
 
-/*
- * IMPORTANT :
- * Quand on change de conversation, supprimer les anciennes
- * bulles avant d'afficher les messages de la nouvelle.
- * Cela évite de mélanger les messages de deux personnes.
- */
-var idConversationAffichee = String(conversationId);
+  var idConversation = String(conversationId);
 
-if (box.dataset.mgConversationId !== idConversationAffichee) {
-  box.replaceChildren();
-  box.dataset.mgConversationId = idConversationAffichee;
-  lastMessageSignature = "";
-}
+  /*
+   * UN SEUL CHARGEMENT À LA FOIS
+   *
+   * Si une actualisation est demandée pendant un chargement,
+   * mémoriser la demande au lieu de programmer plusieurs timers.
+   */
+  if (loadingMessages) {
+    loadMessagesOptimized._pendingConversationId = idConversation;
+    return;
+  }
 
-if (loadingMessages) {
-  setTimeout(function () {
-    if (getChatId() === conversationId) {
-      loadMessagesOptimized();
-    }
-  }, 300);
-  return;
-}
+  loadingMessages = true;
 
-loadingMessages = true;
-  
   try {
+    /*
+     * Ne jamais mélanger les messages de deux conversations.
+     */
+    if (box.dataset.mgConversationId !== idConversation) {
+      box.replaceChildren();
+      box.dataset.mgConversationId = idConversation;
+      lastMessageSignature = "";
+    }
+
     var scroller =
       document.getElementById("chatConversationScroll") || box;
 
@@ -25625,27 +25624,43 @@ loadingMessages = true;
     var messages = await window.supabaseFetch(url);
 
     if (!Array.isArray(messages)) return;
-    if (getChatId() !== conversationId) return;
 
-    markIncomingMessagesRead(conversationId);
+    if (
+      String(getChatId()) !== idConversation ||
+      box.dataset.mgConversationId !== idConversation
+    ) {
+      return;
+    }
 
     /*
-     * Indexer les bulles existantes.
-     * On les conserve pour éviter le clignotement
-     * des photos et les sauts de mise en page.
+     * Confirmer la lecture sans bloquer l'affichage.
+     */
+    try {
+      Promise.resolve(
+        markIncomingMessagesRead(conversationId)
+      ).catch(function (error) {
+        console.warn("Mise à jour de lecture impossible :", error);
+      });
+    } catch (error) {
+      console.warn("Mise à jour de lecture impossible :", error);
+    }
+
+    /*
+     * Indexer les bulles déjà présentes.
      */
     var lignesExistantes = new Map();
 
-    Array.from(box.querySelectorAll(".message-row")).forEach(
-      function (ligne) {
-        var id = ligne.dataset.mgMessageId;
-        if (id) lignesExistantes.set(String(id), ligne);
+    box.querySelectorAll(".message-row").forEach(function (ligne) {
+      var id = ligne.dataset.mgMessageId;
+
+      if (id) {
+        lignesExistantes.set(String(id), ligne);
       }
-    );
+    });
 
     /*
-     * Les messages déjà affichés ne sont pas recréés.
-     * On actualise seulement leur statut de lecture.
+     * Actualiser les heures et le statut Vu
+     * sans reconstruire les messages déjà affichés.
      */
     messages.forEach(function (msg) {
       var ligne = lignesExistantes.get(String(msg.id));
@@ -25687,22 +25702,20 @@ loadingMessages = true;
     });
 
     /*
-     * Ne charger les photos que pour les nouveaux messages.
-     * Les photos déjà affichées restent en place.
+     * Ajouter uniquement les nouveaux messages.
      */
     var nouveauxMessages = messages.filter(function (msg) {
       return !lignesExistantes.has(String(msg.id));
     });
 
+    lastMessageSignature = getMessageSignature(messages, userId);
+
     if (!nouveauxMessages.length) {
-      lastMessageSignature = getMessageSignature(messages, userId);
       return;
     }
 
-            /*
-     * AFFICHAGE RAPIDE :
-     * Afficher immédiatement les messages et leurs textes.
-     * Les URL des photos seront chargées en arrière-plan.
+    /*
+     * Identifier les photos sans doublons.
      */
     var imagePaths = Array.from(
       new Set(
@@ -25716,23 +25729,29 @@ loadingMessages = true;
       )
     );
 
-    /* 1. Afficher toutes les bulles immédiatement */
+    /*
+     * AFFICHAGE IMMÉDIAT
+     *
+     * Les textes apparaissent sans attendre les photos.
+     */
     var fragment = document.createDocumentFragment();
 
     nouveauxMessages.forEach(function (msg) {
-      fragment.appendChild(
-        makeMessageNode(msg, userId, null)
-      );
+      fragment.appendChild(makeMessageNode(msg, userId, null));
     });
 
     box.appendChild(fragment);
 
-    /* 2. Enregistrer immédiatement les messages affichés */
-    lastMessageSignature = getMessageSignature(messages, userId);
-
-    /* 3. Garder le défilement vers le bas si nécessaire */
+    /*
+     * Aller en bas uniquement si l'utilisateur y était déjà.
+     */
     requestAnimationFrame(function () {
-      if (getChatId() !== conversationId) return;
+      if (
+        String(getChatId()) !== idConversation ||
+        box.dataset.mgConversationId !== idConversation
+      ) {
+        return;
+      }
 
       var zone =
         document.getElementById("chatConversationScroll") || box;
@@ -25743,46 +25762,89 @@ loadingMessages = true;
     });
 
     /*
-     * 4. Charger les photos indépendamment de l'affichage
-     * des messages texte.
+     * CHARGEMENT DES PHOTOS EN ARRIÈRE-PLAN
      */
     if (imagePaths.length) {
-      (async function chargerPhotosEnArrierePlan() {
+      (async function chargerPhotos() {
         var urlMap = new Map();
 
+        /*
+         * Essayer d'abord le chargement groupé.
+         */
         try {
-          urlMap = await getSignedPhotoUrls(imagePaths);
+          var resultat = await getSignedPhotoUrls(imagePaths);
+
+          if (resultat instanceof Map) {
+            urlMap = resultat;
+          }
         } catch (error) {
           console.warn(
             "Chargement groupé des photos impossible :",
             error
           );
-
-          await Promise.all(
-            imagePaths.map(async function (path) {
-              try {
-                var signedUrl =
-                  await getSignedPhotoUrlIndividuelle(path);
-
-                urlMap.set(String(path), signedUrl);
-              } catch (photoError) {
-                console.warn(
-                  "Photo non chargée :",
-                  photoError
-                );
-
-                urlMap.set(String(path), null);
-              }
-            })
-          );
         }
 
-        /* Ne jamais modifier une autre conversation */
-        if (getChatId() !== conversationId) return;
+        /*
+         * Compléter les URL manquantes individuellement.
+         */
+        await Promise.all(
+          imagePaths.map(async function (path) {
+            var cle = String(path);
+            var urlExistante = urlMap.get(cle);
+
+            if (
+              typeof urlExistante === "string" &&
+              urlExistante.length > 0
+            ) {
+              return;
+            }
+
+            try {
+              var urlIndividuelle =
+                await getSignedPhotoUrlIndividuelle(path);
+
+              if (
+                typeof urlIndividuelle === "string" &&
+                urlIndividuelle.length > 0
+              ) {
+                urlMap.set(cle, urlIndividuelle);
+              } else {
+                urlMap.set(cle, null);
+              }
+            } catch (error) {
+              console.warn("Photo non chargée :", error);
+              urlMap.set(cle, null);
+            }
+          })
+        );
+
+        /*
+         * Ne jamais modifier une autre conversation.
+         */
+        if (
+          String(getChatId()) !== idConversation ||
+          box.dataset.mgConversationId !== idConversation
+        ) {
+          return;
+        }
+
+        var zone =
+          document.getElementById("chatConversationScroll") || box;
+
+        var hauteurAvant = zone.scrollHeight;
+        var positionAvant = zone.scrollTop;
+
+        var etaitToujoursEnBas =
+          zone.scrollHeight -
+          zone.scrollTop -
+          zone.clientHeight < 100;
 
         nouveauxMessages.forEach(function (msg) {
           if (!msg.image_url) return;
 
+          /*
+           * Retrouver uniquement la bulle concernée.
+           */
           var ligne = Array.from(
             box.querySelectorAll(".message-row")
           ).find(function (element) {
@@ -25794,26 +25856,45 @@ loadingMessages = true;
 
           var urlPhoto = urlMap.get(String(msg.image_url));
 
+          if (!urlPhoto) {
+            return;
+          }
+
           /*
-           * Remplacer uniquement la bulle qui contient
-           * cette photo, sans supprimer les autres messages.
+           * Remplacer la bulle sans reconstruire la conversation.
            */
           var nouvelleLigne = makeMessageNode(
             msg,
             userId,
-            urlPhoto || null
+            urlPhoto
           );
 
           ligne.replaceWith(nouvelleLigne);
         });
+
+        /*
+         * Préserver la position de lecture si l'utilisateur
+         * consultait des messages plus anciens.
+         */
+        requestAnimationFrame(function () {
+          if (
+            String(getChatId()) !== idConversation ||
+            box.dataset.mgConversationId !== idConversation
+          ) {
+            return;
+          }
+
+          if (etaitToujoursEnBas) {
+            zone.scrollTop = zone.scrollHeight;
+          } else {
+            var difference = zone.scrollHeight - hauteurAvant;
+            zone.scrollTop = positionAvant + difference;
+          }
+        });
       })().catch(function (error) {
-        console.warn(
-          "Erreur de chargement des photos en arrière-plan :",
-          error
-        );
+        console.warn("Chargement des photos impossible :", error);
       });
     }
-
   } catch (error) {
     console.warn(
       "Chargement optimisé des messages impossible :",
@@ -25821,6 +25902,24 @@ loadingMessages = true;
     );
   } finally {
     loadingMessages = false;
+
+    /*
+     * Traiter une demande en attente, si elle existe.
+     * Un seul nouveau chargement sera déclenché.
+     */
+    var conversationEnAttente =
+      loadMessagesOptimized._pendingConversationId;
+
+    loadMessagesOptimized._pendingConversationId = null;
+
+    if (
+      conversationEnAttente &&
+      String(getChatId()) === conversationEnAttente
+    ) {
+      queueMicrotask(function () {
+        loadMessagesOptimized();
+      });
+    }
   }
 }
   
