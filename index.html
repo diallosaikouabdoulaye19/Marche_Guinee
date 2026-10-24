@@ -25753,7 +25753,7 @@ async function loadMessagesOptimized() {
             return !!msg.image_url;
           })
           .map(function (msg) {
-            return String(msg.image_url);
+            return String(msg.image_url).replace(/^\/+/, "");
           })
       )
     );
@@ -25883,7 +25883,9 @@ async function loadMessagesOptimized() {
 
           if (!ligne) return;
 
-          var urlPhoto = urlMap.get(String(msg.image_url));
+          var urlPhoto = urlMap.get(
+          String(msg.image_url).replace(/^\/+/, "")
+          );
 
           if (!urlPhoto) {
             return;
