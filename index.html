@@ -25720,7 +25720,7 @@ loadingMessages = true;
       return;
     }
 
-    var imagePaths = Array.from(
+        var imagePaths = Array.from(
       new Set(
         nouveauxMessages
           .filter(function (msg) {
@@ -25732,22 +25732,36 @@ loadingMessages = true;
       )
     );
 
-    var signedResults = await Promise.all(
-      imagePaths.map(async function (path) {
-        try {
-          return [path, await getSignedPhotoUrl(path)];
-        } catch (error) {
-          console.warn("Photo non chargée :", error);
-          return [path, null];
-        }
-      })
-    );
+    var urlMap;
+
+    try {
+      urlMap = await getSignedPhotoUrls(imagePaths);
+    } catch (error) {
+      console.warn(
+        "Chargement groupé des photos impossible :",
+        error
+      );
+
+      urlMap = new Map();
+
+      await Promise.all(
+        imagePaths.map(async function (path) {
+          try {
+            var signedUrl =
+              await getSignedPhotoUrlIndividuelle(path);
+
+            urlMap.set(String(path), signedUrl);
+          } catch (photoError) {
+            console.warn("Photo non chargée :", photoError);
+            urlMap.set(String(path), null);
+          }
+        })
+      );
+    }
 
     if (getChatId() !== conversationId) return;
 
-    var urlMap = new Map(signedResults);
     var fragment = document.createDocumentFragment();
-
     nouveauxMessages.forEach(function (msg) {
       fragment.appendChild(
         makeMessageNode(
