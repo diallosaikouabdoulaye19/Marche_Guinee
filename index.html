@@ -8772,11 +8772,15 @@ async function chargerListeConversations() {
 
   const utilisateurId = String(utilisateurConnecte.id);
 
-  container.innerHTML = `
-    <div class="empty">
-      Chargement des conversations...
-    </div>
-  `;
+    // Conserver la liste existante pendant son actualisation.
+  // Afficher le chargement uniquement lors de la première ouverture.
+  if (!container.children.length) {
+    container.innerHTML = `
+      <div class="empty">
+        Chargement des conversations...
+      </div>
+    `;
+  }
 
   try {
 
@@ -8838,7 +8842,7 @@ async function chargerListeConversations() {
              new Date(a.dateActivite || 0);
     });
 
-    container.innerHTML = "";
+   const fragment = document.createDocumentFragment();
 
     // 6. Construire chaque ligne de la liste.
     conversationsPreparees.forEach(function(element) {
@@ -9082,8 +9086,11 @@ async function chargerListeConversations() {
         await afficherChat();
       };
 
-      container.appendChild(div);
+           fragment.appendChild(div);
     });
+
+    // Afficher toutes les conversations en une seule opération.
+    container.replaceChildren(fragment);
 
   } catch (error) {
     console.error(
