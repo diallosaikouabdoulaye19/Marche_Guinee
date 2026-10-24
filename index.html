@@ -22454,7 +22454,7 @@ function preparerZoneConversation() {
   }
 }
   
-  if (typeof ancienAfficherChat === "function") {
+   if (typeof ancienAfficherChat === "function") {
     window.afficherChat = async function () {
       const enteteVert = obtenirEnteteVert();
 
@@ -22462,29 +22462,54 @@ function preparerZoneConversation() {
         enteteVert.style.display = "none";
       }
 
-      await ancienAfficherChat();
-
-      if (typeof conversationActuelle === "undefined" || !conversationActuelle) return;
-
-      preparerZoneConversation();
+      /*
+       * OUVRIR LA CONVERSATION IMMÉDIATEMENT
+       */
+      const ouverture = ancienAfficherChat();
 
       /*
-       * Évite de forcer le clavier à l'ouverture.
-       * Il s'ouvrira lorsque l'utilisateur touchera le champ.
+       * ORGANISER LA SAISIE SANS ATTENDRE SUPABASE
        */
+      if (
+        typeof conversationActuelle !== "undefined" &&
+        conversationActuelle
+      ) {
+        preparerZoneConversation();
+      }
+
+      /*
+       * ATTENDRE LA FIN DU CHARGEMENT DU PROFIL
+       */
+      await ouverture;
+
+      if (
+        typeof conversationActuelle === "undefined" ||
+        !conversationActuelle
+      ) {
+        return;
+      }
+
+      /*
+       * STABILISER LA MISE EN PAGE APRÈS LE CHARGEMENT
+       */
+      preparerZoneConversation();
+
       const input = document.getElementById("messageInput");
 
       if (input) {
         input.blur();
       }
 
-      const zoneDefilement = document.getElementById("chatConversationScroll");
+      const zoneDefilement =
+        document.getElementById("chatConversationScroll");
+
       const chatBox = document.getElementById("chatBox");
 
       if (zoneDefilement) {
-       zoneDefilement.scrollTop = zoneDefilement.scrollHeight;
-       } else if (chatBox) {
-       chatBox.scrollTop = chatBox.scrollHeight;
+        zoneDefilement.scrollTop =
+          zoneDefilement.scrollHeight;
+      } else if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     };
   }
