@@ -21622,7 +21622,7 @@ function afficherRetourMesAnnonces() {
   "use strict";
 
   const CHAT_BUCKET = "chat-images";
-  const CHAT_MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const CHAT_MAX_FILE_SIZE = 25 * 1024 * 1024;
   const CHAT_SIGNED_URL_SECONDS = 3600;
 
   let chatPhotoEnCours = false;
@@ -21731,8 +21731,7 @@ function afficherRetourMesAnnonces() {
   /* =====================================================
      ENVOYER UNE PHOTO DANS LA CONVERSATION
   ===================================================== */
-
-  async function envoyerPhotoChat(fichier) {
+async function envoyerPhotoChat(fichier) {
     if (chatPhotoEnCours) return;
 
     try {
@@ -21755,10 +21754,11 @@ function afficherRetourMesAnnonces() {
 
       if (fichier.size > CHAT_MAX_FILE_SIZE) {
         alert(
-          "La photo dépasse la limite de 5 MB."
+          "La photo dépasse la limite de 25 Mo."
         );
         return;
       }
+  
 
       chatPhotoEnCours = true;
 
