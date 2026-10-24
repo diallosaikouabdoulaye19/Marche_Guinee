@@ -13596,31 +13596,16 @@ async function repondrePropositionPrix(
 
 }
 
-
 /* =========================================================
    MESSAGERIE — VERSION AVEC PROPOSITIONS
 ========================================================= */
+const ancienneAfficherChatPrix = window.afficherChat;
 
-const ancienneAfficherChatPrix =
-  window.afficherChat;
-
-window.afficherChat =
-  async function(){
-
-    if(
-      typeof ancienneAfficherChatPrix ===
-      "function"
-    ){
-
-      await ancienneAfficherChatPrix();
-
-    }
-
-
-    await chargerPropositionsPrix();
-
-  };
-
+window.afficherChat = async function () {
+  if (typeof ancienneAfficherChatPrix === "function") {
+    return await ancienneAfficherChatPrix.apply(this, arguments);
+  }
+};
 
 /* =========================================================
    🔔 NOTIFICATIONS — CORRECTION supabaseFetch()
