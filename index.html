@@ -11519,54 +11519,37 @@ async function chargerAnnoncesAdmin(){
 }
 
 
-async function chargerUtilisateursAdmin(){
+async function chargerUtilisateursAdmin() {
 
-  const container =
-    document.getElementById(
-      "listeUtilisateursAdmin"
-    );
+  const container = document.getElementById(
+    "listeUtilisateursAdmin"
+  );
 
+  if (!container) return;
 
-  if(!container) return;
+  try {
 
+    const estAdmin = await verifierAccesAdmin();
 
-  try{
-
-    const estAdmin =
-      await verifierAccesAdmin();
-
-
-    if(!estAdmin){
-
-      container.innerHTML =
-        "Accès refusé.";
-
+    if (!estAdmin) {
+      container.innerHTML = "Accès refusé.";
       return;
-
     }
 
+    const utilisateurs = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/users" +
+      "?select=id,full_name,phone,city,neighborhood,status,created_at" +
+      "&order=created_at.desc"
+    );
 
-    const utilisateurs =
-      await supabaseFetch(
+    const liste = Array.isArray(utilisateurs)
+      ? utilisateurs
+      : [];
 
-        SUPABASE_URL +
-        "/rest/v1/users" +
-        "?select=id,full_name,phone,city,neighborhood,status,created_at" +
-        "&order=created_at.desc"
-
-      );
-
-
-    const liste =
-      Array.isArray(utilisateurs)
-        ? utilisateurs
-        : [];
-
-
-    if(!liste.length){
+    if (!liste.length) {
 
       container.innerHTML = `
-
         <div style="
           padding:15px;
           text-align:center;
@@ -11574,125 +11557,243 @@ async function chargerUtilisateursAdmin(){
         ">
           Aucun utilisateur trouvé.
         </div>
-
       `;
 
       return;
-
     }
-
 
     container.innerHTML = "";
 
+    liste.forEach(utilisateur => {
 
-    liste.forEach(
-      utilisateur => {
+      const div = document.createElement("div");
 
-        const div =
-          document.createElement(
-            "div"
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:12px;" +
+        "padding:13px;" +
+        "margin-bottom:10px;" +
+        "background:white;";
+
+      const statut = String(
+        utilisateur.status || "active"
+      );
+
+      const estSupprime = statut === "deleted";
+
+      const estMonCompte =
+        typeof utilisateurConnecte !== "undefined" &&
+        utilisateurConnecte &&
+        String(utilisateurConnecte.id) ===
+        String(utilisateur.id);
+
+      div.innerHTML = `
+
+        <strong>
+          👤 ${
+            escapeHTML(
+              utilisateur.full_name || "Utilisateur"
+            )
+          }
+        </strong>
+
+        <div style="
+          margin-top:6px;
+          font-size:14px;
+        ">
+          📱 ${
+            escapeHTML(utilisateur.phone || "")
+          }
+        </div>
+
+        <div style="
+          font-size:14px;
+        ">
+          📍 ${
+            escapeHTML(utilisateur.city || "")
+          }
+        </div>
+
+        <div style="
+          font-size:13px;
+          color:${estSupprime ? "#b91c1c" : "#777"};
+          margin-top:5px;
+        ">
+          Statut :
+          ${
+            escapeHTML(
+              estSupprime ? "Supprimé" : statut
+            )
+          }
+        </div>
+
+        ${
+          estSupprime
+            ? `
+              <div style="
+                margin-top:10px;
+                padding:9px;
+                background:#f3f4f6;
+                color:#555;
+                border-radius:8px;
+                font-size:13px;
+              ">
+                Ce compte est déjà supprimé.
+                Les annonces et les commandes sont conservées.
+              </div>
+            `
+            : estMonCompte
+              ? `
+                <div style="
+                  margin-top:10px;
+                  color:#777;
+                  font-size:13px;
+                ">
+                  Ton propre compte administrateur
+                  ne peut pas être supprimé ici.
+                </div>
+              `
+              : `
+                <button
+                  type="button"
+                  class="mg-admin-supprimer-compte"
+                  style="
+                    width:100%;
+                    margin-top:12px;
+                    padding:11px;
+                    border:0;
+                    border-radius:9px;
+                    background:#dc2626;
+                    color:white;
+                    font-weight:bold;
+                    font-size:14px;
+                    cursor:pointer;
+                  "
+                >
+                  🗑️ Supprimer le compte
+                </button>
+              `
+        }
+
+      `;
+
+      container.appendChild(div);
+
+      const bouton = div.querySelector(
+        ".mg-admin-supprimer-compte"
+      );
+
+      if (bouton) {
+
+        bouton.addEventListener("click", async () => {
+
+          const nom = String(
+            utilisateur.full_name || "cet utilisateur"
           );
 
+          const confirmation = confirm(
+            "Supprimer le compte de " + nom + " ?\n\n" +
+            "Le compte sera marqué comme supprimé.\n\n" +
+            "✅ Les annonces seront conservées.\n" +
+            "✅ Les commandes seront conservées.\n" +
+            "✅ L'historique sera préservé.\n\n" +
+            "Le vendeur ne pourra plus vendre avec ce compte.\n\n" +
+            "Cette action ne supprime pas les données historiques."
+          );
 
-        div.style.cssText =
-          "border:1px solid #ddd;" +
-          "border-radius:12px;" +
-          "padding:13px;" +
-          "margin-bottom:10px;" +
-          "background:white;";
+          if (!confirmation) return;
 
+          const texteInitial = bouton.textContent;
 
-        div.innerHTML = `
+          bouton.disabled = true;
+          bouton.textContent = "Suppression en cours...";
+          bouton.style.opacity = "0.65";
 
-          <strong>
-            👤 ${
-              escapeHTML(
-                utilisateur.full_name ||
-                "Utilisateur"
-              )
+          try {
+
+            const resultat = await supabaseFetch(
+              SUPABASE_URL +
+              "/rest/v1/rpc/supprimer_compte_vendeur_admin",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  p_user_id: utilisateur.id
+                })
+              }
+            );
+
+            if (
+              resultat &&
+              typeof resultat === "object" &&
+              resultat.success === false
+            ) {
+              throw new Error(
+                resultat.message ||
+                "La suppression du compte a échoué."
+              );
             }
-          </strong>
 
-          <div style="
-            margin-top:6px;
-            font-size:14px;
-          ">
-            📱 ${
-              escapeHTML(
-                utilisateur.phone || ""
+            alert(
+              "✅ Compte marqué comme supprimé.\n\n" +
+              "Les annonces et les commandes sont conservées."
+            );
+
+            await chargerUtilisateursAdmin();
+
+          } catch (error) {
+
+            console.error(
+              "Erreur suppression compte admin :",
+              error
+            );
+
+            alert(
+              "Impossible de supprimer ce compte.\n\n" +
+              (
+                error.message ||
+                "Vérifie les autorisations Supabase."
               )
-            }
-          </div>
+            );
 
-          <div style="
-            font-size:14px;
-          ">
-            📍 ${
-              escapeHTML(
-                utilisateur.city || ""
-              )
-            }
-          </div>
+            bouton.disabled = false;
+            bouton.textContent = texteInitial;
+            bouton.style.opacity = "1";
+          }
 
-          <div style="
-            font-size:13px;
-            color:#777;
-            margin-top:5px;
-          ">
-            Statut :
-            ${
-              escapeHTML(
-                utilisateur.status ||
-                "Actif"
-              )
-            }
-          </div>
-
-        `;
-
-
-        container.appendChild(
-          div
-        );
+        });
 
       }
-    );
 
+    });
 
-  }catch(error){
+  } catch (error) {
 
     console.error(
       "Erreur utilisateurs admin :",
       error
     );
 
-
     container.innerHTML = `
-
       <div style="
         padding:12px;
         background:#fee2e2;
         color:#b91c1c;
         border-radius:10px;
       ">
-
         Impossible de charger les utilisateurs.
-
         <br><br>
-
         ${escapeHTML(
-          error.message ||
-          "Erreur inconnue."
+          error.message || "Erreur inconnue."
         )}
-
       </div>
-
     `;
 
   }
 
 }
-
 
 /* =========================
    RETRAIT ADMIN
