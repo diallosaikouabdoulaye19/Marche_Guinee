@@ -15349,7 +15349,7 @@ document.addEventListener("keydown", function(event){
 
   }
 
-  /* Transformer les boutons existants sans changer leurs actions */
+    /* Transformer les boutons existants sans changer leurs actions */
   Array.from(actions.querySelectorAll("button")).forEach(function(button){
 
     if(button === balanceButton) return;
@@ -15370,22 +15370,56 @@ document.addEventListener("keydown", function(event){
       '<span class="mg-menu-arrow" aria-hidden="true">›</span>';
 
     button.style.gridColumn = "auto";
-
     button.style.order = String(item.order);
 
-       /* Fermer Mon compte après le déclenchement de la rubrique */
-    button.addEventListener("click", function(){
-      const modal = document.getElementById("accountModal");
-
-      if(modal){
-        setTimeout(function(){
-          modal.style.display = "none";
-        }, 0);
-      }
-    });
   });
 
   balanceButton.style.order = "2";
+
+  /* MARCHÉ GUINÉE — FERMETURE COMMUNE DES RUBRIQUES */
+  if (!window.mgAccountRubriquesHandlerInstalled) {
+    window.mgAccountRubriquesHandlerInstalled = true;
+
+    document.addEventListener("click", function(event) {
+      const cible = event.target;
+
+      if (!cible || typeof cible.closest !== "function") {
+        return;
+      }
+
+      const bouton = cible.closest(
+        "#accountConnected .form-actions button"
+      );
+
+      if (!bouton) return;
+
+      if (bouton.classList.contains("mg-account-logout")) {
+        return;
+      }
+
+      const action = bouton.getAttribute("onclick") || "";
+
+      const actionsCibles = [
+        "ouvrirSignalement",
+        "ouvrirMesAchats",
+        "ouvrirComptePaiement",
+        "ouvrirMesVentes"
+      ];
+
+      if (!actionsCibles.some(function(nom) {
+        return action.includes(nom);
+      })) {
+        return;
+      }
+
+      const compte = document.getElementById("accountModal");
+
+      if (compte) {
+        compte.style.display = "none";
+      }
+
+    }, true);
+  }
 
   /* Ajouter la livraison sans remplacer la fonction existante */
   if(!actions.querySelector(".mg-delivery-menu-row")){
@@ -15423,7 +15457,7 @@ document.addEventListener("keydown", function(event){
     actions.appendChild(deliveryButton);
 
   }
-
+ 
   /* Appliquer l'ordre visuel */
   Array.from(actions.children).forEach(function(button){
 
