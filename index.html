@@ -5503,10 +5503,9 @@ async function confirmerReceptionAchat(
 
 }
 
-/* =========================
-   COMPTE DE PAIEMENT VENDEUR
-   VERSION UNIQUE — MARCHÉ GUINÉE 🇬🇳
-========================= */
+/* =====================================================
+   MARCHÉ GUINÉE 🇬🇳 — COMPTE DE PAIEMENT PLEIN ÉCRAN
+===================================================== */
 
 function ouvrirComptePaiement() {
   if (!utilisateurConnecte) {
@@ -5515,183 +5514,294 @@ function ouvrirComptePaiement() {
     return;
   }
 
+  /* Fermer Mon compte avant d'afficher cette rubrique */
+  const comptePrincipal = document.getElementById("accountModal");
+
+  if (comptePrincipal) {
+    comptePrincipal.style.display = "none";
+  }
+
   let modal = document.getElementById("payoutAccountModal");
 
   if (!modal) {
     modal = document.createElement("div");
     modal.id = "payoutAccountModal";
 
-    modal.style.cssText =
-      "display:none;" +
-      "position:fixed;" +
-      "inset:0;" +
-      "background:rgba(4,20,12,.72);" +
-      "backdrop-filter:blur(5px);" +
-      "-webkit-backdrop-filter:blur(5px);" +
-      "z-index:16000;" +
-      "padding:12px;" +
-      "box-sizing:border-box;" +
-      "overflow-y:auto;";
+    modal.style.cssText = `
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      z-index: 20000;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      box-sizing: border-box;
+    `;
 
     modal.innerHTML = `
       <section style="
-        background:#f7faf8;
+        display:flex;
+        flex-direction:column;
         width:100%;
-        max-width:520px;
-        margin:12px auto;
-        border-radius:24px;
-        overflow:hidden;
-        box-shadow:0 20px 60px rgba(0,0,0,.22);
+        min-height:100%;
+        margin:0;
+        padding:0;
+        background:#ffffff;
+        color:#17221d;
+        box-sizing:border-box;
       ">
+
+        <!-- EN-TÊTE AVEC RETOUR -->
         <header style="
-          position:relative;
-          padding:20px;
-          background:linear-gradient(135deg,#07883f,#12a85a);
-          color:#fff;
+          position:sticky;
+          top:0;
+          z-index:5;
+          display:flex;
+          align-items:center;
+          gap:12px;
+          width:100%;
+          min-height:70px;
+          padding:12px 16px;
+          padding-top:calc(12px + env(safe-area-inset-top, 0px));
+          background:#ffffff;
+          border-bottom:1px solid #e6ece8;
+          box-sizing:border-box;
         ">
+
           <button
             type="button"
             onclick="fermerComptePaiement()"
-            aria-label="Fermer"
             style="
-              position:absolute;
-              right:14px;
-              top:14px;
-              width:40px;
-              height:40px;
-              border:0;
-              border-radius:50%;
-              background:rgba(255,255,255,.17);
-              color:#fff;
-              font-size:22px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              gap:7px;
+              flex-shrink:0;
+              min-height:44px;
+              padding:10px 12px;
+              border:1px solid #dce7df;
+              border-radius:12px;
+              background:#f4f8f5;
+              color:#087f3f;
+              font-size:14px;
+              font-weight:800;
+              white-space:nowrap;
               cursor:pointer;
             "
-          >×</button>
+          >
+            <span style="font-size:23px;line-height:1">‹</span>
+            <span>Retour à Mon compte</span>
+          </button>
 
-          <small style="font-weight:700;opacity:.9">
-            🇬🇳 Marché Guinée
-          </small>
+        </header>
 
-          <h2 style="
-            margin:8px 45px 0 0;
-            font-size:24px;
+        <!-- TITRE -->
+        <div style="
+          padding:25px 20px 23px;
+          background:linear-gradient(135deg,#087f3f,#12a85a);
+          color:#ffffff;
+        ">
+
+          <div style="
+            display:inline-block;
+            padding:7px 11px;
+            border:1px solid rgba(255,255,255,.3);
+            border-radius:30px;
+            background:rgba(255,255,255,.13);
+            font-size:12px;
+            font-weight:800;
+          ">
+            🇬🇳 MARCHÉ GUINÉE
+          </div>
+
+          <h1 style="
+            margin:15px 0 8px;
+            font-size:27px;
+            line-height:1.2;
             font-weight:900;
-          ">🏦 Compte de paiement</h2>
+            letter-spacing:-.4px;
+          ">
+            🏦 Compte de paiement
+          </h1>
 
           <p style="
-            margin:7px 0 0;
-            font-size:13px;
-            opacity:.9;
-            line-height:1.5;
+            margin:0;
+            max-width:500px;
+            font-size:14px;
+            line-height:1.6;
+            color:#ffffff;
+            opacity:.95;
           ">
             Configure le compte qui recevra tes paiements vendeur.
           </p>
-        </header>
 
-        <main style="padding:18px;">
+        </div>
+
+        <!-- FORMULAIRE -->
+        <main style="
+          flex:1;
+          width:100%;
+          max-width:650px;
+          margin:0 auto;
+          padding:22px 20px;
+          padding-bottom:calc(30px + env(safe-area-inset-bottom, 0px));
+          box-sizing:border-box;
+        ">
+
           <div style="
-            padding:14px;
+            padding:15px;
             background:#eaf7ef;
             border:1px solid #cdebd8;
             border-radius:15px;
             color:#24633e;
             font-size:13px;
-            line-height:1.5;
+            line-height:1.6;
           ">
             💡 Utilise un numéro de paiement auquel tu as accès.
+            Vérifie bien le numéro et le nom du titulaire avant
+            d'enregistrer tes informations.
           </div>
 
-          <label for="payoutProvider" style="
-            display:block;
-            margin-top:18px;
-            font-weight:800;
-            font-size:14px;
-            color:#26352d;
-          ">Opérateur</label>
+          <div style="margin-top:25px;">
 
-          <select
-            id="payoutProvider"
-            style="
-              width:100%;
+            <label
+              for="payoutProvider"
+              style="
+                display:block;
+                margin-bottom:9px;
+                color:#26352d;
+                font-size:14px;
+                font-weight:800;
+              "
+            >
+              Opérateur de paiement
+            </label>
+
+            <select
+              id="payoutProvider"
+              style="
+                display:block;
+                width:100%;
+                min-height:52px;
+                padding:12px;
+                border:1px solid #d9e2dc;
+                border-radius:13px;
+                background:#ffffff;
+                color:#26352d;
+                font-size:16px;
+                box-sizing:border-box;
+              "
+            >
+              <option value="orange_money">🟠 Orange Money</option>
+              <option value="mobile_money">🔵 Mobile Money</option>
+            </select>
+
+          </div>
+
+          <div style="margin-top:22px;">
+
+            <label
+              for="payoutPhone"
+              style="
+                display:block;
+                margin-bottom:9px;
+                color:#26352d;
+                font-size:14px;
+                font-weight:800;
+              "
+            >
+              Numéro de paiement
+            </label>
+
+            <input
+              id="payoutPhone"
+              type="tel"
+              inputmode="numeric"
+              maxlength="15"
+              autocomplete="tel"
+              placeholder="Exemple : 621 22 23 24"
+              style="
+                display:block;
+                width:100%;
+                min-height:52px;
+                padding:12px;
+                border:1px solid #d9e2dc;
+                border-radius:13px;
+                background:#ffffff;
+                color:#26352d;
+                font-size:16px;
+                box-sizing:border-box;
+              "
+            >
+
+            <small style="
+              display:block;
               margin-top:7px;
-              height:48px;
-              padding:0 13px;
-              border:1px solid #d9e2dc;
-              border-radius:14px;
-              box-sizing:border-box;
-              font-size:16px;
-              background:#fff;
-              color:#26352d;
-            "
-          >
-            <option value="orange_money">🟠 Orange Money</option>
-            <option value="mobile_money">🔵 Mobile Money</option>
-          </select>
+              color:#758078;
+              font-size:12px;
+              line-height:1.5;
+            ">
+              Entre le numéro associé à ton compte de paiement.
+            </small>
 
-          <label for="payoutPhone" style="
-            display:block;
-            margin-top:18px;
-            font-weight:800;
-            font-size:14px;
-            color:#26352d;
-          ">Numéro de paiement</label>
+          </div>
 
-          <input
-            id="payoutPhone"
-            type="tel"
-            inputmode="numeric"
-            maxlength="15"
-            placeholder="Exemple : 621 22 23 24"
-            style="
-              width:100%;
-              margin-top:7px;
-              height:48px;
-              padding:0 13px;
-              border:1px solid #d9e2dc;
-              border-radius:14px;
-              box-sizing:border-box;
-              font-size:16px;
-              background:#fff;
-            "
-          >
+          <div style="margin-top:22px;">
 
-          <label for="payoutAccountName" style="
-            display:block;
-            margin-top:18px;
-            font-weight:800;
-            font-size:14px;
-            color:#26352d;
-          ">Nom du titulaire</label>
+            <label
+              for="payoutAccountName"
+              style="
+                display:block;
+                margin-bottom:9px;
+                color:#26352d;
+                font-size:14px;
+                font-weight:800;
+              "
+            >
+              Nom du titulaire
+            </label>
 
-          <input
-            id="payoutAccountName"
-            type="text"
-            maxlength="100"
-            placeholder="Nom complet du titulaire"
-            style="
-              width:100%;
-              margin-top:7px;
-              height:48px;
-              padding:0 13px;
-              border:1px solid #d9e2dc;
-              border-radius:14px;
-              box-sizing:border-box;
-              font-size:16px;
-              background:#fff;
-            "
-          >
+            <input
+              id="payoutAccountName"
+              type="text"
+              maxlength="100"
+              autocomplete="name"
+              placeholder="Nom complet du titulaire"
+              style="
+                display:block;
+                width:100%;
+                min-height:52px;
+                padding:12px;
+                border:1px solid #d9e2dc;
+                border-radius:13px;
+                background:#ffffff;
+                color:#26352d;
+                font-size:16px;
+                box-sizing:border-box;
+              "
+            >
+
+          </div>
 
           <div
             id="payoutAccountMessage"
             role="status"
             aria-live="polite"
             style="
-              margin-top:15px;
               display:none;
-              padding:12px;
+              margin-top:18px;
+              padding:13px;
               border-radius:13px;
               font-size:13px;
-              line-height:1.5;
+              line-height:1.6;
               overflow-wrap:anywhere;
             "
           ></div>
@@ -5701,50 +5811,63 @@ function ouvrirComptePaiement() {
             type="button"
             onclick="enregistrerComptePaiement()"
             style="
+              display:block;
               width:100%;
-              min-height:48px;
-              margin-top:18px;
+              min-height:54px;
+              margin-top:25px;
+              padding:14px 16px;
               border:0;
               border-radius:14px;
-              background:#07883f;
-              color:#fff;
-              font-size:15px;
+              background:#087f3f;
+              color:#ffffff;
+              font-size:16px;
               font-weight:900;
               cursor:pointer;
-              box-shadow:0 6px 16px rgba(7,136,63,.2);
+              box-shadow:0 5px 14px rgba(8,127,63,.16);
             "
           >
             💾 Enregistrer mon compte
           </button>
 
           <div style="
-            margin-top:14px;
-            padding:12px;
-            background:#eef2ef;
+            margin-top:18px;
+            padding:14px;
+            background:#f3f6f4;
+            border:1px solid #e5ebe7;
             border-radius:13px;
-            color:#68746d;
+            color:#657168;
             font-size:12px;
-            line-height:1.5;
+            line-height:1.7;
           ">
             🔐 Tes informations servent à préparer les futurs
-            versements de tes ventes. L'enregistrement du compte
-            ne signifie pas que les paiements réels sont activés.
+            versements de tes ventes.
+
+            <br><br>
+
+            ℹ️ Enregistrer ton compte ne signifie pas que les
+            paiements réels sont activés. Aucun paiement ne sera
+            simulé par cette rubrique.
           </div>
+
         </main>
+
       </section>
     `;
 
     document.body.appendChild(modal);
   }
 
+  /* Afficher la rubrique en plein écran */
   modal.style.display = "block";
+
+  /* Charger les informations déjà enregistrées */
   chargerComptePaiement();
 }
 
 
-/* =========================
-   FERMER LE COMPTE DE PAIEMENT
-========================= */
+/* =====================================================
+   RETOUR DEPUIS COMPTE DE PAIEMENT VERS MON COMPTE
+===================================================== */
 
 function fermerComptePaiement() {
   const modal = document.getElementById("payoutAccountModal");
@@ -5752,8 +5875,15 @@ function fermerComptePaiement() {
   if (modal) {
     modal.style.display = "none";
   }
-}
 
+  if (window.utilisateurConnecte) {
+    const compte = document.getElementById("accountModal");
+
+    if (compte) {
+      compte.style.display = "block";
+    }
+  }
+}
 
 /* =========================
    CHARGER LE COMPTE ACTIF
