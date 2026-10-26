@@ -11391,133 +11391,292 @@ async function marquerRetraitEchec(
 
 }
 
-async function chargerAnnoncesAdmin(){
+async function chargerAnnoncesAdmin() {
 
-  const container =
-    document.getElementById(
-      "listeAnnoncesAdmin"
-    );
+  const container = document.getElementById(
+    "listeAnnoncesAdmin"
+  );
 
+  if (!container) return;
 
-  if(!container) return;
+  try {
 
+    // Vérifier les droits de l'administrateur.
+    const estAdmin = await verifierAccesAdmin();
 
-  try{
-
-    const annonces =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/listings" +
-        "?select=id,title,price_gnf,condition,city,neighborhood,status,created_at" +
-        "&order=created_at.desc"
-
-      );
-
-
-    const liste =
-      Array.isArray(annonces)
-        ? annonces
-        : [];
-
-
-    if(!liste.length){
-
-      container.innerHTML =
-        "Aucune annonce trouvée.";
-
+    if (!estAdmin) {
+      container.innerHTML = `
+        <div style="
+          padding:12px;
+          background:#fee2e2;
+          color:#b91c1c;
+          border-radius:10px;
+        ">
+          Accès refusé.
+        </div>
+      `;
       return;
-
     }
 
+    // Charger les annonces, y compris celles déjà supprimées.
+    const annonces = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/listings" +
+      "?select=id,title,price_gnf,condition,city,neighborhood,status,is_deleted,created_at" +
+      "&order=created_at.desc"
+    );
+
+    if (!Array.isArray(annonces)) {
+      throw new Error(
+        "La liste des annonces reçue est invalide."
+      );
+    }
+
+    if (!annonces.length) {
+      container.innerHTML = `
+        <div style="
+          padding:15px;
+          text-align:center;
+          color:#777;
+        ">
+          Aucune annonce trouvée.
+        </div>
+      `;
+      return;
+    }
 
     container.innerHTML = "";
 
+    annonces.forEach(annonce => {
 
-    liste.forEach(
-      annonce => {
+      const div = document.createElement("div");
 
-        const div =
-          document.createElement(
-            "div"
-          );
+      div.style.cssText =
+        "border:1px solid #ddd;" +
+        "border-radius:12px;" +
+        "padding:13px;" +
+        "margin-bottom:10px;" +
+        "background:white;";
 
+      const estSupprime =
+        annonce.is_deleted === true;
 
-        div.style.cssText =
-          "border:1px solid #ddd;" +
-          "border-radius:12px;" +
-          "padding:13px;" +
-          "margin-bottom:10px;" +
-          "background:white;";
+      div.innerHTML = `
 
+        <strong>
+          📦 ${
+            escapeHTML(
+              annonce.title || "Annonce"
+            )
+          }
+        </strong>
 
-        div.innerHTML = `
+        <div style="margin-top:7px;">
+          💰 ${
+            Number(
+              annonce.price_gnf || 0
+            ).toLocaleString("fr-FR")
+          } GNF
+        </div>
 
-          <strong>
-            📦 ${
-              escapeHTML(
-                annonce.title ||
-                "Annonce"
-              )
-            }
-          </strong>
+        <div>
+          📍 ${
+            escapeHTML(annonce.city || "")
+          }
+        </div>
 
-          <div>
-            💰 ${
-              Number(
-                annonce.price_gnf || 0
-              ).toLocaleString("fr-FR")
-            } GNF
-          </div>
+        <div>
+          📌 Statut :
+          ${
+            escapeHTML(
+              annonce.status || "Inconnu"
+            )
+          }
+        </div>
 
-          <div>
-            📍 ${
-              escapeHTML(
-                annonce.city || ""
-              )
-            }
-          </div>
+        ${
+          estSupprime
+            ? `
+              <div style="
+                margin-top:10px;
+                padding:10px;
+                background:#f3f4f6;
+                color:#b91c1c;
+                border-radius:8px;
+                font-size:13px;
+              ">
+                🗑️ Annonce supprimée de la marketplace.
+                <br>
+                Son historique est conservé.
+              </div>
+            `
+            : `
+              <button
+                type="button"
+                class="mg-admin-delete-listing"
+                style="
+                  width:100%;
+                  min-height:44px;
+                  margin-top:12px;
+                  padding:11px;
+                  border:0;
+                  border-radius:9px;
+                  background:#dc2626;
+                  color:white;
+                  font-size:14px;
+                  font-weight:bold;
+                  cursor:pointer;
+                "
+              >
+                🗑️ Supprimer l’annonce
+              </button>
+            `
+        }
 
-          <div>
-            📌 Statut :
-            ${
-              escapeHTML(
-                annonce.status ||
-                "Inconnu"
-              )
-            }
-          </div>
+      `;
 
-        `;
+      container.appendChild(div);
 
+      const bouton = div.querySelector(
+        ".mg-admin-delete-listing"
+      );
 
-        container.appendChild(
-          div
+      if (!bouton) return;
+
+      bouton.addEventListener("click", async () => {
+
+        const titre = String(
+          annonce.title || "cette annonce"
         );
 
-      }
-    );
+        const confirmation = confirm(
+          "Supprimer cette annonce ?\n\n" +
+          titre +
+          "\n\n" +
+          "Si des commandes existent, l'annonce sera " +
+          "conservée dans la base pour préserver l'historique.\n\n" +
+          "Sinon, elle sera supprimée définitivement.\n\n" +
+          "Le compte du vendeur et ses autres annonces " +
+          "ne seront pas supprimés."
+        );
 
+        if (!confirmation) return;
 
-  }catch(error){
+        bouton.disabled = true;
+        bouton.textContent = "Suppression en cours...";
+        bouton.style.opacity = "0.65";
+
+        try {
+
+          const resultat = await supabaseFetch(
+            SUPABASE_URL +
+            "/rest/v1/rpc/supprimer_annonce_admin",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                p_listing_id: annonce.id
+              })
+            }
+          );
+
+          if (
+            resultat &&
+            typeof resultat === "object" &&
+            resultat.success === false
+          ) {
+            throw new Error(
+              resultat.message ||
+              "La suppression a échoué."
+            );
+          }
+
+          const action =
+            resultat && resultat.action
+              ? resultat.action
+              : "";
+
+          if (action === "hidden") {
+
+            alert(
+              "✅ Annonce retirée de la marketplace.\n\n" +
+              "Son historique de commandes est conservé.\n" +
+              "Le compte du vendeur reste intact."
+            );
+
+          } else if (action === "deleted") {
+
+            alert(
+              "✅ Annonce supprimée définitivement.\n\n" +
+              "Le compte du vendeur et ses autres annonces " +
+              "restent intacts."
+            );
+
+          } else {
+
+            alert(
+              "L'opération a été exécutée.\n\n" +
+              "Vérifions le résultat dans la liste."
+            );
+
+          }
+
+          await chargerAnnoncesAdmin();
+
+        } catch (error) {
+
+          console.error(
+            "Erreur suppression annonce admin :",
+            error
+          );
+
+          alert(
+            "Impossible de supprimer cette annonce.\n\n" +
+            (
+              error.message ||
+              "Erreur inconnue."
+            )
+          );
+
+          bouton.disabled = false;
+          bouton.textContent = "🗑️ Supprimer l’annonce";
+          bouton.style.opacity = "1";
+
+        }
+
+      });
+
+    });
+
+  } catch (error) {
 
     console.error(
       "Erreur annonces admin :",
       error
     );
 
-
-    container.innerHTML =
-      "Impossible de charger les annonces.<br><br>" +
-      escapeHTML(
-        error.message ||
-        "Erreur inconnue."
-      );
+    container.innerHTML = `
+      <div style="
+        padding:12px;
+        background:#fee2e2;
+        color:#b91c1c;
+        border-radius:10px;
+      ">
+        Impossible de charger les annonces.
+        <br><br>
+        ${
+          escapeHTML(
+            error.message || "Erreur inconnue."
+          )
+        }
+      </div>
+    `;
 
   }
 
 }
-
 
 async function chargerUtilisateursAdmin() {
 
