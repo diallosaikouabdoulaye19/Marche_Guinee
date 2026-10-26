@@ -29535,6 +29535,67 @@ async function ouvrirMesVentes(orderIdCible) {
   }
 })();
 </script>
+
+<script>
+/* MARCHÉ GUINÉE — CORRECTION COMMUNE DES RUBRIQUES DU COMPTE */
+(function () {
+  "use strict";
+
+  if (window.mgAccountNavigationFixInstalled) return;
+  window.mgAccountNavigationFixInstalled = true;
+
+  var rubriques = [
+    "ouvrirSignalement",
+    "ouvrirMesAchats",
+    "ouvrirComptePaiement",
+    "ouvrirMesVentes"
+  ];
+
+  rubriques.forEach(function (nom) {
+    var fonctionOriginale = window[nom];
+
+    if (typeof fonctionOriginale !== "function") {
+      console.warn(
+        "Marché Guinée : fonction introuvable :",
+        nom
+      );
+      return;
+    }
+
+    window[nom] = function () {
+      var argumentsOriginaux = arguments;
+      var utilisateur = window.utilisateurConnecte;
+
+      /*
+       * Si l'utilisateur n'est pas connecté,
+       * conserver le comportement original.
+       */
+      if (!utilisateur) {
+        return fonctionOriginale.apply(this, argumentsOriginaux);
+      }
+
+      /*
+       * Fermer Mon compte avant d'ouvrir la rubrique.
+       */
+      var compte = document.getElementById("accountModal");
+
+      if (compte) {
+        compte.style.display = "none";
+      }
+
+      /*
+       * Exécuter la fonction originale sans modifier
+       * ses paramètres ni son fonctionnement.
+       */
+      return fonctionOriginale.apply(this, argumentsOriginaux);
+    };
+  });
+
+  console.log(
+    "Marché Guinée : correction de navigation installée."
+  );
+})();
+</script>
   
 </body>
 </html>
