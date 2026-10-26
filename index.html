@@ -15373,17 +15373,16 @@ document.addEventListener("keydown", function(event){
 
     button.style.order = String(item.order);
 
-    /* Fermer le compte avant d'ouvrir une autre fonctionnalité */
-    button.addEventListener("click", function(){
+    /* Fermer Mon compte après le déclenchement de la rubrique */
+button.addEventListener("click", function(){
 
-      const modal = document.getElementById("accountModal");
+  const modal = document.getElementById("accountModal");
 
-      if(modal){
-        modal.style.display = "none";
-      }
+  if(modal){
+    modal.style.display = "none";
+  }
 
-    }, true);
-
+});
   });
 
   balanceButton.style.order = "2";
