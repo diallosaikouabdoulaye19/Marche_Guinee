@@ -15386,7 +15386,6 @@ document.addEventListener("keydown", function(event){
       if (!cible || typeof cible.closest !== "function") {
         return;
       }
-
       const bouton = cible.closest(
         "#accountConnected .form-actions button"
       );
@@ -15418,7 +15417,7 @@ document.addEventListener("keydown", function(event){
         compte.style.display = "none";
       }
 
-    }, true);
+    }, false );
   }
 
   /* Ajouter la livraison sans remplacer la fonction existante */
