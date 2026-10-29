@@ -30437,12 +30437,18 @@ sauvegardeEnCours = false;
 // Fermer le formulaire de modification.
 window.mgFermerModificationAnnonce();
 
-// Actualiser les annonces et les boutons Modifier.
+// Actualiser les annonces de la page d'accueil.
 try {
+  if (typeof window.chargerAnnonces === "function") {
+    await window.chargerAnnonces();
+  }
+
+  // Actualiser la liste « Mes annonces ».
   if (typeof window.chargerMesAnnonces === "function") {
     await window.chargerMesAnnonces();
   }
 
+  // Actualiser les données des boutons Modifier.
   if (typeof actualiserCandidates === "function") {
     await actualiserCandidates();
   }
