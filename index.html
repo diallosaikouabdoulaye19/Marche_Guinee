@@ -30068,16 +30068,44 @@ async function ouvrirMesVentes(orderIdCible) {
 #mgEditListingModal .mg-edit-save:disabled {
   opacity:.55;
 }
+#mgMesAnnoncesModal .mg-ma-card {
+  position:relative;
+  padding-bottom:55px !important;
+}
+
 #mgMesAnnoncesModal .mg-ma-edit-button {
-  display:block;
-  width:100%;
-  min-height:43px;
-  margin-top:12px;
-  border-radius:10px;
-  background:#087f3f;
-  color:#fff;
-  font-size:13px;
-  font-weight:800;
+  position:absolute !important;
+  right:12px !important;
+  bottom:10px !important;
+  left:auto !important;
+  top:auto !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:auto !important;
+  min-width:0 !important;
+  max-width:max-content !important;
+  height:34px !important;
+  min-height:34px !important;
+
+  margin:0 !important;
+  padding:0 12px !important;
+  box-sizing:border-box !important;
+  flex:none !important;
+  align-self:flex-start !important;
+
+  border:0 !important;
+  border-radius:9px !important;
+  background:#087f3f !important;
+  color:#fff !important;
+
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+  z-index:2 !important;
 }
 #mgEditListingMessage {
   margin-top:12px;
