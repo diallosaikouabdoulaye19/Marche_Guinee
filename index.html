@@ -30429,25 +30429,26 @@ async function ouvrirMesVentes(orderIdCible) {
         );
       }
 
-      afficherMessage("Modification enregistrée avec succès.", false);
+     afficherMessage("Modification enregistrée avec succès.", false);
 
-// Fermer immédiatement le formulaire.
+// Autoriser la fermeture après la sauvegarde réussie.
+sauvegardeEnCours = false;
+
+// Fermer le formulaire de modification.
 window.mgFermerModificationAnnonce();
 
-// Recharger la liste pour afficher les nouvelles informations.
+// Actualiser les annonces et les boutons Modifier.
 try {
   if (typeof window.chargerMesAnnonces === "function") {
     await window.chargerMesAnnonces();
   }
 
-  // Actualiser aussi les données utilisées par les boutons Modifier.
-  if (typeof window.mgEditListingGetCandidates === "function") {
-    window.mgEditListingGetCandidates();
+  if (typeof actualiserCandidates === "function") {
+    await actualiserCandidates();
   }
-
 } catch (refreshError) {
   console.error(
-    "Modification enregistrée, mais actualisation de la liste impossible :",
+    "Annonce enregistrée, mais actualisation impossible :",
     refreshError
   );
 }
