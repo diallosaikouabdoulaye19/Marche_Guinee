@@ -30431,13 +30431,26 @@ async function ouvrirMesVentes(orderIdCible) {
 
       afficherMessage("Modification enregistrée avec succès.", false);
 
-      alert("✅ Ton annonce a été modifiée.");
+// Fermer immédiatement le formulaire.
+window.mgFermerModificationAnnonce();
 
-      window.mgFermerModificationAnnonce();
+// Recharger la liste pour afficher les nouvelles informations.
+try {
+  if (typeof window.chargerMesAnnonces === "function") {
+    await window.chargerMesAnnonces();
+  }
 
-      if (typeof window.chargerMesAnnonces === "function") {
-        await window.chargerMesAnnonces();
-      }
+  // Actualiser aussi les données utilisées par les boutons Modifier.
+  if (typeof window.mgEditListingGetCandidates === "function") {
+    window.mgEditListingGetCandidates();
+  }
+
+} catch (refreshError) {
+  console.error(
+    "Modification enregistrée, mais actualisation de la liste impossible :",
+    refreshError
+  );
+}
 
     } catch (erreur) {
       console.error("Erreur modification annonce :", erreur);
