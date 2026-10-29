@@ -29986,6 +29986,595 @@ async function ouvrirMesVentes(orderIdCible) {
   );
 })();
 </script>
+
+<!-- =====================================================
+     MARCHÉ GUINÉE — MODIFICATION DES ANNONCES V1
+     Extension indépendante de Mes annonces
+     ===================================================== -->
+<style id="mg-edit-listing-style">
+#mgEditListingModal {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:60000;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:15px;
+  background:rgba(0,0,0,.65);
+  font-family:Arial,Helvetica,sans-serif;
+}
+#mgEditListingModal .mg-edit-listing-card {
+  width:100%;
+  max-width:520px;
+  margin:20px auto;
+  padding:20px;
+  border-radius:18px;
+  background:#fff;
+  color:#17221d;
+}
+#mgEditListingModal h2 {
+  margin:0 0 7px;
+  font-size:21px;
+}
+#mgEditListingModal .mg-edit-help {
+  color:#68766d;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:17px;
+}
+#mgEditListingModal label {
+  display:block;
+  margin:13px 0 6px;
+  font-size:13px;
+  font-weight:800;
+}
+#mgEditListingModal input,
+#mgEditListingModal textarea,
+#mgEditListingModal select {
+  display:block;
+  width:100%;
+  min-height:47px;
+  padding:12px;
+  border:1px solid #dce5df;
+  border-radius:10px;
+  background:#fff;
+  color:#17221d;
+  font-size:16px;
+  box-sizing:border-box;
+}
+#mgEditListingModal textarea {
+  min-height:110px;
+  resize:vertical;
+}
+#mgEditListingModal .mg-edit-actions {
+  display:flex;
+  gap:9px;
+  margin-top:20px;
+}
+#mgEditListingModal .mg-edit-actions button {
+  flex:1;
+  min-height:48px;
+  border-radius:11px;
+  font-weight:800;
+}
+#mgEditListingModal .mg-edit-save {
+  background:#087f3f;
+  color:#fff;
+}
+#mgEditListingModal .mg-edit-cancel {
+  background:#edf1ee;
+  color:#26352d;
+}
+#mgEditListingModal .mg-edit-save:disabled {
+  opacity:.55;
+}
+#mgMesAnnoncesModal .mg-ma-edit-button {
+  display:block;
+  width:100%;
+  min-height:43px;
+  margin-top:12px;
+  border-radius:10px;
+  background:#087f3f;
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+}
+#mgEditListingMessage {
+  margin-top:12px;
+  font-size:13px;
+  line-height:1.5;
+}
+@media(max-width:380px) {
+  #mgEditListingModal { padding:9px; }
+  #mgEditListingModal .mg-edit-listing-card {
+    margin:10px auto;
+    padding:15px;
+  }
+}
+</style>
+
+<div id="mgEditListingModal" aria-hidden="true">
+  <section class="mg-edit-listing-card">
+    <h2>✏️ Modifier mon annonce</h2>
+    <p class="mg-edit-help">
+      Modifie les informations de ton annonce.
+      Son statut actuel sera conservé.
+    </p>
+
+    <form id="mgEditListingForm">
+      <input type="hidden" id="mgEditListingId">
+
+      <label for="mgEditListingTitle">Titre</label>
+      <input id="mgEditListingTitle"
+             maxlength="120"
+             required>
+
+      <label for="mgEditListingDescription">Description</label>
+      <textarea id="mgEditListingDescription"
+                maxlength="5000"
+                required></textarea>
+
+      <label for="mgEditListingPrice">Prix (GNF)</label>
+      <input id="mgEditListingPrice"
+             type="number"
+             min="1"
+             step="1"
+             required>
+
+      <label for="mgEditListingCondition">État du produit</label>
+      <select id="mgEditListingCondition" required>
+        <option value="">Choisir l'état</option>
+        <option value="Neuf">Neuf</option>
+        <option value="Comme neuf">Comme neuf</option>
+        <option value="Bon état">Bon état</option>
+        <option value="État acceptable">État acceptable</option>
+        <option value="Occasion">Occasion</option>
+      </select>
+
+      <label for="mgEditListingCity">Ville</label>
+      <input id="mgEditListingCity"
+             maxlength="100"
+             required>
+
+      <label for="mgEditListingNeighborhood">Quartier</label>
+      <input id="mgEditListingNeighborhood"
+             maxlength="100">
+
+      <div id="mgEditListingMessage"
+           role="status"
+           aria-live="polite"></div>
+
+      <div class="mg-edit-actions">
+        <button type="button"
+                class="mg-edit-cancel"
+                onclick="mgFermerModificationAnnonce()">
+          Annuler
+        </button>
+
+        <button type="submit"
+                class="mg-edit-save"
+                id="mgEditListingSave">
+          💾 Enregistrer
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<script id="mg-edit-listing-script">
+(function () {
+  "use strict";
+
+  if (window.mgEditListingV1Installed) return;
+  window.mgEditListingV1Installed = true;
+
+  var modal = document.getElementById("mgEditListingModal");
+  var form = document.getElementById("mgEditListingForm");
+  var message = document.getElementById("mgEditListingMessage");
+  var saveButton = document.getElementById("mgEditListingSave");
+
+  var annonceEnCours = null;
+  var sauvegardeEnCours = false;
+
+  function utilisateurActuel() {
+    return window.utilisateurConnecte ||
+      (typeof utilisateurConnecte !== "undefined"
+        ? utilisateurConnecte
+        : null);
+  }
+
+  function afficherMessage(texte, erreur) {
+    message.textContent = texte;
+    message.style.color = erreur ? "#b42318" : "#087f3f";
+  }
+
+  function htmlSafe(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function verrouillerBouton(bouton, verrouille) {
+    bouton.disabled = verrouille;
+    bouton.style.opacity = verrouille ? ".55" : "1";
+  }
+
+  async function verifierAnnonce(id, userId) {
+    var url =
+      SUPABASE_URL +
+      "/rest/v1/listings" +
+      "?select=id,seller_id,title,description,price_gnf,condition,city,neighborhood,status,is_deleted,pause_reason,pause_order_id" +
+      "&id=eq." + encodeURIComponent(id) +
+      "&seller_id=eq." + encodeURIComponent(userId) +
+      "&limit=1";
+
+    var lignes = await supabaseFetch(url);
+
+    if (!Array.isArray(lignes) || !lignes.length) {
+      throw new Error("Annonce introuvable ou accès refusé.");
+    }
+
+    var annonce = lignes[0];
+
+    if (annonce.is_deleted === true) {
+      throw new Error("Cette annonce a été supprimée et ne peut plus être modifiée.");
+    }
+
+    if (String(annonce.status || "").toLowerCase() !== "active") {
+      throw new Error("Seules les annonces actives peuvent être modifiées pour le moment.");
+    }
+
+    if (annonce.pause_order_id || annonce.pause_reason === "pending_order") {
+      throw new Error("Cette annonce est réservée par une commande.");
+    }
+
+    return annonce;
+  }
+
+  async function verifierCommandes(id) {
+    var url =
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?select=id,status" +
+      "&listing_id=eq." + encodeURIComponent(id);
+
+    var commandes = await supabaseFetch(url);
+
+    if (!Array.isArray(commandes)) {
+      throw new Error("Impossible de vérifier les commandes liées à cette annonce.");
+    }
+
+    var commandeBloquante = commandes.some(function (commande) {
+      return String(commande.status || "").toLowerCase() !== "cancelled";
+    });
+
+    if (commandeBloquante) {
+      throw new Error("Cette annonce est liée à une commande. Modification bloquée.");
+    }
+  }
+
+  window.mgOuvrirModificationAnnonce = async function (id) {
+    var user = utilisateurActuel();
+
+    if (!user || !user.id) {
+      alert("Connecte-toi pour modifier ton annonce.");
+      return;
+    }
+
+    if (typeof window.supabaseFetch !== "function" ||
+        typeof window.SUPABASE_URL === "undefined") {
+      alert("Le service de données est indisponible.");
+      return;
+    }
+
+    afficherMessage("Vérification de l'annonce...", false);
+    modal.style.display = "block";
+    modal.setAttribute("aria-hidden", "false");
+    form.style.display = "none";
+
+    try {
+      var annonce = await verifierAnnonce(id, user.id);
+
+      await verifierCommandes(id);
+
+      annonceEnCours = annonce;
+
+      document.getElementById("mgEditListingId").value = annonce.id;
+      document.getElementById("mgEditListingTitle").value = annonce.title || "";
+      document.getElementById("mgEditListingDescription").value =
+        annonce.description || "";
+      document.getElementById("mgEditListingPrice").value =
+        annonce.price_gnf || "";
+      document.getElementById("mgEditListingCondition").value =
+        annonce.condition || "";
+      document.getElementById("mgEditListingCity").value =
+        annonce.city || "";
+      document.getElementById("mgEditListingNeighborhood").value =
+        annonce.neighborhood || "";
+
+      form.style.display = "block";
+      afficherMessage(
+        "Tu peux maintenant modifier les informations de ton annonce.",
+        false
+      );
+
+    } catch (erreur) {
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+
+      alert(erreur.message || "Impossible d'ouvrir cette annonce.");
+      console.error("Modification annonce :", erreur);
+    }
+  };
+
+  window.mgFermerModificationAnnonce = function () {
+    if (sauvegardeEnCours) return;
+
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+    form.reset();
+    annonceEnCours = null;
+  };
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (sauvegardeEnCours || !annonceEnCours) return;
+
+    var user = utilisateurActuel();
+
+    if (!user || user.id !== annonceEnCours.seller_id) {
+      afficherMessage("Accès refusé : propriétaire non reconnu.", true);
+      return;
+    }
+
+    var titre = document.getElementById("mgEditListingTitle").value.trim();
+    var description =
+      document.getElementById("mgEditListingDescription").value.trim();
+    var prix = Number(document.getElementById("mgEditListingPrice").value);
+    var condition =
+      document.getElementById("mgEditListingCondition").value;
+    var ville = document.getElementById("mgEditListingCity").value.trim();
+    var quartier =
+      document.getElementById("mgEditListingNeighborhood").value.trim();
+
+    if (!titre || !description || !condition || !ville) {
+      afficherMessage("Remplis tous les champs obligatoires.", true);
+      return;
+    }
+
+    if (!Number.isSafeInteger(prix) || prix <= 0) {
+      afficherMessage("Entre un prix valide en GNF.", true);
+      return;
+    }
+
+    if (titre.length > 120 ||
+        description.length > 5000 ||
+        ville.length > 100 ||
+        quartier.length > 100) {
+      afficherMessage("Un des champs dépasse la longueur autorisée.", true);
+      return;
+    }
+
+    sauvegardeEnCours = true;
+    verrouillerBouton(saveButton, true);
+    saveButton.textContent = "Enregistrement...";
+
+    try {
+      // Recontrôle immédiat avant l'écriture.
+      var annonceVerifiee = await verifierAnnonce(
+        annonceEnCours.id,
+        user.id
+      );
+
+      await verifierCommandes(annonceEnCours.id);
+
+      var url =
+        SUPABASE_URL +
+        "/rest/v1/listings" +
+        "?id=eq." + encodeURIComponent(annonceEnCours.id) +
+        "&seller_id=eq." + encodeURIComponent(user.id) +
+        "&is_deleted=eq.false" +
+        "&status=eq.active" +
+        "&select=id";
+
+      var resultat = await supabaseFetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          title: titre,
+          description: description,
+          price_gnf: prix,
+          condition: condition,
+          city: ville,
+          neighborhood: quartier || null
+        })
+      });
+
+      if (!Array.isArray(resultat) || resultat.length !== 1) {
+        throw new Error(
+          "Aucune modification confirmée. L'annonce a peut-être changé d'état."
+        );
+      }
+
+      afficherMessage("Modification enregistrée avec succès.", false);
+
+      alert("✅ Ton annonce a été modifiée.");
+
+      window.mgFermerModificationAnnonce();
+
+      if (typeof window.chargerMesAnnonces === "function") {
+        await window.chargerMesAnnonces();
+      }
+
+    } catch (erreur) {
+      console.error("Erreur modification annonce :", erreur);
+      afficherMessage(
+        erreur.message || "Impossible d'enregistrer les modifications.",
+        true
+      );
+
+    } finally {
+      sauvegardeEnCours = false;
+      verrouillerBouton(saveButton, false);
+      saveButton.textContent = "💾 Enregistrer";
+    }
+  });
+
+  /*
+   * Ajouter le bouton uniquement aux annonces actives.
+   * Le serveur vérifie à nouveau le propriétaire et le statut.
+   */
+  function ajouterBoutonsModification() {
+    var liste = document.getElementById("mgMaList");
+    if (!liste) return;
+
+    liste.querySelectorAll(".mg-ma-card").forEach(function (carte) {
+      if (carte.querySelector(".mg-ma-edit-button")) return;
+
+      var titre = carte.querySelector(".mg-ma-title");
+      var annonce = null;
+
+      if (!titre) return;
+
+      // Retrouver l'annonce à partir de son titre et de sa carte.
+      var details = carte.querySelector(".mg-ma-details");
+      if (!details) return;
+
+      var index = Array.prototype.indexOf.call(
+        liste.querySelectorAll(".mg-ma-card"),
+        carte
+      );
+
+      var filtreActuel =
+        document.querySelector(
+          '#mgMesAnnoncesModal .mg-ma-filter.active'
+        );
+
+      var filtre = filtreActuel
+        ? filtreActuel.getAttribute("data-mg-ma-filter")
+        : "all";
+
+      var candidates = window.mgEditListingGetCandidates
+        ? window.mgEditListingGetCandidates()
+        : null;
+
+      if (!Array.isArray(candidates)) return;
+
+      var visible = candidates.filter(function (item) {
+        if (filtre !== "all" &&
+            String(item.status || "").toLowerCase() !== filtre) {
+          return false;
+        }
+        return true;
+      });
+
+      annonce = visible[index];
+
+      if (!annonce ||
+          String(annonce.status || "").toLowerCase() !== "active" ||
+          annonce.is_deleted === true) {
+        return;
+      }
+
+      var bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "mg-ma-edit-button";
+      bouton.textContent = "✏️ Modifier";
+
+      bouton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        window.mgOuvrirModificationAnnonce(annonce.id);
+      });
+
+      carte.appendChild(bouton);
+    });
+  }
+
+  /*
+   * Récupérer la liste interne de Mes annonces sans la remplacer.
+   * L'extension observe l'affichage des cartes.
+   */
+  var ancienneCharger = window.chargerMesAnnonces;
+
+  if (typeof ancienneCharger === "function") {
+    window.chargerMesAnnonces = async function () {
+      var resultat = await ancienneCharger.apply(this, arguments);
+      return resultat;
+    };
+  }
+
+  /*
+   * Les données de la V1 sont privées dans sa fermeture.
+   * On récupère donc les annonces depuis Supabase pour construire
+   * une correspondance fiable avec les cartes visibles.
+   */
+  var candidatesCache = [];
+  var derniereMaj = 0;
+
+  window.mgEditListingGetCandidates = function () {
+    return candidatesCache;
+  };
+
+  async function actualiserCandidates() {
+    var user = utilisateurActuel();
+    if (!user || !user.id) return;
+
+    try {
+      var url =
+        SUPABASE_URL +
+        "/rest/v1/listings" +
+        "?select=id,seller_id,title,status,is_deleted,pause_reason,pause_order_id" +
+        "&seller_id=eq." + encodeURIComponent(user.id) +
+        "&order=created_at.desc";
+
+      var rows = await supabaseFetch(url);
+      candidatesCache = Array.isArray(rows) ? rows : [];
+      derniereMaj = Date.now();
+      ajouterBoutonsModification();
+
+    } catch (erreur) {
+      console.warn("Préparation des boutons de modification :", erreur);
+    }
+  }
+
+  var liste = document.getElementById("mgMaList");
+
+  if (liste) {
+    var observer = new MutationObserver(function () {
+      if (Date.now() - derniereMaj > 1200) {
+        actualiserCandidates();
+      } else {
+        ajouterBoutonsModification();
+      }
+    });
+
+    observer.observe(liste, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    var filtre = event.target.closest &&
+      event.target.closest("#mgMesAnnoncesModal .mg-ma-filter");
+
+    if (filtre) {
+      window.setTimeout(actualiserCandidates, 250);
+    }
+  });
+
+  console.log("Marché Guinée : module de modification prêt.");
+})();
+</script>
+<!-- FIN — MODIFICATION DES ANNONCES V1 -->
   
 </body>
 </html>
