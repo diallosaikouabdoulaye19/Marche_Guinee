@@ -19857,17 +19857,307 @@ function afficherRetour() {
   };
 
  /* =====================================================
+   MARCHÉ GUINÉE 🇬🇳
    PARAMÈTRES — 9 RUBRIQUES
+   LANGUES + THÈMES
+===================================================== */
+
+
+/* =====================================================
+   1. INSTALLATION DU SYSTÈME DE THÈMES
+===================================================== */
+
+(function () {
+
+  var cleTheme = "mg_theme";
+  var mediaTheme = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+
+  function lireTheme() {
+    try {
+      return localStorage.getItem(cleTheme) || "auto";
+    } catch (e) {
+      return "auto";
+    }
+  }
+
+  window.mgAppliquerTheme = function (theme) {
+
+    var themesAutorises = ["clair", "sombre", "auto"];
+
+    if (themesAutorises.indexOf(theme) === -1) {
+      theme = "auto";
+    }
+
+    try {
+      localStorage.setItem(cleTheme, theme);
+    } catch (e) {
+      console.warn("Enregistrement du thème impossible.", e);
+    }
+
+    document.documentElement.setAttribute(
+      "data-mg-theme",
+      theme
+    );
+
+    document.documentElement.style.colorScheme =
+      theme === "sombre" ? "dark" :
+      theme === "clair" ? "light" : "normal";
+
+    return theme;
+  };
+
+  window.mgChangerTheme = function (theme) {
+
+    window.mgAppliquerTheme(theme);
+
+    var select = document.getElementById("mgSelectTheme");
+
+    if (select && select.value !== theme) {
+      select.value = theme;
+    }
+  };
+
+  /* Appliquer le thème mémorisé */
+  window.mgAppliquerTheme(lireTheme());
+
+  /* CSS global du thème sombre */
+  if (!document.getElementById("mg-theme-global-style")) {
+
+    var style = document.createElement("style");
+
+    style.id = "mg-theme-global-style";
+
+    style.textContent = `
+
+      html[data-mg-theme="sombre"] {
+        color-scheme: dark;
+      }
+
+      @media (prefers-color-scheme: dark) {
+
+        html[data-mg-theme="auto"] {
+          color-scheme: dark;
+        }
+
+      }
+
+      /* Fond général */
+      html[data-mg-theme="sombre"] body {
+        background: #111713 !important;
+        color: #edf2ee !important;
+      }
+
+      /* Accueil et grandes zones */
+      html[data-mg-theme="sombre"] .mg-home,
+      html[data-mg-theme="sombre"] main,
+      html[data-mg-theme="sombre"] .mg-content {
+        background: #111713 !important;
+        color: #edf2ee !important;
+      }
+
+      /* En-têtes */
+      html[data-mg-theme="sombre"] header,
+      html[data-mg-theme="sombre"] .mg-header {
+        background: #18221c !important;
+        color: #edf2ee !important;
+        border-color: #344239 !important;
+      }
+
+      html[data-mg-theme="sombre"] .mg-logo,
+      html[data-mg-theme="sombre"] .logo {
+        color: #ffffff !important;
+      }
+
+      /* Cartes et panneaux */
+      html[data-mg-theme="sombre"] .card,
+      html[data-mg-theme="sombre"] .empty,
+      html[data-mg-theme="sombre"] .modal-box,
+      html[data-mg-theme="sombre"] .conversation-item {
+        background: #202b24 !important;
+        color: #edf2ee !important;
+        border-color: #3a493f !important;
+      }
+
+      /* Fenêtres */
+      html[data-mg-theme="sombre"] .modal {
+        background: rgba(0,0,0,.78) !important;
+      }
+
+      /* Textes */
+      html[data-mg-theme="sombre"] .card-title,
+      html[data-mg-theme="sombre"] .section-title,
+      html[data-mg-theme="sombre"] .conversation-title,
+      html[data-mg-theme="sombre"] .modal-box h1,
+      html[data-mg-theme="sombre"] .modal-box h2,
+      html[data-mg-theme="sombre"] .modal-box h3,
+      html[data-mg-theme="sombre"] .modal-box p,
+      html[data-mg-theme="sombre"] .modal-box label {
+        color: #edf2ee !important;
+      }
+
+      html[data-mg-theme="sombre"] .meta,
+      html[data-mg-theme="sombre"] .conversation-date,
+      html[data-mg-theme="sombre"] footer {
+        color: #b5c1b8 !important;
+      }
+
+      /* Formulaires */
+      html[data-mg-theme="sombre"] input,
+      html[data-mg-theme="sombre"] textarea,
+      html[data-mg-theme="sombre"] select {
+        background-color: #17221b !important;
+        color: #ffffff !important;
+        border-color: #46564b !important;
+      }
+
+      html[data-mg-theme="sombre"] input::placeholder,
+      html[data-mg-theme="sombre"] textarea::placeholder {
+        color: #aebbb1 !important;
+      }
+
+      /* Recherche */
+      html[data-mg-theme="sombre"] .mg-search input,
+      html[data-mg-theme="sombre"] .search input {
+        background: #202b24 !important;
+        color: #ffffff !important;
+        border-color: #46564b !important;
+      }
+
+      /* Messagerie */
+      html[data-mg-theme="sombre"] .chat-box,
+      html[data-mg-theme="sombre"] #chatConversationScroll {
+        background: #111b15 !important;
+      }
+
+      html[data-mg-theme="sombre"] .message {
+        background: #29362e !important;
+        color: #ffffff !important;
+      }
+
+      html[data-mg-theme="sombre"] .conversation-item:hover {
+        background: #344238 !important;
+      }
+
+      html[data-mg-theme="sombre"]
+      #messagesModal #chatContainer .chat-input {
+        background: #18221c !important;
+        border-color: #3a493f !important;
+      }
+
+      /* Rubriques et notifications */
+      html[data-mg-theme="sombre"] .mg-extra-notice,
+      html[data-mg-theme="sombre"] .mg-extra-footer {
+        background: #29362e !important;
+        color: #edf2ee !important;
+        border-color: #46564b !important;
+      }
+
+      /* Thème automatique */
+      @media (prefers-color-scheme: dark) {
+
+        html[data-mg-theme="auto"] body {
+          background: #111713 !important;
+          color: #edf2ee !important;
+        }
+
+        html[data-mg-theme="auto"] .mg-home,
+        html[data-mg-theme="auto"] main,
+        html[data-mg-theme="auto"] .mg-content {
+          background: #111713 !important;
+          color: #edf2ee !important;
+        }
+
+        html[data-mg-theme="auto"] header,
+        html[data-mg-theme="auto"] .mg-header {
+          background: #18221c !important;
+          color: #edf2ee !important;
+          border-color: #344239 !important;
+        }
+
+        html[data-mg-theme="auto"] .card,
+        html[data-mg-theme="auto"] .empty,
+        html[data-mg-theme="auto"] .modal-box,
+        html[data-mg-theme="auto"] .conversation-item {
+          background: #202b24 !important;
+          color: #edf2ee !important;
+          border-color: #3a493f !important;
+        }
+
+        html[data-mg-theme="auto"] .modal {
+          background: rgba(0,0,0,.78) !important;
+        }
+
+        html[data-mg-theme="auto"] .card-title,
+        html[data-mg-theme="auto"] .section-title,
+        html[data-mg-theme="auto"] .conversation-title,
+        html[data-mg-theme="auto"] .modal-box h1,
+        html[data-mg-theme="auto"] .modal-box h2,
+        html[data-mg-theme="auto"] .modal-box h3,
+        html[data-mg-theme="auto"] .modal-box p,
+        html[data-mg-theme="auto"] .modal-box label {
+          color: #edf2ee !important;
+        }
+
+        html[data-mg-theme="auto"] input,
+        html[data-mg-theme="auto"] textarea,
+        html[data-mg-theme="auto"] select {
+          background-color: #17221b !important;
+          color: #ffffff !important;
+          border-color: #46564b !important;
+        }
+
+        html[data-mg-theme="auto"] .chat-box,
+        html[data-mg-theme="auto"] #chatConversationScroll {
+          background: #111b15 !important;
+        }
+
+        html[data-mg-theme="auto"] .message {
+          background: #29362e !important;
+          color: #ffffff !important;
+        }
+
+        html[data-mg-theme="auto"]
+        #messagesModal #chatContainer .chat-input {
+          background: #18221c !important;
+          border-color: #3a493f !important;
+        }
+
+        html[data-mg-theme="auto"] .mg-extra-notice,
+        html[data-mg-theme="auto"] .mg-extra-footer {
+          background: #29362e !important;
+          color: #edf2ee !important;
+          border-color: #46564b !important;
+        }
+      }
+
+    `;
+
+    document.head.appendChild(style);
+  }
+
+})();
+
+
+/* =====================================================
+   2. PARAMÈTRES — 9 RUBRIQUES
 ===================================================== */
 
 window.mgOuvrirParametres = function () {
+
   fermerCompte();
 
   var langueEnregistree = "fr";
+  var themeEnregistre = "auto";
 
   try {
     langueEnregistree =
       localStorage.getItem("mg_langue") || "fr";
+
+    themeEnregistre =
+      localStorage.getItem("mg_theme") || "auto";
+
   } catch (erreur) {}
 
   ouvrirPage(
@@ -19889,9 +20179,28 @@ window.mgOuvrirParametres = function () {
     carte(
       "🎨 Apparence et thème",
       '<p>Choisis l’apparence de ton application.</p>' +
-      '<div class="mg-extra-notice">' +
-      '☀️ Thème clair — 🌙 Thème sombre — 📱 Automatique.' +
-      '<br>Les réglages visuels seront activés dans la prochaine étape.' +
+
+      '<select id="mgSelectTheme" ' +
+      'onchange="window.mgChangerTheme(this.value)" ' +
+      'style="width:100%;padding:14px;border:1px solid #ddd;' +
+      'border-radius:10px;font-size:16px;background:#fff;">' +
+
+      '<option value="clair" ' +
+      (themeEnregistre === "clair" ? "selected" : "") +
+      '>☀️ Thème clair</option>' +
+
+      '<option value="sombre" ' +
+      (themeEnregistre === "sombre" ? "selected" : "") +
+      '>🌙 Thème sombre</option>' +
+
+      '<option value="auto" ' +
+      (themeEnregistre === "auto" ? "selected" : "") +
+      '>📱 Automatique</option>' +
+
+      '</select>' +
+
+      '<div class="mg-extra-notice" style="margin-top:12px;">' +
+      'Le thème choisi sera mémorisé sur ton appareil.' +
       '</div>'
     ) +
 
@@ -19959,7 +20268,7 @@ window.mgOuvrirParametres = function () {
 
       '<div class="mg-extra-notice" style="margin-top:12px;">' +
       'La langue choisie sera mémorisée sur cet appareil. ' +
-      'La traduction complète de l’application sera intégrée progressivement.' +
+      'Les traductions des différentes pages seront intégrées progressivement.' +
       '</div>'
     ) +
 
@@ -20014,7 +20323,7 @@ window.mgOuvrirParametres = function () {
 
 
 /* =====================================================
-   ENREGISTREMENT DE LA LANGUE
+   3. ENREGISTREMENT DE LA LANGUE
 ===================================================== */
 
 window.mgChangerLangueInterface = function (langue) {
@@ -20035,6 +20344,9 @@ window.mgChangerLangueInterface = function (langue) {
   }
 
   document.documentElement.lang = langue;
+
+  document.documentElement.dir =
+    langue === "ar" ? "rtl" : "ltr";
 
   alert(
     langue === "fr" ? "Langue enregistrée : Français." :
