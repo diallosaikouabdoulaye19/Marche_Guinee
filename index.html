@@ -23551,14 +23551,25 @@ function preparerZoneConversation() {
     }
   };
 
-  var ancienneFermeture = window.fermerTableauAdmin;
+var ancienneFermeture = window.fermerTableauAdmin;
 
-  if (typeof ancienneFermeture === "function") {
-    window.fermerTableauAdmin = function () {
-      ancienneFermeture.apply(this, arguments);
-      document.body.style.overflow = "";
-    };
-  }
+if (typeof ancienneFermeture === "function") {
+  window.fermerTableauAdmin = function () {
+
+    // Fermer le tableau administrateur normalement.
+    ancienneFermeture.apply(this, arguments);
+
+    // Restaurer Mon compte.
+    var compte = document.getElementById("accountModal");
+
+    if (compte) {
+      compte.style.display = "block";
+    }
+
+    // Conserver le défilement bloqué derrière Mon compte.
+    document.body.style.overflow = "hidden";
+  };
+}
 
 })();
 </script>
