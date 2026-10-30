@@ -23541,17 +23541,28 @@ function preparerZoneConversation() {
     configurerNavigation();
   };
 
-  window.ouvrirTableauAdmin = async function () {
-    await ancienneOuverture.apply(this, arguments);
+window.ouvrirTableauAdmin = async function () {
 
-    var modal = document.getElementById("adminDashboardModal");
-    if (modal) {
-      modal.style.display = "block";
-      document.body.style.overflow = "hidden";
+  // Exécuter l'ouverture originale et attendre la vérification.
+  await ancienneOuverture.apply(this, arguments);
+
+  var modal = document.getElementById("adminDashboardModal");
+
+  // Ne poursuivre que si le tableau a réellement été ouvert.
+  if (modal && modal.style.display !== "none") {
+
+    // Fermer Mon compte après l'ouverture du tableau.
+    var compte = document.getElementById("accountModal");
+
+    if (compte) {
+      compte.style.display = "none";
     }
-  };
 
-var ancienneFermeture = window.fermerTableauAdmin;
+    document.body.style.overflow = "hidden";
+  }
+};
+
+  var ancienneFermeture = window.fermerTableauAdmin;
 
 if (typeof ancienneFermeture === "function") {
   window.fermerTableauAdmin = function () {
