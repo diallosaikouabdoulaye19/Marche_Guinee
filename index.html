@@ -29846,13 +29846,13 @@ async function ouvrirMesVentes(orderIdCible) {
   if (window.mgAccountNavigationFixInstalled) return;
   window.mgAccountNavigationFixInstalled = true;
 
-  var rubriques = [
-    "ouvrirSignalement",
-    "ouvrirMesAchats",
-    "ouvrirComptePaiement",
-    "ouvrirMesVentes"
-  ];
-
+ var rubriques = [
+  "ouvrirSignalement",
+  "ouvrirMesAchats",
+  "ouvrirComptePaiement",
+  "ouvrirMesVentes",
+  "ouvrirTableauAdmin"
+];
   rubriques.forEach(function (nom) {
     var fonctionOriginale = window[nom];
 
