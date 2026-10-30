@@ -28152,26 +28152,20 @@ if (
 </script>
 <!-- FIN DU CORRECTIF NÉGOCIATION CENTRÉE -->
 
- <!-- =========================================================
-     MARCHÉ GUINÉE 🇬🇳
-     NÉGOCIATION UNIFIÉE — GESTIONNAIRE CENTRAL
-     Remplace le comportement des anciens mécanismes
-     sans supprimer les fonctions existantes nécessaires.
-========================================================= -->
 <script id="mg-negociation-unifiee">
 (function () {
   "use strict";
 
-  if (window.__MG_NEGOCIATION_UNIFIEE__) return;
-  window.__MG_NEGOCIATION_UNIFIEE__ = true;
+  if (window.__MG_NEGOCIATION_UNIFIEE_V2__) return;
+  window.__MG_NEGOCIATION_UNIFIEE_V2__ = true;
 
   var overlay = null;
   var contenu = null;
   var titre = null;
   var sousTitre = null;
   var message = null;
-  var ancienOverflow = "";
   var operationEnCours = false;
+  var anciennesAnnonces = [];
 
   function utilisateur() {
     return window.utilisateurConnecte || null;
@@ -28181,50 +28175,51 @@ if (
     return window.conversationActuelle || null;
   }
 
-  function annonce() {
-    return window.annonceConversationActuelle || null;
-  }
-
   function estVendeur() {
     var u = utilisateur();
     var c = conversation();
 
     return !!(
-      u &&
-      c &&
-      String(c.seller_id) === String(u.id)
+      u && c &&
+      String(u.id) === String(c.seller_id)
     );
   }
 
   function prixFormate(valeur) {
-  var prix = Number(valeur);
+    var n = Number(valeur || 0);
 
-  if (!Number.isFinite(prix)) return "—";
+    if (!Number.isFinite(n)) return "—";
 
-  if (typeof window.formatPrix === "function") {
-    try {
-      var resultat = String(window.formatPrix(prix)).trim();
-
-      if (/\bGNF\b/i.test(resultat)) {
-        return resultat;
-      }
-
-      return resultat + " GNF";
-    } catch (e) {}
+    return typeof window.formatPrix === "function"
+      ? window.formatPrix(n) + (
+          /\bGNF\b/i.test(String(window.formatPrix(n)))
+            ? ""
+            : " GNF"
+        )
+      : n.toLocaleString("fr-FR") + " GNF";
   }
 
-  return new Intl.NumberFormat("fr-FR").format(prix) + " GNF";
-}
+  function creerElement(tag, texte, classe) {
+    var el = document.createElement(tag);
+
+    if (texte !== undefined && texte !== null) {
+      el.textContent = String(texte);
+    }
+
+    if (classe) el.className = classe;
+
+    return el;
+  }
 
   function creerBouton(texte, classe, action) {
-    var bouton = document.createElement("button");
+    var b = document.createElement("button");
 
-    bouton.type = "button";
-    bouton.className = classe;
-    bouton.textContent = texte;
-    bouton.addEventListener("click", action);
+    b.type = "button";
+    b.className = classe;
+    b.textContent = texte;
+    b.addEventListener("click", action);
 
-    return bouton;
+    return b;
   }
 
   function afficherMessage(texte, succes) {
@@ -28232,10 +28227,35 @@ if (
 
     message.textContent = texte;
     message.style.display = "block";
+
     message.classList.toggle(
       "mg-price-message-success",
       !!succes
     );
+  }
+
+  function fermerFenetre() {
+    if (!overlay || operationEnCours) return;
+
+    overlay.classList.remove("mg-price-modal-visible");
+    document.body.style.overflow = "";
+  }
+
+  function ouvrirFenetre(t, st) {
+    creerFenetre();
+
+    operationEnCours = false;
+
+    titre.textContent = t || "💰 Négociation";
+    sousTitre.textContent = st || "";
+
+    contenu.replaceChildren();
+
+    message.textContent = "";
+    message.style.display = "none";
+
+    overlay.classList.add("mg-price-modal-visible");
+    document.body.style.overflow = "hidden";
   }
 
   function creerFenetre() {
@@ -28243,7 +28263,6 @@ if (
 
     overlay = document.createElement("div");
     overlay.id = "mgPriceModalOverlay";
-    overlay.setAttribute("role", "presentation");
 
     overlay.innerHTML = `
       <section
@@ -28304,285 +28323,618 @@ if (
     });
   }
 
-  function ouvrirFenetre(titreTexte, sousTitreTexte) {
-    creerFenetre();
-
-    ancienOverflow = document.body.style.overflow;
-    operationEnCours = false;
-
-    titre.textContent = titreTexte;
-    sousTitre.textContent = sousTitreTexte || "";
-
-    contenu.replaceChildren();
-
-    message.textContent = "";
-    message.style.display = "none";
-    message.classList.remove("mg-price-message-success");
-
-    overlay.classList.add("mg-price-modal-visible");
-    document.body.style.overflow = "hidden";
-  }
-
-  function fermerFenetre() {
-    if (!overlay || operationEnCours) return;
-
-    overlay.classList.remove("mg-price-modal-visible");
-    document.body.style.overflow = ancienOverflow;
-  }
-
   function ajouterActions(parent, boutons) {
-    var actions = document.createElement("div");
-    actions.className = "mg-price-modal-actions";
+    var actions = creerElement("div", null, "mg-price-modal-actions");
 
-    boutons.forEach(function (bouton) {
-      actions.appendChild(bouton);
+    boutons.forEach(function (b) {
+      actions.appendChild(b);
     });
 
     parent.appendChild(actions);
   }
 
-  function afficherChargement(texte) {
-    ouvrirFenetre("💰 Négociation", "Chargement des propositions…");
+  async function requete(url, options) {
+    if (
+      typeof window.supabaseFetch !== "function" ||
+      !window.SUPABASE_URL ||
+      typeof window.headers !== "function"
+    ) {
+      throw new Error("Connexion Supabase indisponible.");
+    }
 
-    var p = document.createElement("p");
-    p.textContent = texte || "Veuillez patienter…";
-    p.style.cssText = "line-height:1.6;color:#59665e;";
+    var opts = options || {};
+    opts.headers = window.headers(
+      Object.assign(
+        { "Content-Type": "application/json" },
+        opts.headers || {}
+      )
+    );
 
-    contenu.appendChild(p);
+    return await window.supabaseFetch(url, opts);
   }
 
-  async function chargerOffresAcheteur() {
+  async function chargerAnnoncesVendeur() {
+    var c = conversation();
+
+    if (!c || !c.seller_id) {
+      throw new Error("Vendeur introuvable.");
+    }
+
+    var url =
+      window.SUPABASE_URL +
+      "/rest/v1/listings" +
+      "?select=id,seller_id,title,price_gnf,status,is_deleted" +
+      "&seller_id=eq." +
+      encodeURIComponent(c.seller_id) +
+      "&status=eq.active" +
+      "&is_deleted=eq.false" +
+      "&order=created_at.desc";
+
+    var rows = await requete(url);
+
+    anciennesAnnonces = Array.isArray(rows) ? rows : [];
+
+    return anciennesAnnonces;
+  }
+
+  async function chargerOffres() {
+    var c = conversation();
+
+    if (!c || !c.id) {
+      throw new Error("Conversation introuvable.");
+    }
+
+    var url =
+      window.SUPABASE_URL +
+      "/rest/v1/conversation_offers" +
+      "?select=*" +
+      "&conversation_id=eq." +
+      encodeURIComponent(c.id) +
+      "&order=created_at.desc";
+
+    var offres = await requete(url);
+
+    if (!Array.isArray(offres)) {
+      throw new Error("Format des propositions invalide.");
+    }
+
+    if (!offres.length) return [];
+
+    var ids = offres.map(function (o) {
+      return o.id;
+    }).filter(Boolean);
+
+    var urlItems =
+      window.SUPABASE_URL +
+      "/rest/v1/conversation_offer_items" +
+      "?select=*" +
+      "&conversation_offer_id=in." +
+      encodeURIComponent("(" + ids.join(",") + ")") +
+      "&order=line_number.asc";
+
+    var items = await requete(urlItems);
+
+    if (!Array.isArray(items)) {
+      throw new Error("Impossible de charger les articles.");
+    }
+
+    offres.forEach(function (offre) {
+      offre.items = items.filter(function (item) {
+        return String(item.conversation_offer_id) ===
+          String(offre.id);
+      });
+    });
+
+    return offres;
+  }
+
+  function afficherArticles(parent, items) {
+    var liste = creerElement("div", null, "mg-price-modal-public");
+
+    if (!items || !items.length) {
+      liste.textContent = "Aucun article.";
+      parent.appendChild(liste);
+      return;
+    }
+
+    var titreListe = creerElement("strong", "Articles proposés");
+    liste.appendChild(titreListe);
+
+    items.forEach(function (item) {
+      var ligne = creerElement("div");
+
+      ligne.style.cssText =
+        "padding:10px 0;border-bottom:1px solid #e8ece9;";
+
+      var nom = creerElement(
+        "strong",
+        item.product_title || "Produit"
+      );
+
+      var detail = creerElement(
+        "div",
+        Number(item.quantity || 1) +
+        " × " +
+        prixFormate(item.unit_price_gnf)
+      );
+
+      var total = creerElement(
+        "div",
+        "Total : " + prixFormate(item.line_total_gnf)
+      );
+
+      detail.style.cssText =
+        "font-size:13px;color:#657168;margin-top:4px;";
+
+      total.style.cssText =
+        "font-size:13px;font-weight:700;margin-top:3px;";
+
+      ligne.appendChild(nom);
+      ligne.appendChild(detail);
+      ligne.appendChild(total);
+
+      liste.appendChild(ligne);
+    });
+
+    parent.appendChild(liste);
+  }
+
+  function statutLisible(statut) {
+    var s = String(statut || "").toLowerCase();
+
+    var labels = {
+      pending: "En attente",
+      accepted: "Acceptée",
+      rejected: "Refusée",
+      cancelled: "Annulée",
+      expired: "Expirée"
+    };
+
+    return labels[s] || statut || "Inconnu";
+  }
+
+  async function envoyerProposition(items, remise) {
     var u = utilisateur();
     var c = conversation();
-    var a = annonce();
 
-    if (!u || !c || !a) {
-      throw new Error(
-        "La conversation ou l'annonce n'est pas disponible."
-      );
+    if (!u || !u.id || !c || !c.id) {
+      throw new Error("Session ou conversation indisponible.");
     }
 
-    var listingId = c.listing_id || a.id;
-
-    if (!listingId) {
-      throw new Error("Impossible d'identifier l'annonce.");
+    if (!Array.isArray(items) || !items.length || items.length > 30) {
+      throw new Error("Ajoute entre 1 et 30 produits.");
     }
 
-    var resultat = await window.supabaseFetch(
+    var payload = {
+      p_conversation_id: c.id,
+      p_items: items,
+      p_discount_gnf: remise,
+      p_source_listing_id: null
+    };
+
+    var resultat = await requete(
       window.SUPABASE_URL +
-        "/rest/v1/rpc/get_buyer_price_offers",
+      "/rest/v1/rpc/create_conversation_offer",
       {
         method: "POST",
-        headers: window.headers({
-          "Content-Type": "application/json"
-        }),
-        body: JSON.stringify({
-          p_listing_id: listingId
-        })
+        body: JSON.stringify(payload)
       }
     );
 
-    return Array.isArray(resultat) ? resultat : [];
+    if (resultat === false || resultat === null) {
+      throw new Error("La proposition n'a pas été créée.");
+    }
+
+    var destinataire = estVendeur()
+      ? c.buyer_id
+      : c.seller_id;
+
+    if (typeof window.creerNotification === "function") {
+      try {
+        await window.creerNotification(
+          destinataire,
+          "💰 Nouvelle proposition",
+          "Une nouvelle proposition commerciale a été envoyée dans votre conversation.",
+          "conversation_offer"
+        );
+      } catch (e) {
+        console.warn("Notification non envoyée :", e);
+      }
+    }
+
+    return resultat;
   }
 
-  function afficherPrixPublic(prix) {
-    var bloc = document.createElement("div");
-    bloc.className = "mg-price-modal-public";
-    bloc.textContent = "Prix public de l'annonce";
+  function creerLigneProduit(index, annonces) {
+    var ligne = creerElement("div", null, "mg-price-modal-public");
 
-    var valeur = document.createElement("strong");
-    valeur.textContent = prixFormate(prix);
+    ligne.style.cssText =
+      "margin:10px 0;padding:12px;border:1px solid #e2e9e4;border-radius:12px;";
 
-    bloc.appendChild(valeur);
-    contenu.appendChild(bloc);
+    var type = document.createElement("select");
+    type.className = "mg-price-modal-input";
+    type.style.marginBottom = "8px";
+
+    type.add(new Option("Annonce publiée", "listing"));
+    type.add(new Option("Produit privé", "custom"));
+
+    var selectAnnonce = document.createElement("select");
+    selectAnnonce.className = "mg-price-modal-input";
+    selectAnnonce.style.marginBottom = "8px";
+
+    selectAnnonce.add(new Option("Choisir une annonce", ""));
+
+    annonces.forEach(function (a) {
+      selectAnnonce.add(
+        new Option(
+          (a.title || "Annonce") +
+          " — " +
+          prixFormate(a.price_gnf),
+          a.id
+        )
+      );
+    });
+
+    var nom = document.createElement("input");
+    nom.type = "text";
+    nom.maxLength = 200;
+    nom.placeholder = "Nom du produit privé";
+    nom.className = "mg-price-modal-input";
+    nom.style.marginBottom = "8px";
+
+    var quantite = document.createElement("input");
+    quantite.type = "number";
+    quantite.min = "1";
+    quantite.max = "10000";
+    quantite.step = "1";
+    quantite.value = "1";
+    quantite.inputMode = "numeric";
+    quantite.placeholder = "Quantité";
+    quantite.className = "mg-price-modal-input";
+    quantite.style.marginBottom = "8px";
+
+    var prix = document.createElement("input");
+    prix.type = "number";
+    prix.min = "0";
+    prix.step = "1";
+    prix.inputMode = "numeric";
+    prix.placeholder = "Prix unitaire en GNF";
+    prix.className = "mg-price-modal-input";
+
+    var supprimer = creerBouton(
+      "Retirer ce produit",
+      "mg-price-modal-danger",
+      function () {
+        ligne.remove();
+      }
+    );
+
+    function actualiserType() {
+      var prive = type.value === "custom";
+
+      selectAnnonce.style.display = prive ? "none" : "block";
+      nom.style.display = prive ? "block" : "none";
+
+      if (!prive) {
+        var choisi = annonces.find(function (a) {
+          return String(a.id) === String(selectAnnonce.value);
+        });
+
+        if (choisi) {
+          nom.value = choisi.title || "";
+          prix.value = Number(choisi.price_gnf || 0);
+        }
+      }
+    }
+
+    type.addEventListener("change", actualiserType);
+
+    selectAnnonce.addEventListener("change", function () {
+      var choisi = annonces.find(function (a) {
+        return String(a.id) === String(selectAnnonce.value);
+      });
+
+      if (choisi) {
+        prix.value = Number(choisi.price_gnf || 0);
+      }
+    });
+
+    ligne.appendChild(creerElement("strong", "Produit " + index));
+    ligne.appendChild(type);
+    ligne.appendChild(selectAnnonce);
+    ligne.appendChild(nom);
+    ligne.appendChild(quantite);
+    ligne.appendChild(prix);
+    ligne.appendChild(supprimer);
+
+    actualiserType();
+
+    return {
+      element: ligne,
+      type: type,
+      annonce: selectAnnonce,
+      nom: nom,
+      quantite: quantite,
+      prix: prix
+    };
   }
 
-  async function ouvrirFormulaireVendeur() {
+  async function ouvrirFormulaire() {
     var u = utilisateur();
     var c = conversation();
-    var a = annonce();
 
-    if (!u || !c) {
-      alert("Connecte-toi pour continuer.");
-      return;
-    }
-
-    if (!estVendeur()) {
-      alert("Seul le vendeur peut proposer un prix.");
-      return;
-    }
-
-    if (!a || !a.id) {
-      alert("Annonce introuvable.");
-      return;
-    }
-
-    var prixPublic = Number(a.price_gnf || 0);
-
-    if (!Number.isFinite(prixPublic) || prixPublic <= 0) {
-      alert("Le prix public de l'annonce est invalide.");
+    if (!u || !c || !c.id) {
+      alert("Ouvre d'abord une conversation.");
       return;
     }
 
     ouvrirFenetre(
-      "💰 Proposer un prix",
-      "Ta proposition sera envoyée en privé à cet acheteur."
+      "💰 Nouvelle proposition",
+      "Ajoute les produits, leurs quantités et leurs prix."
     );
 
-    afficherPrixPublic(prixPublic);
+    var zone = creerElement("div");
+    contenu.appendChild(zone);
 
-    var label = document.createElement("label");
-    label.className = "mg-price-modal-label";
-    label.htmlFor = "mgUnifiedPriceInput";
-    label.textContent = "Prix proposé (GNF)";
+    try {
+      afficherMessage("Chargement des annonces disponibles…", true);
 
-    var input = document.createElement("input");
-    input.id = "mgUnifiedPriceInput";
-    input.className = "mg-price-modal-input";
-    input.type = "number";
-    input.inputMode = "numeric";
-    input.min = "1";
-    input.step = "1";
-    input.placeholder = "Ex. : 70000";
-    input.autocomplete = "off";
+      var annonces = await chargerAnnoncesVendeur();
 
-    contenu.appendChild(label);
-    contenu.appendChild(input);
+      if (!overlay.classList.contains("mg-price-modal-visible")) return;
 
-    var annuler = creerBouton(
-      "Annuler",
-      "mg-price-modal-secondary",
-      fermerFenetre
-    );
+      message.style.display = "none";
+      zone.replaceChildren();
 
-    var envoyer = creerBouton(
-      "Envoyer la proposition",
-      "mg-price-modal-primary",
-      envoyerProposition
-    );
+      var lignes = [];
 
-    ajouterActions(contenu, [annuler, envoyer]);
+      var liste = creerElement("div");
+      zone.appendChild(liste);
 
-    input.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        envoyerProposition();
-      }
-    });
-
-    setTimeout(function () {
-      if (overlay && overlay.classList.contains("mg-price-modal-visible")) {
-        input.focus({ preventScroll: true });
-      }
-    }, 80);
-
-    async function envoyerProposition() {
-      if (operationEnCours) return;
-
-      var saisie = String(input.value || "").trim();
-      var prix = Number(saisie);
-
-      if (
-        !saisie ||
-        !Number.isSafeInteger(prix) ||
-        prix <= 0
-      ) {
-        afficherMessage(
-          "Entre un montant entier valide supérieur à zéro.",
-          false
-        );
-        input.focus();
-        return;
-      }
-
-      operationEnCours = true;
-      envoyer.disabled = true;
-      annuler.disabled = true;
-
-      afficherMessage("Envoi de la proposition…", true);
-
-      try {
-        var resultat = await window.supabaseFetch(
-          window.SUPABASE_URL +
-            "/rest/v1/rpc/create_price_offer",
-          {
-            method: "POST",
-            headers: window.headers({
-              "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-              p_listing_id: a.id,
-              p_buyer_id: c.buyer_id,
-              p_proposed_price_gnf: prix
-            })
-          }
-        );
-
-        if (resultat === false || resultat === null) {
-          throw new Error("La proposition n'a pas été créée.");
+      function ajouterProduit() {
+        if (lignes.length >= 30) {
+          afficherMessage("Maximum 30 produits par proposition.", false);
+          return;
         }
+
+        var nouvelle = creerLigneProduit(
+          lignes.length + 1,
+          annonces
+        );
+
+        lignes.push(nouvelle);
+        liste.appendChild(nouvelle.element);
+      }
+
+      ajouterProduit();
+
+      var ajouter = creerBouton(
+        "＋ Ajouter un produit",
+        "mg-price-modal-secondary",
+        ajouterProduit
+      );
+
+      zone.appendChild(ajouter);
+
+      var remiseLabel = creerElement("label", "Remise sur le lot (GNF)");
+      remiseLabel.className = "mg-price-modal-label";
+
+      var remise = document.createElement("input");
+      remise.type = "number";
+      remise.min = "0";
+      remise.step = "1";
+      remise.value = "0";
+      remise.inputMode = "numeric";
+      remise.className = "mg-price-modal-input";
+
+      zone.appendChild(remiseLabel);
+      zone.appendChild(remise);
+
+      var totalBox = creerElement("div", "Total estimé : 0 GNF");
+      totalBox.className = "mg-price-modal-public";
+      zone.appendChild(totalBox);
+
+      function calculerTotal() {
+        var total = 0;
+
+        lignes.forEach(function (l) {
+          if (!l.element.isConnected) return;
+
+          var q = Number(l.quantite.value);
+          var p = Number(l.prix.value);
+
+          if (
+            Number.isSafeInteger(q) &&
+            Number.isSafeInteger(p) &&
+            q > 0 &&
+            p >= 0
+          ) {
+            total += q * p;
+          }
+        });
+
+        var r = Number(remise.value || 0);
+
+        if (!Number.isSafeInteger(r) || r < 0) r = 0;
+
+        totalBox.textContent =
+          "Total estimé : " +
+          prixFormate(Math.max(0, total - r));
+      }
+
+      lignes.forEach(function (l) {
+        l.quantite.addEventListener("input", calculerTotal);
+        l.prix.addEventListener("input", calculerTotal);
+      });
+
+      liste.addEventListener("input", calculerTotal);
+      liste.addEventListener("change", calculerTotal);
+      remise.addEventListener("input", calculerTotal);
+
+      var annuler = creerBouton(
+        "Annuler",
+        "mg-price-modal-secondary",
+        fermerFenetre
+      );
+
+      var envoyer = creerBouton(
+        "Envoyer la proposition",
+        "mg-price-modal-primary",
+        envoyerFormulaire
+      );
+
+      ajouterActions(zone, [annuler, envoyer]);
+
+      async function envoyerFormulaire() {
+        if (operationEnCours) return;
+
+        var items = [];
+
+        for (var i = 0; i < lignes.length; i++) {
+          var l = lignes[i];
+
+          if (!l.element.isConnected) continue;
+
+          var q = Number(l.quantite.value);
+          var p = Number(l.prix.value);
+
+          if (
+            !Number.isSafeInteger(q) ||
+            q < 1 ||
+            q > 10000 ||
+            !Number.isSafeInteger(p) ||
+            p < 0
+          ) {
+            afficherMessage(
+              "Vérifie les quantités et les prix de chaque produit.",
+              false
+            );
+            return;
+          }
+
+          var item = {
+            item_type: l.type.value,
+            listing_id: null,
+            product_title: "",
+            quantity: q,
+            unit_price_gnf: p
+          };
+
+          if (l.type.value === "listing") {
+            var annonceChoisie = annonces.find(function (a) {
+              return String(a.id) === String(l.annonce.value);
+            });
+
+            if (!annonceChoisie) {
+              afficherMessage("Choisis une annonce valide.", false);
+              return;
+            }
+
+            item.listing_id = annonceChoisie.id;
+            item.product_title = annonceChoisie.title;
+
+          } else {
+            item.product_title = String(l.nom.value || "").trim();
+
+            if (!item.product_title) {
+              afficherMessage("Saisis le nom du produit privé.", false);
+              return;
+            }
+          }
+
+          items.push(item);
+        }
+
+        if (!items.length) {
+          afficherMessage("Ajoute au moins un produit.", false);
+          return;
+        }
+
+        var r = Number(remise.value || 0);
+
+        if (!Number.isSafeInteger(r) || r < 0) {
+          afficherMessage("La remise doit être un montant valide.", false);
+          return;
+        }
+
+        var sousTotal = items.reduce(function (s, item) {
+          return s + item.quantity * item.unit_price_gnf;
+        }, 0);
+
+        if (!Number.isSafeInteger(sousTotal) || sousTotal <= 0) {
+          afficherMessage("Le montant total est invalide.", false);
+          return;
+        }
+
+        if (r > sousTotal) {
+          afficherMessage("La remise ne peut pas dépasser le sous-total.", false);
+          return;
+        }
+
+        if (sousTotal - r <= 0) {
+          afficherMessage("Le total après remise doit être supérieur à zéro.", false);
+          return;
+        }
+
+        operationEnCours = true;
+        envoyer.disabled = true;
+        annuler.disabled = true;
+
+        afficherMessage("Envoi de la proposition…", true);
 
         try {
-          if (typeof window.creerNotification === "function") {
-            await window.creerNotification(
-              c.buyer_id,
-              "💰 Nouvelle proposition de prix",
-              "Le vendeur vous propose " +
-                prixFormate(prix) +
-                " pour « " +
-                (a.title || "votre annonce") +
-                " ». Ouvrez la conversation pour répondre.",
-              "price_offer"
-            );
-          }
-        } catch (e) {
-          console.warn("Notification non envoyée :", e);
+          await envoyerProposition(items, r);
+
+          operationEnCours = false;
+          fermerFenetre();
+
+          await afficherNegociation();
+
+        } catch (erreur) {
+          operationEnCours = false;
+          envoyer.disabled = false;
+          annuler.disabled = false;
+
+          afficherMessage(
+            "Impossible d'envoyer : " +
+            (erreur.message || "Erreur inconnue."),
+            false
+          );
         }
-
-        operationEnCours = false;
-
-        fermerFenetre();
-
-        if (typeof window.chargerPropositionsPrix === "function") {
-          await window.chargerPropositionsPrix();
-        }
-
-        alert("✅ Proposition envoyée : " + prixFormate(prix) + ".");
-
-      } catch (erreur) {
-        operationEnCours = false;
-        envoyer.disabled = false;
-        annuler.disabled = false;
-
-        afficherMessage(
-          "Impossible d'envoyer la proposition : " +
-            (erreur && erreur.message
-              ? erreur.message
-              : "erreur inconnue."),
-          false
-        );
       }
+
+    } catch (erreur) {
+      afficherMessage(
+        "Impossible de charger les annonces : " +
+        (erreur.message || "Erreur inconnue."),
+        false
+      );
     }
   }
 
-  async function repondreAOffre(offreId, action) {
+  async function repondreAOffre(offerId, action) {
     if (operationEnCours) return;
 
     if (action !== "accepted" && action !== "rejected") return;
 
-    var accepter = action === "accepted";
-
     ouvrirFenetre(
-      accepter ? "✅ Accepter le prix ?" : "❌ Refuser le prix ?",
-      "Confirme ton choix avant de l'enregistrer."
+      action === "accepted"
+        ? "✅ Accepter cette proposition ?"
+        : "❌ Refuser cette proposition ?",
+      action === "accepted"
+        ? "Une commande sera créée, en attente de paiement."
+        : "Cette proposition sera marquée comme refusée."
     );
 
-    var explication = document.createElement("p");
+    var explication = creerElement(
+      "p",
+      action === "accepted"
+        ? "La commande ne sera pas considérée comme payée."
+        : "Tu pourras toujours envoyer une nouvelle proposition."
+    );
+
     explication.style.cssText =
-      "font-size:15px;line-height:1.6;color:#4d5b52;";
-    explication.textContent = accepter
-      ? "Le prix négocié sera enregistré comme accepté."
-      : "Ta décision de refuser cette proposition sera enregistrée.";
+      "line-height:1.6;color:#59665e;";
 
     contenu.appendChild(explication);
 
@@ -28593,8 +28945,10 @@ if (
     );
 
     var confirmer = creerBouton(
-      accepter ? "Confirmer l'acceptation" : "Confirmer le refus",
-      accepter
+      action === "accepted"
+        ? "Confirmer l'acceptation"
+        : "Confirmer le refus",
+      action === "accepted"
         ? "mg-price-modal-primary"
         : "mg-price-modal-danger",
       confirmerReponse
@@ -28609,19 +28963,16 @@ if (
       annuler.disabled = true;
       confirmer.disabled = true;
 
-      afficherMessage("Enregistrement de ta réponse…", true);
+      afficherMessage("Enregistrement…", true);
 
       try {
-        var resultat = await window.supabaseFetch(
+        var resultat = await requete(
           window.SUPABASE_URL +
-            "/rest/v1/rpc/respond_price_offer",
+          "/rest/v1/rpc/respond_conversation_offer",
           {
             method: "POST",
-            headers: window.headers({
-              "Content-Type": "application/json"
-            }),
             body: JSON.stringify({
-              p_offer_id: offreId,
+              p_offer_id: offerId,
               p_action: action
             })
           }
@@ -28634,15 +28985,7 @@ if (
         operationEnCours = false;
         fermerFenetre();
 
-        if (typeof window.chargerPropositionsPrix === "function") {
-          await window.chargerPropositionsPrix();
-        }
-
-        alert(
-          accepter
-            ? "✅ Proposition acceptée."
-            : "❌ Proposition refusée."
-        );
+        await afficherNegociation();
 
       } catch (erreur) {
         operationEnCours = false;
@@ -28650,149 +28993,160 @@ if (
         confirmer.disabled = false;
 
         afficherMessage(
-          "Impossible d'enregistrer la réponse : " +
-            (erreur && erreur.message
-              ? erreur.message
-              : "erreur inconnue."),
+          "Erreur : " + (erreur.message || "Réponse impossible."),
           false
         );
       }
     }
   }
 
-  async function ouvrirNegociationAcheteur() {
-    afficherChargement("Recherche des propositions de prix…");
+  async function afficherNegociation() {
+    var c = conversation();
+    var u = utilisateur();
+
+    if (!c || !c.id || !u || !u.id) {
+      alert("Conversation indisponible.");
+      return;
+    }
+
+    ouvrirFenetre(
+      "💰 Négociation",
+      "Propositions et contre-propositions de cette conversation."
+    );
+
+    afficherMessage("Chargement des propositions…", true);
 
     try {
-      var offres = await chargerOffresAcheteur();
+      var offres = await chargerOffres();
 
-      var attente = offres.find(function (offre) {
-  return String(offre.status).toLowerCase() === "pending";
-});
-
-var acceptee = offres.find(function (offre) {
-  return String(offre.status).toLowerCase() === "accepted";
-});
+      if (!overlay.classList.contains("mg-price-modal-visible")) return;
 
       contenu.replaceChildren();
+      message.style.display = "none";
 
-         if (acceptee && !attente) {
-        titre.textContent = "✅ Prix négocié accepté";
-        sousTitre.textContent =
-          "Le prix accepté pour cette annonce est :";
-
-        afficherPrixPublic(acceptee.original_price_gnf);
-
-        var prixAccepte = document.createElement("div");
-        prixAccepte.className = "mg-price-modal-public";
-
-        var valeur = document.createElement("strong");
-        valeur.textContent = prixFormate(
-          acceptee.proposed_price_gnf
-        );
-
-        prixAccepte.appendChild(valeur);
-        contenu.appendChild(prixAccepte);
-
-        var badge = document.createElement("p");
-        badge.textContent = "Prix négocié accepté 💰";
-        badge.style.cssText =
-          "color:#087f3f;font-weight:800;line-height:1.5;";
-
-        contenu.appendChild(badge);
-        return;
-      }
-
-      if (attente) {
-        titre.textContent = "💰 Nouvelle proposition de prix";
-        sousTitre.textContent =
-          "Le vendeur attend ta réponse.";
-
-        afficherPrixPublic(attente.original_price_gnf);
-
-        var prixPropose = document.createElement("div");
-        prixPropose.className = "mg-price-modal-public";
-
-        var montant = document.createElement("strong");
-        montant.textContent = prixFormate(
-          attente.proposed_price_gnf
-        );
-
-        prixPropose.appendChild(montant);
-        contenu.appendChild(prixPropose);
-
-        var idOffre = attente.id;
-
-        ajouterActions(contenu, [
-          creerBouton(
-            "❌ Refuser",
-            "mg-price-modal-danger",
-            function () {
-              repondreAOffre(idOffre, "rejected");
-            }
-          ),
-          creerBouton(
-            "✅ Accepter",
-            "mg-price-modal-primary",
-            function () {
-              repondreAOffre(idOffre, "accepted");
-            }
+      if (!offres.length) {
+        contenu.appendChild(
+          creerElement(
+            "p",
+            "Aucune proposition pour le moment."
           )
-        ]);
-
-        return;
+        );
       }
 
-      titre.textContent = "💰 Négociation";
-      sousTitre.textContent = "Tes propositions de prix";
+      offres.forEach(function (offre) {
+        var carte = creerElement("div", null, "mg-price-modal-public");
 
-      var vide = document.createElement("p");
-      vide.textContent =
-        "Aucune proposition en attente pour cette annonce.";
-      vide.style.cssText =
-        "line-height:1.6;color:#59665e;";
+        carte.style.cssText =
+          "margin:12px 0;padding:14px;border:1px solid #e1e8e3;border-radius:13px;";
 
-      contenu.appendChild(vide);
+        var auteur = String(offre.proposed_by) === String(u.id)
+          ? "Ta proposition"
+          : "Proposition reçue";
+
+        carte.appendChild(creerElement("strong", auteur));
+
+        carte.appendChild(
+          creerElement(
+            "div",
+            "État : " + statutLisible(offre.status)
+          )
+        );
+
+        afficherArticles(carte, offre.items || []);
+
+        carte.appendChild(
+          creerElement(
+            "div",
+            "Sous-total : " + prixFormate(offre.subtotal_gnf)
+          )
+        );
+
+        carte.appendChild(
+          creerElement(
+            "div",
+            "Remise : " + prixFormate(offre.discount_gnf)
+          )
+        );
+
+        var total = creerElement(
+          "strong",
+          "Total : " + prixFormate(offre.total_gnf)
+        );
+
+        total.style.cssText = "display:block;margin-top:10px;";
+        carte.appendChild(total);
+
+        if (String(offre.status).toLowerCase() === "pending") {
+          if (String(offre.proposed_by) !== String(u.id)) {
+            var id = offre.id;
+
+            ajouterActions(carte, [
+              creerBouton(
+                "❌ Refuser",
+                "mg-price-modal-danger",
+                function () {
+                  repondreAOffre(id, "rejected");
+                }
+              ),
+              creerBouton(
+                "Contre-proposer",
+                "mg-price-modal-secondary",
+                ouvrirFormulaire
+              ),
+              creerBouton(
+                "✅ Accepter",
+                "mg-price-modal-primary",
+                function () {
+                  repondreAOffre(id, "accepted");
+                }
+              )
+            ]);
+          } else {
+            carte.appendChild(
+              creerElement("p", "En attente de la réponse de l'autre participant.")
+            );
+          }
+        }
+
+        contenu.appendChild(carte);
+      });
+
+      var nouvelle = creerBouton(
+        "＋ Nouvelle proposition / contre-proposition",
+        "mg-price-modal-primary",
+        ouvrirFormulaire
+      );
+
+      nouvelle.style.width = "100%";
+      nouvelle.style.marginTop = "12px";
+
+      contenu.appendChild(nouvelle);
 
     } catch (erreur) {
       contenu.replaceChildren();
 
-      var erreurTexte = document.createElement("p");
-      erreurTexte.style.cssText =
-        "line-height:1.6;color:#a32121;";
-      erreurTexte.textContent =
-        "Impossible de charger les propositions : " +
-        (erreur && erreur.message
-          ? erreur.message
-          : "erreur inconnue.");
-
-      contenu.appendChild(erreurTexte);
+      contenu.appendChild(
+        creerElement(
+          "p",
+          "Impossible de charger les propositions : " +
+          (erreur.message || "Erreur inconnue.")
+        )
+      );
     }
   }
 
   async function ouvrirNegociation() {
-    if (!utilisateur() || !conversation()) {
-      alert("Ouvre d'abord une conversation pour négocier un prix.");
+    var u = utilisateur();
+    var c = conversation();
+
+    if (!u || !c || !c.id) {
+      alert("Ouvre d'abord une conversation.");
       return;
     }
 
-    if (!annonce()) {
-      alert("L'annonce liée à cette conversation est introuvable.");
-      return;
-    }
-
-    if (estVendeur()) {
-      await ouvrirFormulaireVendeur();
-    } else {
-      await ouvrirNegociationAcheteur();
-    }
+    await afficherNegociation();
   }
 
-  /*
-   * Un seul gestionnaire pour les clics du bouton.
-   * Il intercepte l'ancien gestionnaire avant qu'il ouvre
-   * le panneau priceOfferPanel.
-   */
   document.addEventListener("click", function (event) {
     var cible = event.target;
 
@@ -28807,17 +29161,14 @@ var acceptee = offres.find(function (offre) {
     event.stopImmediatePropagation();
 
     ouvrirNegociation().catch(function (erreur) {
-      console.error("Erreur de négociation :", erreur);
-      alert("Impossible d'ouvrir la négociation pour le moment.");
+      console.error("Erreur négociation :", erreur);
+      alert(
+        "Impossible d'ouvrir la négociation : " +
+        (erreur.message || "Erreur inconnue.")
+      );
     });
   }, true);
 
-  /*
-   * Le chargement automatique ne doit plus recréer
-   * l'ancien panneau visible dans la conversation.
-   * Le prix négocié accepté reste récupérable grâce
-   * à recupererPrixNegocie(), qui n'est pas modifiée.
-   */
   window.chargerPropositionsPrix = async function () {
     var ancien = document.getElementById("priceOfferPanel");
 
@@ -28826,17 +29177,13 @@ var acceptee = offres.find(function (offre) {
     return true;
   };
 
-  /*
-   * Ces fonctions globales sont désormais pilotées
-   * par le gestionnaire unifié.
-   */
-  window.proposerPrixPrive = ouvrirFormulaireVendeur;
+  window.proposerPrixPrive = ouvrirFormulaire;
 
   window.repondrePropositionPrix = function (offerId, action) {
     return repondreAOffre(offerId, action);
   };
 
-  console.log("✅ Gestionnaire de négociation unifiée installé.");
+  console.log("Marché Guinée : négociation unifiée V2 installée.");
 
 })();
 </script>
