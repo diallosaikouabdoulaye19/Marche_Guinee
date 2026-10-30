@@ -19857,60 +19857,127 @@ function afficherRetour() {
   };
 
   /* =====================================================
-     PARAMÈTRES
-  ===================================================== */
+   PARAMÈTRES — 9 RUBRIQUES
+===================================================== */
 
-  window.mgOuvrirParametres = function () {
-    fermerCompte();
+window.mgOuvrirParametres = function () {
+  fermerCompte();
 
-    ouvrirPage(
-      "⚙️ Paramètres",
-      "Gère les préférences de ton compte",
-      carte(
-        "👤 Profil",
-        '<p>Modifie les informations de ton profil et ta photo.</p>' +
-        boutonInterne(
-          "✏️",
-          "Modifier mon profil",
-          "mgExtraActionProfil()"
-        )
-      ) +
-      carte(
-        "🔔 Notifications",
-        '<p>Consulte les notifications disponibles dans ton compte.</p>' +
-        boutonInterne(
-          "🔔",
-          "Ouvrir mes notifications",
-          "mgExtraActionNotifications()"
-        )
-      ) +
-      carte(
-        "🔒 Confidentialité",
-        '<p>Consulte les informations sur la protection des données.</p>' +
-        boutonInterne(
-          "🔒",
-          "Confidentialité",
-          "mgExtraActionConfidentialite()"
-        )
-      ) +
-      carte(
-        "🛡️ Sécurité",
-        '<p>Découvre les conseils pour protéger ton compte.</p>' +
-        boutonInterne(
-          "🛡️",
-          "Sécurité du compte",
-          "mgExtraActionSecurite()"
-        )
-      ) +
+  ouvrirPage(
+    "⚙️ Paramètres",
+    "Personnalise ton expérience sur Marché Guinée 🇬🇳",
+
+    /* 1. COMPTE ET PROFIL */
+    carte(
+      "👤 Compte et profil",
+      '<p>Gère tes informations personnelles et ta photo de profil.</p>' +
+      boutonInterne(
+        "✏️",
+        "Modifier mon profil",
+        "mgExtraActionProfil()"
+      )
+    ) +
+
+    /* 2. APPARENCE ET THÈME */
+    carte(
+      "🎨 Apparence et thème",
+      '<p>Choisis l’apparence de ton application.</p>' +
       '<div class="mg-extra-notice">' +
-      'Les réglages avancés du compte seront ajoutés lorsque les ' +
-      'fonctions correspondantes seront disponibles. Cette page ' +
-      'ne modifie pas ton mot de passe et ne change aucun statut ' +
-      'de commande ou de paiement.' +
+      '☀️ Thème clair — 🌙 Thème sombre — 📱 Automatique.' +
+      '<br>Les réglages visuels seront activés dans la prochaine étape.' +
       '</div>'
-    );
-  };
+    ) +
 
+    /* 3. NOTIFICATIONS */
+    carte(
+      "🔔 Notifications",
+      '<p>Consulte les notifications concernant ton compte et ton activité.</p>' +
+      boutonInterne(
+        "🔔",
+        "Ouvrir mes notifications",
+        "mgExtraActionNotifications()"
+      )
+    ) +
+
+    /* 4. CONFIDENTIALITÉ */
+    carte(
+      "🔒 Confidentialité et données personnelles",
+      '<p>Découvre les informations relatives à tes données personnelles et à leur protection.</p>' +
+      boutonInterne(
+        "🔒",
+        "Consulter la confidentialité",
+        "mgExtraActionConfidentialite()"
+      )
+    ) +
+
+    /* 5. SÉCURITÉ */
+    carte(
+      "🛡️ Sécurité du compte",
+      '<p>Découvre les conseils pour protéger ton compte et effectuer tes échanges prudemment.</p>' +
+      boutonInterne(
+        "🛡️",
+        "Consulter les conseils de sécurité",
+        "mgExtraActionSecurite()"
+      )
+    ) +
+
+    /* 6. PRÉFÉRENCES */
+    carte(
+      "🌍 Préférences d’utilisation",
+      '<p>Retrouve ici les futurs réglages de langue, d’accessibilité et d’utilisation de Marché Guinée.</p>' +
+      '<div class="mg-extra-notice">' +
+      'De nouvelles préférences seront ajoutées progressivement.' +
+      '</div>'
+    ) +
+
+    /* 7. INFORMATIONS LÉGALES */
+    carte(
+      "📜 Informations légales",
+      '<p>Consulte les règles et les informations relatives à l’utilisation de la marketplace.</p>' +
+      boutonInterne(
+        "📜",
+        "Conditions d’utilisation",
+        "mgOuvrirConditions()"
+      )
+    ) +
+
+    /* 8. À PROPOS */
+    carte(
+      "🇬🇳 À propos de Marché Guinée",
+      '<p>Découvre notre plateforme, notre mission et nos engagements.</p>' +
+      boutonInterne(
+        "🇬🇳",
+        "Découvrir Marché Guinée",
+        "mgOuvrirAPropos()"
+      )
+    ) +
+
+    /* 9. AIDE ET ASSISTANCE */
+    carte(
+      "🆘 Aide et assistance",
+      '<p>Besoin d’aide ? Retrouve les réponses à tes questions et les moyens de signaler un problème.</p>' +
+      boutonInterne(
+        "❓",
+        "Questions fréquentes",
+        "mgOuvrirFAQ()"
+      ) +
+      boutonInterne(
+        "🆘",
+        "Centre d’aide",
+        "mgOuvrirAide()"
+      ) +
+      boutonInterne(
+        "📞",
+        "Contacter l’assistance",
+        "mgOuvrirContact()"
+      )
+    ) +
+
+    '<div class="mg-extra-notice">' +
+    'Marché Guinée 🇬🇳 — Tes préférences, ton compte et ta sécurité réunis au même endroit.' +
+    '</div>'
+  );
+};
   window.mgExtraActionProfil = function () {
     ouvrirComptePuis("ouvrirModificationProfil");
   };
