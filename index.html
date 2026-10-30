@@ -19856,12 +19856,19 @@ function afficherRetour() {
     );
   };
 
-  /* =====================================================
+ /* =====================================================
    PARAMÈTRES — 9 RUBRIQUES
 ===================================================== */
 
 window.mgOuvrirParametres = function () {
   fermerCompte();
+
+  var langueEnregistree = "fr";
+
+  try {
+    langueEnregistree =
+      localStorage.getItem("mg_langue") || "fr";
+  } catch (erreur) {}
 
   ouvrirPage(
     "⚙️ Paramètres",
@@ -19921,12 +19928,38 @@ window.mgOuvrirParametres = function () {
       )
     ) +
 
-    /* 6. PRÉFÉRENCES */
+    /* 6. PRÉFÉRENCES ET LANGUES */
     carte(
       "🌍 Préférences d’utilisation",
-      '<p>Retrouve ici les futurs réglages de langue, d’accessibilité et d’utilisation de Marché Guinée.</p>' +
-      '<div class="mg-extra-notice">' +
-      'De nouvelles préférences seront ajoutées progressivement.' +
+
+      '<p>Choisis la langue que tu souhaites utiliser dans Marché Guinée.</p>' +
+
+      '<select id="mgSelectLangue" ' +
+      'onchange="window.mgChangerLangueInterface(this.value)" ' +
+      'style="width:100%;padding:14px;border:1px solid #ddd;' +
+      'border-radius:10px;font-size:16px;background:#fff;">' +
+
+      '<option value="fr" ' +
+      (langueEnregistree === "fr" ? "selected" : "") +
+      '>🇫🇷 Français</option>' +
+
+      '<option value="en" ' +
+      (langueEnregistree === "en" ? "selected" : "") +
+      '>🇬🇧 English</option>' +
+
+      '<option value="ar" ' +
+      (langueEnregistree === "ar" ? "selected" : "") +
+      '>🇸🇦 العربية</option>' +
+
+      '<option value="es" ' +
+      (langueEnregistree === "es" ? "selected" : "") +
+      '>🇪🇸 Español</option>' +
+
+      '</select>' +
+
+      '<div class="mg-extra-notice" style="margin-top:12px;">' +
+      'La langue choisie sera mémorisée sur cet appareil. ' +
+      'La traduction complète de l’application sera intégrée progressivement.' +
       '</div>'
     ) +
 
@@ -19978,6 +20011,39 @@ window.mgOuvrirParametres = function () {
     '</div>'
   );
 };
+
+
+/* =====================================================
+   ENREGISTREMENT DE LA LANGUE
+===================================================== */
+
+window.mgChangerLangueInterface = function (langue) {
+
+  var languesAutorisees = ["fr", "en", "ar", "es"];
+
+  if (languesAutorisees.indexOf(langue) === -1) {
+    langue = "fr";
+  }
+
+  try {
+    localStorage.setItem("mg_langue", langue);
+  } catch (erreur) {
+    console.warn(
+      "Impossible d'enregistrer la langue :",
+      erreur
+    );
+  }
+
+  document.documentElement.lang = langue;
+
+  alert(
+    langue === "fr" ? "Langue enregistrée : Français." :
+    langue === "en" ? "Language saved: English." :
+    langue === "ar" ? "تم حفظ اللغة: العربية." :
+    "Idioma guardado: Español."
+  );
+};
+  
   window.mgExtraActionProfil = function () {
     ouvrirComptePuis("ouvrirModificationProfil");
   };
