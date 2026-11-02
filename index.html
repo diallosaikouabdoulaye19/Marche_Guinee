@@ -5191,27 +5191,32 @@ function fermerMesAchats(){
 
 }
 
-
 async function chargerMesAchats(){
   const container = document.getElementById("listeMesAchats");
   if(!container) return;
+
   if(!utilisateurConnecte){
     container.innerHTML =
       '<div style="padding:20px;text-align:center;color:#777;">Connecte-toi pour consulter tes achats.</div>';
     return;
   }
+
   container.innerHTML =
     '<div style="padding:20px;text-align:center;color:#666;">Chargement de tes achats...</div>';
+
   try{
+    // 1. Récupération des commandes de l'acheteur
     const commandes = await supabaseFetch(
       SUPABASE_URL +
       "/rest/v1/orders" +
       "?buyer_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=id,order_number,product_title,price_gnf,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&select=id,order_number,product_title,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
+
     const achats = Array.isArray(commandes) ? commandes : [];
+
     if(!achats.length){
       container.innerHTML =
         '<div style="padding:20px;text-align:center;color:#777;">' +
@@ -5220,28 +5225,136 @@ async function chargerMesAchats(){
         '</div>';
       return;
     }
+
+    // 2. Récupération groupée des articles de toutes les commandes
+    const idsCommandes = achats
+      .map(a => a.id)
+      .filter(Boolean);
+
+    const articlesParCommande = {};
+
+    if(idsCommandes.length){
+      const articles = await supabaseFetch(
+        SUPABASE_URL +
+        "/rest/v1/order_items" +
+        "?select=order_id,line_number,item_type,listing_id,product_title,quantity,unit_price_gnf,line_total_gnf" +
+        "&order_id=in." +
+        encodeURIComponent("(" + idsCommandes.join(",") + ")") +
+        "&order=line_number.asc"
+      );
+
+      if(!Array.isArray(articles)){
+        throw new Error("Impossible de récupérer les articles des commandes.");
+      }
+
+      articles.forEach(article => {
+        const id = String(article.order_id);
+
+        if(!articlesParCommande[id]){
+          articlesParCommande[id] = [];
+        }
+
+        articlesParCommande[id].push(article);
+      });
+    }
+
     container.innerHTML = "";
+
+    // 3. Affichage de chaque commande
     for(const achat of achats){
+
       const prix = Number(achat.price_gnf || 0);
-      const commission = Number(achat.commission_gnf || 0);
-      const montantVendeur = Number(achat.seller_amount_gnf || 0);
+
+      const commission = achat.commission_gnf !== null
+        ? Number(achat.commission_gnf)
+        : Math.round(prix * 0.03);
+
+      const montantVendeur = achat.seller_amount_gnf !== null
+        ? Number(achat.seller_amount_gnf)
+        : prix - commission;
+
       const statut = achat.status || "";
       const livraison = achat.delivery_status || "pending";
+
       let codeAcheteur = "";
       let messageCode = "";
       let boutonReception = "";
-      /*
-       * Le code acheteur est récupéré uniquement
-       * pour les commandes dont la livraison a commencé.
-       */
+
+      // 4. Articles de la commande
+      const articles = articlesParCommande[String(achat.id)] || [];
+
+      let articlesHTML = "";
+
+      if(articles.length){
+
+        articlesHTML = articles.map(article => {
+
+          const quantite = Number(article.quantity || 1);
+          const prixUnitaire = Number(article.unit_price_gnf || 0);
+
+          const totalArticle = article.line_total_gnf !== null
+            ? Number(article.line_total_gnf)
+            : quantite * prixUnitaire;
+
+          return `
+            <div style="
+              padding:11px 0;
+              border-bottom:1px solid #e5e7eb;
+            ">
+              <strong>${escapeHTML(article.product_title || "Produit")}</strong>
+
+              <div style="
+                margin-top:5px;
+                font-size:13px;
+                color:#666;
+              ">
+                Quantité : ${quantite}
+              </div>
+
+              <div style="
+                font-size:13px;
+                color:#666;
+              ">
+                Prix unitaire : ${prixUnitaire.toLocaleString("fr-FR")} GNF
+              </div>
+
+              <div style="
+                margin-top:4px;
+                font-weight:700;
+              ">
+                Total : ${totalArticle.toLocaleString("fr-FR")} GNF
+              </div>
+            </div>
+          `;
+
+        }).join("");
+
+      }else{
+
+        // Compatibilité avec les anciennes commandes
+        articlesHTML = `
+          <div style="padding:10px 0;">
+            <strong>${escapeHTML(achat.product_title || "Produit")}</strong>
+
+            <div style="font-size:13px;color:#666;margin-top:5px;">
+              Quantité : ${Number(achat.quantity || 1)}
+            </div>
+          </div>
+        `;
+      }
+
+      // 5. Code de livraison
       const livraisonCommencee = [
         "handed_to_courier",
         "in_delivery",
         "awaiting_receipt",
         "completed"
       ].includes(statut);
+
       if(livraisonCommencee && statut !== "completed"){
+
         try{
+
           const resultatCode = await supabaseFetch(
             SUPABASE_URL + "/rest/v1/rpc/get_my_delivery_code",
             {
@@ -5254,6 +5367,7 @@ async function chargerMesAchats(){
               })
             }
           );
+
           if(
             resultatCode &&
             resultatCode.success === true &&
@@ -5262,13 +5376,17 @@ async function chargerMesAchats(){
           ){
             codeAcheteur = String(resultatCode.code);
           }
+
         }catch(erreurCode){
+
           console.error(
             "Erreur récupération code acheteur :",
             erreurCode
           );
         }
+
         if(codeAcheteur){
+
           messageCode =
             '<div style="' +
               'margin-top:12px;' +
@@ -5292,7 +5410,9 @@ async function chargerMesAchats(){
                 'Garde ce code secret. Présente-le au vendeur ou au livreur lors de la remise du colis.' +
               '</small>' +
             '</div>';
+
         }else{
+
           messageCode =
             '<div style="' +
               'margin-top:10px;' +
@@ -5305,65 +5425,93 @@ async function chargerMesAchats(){
             '</div>';
         }
       }
+
+      // 6. Confirmation de réception
       if(statut === "awaiting_receipt"){
-        boutonReception = `
-          <button
-            onclick="confirmerReceptionAchat('${escapeHTML(achat.id)}')"
-            style="
-              margin-top:12px;
-              width:100%;
-              padding:13px;
-              border:none;
-              border-radius:10px;
-              background:#16a34a;
-              color:white;
-              font-weight:bold;
-              cursor:pointer;
-            ">
-            ✅ Confirmer la réception
-          </button>
-        `;
+
+        boutonReception = document.createElement("button");
+
+        boutonReception.type = "button";
+        boutonReception.textContent = "✅ Confirmer la réception";
+
+        boutonReception.style.cssText =
+          "margin-top:12px;" +
+          "width:100%;" +
+          "padding:13px;" +
+          "border:none;" +
+          "border-radius:10px;" +
+          "background:#16a34a;" +
+          "color:white;" +
+          "font-weight:bold;" +
+          "cursor:pointer;";
+
+        boutonReception.addEventListener("click", function(){
+          confirmerReceptionAchat(achat.id);
+        });
       }
+
+      // 7. Création de la carte de commande
       const div = document.createElement("div");
+
       div.style.cssText =
         "border:1px solid #ddd;" +
         "border-radius:14px;" +
         "padding:15px;" +
         "margin-bottom:12px;" +
         "background:#fafafa;";
+
       div.innerHTML =
-        "<strong>" +
-          escapeHTML(achat.product_title || "Produit") +
-        "</strong>" +
+        "<div style='font-weight:bold;margin-bottom:10px;'>" +
+          "🛍️ Articles de ta commande" +
+        "</div>" +
+
+        articlesHTML +
+
+        "<div style='margin-top:12px;font-size:17px;font-weight:bold;'>" +
+          "💰 Prix total : " +
+          prix.toLocaleString("fr-FR") +
+          " GNF" +
+        "</div>" +
+
         "<div style='margin-top:8px;'>" +
           "🧾 Commande : " +
           escapeHTML(achat.order_number || "") +
         "</div>" +
-        "<div>💰 Prix : " +
-          prix.toLocaleString("fr-FR") +
-          " GNF</div>" +
+
         "<div>🏦 Commission prévue (3 %) : " +
-          Math.round(prix * 0.03).toLocaleString("fr-FR") +
+          commission.toLocaleString("fr-FR") +
           " GNF</div>" +
+
         "<div>💵 Montant vendeur prévu : " +
-          Math.round(prix * 0.97).toLocaleString("fr-FR") +
+          montantVendeur.toLocaleString("fr-FR") +
           " GNF</div>" +
+
         "<div style='margin-top:8px;'>📦 Statut : " +
           escapeHTML(statutCommandeTexte(statut)) +
         "</div>" +
+
         "<div>🚚 Livraison : " +
           escapeHTML(livraisonTexte(livraison)) +
         "</div>" +
+
         messageCode +
+
         "<div style='margin-top:8px;color:#777;font-size:12px;'>" +
           "📅 " +
           escapeHTML(formatDate(achat.created_at)) +
-        "</div>" +
-        boutonReception;
+        "</div>";
+
       container.appendChild(div);
+
+      if(boutonReception){
+        div.appendChild(boutonReception);
+      }
     }
+
   }catch(error){
+
     console.error("Erreur chargement achats :", error);
+
     container.innerHTML =
       '<div style="padding:15px;color:#dc2626;background:#fdeaea;border-radius:10px;">' +
         '<strong>Impossible de charger tes achats.</strong>' +
@@ -5372,7 +5520,6 @@ async function chargerMesAchats(){
       '</div>';
   }
 }
-
 /* =========================
    CONFIRMATION DE RÉCEPTION
 ========================= */
