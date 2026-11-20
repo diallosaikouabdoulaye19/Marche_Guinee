@@ -31344,6 +31344,7 @@ try {
 </script>
 <!-- FIN — MODIFICATION DES ANNONCES V1 -->
 
+
 <!-- MARCHÉ GUINÉE — PROTECTION DES COMPTES BLOQUÉS -->
 <script id="mg-protection-statut-comptes">
 (function () {
@@ -31353,7 +31354,6 @@ try {
   window.mgProtectionStatutInstallee = true;
 
   var verificationEnCours = false;
-  var dernierControle = 0;
   var intervalleControle = null;
 
   function lireSession() {
@@ -31362,24 +31362,32 @@ try {
         "marche_guinee_session"
       );
 
-      if (!sauvegarde) return null;
-
-      return JSON.parse(sauvegarde);
-    } catch (e) {
+      return sauvegarde ? JSON.parse(sauvegarde) : null;
+    } catch (erreur) {
       return null;
     }
   }
 
   function obtenirUtilisateur() {
-    if (
-      typeof utilisateurConnecte !== "undefined" &&
-      utilisateurConnecte &&
-      utilisateurConnecte.id
-    ) {
-      return utilisateurConnecte;
-    }
+    try {
+      if (
+        typeof utilisateurConnecte !== "undefined" &&
+        utilisateurConnecte &&
+        utilisateurConnecte.id
+      ) {
+        return utilisateurConnecte;
+      }
+    } catch (erreur) {}
 
-    return lireSession();
+    return window.utilisateurConnecte || lireSession();
+  }
+
+  function definirUtilisateur(utilisateur) {
+    try {
+      utilisateurConnecte = utilisateur;
+    } catch (erreur) {}
+
+    window.utilisateurConnecte = utilisateur;
   }
 
   function afficherMessageProtection(message) {
@@ -31393,27 +31401,25 @@ try {
     }
   }
 
-  async function fermerSessionBloquee(message) {
+  async function fermerSessionBloquee() {
     var session = obtenirUtilisateur();
 
-    var token = session && session.accessToken
-      ? session.accessToken
-      : null;
+    var token =
+      session && session.accessToken
+        ? session.accessToken
+        : null;
 
-    // Effacer immédiatement la session locale.
     try {
       localStorage.removeItem("marche_guinee_session");
-    } catch (e) {}
+    } catch (erreur) {}
 
-    utilisateurConnecte = null;
+    definirUtilisateur(null);
 
-    // Arrêter les contrôles périodiques.
     if (intervalleControle) {
       clearInterval(intervalleControle);
       intervalleControle = null;
     }
 
-    // Révoquer la session Supabase si possible.
     if (token) {
       try {
         await fetch(
@@ -31421,20 +31427,19 @@ try {
           {
             method: "POST",
             headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": "Bearer " + token
+              apikey: SUPABASE_KEY,
+              Authorization: "Bearer " + token
             }
           }
         );
-      } catch (e) {
+      } catch (erreur) {
         console.warn(
-          "Révocation distante de la session impossible.",
-          e
+          "Révocation distante impossible.",
+          erreur
         );
       }
     }
 
-    // Fermer les fenêtres de compte.
     var accountConnected =
       document.getElementById("accountConnected");
 
@@ -31449,24 +31454,25 @@ try {
       accountForms.classList.remove("hidden");
     }
 
-    // Revenir à la page de bienvenue.
+    var message =
+      "🔒 Ton compte Marché Guinée a été bloqué par l'administrateur. Tu ne peux plus accéder à ton compte.";
+
     if (typeof window.afficherBienvenue === "function") {
       window.afficherBienvenue();
     }
 
     afficherMessageProtection(message);
-
     alert(message);
   }
 
   async function verifierStatutCompte(utilisateur) {
     if (!utilisateur || !utilisateur.id) {
-      return false;
+      return true;
     }
 
-    if (!utilisateur.accessToken) {
+    if (typeof window.supabaseFetch !== "function") {
       throw new Error(
-        "Session incomplète. Reconnecte-toi."
+        "Le service de vérification Supabase est indisponible."
       );
     }
 
@@ -31476,30 +31482,24 @@ try {
       encodeURIComponent(utilisateur.id) +
       "&select=id,status&limit=1";
 
-    var response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + utilisateur.accessToken,
-        "Content-Type": "application/json"
-      }
+    /*
+     * Utiliser supabaseFetch :
+     * le mécanisme central de renouvellement du jeton
+     * peut ainsi intervenir avant la requête.
+     */
+    var lignes = await window.supabaseFetch(url, {
+      method: "GET"
     });
-
-    if (!response.ok) {
-      throw new Error(
-        "Impossible de vérifier le statut du compte auprès de Supabase."
-      );
-    }
-
-    var lignes = await response.json();
 
     if (!Array.isArray(lignes) || lignes.length !== 1) {
       throw new Error(
-        "Profil utilisateur introuvable. Reconnecte-toi."
+        "Impossible de confirmer le statut du compte."
       );
     }
 
-    var statut = String(lignes[0].status || "").toLowerCase();
+    var statut = String(
+      lignes[0].status || ""
+    ).toLowerCase();
 
     if (statut === "blocked") {
       return false;
@@ -31507,17 +31507,20 @@ try {
 
     if (statut !== "active") {
       throw new Error(
-        "Le statut de ce compte ne permet pas la connexion."
+        "Le statut du compte n'a pas pu être confirmé."
       );
     }
-
-    dernierControle = Date.now();
 
     return true;
   }
 
   async function controlerSessionActuelle() {
-    if (verificationEnCours) return false;
+    /*
+     * Ne pas lancer plusieurs vérifications simultanément.
+     */
+    if (verificationEnCours) {
+      return true;
+    }
 
     var utilisateur = obtenirUtilisateur();
 
@@ -31525,103 +31528,100 @@ try {
       return true;
     }
 
+    definirUtilisateur(utilisateur);
     verificationEnCours = true;
 
     try {
       var autorise =
         await verifierStatutCompte(utilisateur);
 
-      if (!autorise) {
-        await fermerSessionBloquee(
-          "🔒 Ton compte Marché Guinée a été bloqué par l'administrateur. Tu ne peux plus accéder à ton compte."
-        );
-
+      if (autorise === false) {
+        await fermerSessionBloquee();
         return false;
       }
 
       return true;
 
     } catch (erreur) {
-      console.error(
-        "Vérification du statut impossible :",
+      /*
+       * Une erreur réseau, une expiration temporaire
+       * ou un échec de renouvellement ne signifie PAS
+       * que le compte est bloqué.
+       *
+       * On conserve la session et on réessaiera
+       * lors du prochain contrôle.
+       */
+      console.warn(
+        "Vérification du statut reportée :",
         erreur
       );
 
-      await fermerSessionBloquee(
-        "Impossible de vérifier la sécurité de ton compte. Reconnecte-toi lorsque ta connexion Internet sera rétablie."
-      );
-
-      return false;
+      return true;
 
     } finally {
       verificationEnCours = false;
     }
   }
 
-  // Vérification après une connexion.
+  /* Vérification après connexion. */
   var ancienneConnexion = window.connecterCompte;
 
   if (typeof ancienneConnexion === "function") {
     window.connecterCompte = async function () {
-
       await ancienneConnexion.apply(this, arguments);
 
-      if (
-        typeof utilisateurConnecte !== "undefined" &&
-        utilisateurConnecte &&
-        utilisateurConnecte.id
-      ) {
-        var autorise =
-          await controlerSessionActuelle();
+      var utilisateur = obtenirUtilisateur();
 
-        if (!autorise) return false;
+      if (utilisateur && utilisateur.id) {
+        return await controlerSessionActuelle();
       }
 
       return true;
     };
   }
 
-  // Vérification après restauration d'une ancienne session.
+  /* Vérification après restauration de session. */
   var ancienneRestauration = window.restaurerSession;
 
   if (typeof ancienneRestauration === "function") {
     window.restaurerSession = async function () {
-
       await ancienneRestauration.apply(this, arguments);
 
-      if (
-        typeof utilisateurConnecte !== "undefined" &&
-        utilisateurConnecte &&
-        utilisateurConnecte.id
-      ) {
+      var utilisateur = obtenirUtilisateur();
+
+      if (utilisateur && utilisateur.id) {
         await controlerSessionActuelle();
       }
     };
   }
 
-  // Vérifier lorsque l'utilisateur revient dans l'application.
-  document.addEventListener("visibilitychange", function () {
-    if (!document.hidden) {
-      controlerSessionActuelle();
+  /* Vérification au retour dans l'application. */
+  document.addEventListener(
+    "visibilitychange",
+    function () {
+      if (!document.hidden) {
+        controlerSessionActuelle();
+      }
     }
-  });
+  );
 
   window.addEventListener("pageshow", function () {
     controlerSessionActuelle();
   });
 
-  // Vérification périodique.
+  /* Vérification périodique conservée. */
   intervalleControle = setInterval(function () {
     controlerSessionActuelle();
   }, 30000);
 
   console.log(
-    "Marché Guinée : protection du statut des comptes installée."
+    "Marché Guinée : protection des comptes installée."
   );
 
 })();
 </script>
 <!-- FIN PROTECTION DES COMPTES BLOQUÉS -->
+
   
 </body>
 </html>
