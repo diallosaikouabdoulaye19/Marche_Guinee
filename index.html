@@ -7617,12 +7617,13 @@ function mettreAJourQuantiteAchat() {
   const totalElement = document.getElementById("mgTotalAchat");
   const commissionElement = document.getElementById("mgCommissionAchat");
   const vendeurElement = document.getElementById("mgVendeurAchat");
+  const quantiteElement = document.getElementById("mgQuantiteResume");
   const continuer = document.getElementById("mgContinuerAchat");
 
   if (!input) return;
 
   let quantite = Number(input.value);
-  const prixUnitaire = Number(window.mgPrixUnitaireAchat) || 0;
+  const prixUnitaire = Number(input.dataset.prixUnitaire || window.mgPrixUnitaireAchat) || 0;
 
   const afficherErreur = function(message) {
     if (erreur) erreur.textContent = message;
@@ -7658,6 +7659,7 @@ function mettreAJourQuantiteAchat() {
   if (totalElement) totalElement.textContent = formatPrix(total);
   if (commissionElement) commissionElement.textContent = formatPrix(commission);
   if (vendeurElement) vendeurElement.textContent = formatPrix(montantVendeur);
+  if (quantiteElement) quantiteElement.textContent = quantite + (quantite > 1 ? " pièces" : " pièce");
   if (continuer) continuer.disabled = false;
 
   const moins = document.getElementById("mgQuantiteMoins");
@@ -7842,6 +7844,7 @@ async function ouvrirPaiement(listingId) {
             min="1"
             step="1"
             value="1"
+            data-prix-unitaire="${prix}"
             aria-label="Nombre de pièces"
             oninput="mettreAJourQuantiteAchat()"
             style="
