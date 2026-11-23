@@ -2523,7 +2523,7 @@ footer{
     <div class="success">
 
       Commission Marché Guinée :
-      <strong>3 %</strong>
+      <strong>5 %</strong>
       de la vente.
 
     </div>
@@ -5267,7 +5267,7 @@ async function chargerMesAchats(){
 
       const commission = achat.commission_gnf !== null
         ? Number(achat.commission_gnf)
-        : Math.round(prix * 0.03);
+        : Math.round(prix * 0.05);
 
       const montantVendeur = achat.seller_amount_gnf !== null
         ? Number(achat.seller_amount_gnf)
@@ -5478,7 +5478,7 @@ async function chargerMesAchats(){
           escapeHTML(achat.order_number || "") +
         "</div>" +
 
-        "<div>🏦 Commission prévue (3 %) : " +
+        "<div>🏦 Commission prévue (5 %) : " +
           commission.toLocaleString("fr-FR") +
           " GNF</div>" +
 
@@ -5563,7 +5563,7 @@ async function confirmerReceptionAchat(
   const confirmation = confirm(
     "✅ CONFIRMATION DE RÉCEPTION\n\n" +
     "Confirme-tu avoir reçu ton colis ?\n\n" +
-    "Après validation du code, la commande sera finalisée et la commission de 3 % sera appliquée."
+    "Après validation du code, la commande sera finalisée et la commission de 5 % sera appliquée."
   );
 
   if(!confirmation) return;
@@ -5616,7 +5616,7 @@ async function confirmerReceptionAchat(
       "✅ RÉCEPTION CONFIRMÉE !\n\n" +
       "Ton code a été validé.\n\n" +
       "La commande est terminée. " +
-      "La commission de 3 % est appliquée conformément au système de la plateforme."
+      "La commission de 5 % est appliquée conformément au système de la plateforme."
     );
 
     fermerMesAchats();
@@ -6518,7 +6518,7 @@ async function chargerMesVentes(){
         vente.commission_gnf !== null &&
         vente.commission_gnf !== undefined
           ? Number(vente.commission_gnf)
-          : Math.round(prix * 0.03);
+          : Math.round(prix * 0.05);
 
       const montantVendeur =
         vente.seller_amount_gnf !== null &&
@@ -6858,7 +6858,7 @@ async function chargerMesVentes(){
           prix.toLocaleString("fr-FR") +
           " GNF</div>" +
 
-        "<div>🏦 Commission Marché Guinée (3 %) : " +
+        "<div>🏦 Commission Marché Guinée (5 %) : " +
           commission.toLocaleString("fr-FR") +
           " GNF</div>" +
 
@@ -7602,7 +7602,7 @@ async function enregistrerVue(annonce){
 
 /* =====================================================
    MARCHÉ GUINÉE — ACHAT MULTIPLE
-   Quantité, total, commission de 3 % et commande
+   Quantité, total, commission de 5 % et commande
    ===================================================== */
 
 /* =========================
@@ -7649,7 +7649,7 @@ function mettreAJourQuantiteAchat() {
     return;
   }
 
-  const commission = Math.round(total * 0.03);
+  const commission = Math.round(total * 0.05);
   const montantVendeur = total - commission;
 
   window.mgQuantiteAchat = quantite;
@@ -7918,9 +7918,9 @@ async function ouvrirPaiement(listingId) {
           gap:12px;
           margin-bottom:12px;
         ">
-          <span>Commission (3 %)</span>
+          <span>Commission (5 %)</span>
           <strong id="mgCommissionAchat">
-            ${formatPrix(Math.round(prix * 0.03))}
+            ${formatPrix(Math.round(prix * 0.05))}
           </strong>
         </div>
 
@@ -7933,7 +7933,7 @@ async function ouvrirPaiement(listingId) {
         ">
           <span>Montant vendeur après commission</span>
           <strong id="mgVendeurAchat">
-            ${formatPrix(prix - Math.round(prix * 0.03))}
+            ${formatPrix(prix - Math.round(prix * 0.05))}
           </strong>
         </div>
       </div>
@@ -7959,7 +7959,7 @@ async function ouvrirPaiement(listingId) {
    MARCHÉ GUINÉE 🇬🇳
    CRÉATION SÉCURISÉE DES COMMANDES
    Utilise Supabase : create_order_secure()
-   Commission : 3 %
+   Commission : 5 %
    Aucun paiement simulé
 ========================================================= */
 
@@ -8287,7 +8287,7 @@ async function continuerPaiement(listingId) {
 
         <div class="success">
           Commission Marché Guinée :
-          <strong>${formatPrix(commission)}</strong> (3 %)
+          <strong>${formatPrix(commission)}</strong> (5 %)
           <br><br>
           Montant vendeur après commission :
           <strong>${formatPrix(montantVendeur)}</strong>
@@ -9808,7 +9808,7 @@ async function verifierLivraison(){
         "✅ Confirmation de réception enregistrée !\n\n" +
         "Commande : " +
         commande.order_number +
-        "\n\nSi les deux validations sont terminées, la vente est finalisée avec une commission de 3 %."
+        "\n\nSi les deux validations sont terminées, la vente est finalisée avec une commission de 5 %."
       );
     }
     chargerAnnonces();
@@ -10802,7 +10802,7 @@ const soldeDisponible = Math.max(
         </p>
 
         <p>
-          Commission plateforme (3 %) :
+          Commission plateforme (5 %) :
           <strong>
             ${totalCommission.toLocaleString("fr-FR")}
             GNF
