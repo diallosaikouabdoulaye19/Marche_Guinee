@@ -3437,6 +3437,27 @@ function formatHeure(date){
     );
 }
 
+window.mgActualiserVerrouillageDefilement = function () {
+  var ids = ["accountModal", "messagesModal", "mgWelcomePage", "adminDashboardModal"];
+  var verrouiller = ids.some(function (id) {
+    var el = document.getElementById(id);
+    return !!el && window.getComputedStyle(el).display !== "none";
+  });
+  var couches = [
+    ["mgV6PhotoOverlay", "mg-v6-visible"],
+    ["mgChat2026PhotoViewer", "mg-viewer-open"],
+    ["mgChatPhotoViewer", "mg-visible"],
+    ["mgPriceModalOverlay", "mg-price-modal-visible"]
+  ];
+  if (!verrouiller) {
+    verrouiller = couches.some(function (item) {
+      var el = document.getElementById(item[0]);
+      return !!el && el.classList.contains(item[1]);
+    });
+  }
+  document.body.style.overflow = verrouiller ? "hidden" : "";
+};
+
 function fermerModal(id){
 
   const element =
@@ -3446,10 +3467,7 @@ function fermerModal(id){
     element.style.display = "none";
   }
 
-  // Restaurer le défilement après la fermeture de Mon compte.
-  if(id === "accountModal"){
-    document.body.style.overflow = "";
-  }
+  window.mgActualiserVerrouillageDefilement();
 
   if(
     id === "messagesModal" &&
@@ -3472,6 +3490,7 @@ function fermerModal(id){
 
 function ouvrirCompte(){
   document.getElementById("accountModal").style.display = "block";
+  window.mgActualiserVerrouillageDefilement();
 
   if(utilisateurConnecte){
     document.getElementById("accountForms").classList.add("hidden");
@@ -8610,6 +8629,7 @@ async function ouvrirMessageVendeur(
       "messagesModal"
     ).style.display = "block";
 
+    window.mgActualiserVerrouillageDefilement();
 
     afficherChat();
 
@@ -9115,6 +9135,7 @@ async function ouvrirMessages(){
     "messagesModal"
   ).style.display = "block";
 
+  window.mgActualiserVerrouillageDefilement();
 
   document.getElementById(
     "messagesList"
@@ -16891,13 +16912,13 @@ document.addEventListener("keydown", function(event){
 
     enlargedImage.src = avatar.src;
     overlay.classList.add("mg-v6-visible");
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   function fermerPhoto() {
     overlay.classList.remove("mg-v6-visible");
     enlargedImage.removeAttribute("src");
-    document.body.style.overflow = "";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   closePhoto.addEventListener("click", fermerPhoto);
@@ -21415,12 +21436,12 @@ window.mgOuvrirParametres = function () {
 
   function afficherBienvenue() {
     welcome.style.display = "flex";
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   function masquerBienvenue() {
     welcome.style.display = "none";
-    document.body.style.overflow = "";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   function afficherMessage(texte) {
@@ -23383,7 +23404,7 @@ function preparerZoneConversation() {
       bienvenue.style.display = "none";
     }
 
-    document.body.style.overflow = "";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   /*
@@ -23560,7 +23581,7 @@ function preparerZoneConversation() {
     ) {
       if (bienvenue) bienvenue.style.display = "none";
       compte.style.display = "none";
-      document.body.style.overflow = "";
+      window.mgActualiserVerrouillageDefilement();
       return;
     }
 
@@ -23597,7 +23618,7 @@ function preparerZoneConversation() {
       bienvenue.style.display = "none";
     }
 
-    document.body.style.overflow = "";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   window.mgWelcomeInscription = function () {
@@ -23859,7 +23880,7 @@ window.ouvrirTableauAdmin = async function () {
       compte.style.display = "none";
     }
 
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
   }
 };
 
@@ -23878,8 +23899,7 @@ if (typeof ancienneFermeture === "function") {
       compte.style.display = "block";
     }
 
-    // Conserver le défilement bloqué derrière Mon compte.
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
   };
 }
 
@@ -25496,7 +25516,7 @@ display: none !important;
     function closeViewer() {
       viewer.classList.remove("mg-viewer-open");
       image.removeAttribute("src");
-      document.body.style.overflow = "";
+      window.mgActualiserVerrouillageDefilement();
     }
 
     close.addEventListener("click", closeViewer);
@@ -25516,7 +25536,7 @@ display: none !important;
       image.src = src;
       caption.textContent = label || "";
       viewer.classList.add("mg-viewer-open");
-      document.body.style.overflow = "hidden";
+      window.mgActualiserVerrouillageDefilement();
     };
   }
 
@@ -28038,7 +28058,7 @@ if (
     if (!overlay || operationEnCours) return;
 
     overlay.classList.remove("mg-price-modal-visible");
-    document.body.style.overflow = "";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   function ouvrirFenetre(t, st) {
@@ -28055,7 +28075,7 @@ if (
     message.style.display = "none";
 
     overlay.classList.add("mg-price-modal-visible");
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
   }
 
   function creerFenetre() {
