@@ -4625,256 +4625,113 @@ async function chargerImages(listingId){
   async function chargerSoldeVendeur(){
 
   const soldeElement =
-    document.getElementById(
-      "soldeVendeur"
-    );
+    document.getElementById("soldeVendeur");
 
   const detailsElement =
-    document.getElementById(
-      "detailsSoldeVendeur"
-    );
+    document.getElementById("detailsSoldeVendeur");
 
-
-  if(
-    !soldeElement ||
-    !detailsElement
-  ){
-    return;
-  }
-
+  if(!soldeElement || !detailsElement) return;
 
   if(!utilisateurConnecte){
-
-    soldeElement.textContent =
-      "0 GNF";
-
-    detailsElement.textContent =
-      "Connecte-toi pour voir ton solde.";
-
+    soldeElement.textContent = "0 GNF";
+    detailsElement.textContent = "Connecte-toi pour voir ton solde.";
     return;
-
   }
-
 
   try{
 
-    /* =========================
-       VENTES TERMINÉES
-    ========================= */
+    /* Statistiques des ventes terminées uniquement. */
+    const commandes = await supabaseFetch(
+      SUPABASE_URL +
+      "/rest/v1/orders" +
+      "?seller_id=eq." +
+      encodeURIComponent(utilisateurConnecte.id) +
+      "&status=eq.completed" +
+      "&delivery_status=eq.delivered" +
+      "&select=id,price_gnf,commission_gnf"
+    );
 
-    const commandes =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/orders" +
-        "?seller_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=eq.completed" +
-        "&delivery_status=eq.delivered" +
-        "&select=id,price_gnf,commission_gnf,seller_amount_gnf"
-
-      );
-
-
-    const ventes =
-      Array.isArray(commandes)
-        ? commandes
-        : [];
-
+    if(!Array.isArray(commandes)){
+      throw new Error("Impossible de charger les statistiques des ventes.");
+    }
 
     let totalVentes = 0;
     let totalCommission = 0;
-    let soldeVentes = 0;
 
+    commandes.forEach(commande => {
+      totalVentes += Number(commande.price_gnf || 0);
+      totalCommission += Number(commande.commission_gnf || 0);
+    });
 
-    ventes.forEach(
-      commande => {
-
-        totalVentes +=
-          Number(
-            commande.price_gnf || 0
-          );
-
-        totalCommission +=
-          Number(
-            commande.commission_gnf || 0
-          );
-
-        soldeVentes +=
-          Number(
-            commande.seller_amount_gnf || 0
-          );
-
+    /*
+     * Le solde disponible est calculé exclusivement côté serveur :
+     * paiements vérifiés, commissions disponibles et retraits réservés.
+     */
+    const soldeReponse = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/get_seller_available_balance",
+      {
+        method: "POST",
+        headers: headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify({})
       }
     );
 
+    const soldeDisponible = Number(soldeReponse);
 
-    /* =========================
-       RETRAITS DÉJÀ DEMANDÉS
-    ========================= */
-
-    const retraits =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/payouts" +
-        "?seller_id=eq." +
-        encodeURIComponent(
-          utilisateurConnecte.id
-        ) +
-        "&status=in.(pending,processing,paid)" +
-        "&select=amount_gnf"
-
-      );
-
-
-    const listeRetraits =
-      Array.isArray(retraits)
-        ? retraits
-        : [];
-
-
-    let totalRetraits = 0;
-
-
-    listeRetraits.forEach(
-      retrait => {
-
-        totalRetraits +=
-          Number(
-            retrait.amount_gnf || 0
-          );
-
-      }
-    );
-
-
-    /* =========================
-       SOLDE DISPONIBLE
-    ========================= */
-
-    const soldeDisponible =
-      Math.max(
-        0,
-        soldeVentes -
-        totalRetraits
-      );
-
+    if(!Number.isSafeInteger(soldeDisponible) || soldeDisponible < 0){
+      throw new Error("Supabase a retourné un solde vendeur invalide.");
+    }
 
     soldeElement.textContent =
-      soldeDisponible.toLocaleString(
-        "fr-FR"
-      ) +
-      " GNF";
-
+      soldeDisponible.toLocaleString("fr-FR") + " GNF";
 
     detailsElement.textContent =
-
-      ventes.length +
+      commandes.length +
       " vente" +
-      (
-        ventes.length > 1
-          ? "s"
-          : ""
-      ) +
+      (commandes.length > 1 ? "s" : "") +
       " • " +
-      totalVentes.toLocaleString(
-        "fr-FR"
-      ) +
+      totalVentes.toLocaleString("fr-FR") +
       " GNF de ventes • Commission : " +
-      totalCommission.toLocaleString(
-        "fr-FR"
-      ) +
+      totalCommission.toLocaleString("fr-FR") +
       " GNF";
 
-
-    /* =========================
-       BOUTON RETRAIT
-    ========================= */
-
     let boutonRetrait =
-      document.getElementById(
-        "boutonDemanderRetrait"
-      );
-
+      document.getElementById("boutonDemanderRetrait");
 
     if(!boutonRetrait){
+      boutonRetrait = document.createElement("button");
+      boutonRetrait.id = "boutonDemanderRetrait";
+      boutonRetrait.className = "btn-primary";
+      boutonRetrait.style.marginTop = "12px";
+      boutonRetrait.textContent = "💸 Demander un retrait";
 
-      boutonRetrait =
-        document.createElement(
-          "button"
-        );
-
-      boutonRetrait.id =
-        "boutonDemanderRetrait";
-
-      boutonRetrait.className =
-        "btn-primary";
-
-      boutonRetrait.style.marginTop =
-        "12px";
-
-      boutonRetrait.textContent =
-        "💸 Demander un retrait";
-
-
-      boutonRetrait.onclick =
-        function(){
-
-          ouvrirDemandeRetrait(
-            soldeDisponible
-          );
-
-        };
-
-
-      const parent =
-        soldeElement.parentElement;
-
-
-      if(parent){
-
-        parent.appendChild(
-          boutonRetrait
-        );
-
-      }
-
+      const parent = soldeElement.parentElement;
+      if(parent) parent.appendChild(boutonRetrait);
     }
 
+    boutonRetrait.onclick = function(){
+      ouvrirDemandeRetrait(soldeDisponible);
+    };
 
-    if(
-      soldeDisponible > 0
-    ){
-
-      boutonRetrait.style.display =
-        "block";
-
-    }else{
-
-      boutonRetrait.style.display =
-        "none";
-
-    }
-
+    boutonRetrait.style.display =
+      soldeDisponible > 0 ? "block" : "none";
 
   }catch(error){
 
-    console.error(
-      "Erreur chargement solde vendeur :",
-      error
-    );
+    console.error("Erreur chargement solde vendeur :", error);
 
-
-    soldeElement.textContent =
-      "Erreur";
-
-
+    soldeElement.textContent = "Indisponible";
     detailsElement.textContent =
-      error.message ||
-      "Impossible de charger le solde.";
+      error.message || "Impossible de charger le solde.";
+
+    const boutonRetrait =
+      document.getElementById("boutonDemanderRetrait");
+
+    if(boutonRetrait){
+      boutonRetrait.style.display = "none";
+    }
 
   }
 
