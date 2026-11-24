@@ -24755,7 +24755,6 @@ if (typeof ancienneFermeture === "function") {
 
   var overlay;
   var imageAgrandie;
-  var ancienOverflow = "";
   var imageOrigine = null;
 
   function creerVisionneuse() {
@@ -24801,13 +24800,12 @@ if (typeof ancienneFermeture === "function") {
     creerVisionneuse();
 
     imageOrigine = image;
-    ancienOverflow = document.body.style.overflow;
 
     imageAgrandie.alt = image.alt || "Photo agrandie";
     imageAgrandie.src = image.currentSrc || image.src;
 
     overlay.classList.add("mg-visible");
-    document.body.style.overflow = "hidden";
+    window.mgActualiserVerrouillageDefilement();
 
     var boutonFermer = document.getElementById("mgChatPhotoClose");
     if (boutonFermer) boutonFermer.focus({ preventScroll: true });
@@ -24818,7 +24816,7 @@ if (typeof ancienneFermeture === "function") {
 
     overlay.classList.remove("mg-visible");
     imageAgrandie.removeAttribute("src");
-    document.body.style.overflow = ancienOverflow;
+    window.mgActualiserVerrouillageDefilement();
 
     if (imageOrigine && imageOrigine.isConnected) {
       imageOrigine.focus({ preventScroll: true });
