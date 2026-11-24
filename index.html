@@ -19058,46 +19058,6 @@ function afficherRetour() {
     });
   }
 
-  /* Créer la page de profil vendeur. */
-  function creerModalProfil() {
-    var modal = document.getElementById("mgProfilVendeurModal");
-    if (modal) return modal;
-
-    modal = document.createElement("div");
-    modal.id = "mgProfilVendeurModal";
-    modal.innerHTML = `
-      <div class="mg-profil-page">
-        <div class="mg-profil-header">
-          <button type="button"
-                  class="mg-profil-retour"
-                  id="mgProfilRetour"
-                  aria-label="Retour">‹</button>
-          <div class="mg-profil-titre">Profil du vendeur</div>
-        </div>
-
-        <div id="mgProfilIdentite" class="mg-profil-identite">
-          Chargement du profil...
-        </div>
-
-        <h2 class="mg-profil-annonces-titre">
-          Ses autres annonces
-        </h2>
-
-        <div id="mgProfilAnnonces" class="mg-profil-annonces"></div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    modal.querySelector("#mgProfilRetour").addEventListener(
-      "click",
-      function () {
-        modal.style.display = "none";
-      }
-    );
-
-    return modal;
-  }
 
   /* Vérification initiale après installation. */
   completerDetail();
