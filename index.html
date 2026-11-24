@@ -20505,20 +20505,24 @@ window.mgOuvrirParametres = function () {
       "📞 Contacter l’assistance",
       "Aide pour ton compte et tes annonces",
       carte(
-        "🆘 Besoin d’aide ?",
+        "✉️ Écrire à notre assistance",
         '<p>Décris clairement le problème rencontré et précise ' +
         'la rubrique concernée. N’envoie jamais ton mot de passe.</p>' +
+        '<a class="mg-extra-action" href="mailto:marcheguinee19@gmail.com?subject=Assistance%20March%C3%A9%20Guin%C3%A9e">' +
+        '<span>✉️</span>' +
+        '<span>marcheguinee19@gmail.com</span>' +
+        '<span aria-hidden="true">›</span>' +
+        '</a>'
+      ) +
+      carte(
+        "⚠️ Signaler un problème",
+        '<p>Pour signaler un comportement ou un problème rencontré ' +
+        'sur la plateforme, utilise également le formulaire de signalement.</p>' +
         boutonInterne(
           "⚠️",
           "Ouvrir le signalement",
           "mgExtraActionSignalement()"
         )
-      ) +
-      carte(
-        "ℹ️ À savoir",
-        '<p>Aucune adresse e-mail ou aucun numéro d’assistance ' +
-        'n’est affiché ici, car un contact officiel doit être ' +
-        'confirmé avant d’être publié.</p>'
       )
     );
   };
