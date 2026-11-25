@@ -10830,8 +10830,9 @@ const soldeDisponible = Math.max(
           color:#555;
           line-height:1.5;
         ">
-          Consulte et traite les demandes de retrait
-          des vendeurs.
+          Consulte les demandes des vendeurs. En attendant
+          l'activation des décaissements Sily Link, elles restent
+          en attente sécurisée : aucun paiement manuel.
         </p>
 
         <button
@@ -10857,7 +10858,7 @@ const soldeDisponible = Math.max(
       ">
 
         <h3>
-          💸 Historique des retraits
+          💼 Historique des retraits de la plateforme
         </h3>
 
         ${
@@ -11045,7 +11046,7 @@ async function ouvrirRetraitsAdmin(){
         ">
 
           <h2 style="margin:0;">
-            💸 Retraits vendeurs
+            💸 Demandes de retrait des vendeurs
           </h2>
 
           <button
@@ -11356,64 +11357,21 @@ async function chargerRetraitsAdmin(){
                 }
 
                 ${
-                  statut === "pending"
-                    ? `
-                      <button
-                        onclick="traiterRetraitAdmin('${retrait.id}')"
-                        style="
-                          width:100%;
-                          margin-top:14px;
-                          padding:12px;
-                          border:none;
-                          border-radius:10px;
-                          background:#2563eb;
-                          color:white;
-                          font-weight:bold;
-                          font-size:15px;
-                        ">
-                        ⚙️ Traiter le retrait
-                      </button>
-                    `
-                    : ""
-                }
-
-                ${
-                  statut === "processing"
+                  statut === "pending" || statut === "processing"
                     ? `
                       <div style="
-                        display:grid;
-                        grid-template-columns:
-                          1fr 1fr;
-                        gap:8px;
                         margin-top:14px;
+                        padding:12px;
+                        border-radius:10px;
+                        background:#fff7ed;
+                        color:#9a3412;
+                        font-size:13px;
+                        line-height:1.5;
                       ">
-
-                        <button
-                          onclick="marquerRetraitPaye('${retrait.id}')"
-                          style="
-                            padding:12px;
-                            border:none;
-                            border-radius:10px;
-                            background:#16a34a;
-                            color:white;
-                            font-weight:bold;
-                          ">
-                          ✅ Payé
-                        </button>
-
-                        <button
-                          onclick="marquerRetraitEchec('${retrait.id}')"
-                          style="
-                            padding:12px;
-                            border:none;
-                            border-radius:10px;
-                            background:#dc2626;
-                            color:white;
-                            font-weight:bold;
-                          ">
-                          ❌ Échec
-                        </button>
-
+                        🔒 Demande conservée en attente sécurisée.
+                        Le paiement automatique sera activé après
+                        connexion et confirmation réelle de Sily Link.
+                        Aucune validation manuelle autorisée.
                       </div>
                     `
                     : ""
@@ -11485,12 +11443,11 @@ async function traiterRetraitAdmin(
   payoutId
 ){
 
-  const confirmation =
-    confirm(
-      "⚙️ Mettre cette demande en traitement ?"
-    );
-
-  if(!confirmation) return;
+  alert(
+    "Les retraits vendeurs restent en attente sécurisée. " +
+    "Le traitement sera activé après intégration réelle de Sily Link."
+  );
+  return;
 
   try{
 
@@ -11555,19 +11512,11 @@ async function marquerRetraitPaye(
   payoutId
 ){
 
-  const reference =
-    prompt(
-      "🔖 Entre la référence du paiement si tu en as une :"
-    );
-
-  if(reference === null) return;
-
-  const confirmation =
-    confirm(
-      "✅ Confirmer que ce retrait a été payé ?"
-    );
-
-  if(!confirmation) return;
+  alert(
+    "Impossible de marquer manuellement un retrait comme payé. " +
+    "Seule une confirmation réelle du prestataire pourra valider le paiement."
+  );
+  return;
 
   try{
 
@@ -11636,12 +11585,11 @@ async function marquerRetraitEchec(
   payoutId
 ){
 
-  const confirmation =
-    confirm(
-      "❌ Marquer cette demande de retrait en échec ?"
-    );
-
-  if(!confirmation) return;
+  alert(
+    "Le statut echec devra être confirmé par le prestataire. " +
+    "Aucune modification manuelle autorisée."
+  );
+  return;
 
   try{
 
