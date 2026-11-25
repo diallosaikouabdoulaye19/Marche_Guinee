@@ -13572,6 +13572,39 @@ async function recupererPrixNegocie(listingId){
 }
 
 /* ---------------------------------------------------------
+   Vérifier que la session locale et le jeton Supabase
+   correspondent au même compte avant toute négociation.
+--------------------------------------------------------- */
+async function verifierIdentiteNegociation() {
+  const session = utilisateurConnecte || window.utilisateurConnecte || null;
+  const token = session && session.accessToken;
+
+  if (!session || !session.id || !token) {
+    throw new Error("La session de connexion est incomplète. Déconnecte-toi puis reconnecte-toi.");
+  }
+
+  const response = await fetch(SUPABASE_URL + "/auth/v1/user", {
+    method: "GET",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + token
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("La session Supabase a expiré ou n'est plus valide. Reconnecte-toi.");
+  }
+
+  const authUser = await response.json();
+
+  if (!authUser || String(authUser.id || "") !== String(session.id)) {
+    throw new Error("Le compte affiché et le compte réellement connecté à Supabase ne correspondent pas. Déconnecte-toi puis reconnecte-toi.");
+  }
+
+  return String(authUser.id);
+}
+
+/* ---------------------------------------------------------
    Afficher les propositions dans la conversation
 --------------------------------------------------------- */
 
@@ -13612,6 +13645,7 @@ async function chargerPropositionsPrix(){
       panneauDiagnostic.className = "price-offer-panel";
     }
 
+    panneauDiagnostic.dataset.mgToggleInitialized = "1";
     panneauDiagnostic.innerHTML =
       '<div class="price-offer-title">⚠️ Négociation indisponible</div>' +
       '<div class="price-offer-text">' + message + '</div>' +
@@ -13643,6 +13677,14 @@ async function chargerPropositionsPrix(){
     afficherBlocageNegociation("La conversation active n'est pas détectée. Reviens à la liste des messages puis rouvre cette conversation depuis l'annonce.");
     return;
   }
+
+  try {
+    await verifierIdentiteNegociation();
+  } catch (erreurSession) {
+    afficherBlocageNegociation(escapeHTML(erreurSession.message || "Session de connexion à vérifier."));
+    return;
+  }
+
 
   const listingId =
     conversationActuelle.listing_id ||
@@ -13742,8 +13784,9 @@ async function chargerPropositionsPrix(){
       panel.innerHTML = '<div class="price-offer-text">Impossible de charger la proposition pour le moment.</div>';
     }
 
-    const chatBox = document.getElementById("chatBox");
-    if(chatBox) chatContainer.insertBefore(panel, chatBox);
+    panel.dataset.mgToggleInitialized = "1";
+    panel.style.cssText += ";position:fixed!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(88vw,420px)!important;max-width:88vw!important;max-height:70vh!important;overflow:auto!important;box-sizing:border-box!important;z-index:100001!important;background:#fff!important;";
+    document.body.appendChild(panel);
     return;
   }
 
@@ -13789,6 +13832,7 @@ function afficherPanneauCentre() {
    * Le panneau doit être présent dans le document pour
    * que le bouton puisse le retrouver et l'afficher.
    */
+  panel.dataset.mgToggleInitialized = "1";
   if (panel.parentElement !== document.body) {
     document.body.appendChild(panel);
   }
@@ -13990,6 +14034,13 @@ window.chargerPropositionsPrix = chargerPropositionsPrix;
 
 async function proposerPrixPrive(){
 
+  try {
+    await verifierIdentiteNegociation();
+  } catch (erreurSession) {
+    alert(erreurSession.message || "Session de connexion à vérifier.");
+    return;
+  }
+
   if(!utilisateurConnecte || !conversationActuelle){
     alert("Connecte-toi pour continuer.");
     return;
@@ -14068,6 +14119,13 @@ async function repondrePropositionPrix(
   offerId,
   action
 ){
+
+  try {
+    await verifierIdentiteNegociation();
+  } catch (erreurSession) {
+    alert(erreurSession.message || "Session de connexion à vérifier.");
+    return;
+  }
 
   if(
     !utilisateurConnecte ||
