@@ -19479,7 +19479,7 @@ function afficherRetour() {
     }
 
     try {
-      var base = obtenirAdresseSupabase().replace(/\\/+$/, "");
+      var base = obtenirAdresseSupabase().replace(/\/+$/, "");
       var requete = obtenirFetch();
       var resultat = await requete(
         base + "/rest/v1/rpc/get_or_create_direct_conversation",
