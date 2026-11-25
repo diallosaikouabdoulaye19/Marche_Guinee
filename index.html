@@ -19731,17 +19731,17 @@ function afficherRetour() {
   }
 }
   
-  /* Le gestionnaire est installé après la déclaration publique du profil.
-     Ainsi, la fonction appelée existe déjà au moment du clic. */
+};
+
+  /* Gestionnaire global : installé immédiatement, après la définition
+     de mgOuvrirProfilVendeur et en dehors de sa fonction async. */
   function ouvrirProfilDepuisCarte(event) {
     var cible = event.target;
     if (!cible || typeof cible.closest !== "function") return;
-
     var carte = cible.closest("#detailContent .mg-seller-card");
     if (!carte) return;
 
-    var contenu = document.getElementById("detailContent");
-    var page = contenu && contenu.querySelector(".mg-detail-page");
+    var page = document.querySelector("#detailContent .mg-detail-page");
     if (!page) return;
 
     var boutonAcheter = page.querySelector(
@@ -19751,61 +19751,28 @@ function afficherRetour() {
     var match = onclick.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
     var idAnnonce = match ? match[1] : "";
 
-    var annonces = typeof toutesLesAnnonces !== "undefined"
-      ? toutesLesAnnonces
-      : [];
-    var annonce = annonces.find(function (a) {
-      return String(a.id) === String(idAnnonce);
-    });
-
-    if (!annonce || !annonce.seller_id) {
-      console.error("[Marché Guinée] Vendeur introuvable pour l'annonce :", idAnnonce);
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
-  }
-
-  };
-
-  /* Installation au chargement du script, hors de la fonction async.
-     La carte est recréée à chaque ouverture : la délégation reste active. */
-  function ouvrirProfilDepuisCarte(event) {
-    var cible = event.target;
-    if (!cible || typeof cible.closest !== "function") return;
-    var carte = cible.closest("#detailContent .mg-seller-card");
-    if (!carte) return;
-
-    var page = document.querySelector("#detailContent .mg-detail-page");
-    var boutonAcheter = page && page.querySelector(
-      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
-    );
-    var onclick = boutonAcheter ? boutonAcheter.getAttribute("onclick") || "" : "";
-    var match = onclick.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
-    var idAnnonce = match ? match[1] : "";
     var annonces = typeof toutesLesAnnonces !== "undefined" ? toutesLesAnnonces : [];
     var annonce = annonces.find(function (a) {
       return String(a.id) === String(idAnnonce);
     });
 
     if (!annonce || !annonce.seller_id) {
-      console.error("[Marché Guinée] Impossible d'identifier le vendeur.", {
+      console.error("[Marché Guinée] Vendeur introuvable pour l'annonce :", {
         idAnnonce: idAnnonce,
         boutonAcheterTrouve: !!boutonAcheter,
-        nombreAnnonces: annonces.length
+        annoncesDisponibles: annonces.length
       });
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
+
     if (typeof window.mgOuvrirProfilVendeur !== "function") {
-      console.error("[Marché Guinée] La fonction de profil n'est pas chargée.");
+      console.error("[Marché Guinée] Fonction de profil vendeur non chargée.");
       return;
     }
+
     window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
   }
 
