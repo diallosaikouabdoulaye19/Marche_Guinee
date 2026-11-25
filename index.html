@@ -13610,12 +13610,12 @@ async function chargerPropositionsPrix(){
   if(!chatContainer) return;
 
   const estVendeur =
-    conversationActuelle.seller_id ===
-    utilisateurConnecte.id;
+    String(conversationActuelle.seller_id || "") ===
+    String(utilisateurConnecte.id || "");
 
   const estAcheteur =
-    conversationActuelle.buyer_id ===
-    utilisateurConnecte.id;
+    String(conversationActuelle.buyer_id || "") ===
+    String(utilisateurConnecte.id || "");
 
 
   const panel =
@@ -13904,19 +13904,26 @@ panel.dataset.mgCompactReady = "1";
 
     } catch (error) {
 
-      console.log(
-        "Erreur propositions prix :",
-        error
-      );
+      console.error("Erreur propositions acheteur :", error);
+      panel.innerHTML = '<div class="price-offer-title">⚠️ Propositions indisponibles</div><div class="price-offer-text">' +
+        String(error && error.message ? error.message : "Réessaie dans un instant.")
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+        '</div>';
+      chatContainer.insertBefore(panel, chatContainer.firstChild);
 
     }
 
+  } else {
+    panel.innerHTML = '<div class="price-offer-title">⚠️ Conversation non reconnue</div><div class="price-offer-text">Recharge la conversation puis réessaie.</div>';
+    chatContainer.insertBefore(panel, chatContainer.firstChild);
   }
 }
 
 /* ---------------------------------------------------------
    Le vendeur propose un prix
 --------------------------------------------------------- */
+
+window.chargerPropositionsPrix = chargerPropositionsPrix;
 
 async function proposerPrixPrive(){
 
@@ -13991,6 +13998,8 @@ async function proposerPrixPrive(){
 /* ---------------------------------------------------------
    L'acheteur accepte ou refuse
 --------------------------------------------------------- */
+
+window.proposerPrixPrive = proposerPrixPrive;
 
 async function repondrePropositionPrix(
   offerId,
@@ -14096,6 +14105,8 @@ async function repondrePropositionPrix(
   }
 
 }
+
+window.repondrePropositionPrix = repondrePropositionPrix;
 
 /* =========================================================
    MESSAGERIE — VERSION AVEC PROPOSITIONS
@@ -26771,7 +26782,7 @@ async function loadMessagesOptimized() {
   }
 
   function obtenirTexteBouton(panel) {
-    if (!panel) return "💰 Négociation";
+    if (!panel) return "💰 Proposer un prix";
 
     if (panel.querySelector(".price-offer-btn")) {
       return "💰 Proposer un prix";
