@@ -13953,6 +13953,7 @@ async function proposerPrixPrive(){
         headers:headers({"Content-Type":"application/json"}),
         body:JSON.stringify({
           p_listing_id: listingId,
+          p_buyer_id: conversationActuelle.buyer_id,
           p_proposed_price_gnf: Math.round(prix),
           p_details: details.trim() || null
         })
