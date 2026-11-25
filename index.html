@@ -5125,7 +5125,7 @@ async function chargerMesAchats(){
       "/rest/v1/orders" +
       "?buyer_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=id,order_number,product_title,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&select=id,order_number,product_title,negotiation_details,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
 
@@ -5380,6 +5380,10 @@ async function chargerMesAchats(){
         "</div>" +
 
         articlesHTML +
+
+        (achat.negotiation_details
+          ? "<div style='margin-top:10px;padding:10px;background:#f4f8f5;border-radius:10px;color:#315b40;'>📝 <strong>Détail convenu :</strong><br>" + escapeHTML(achat.negotiation_details) + "</div>"
+          : "") +
 
         "<div style='margin-top:12px;font-size:17px;font-weight:bold;'>" +
           "💰 Prix total : " +
@@ -6352,7 +6356,7 @@ async function chargerMesVentes(){
       "/rest/v1/orders" +
       "?seller_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=id,order_number,product_title,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&select=id,order_number,product_title,negotiation_details,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
 
@@ -6767,6 +6771,10 @@ async function chargerMesVentes(){
         "</strong>" +
 
         articlesHTML +
+
+        (vente.negotiation_details
+          ? "<div style='margin-top:10px;padding:10px;background:#f4f8f5;border-radius:10px;color:#315b40;'>📝 <strong>Détail convenu :</strong><br>" + escapeHTML(vente.negotiation_details) + "</div>"
+          : "") +
 
         "<div style='margin-top:12px;'>💰 Total de la commande : " +
           prix.toLocaleString("fr-FR") +
@@ -8165,6 +8173,15 @@ async function continuerPaiement(listingId) {
         </p>
 
         ${
+          commandeCreee.negotiation_details
+            ? `<div style="margin:10px 0;padding:11px;background:#f4f8f5;border-radius:10px;color:#315b40;">
+                📝 <strong>Détail de la proposition :</strong><br>
+                ${escapeHTML(commandeCreee.negotiation_details)}
+              </div>`
+            : ""
+        }
+
+        ${
           prixNegocie
             ? `
               <div style="
@@ -8846,7 +8863,7 @@ async function afficherChat() {
 
  // Charger les messages et les propositions de prix
 await window.chargerMessages();
-await chargerPropositionsPrix();
+
   const input = document.getElementById("messageInput");
 
   if (input) {
@@ -18886,7 +18903,7 @@ async function chargerMesAchats(){
       "/rest/v1/orders" +
       "?buyer_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=id,order_number,product_title,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&select=id,order_number,product_title,negotiation_details,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
 
@@ -19141,6 +19158,10 @@ async function chargerMesAchats(){
         "</div>" +
 
         articlesHTML +
+
+        (achat.negotiation_details
+          ? "<div style='margin-top:10px;padding:10px;background:#f4f8f5;border-radius:10px;color:#315b40;'>📝 <strong>Détail convenu :</strong><br>" + escapeHTML(achat.negotiation_details) + "</div>"
+          : "") +
 
         "<div style='margin-top:12px;font-size:17px;font-weight:bold;'>" +
           "💰 Prix total : " +
@@ -20113,7 +20134,7 @@ async function chargerMesVentes(){
       "/rest/v1/orders" +
       "?seller_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
-      "&select=id,order_number,product_title,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
+      "&select=id,order_number,product_title,negotiation_details,price_gnf,quantity,status,delivery_status,commission_gnf,seller_amount_gnf,created_at" +
       "&order=created_at.desc"
     );
 
@@ -20528,6 +20549,10 @@ async function chargerMesVentes(){
         "</strong>" +
 
         articlesHTML +
+
+        (vente.negotiation_details
+          ? "<div style='margin-top:10px;padding:10px;background:#f4f8f5;border-radius:10px;color:#315b40;'>📝 <strong>Détail convenu :</strong><br>" + escapeHTML(vente.negotiation_details) + "</div>"
+          : "") +
 
         "<div style='margin-top:12px;'>💰 Total de la commande : " +
           prix.toLocaleString("fr-FR") +
@@ -21926,6 +21951,15 @@ async function continuerPaiement(listingId) {
         </p>
 
         ${
+          commandeCreee.negotiation_details
+            ? `<div style="margin:10px 0;padding:11px;background:#f4f8f5;border-radius:10px;color:#315b40;">
+                📝 <strong>Détail de la proposition :</strong><br>
+                ${escapeHTML(commandeCreee.negotiation_details)}
+              </div>`
+            : ""
+        }
+
+        ${
           prixNegocie
             ? `
               <div style="
@@ -22607,7 +22641,7 @@ async function afficherChat() {
 
  // Charger les messages et les propositions de prix
 await window.chargerMessages();
-await chargerPropositionsPrix();
+
   const input = document.getElementById("messageInput");
 
   if (input) {
@@ -27666,6 +27700,12 @@ panel.dataset.mgCompactReady = "1";
             Le vendeur t'a proposé un prix privé.
           </div>
 
+          ${offreAcceptee.details ? `
+            <div class="price-offer-text" style="margin:8px 0;padding:10px;background:#f4f8f5;border-radius:10px;">
+              📝 Détail convenu : ${escapeHTML(offreAcceptee.details)}
+            </div>
+          ` : ""}
+
           <div class="price-offer-original">
             Prix public :
             ${formatPrix(offreAcceptee.original_price_gnf)}
@@ -27701,6 +27741,12 @@ panel.dataset.mgCompactReady = "1";
           <div class="price-offer-price">
             ${formatPrix(offreEnAttente.proposed_price_gnf)}
           </div>
+
+          ${offreEnAttente.details ? `
+            <div class="price-offer-text" style="margin:8px 0;padding:10px;background:#f4f8f5;border-radius:10px;">
+              📝 Détail du vendeur : ${escapeHTML(offreEnAttente.details)}
+            </div>
+          ` : ""}
 
           <div class="price-offer-original">
             Prix public :
