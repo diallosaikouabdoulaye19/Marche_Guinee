@@ -19476,13 +19476,13 @@ function afficherRetour() {
         throw new Error("La conversation n'a pas pu être ouverte.");
       }
 
-      window.conversationActuelle = {
+      conversationActuelle = {
         id: conversationId,
         listing_id: null,
         buyer_id: window.utilisateurConnecte.id,
         seller_id: sellerId
       };
-      window.annonceConversationActuelle = null;
+      annonceConversationActuelle = null;
 
       var profilModal = document.getElementById("mgProfilVendeurModal");
       if (profilModal) profilModal.style.display = "none";
