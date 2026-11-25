@@ -26856,10 +26856,12 @@ async function loadMessagesOptimized() {
     if (!bouton) return;
 
     var panel = document.getElementById(ID_PANEL);
+    var panneauCharge = false;
 
     /*
-     * Si le panneau n'existe pas encore, tenter de charger
-     * la proposition avec la fonction déjà présente dans l'app.
+     * Si le panneau n'existe pas encore, le charger.
+     * Un panneau qui vient d'être créé doit s'ouvrir
+     * immédiatement au lieu d'être refermé au premier appui.
      */
     if (!panel && !chargementEnCours) {
       if (typeof window.chargerPropositionsPrix === "function") {
@@ -26867,6 +26869,7 @@ async function loadMessagesOptimized() {
 
         try {
           await window.chargerPropositionsPrix();
+          panneauCharge = true;
         } catch (error) {
           console.error(
             "Erreur de chargement de la négociation :",
@@ -26885,13 +26888,24 @@ async function loadMessagesOptimized() {
       return;
     }
 
+    centrerPanneau(panel);
+
     /*
-     * Lire l'état réel du panneau plutôt que de se fier
-     * uniquement à aria-expanded.
+     * Premier affichage : ouvrir directement le panneau fraîchement chargé.
      */
+    if (panneauCharge) {
+      panel.style.setProperty("display", "block", "important");
+      bouton.setAttribute("aria-expanded", "true");
+      return;
+    }
+
+    /*
+     * Pour les appuis suivants, basculer selon l'état réel.
+     */
+    var stylePanel = window.getComputedStyle(panel);
     var estVisible =
-      window.getComputedStyle(panel).display !== "none" &&
-      window.getComputedStyle(panel).visibility !== "hidden";
+      stylePanel.display !== "none" &&
+      stylePanel.visibility !== "hidden";
 
     if (estVisible) {
       panel.style.setProperty("display", "none", "important");
@@ -26899,7 +26913,6 @@ async function loadMessagesOptimized() {
       return;
     }
 
-    centrerPanneau(panel);
     panel.style.setProperty("display", "block", "important");
     bouton.setAttribute("aria-expanded", "true");
   }
