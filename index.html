@@ -19010,50 +19010,6 @@ function afficherRetour() {
     }
   }
 
-  /* Gestion robuste du profil vendeur par délégation :
-     fonctionne même si le détail et sa carte sont recréés après coup. */
-  function ouvrirProfilDepuisCarte(event) {
-    var cible = event.target;
-    if (!cible || typeof cible.closest !== "function") return;
-
-    var carte = cible.closest("#detailContent .mg-seller-card");
-    if (!carte) return;
-
-    var contenu = document.getElementById("detailContent");
-    var page = contenu && contenu.querySelector(".mg-detail-page");
-    if (!page) return;
-
-    var idAnnonce = obtenirIdAnnonceCourante(page);
-    var annonce = obtenirAnnonces().find(function (a) {
-      return String(a.id) === String(idAnnonce);
-    });
-
-    if (!annonce || !annonce.seller_id) {
-      console.error("[Marché Guinée] Impossible d'identifier le vendeur du détail ouvert.");
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (typeof window.mgOuvrirProfilVendeur !== "function") {
-      console.error("[Marché Guinée] Fonction de profil vendeur indisponible.");
-      alert("Le profil du vendeur n'est pas disponible. Recharge l'application.");
-      return;
-    }
-
-    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
-  }
-
-  document.addEventListener("click", ouvrirProfilDepuisCarte, true);
-  document.addEventListener("keydown", function (event) {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    var cible = event.target;
-    if (!cible || typeof cible.closest !== "function") return;
-    if (!cible.closest("#detailContent .mg-seller-card")) return;
-    ouvrirProfilDepuisCarte(event);
-  }, true);
-
   /* Observer les changements de contenu du détail.
      Cela fonctionne aussi lorsque l'annonce se recharge. */
   var observateur = new MutationObserver(function () {
@@ -19774,6 +19730,58 @@ function afficherRetour() {
     };
   }
 }
+  
+  /* Le gestionnaire est installé après la déclaration publique du profil.
+     Ainsi, la fonction appelée existe déjà au moment du clic. */
+  function ouvrirProfilDepuisCarte(event) {
+    var cible = event.target;
+    if (!cible || typeof cible.closest !== "function") return;
+
+    var carte = cible.closest("#detailContent .mg-seller-card");
+    if (!carte) return;
+
+    var contenu = document.getElementById("detailContent");
+    var page = contenu && contenu.querySelector(".mg-detail-page");
+    if (!page) return;
+
+    var boutonAcheter = page.querySelector(
+      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
+    );
+    var onclick = boutonAcheter ? boutonAcheter.getAttribute("onclick") || "" : "";
+    var match = onclick.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
+    var idAnnonce = match ? match[1] : "";
+
+    var annonces = typeof toutesLesAnnonces !== "undefined"
+      ? toutesLesAnnonces
+      : [];
+    var annonce = annonces.find(function (a) {
+      return String(a.id) === String(idAnnonce);
+    });
+
+    if (!annonce || !annonce.seller_id) {
+      console.error("[Marché Guinée] Vendeur introuvable pour l'annonce :", idAnnonce);
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
+  }
+
+  if (!window.mgProfilVendeurClicInstalle) {
+    window.mgProfilVendeurClicInstalle = true;
+
+    document.addEventListener("click", ouvrirProfilDepuisCarte, true);
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      var cible = event.target;
+      if (!cible || typeof cible.closest !== "function") return;
+      if (!cible.closest("#detailContent .mg-seller-card")) return;
+      ouvrirProfilDepuisCarte(event);
+    }, true);
+  }
+
   
 };
 })();
