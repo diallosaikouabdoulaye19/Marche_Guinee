@@ -24907,6 +24907,9 @@ if (typeof ancienneFermeture === "function") {
   document.addEventListener("click", function (event) {
     var image = event.target.closest && event.target.closest("#chatBox img");
 
+    /* Les photos optimisées sont gérées par la visionneuse 2026 */
+    if (image && image.classList.contains("mg-chat-image")) return;
+
     if (image) {
       event.preventDefault();
       ouvrirPhoto(image);
