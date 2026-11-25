@@ -19498,13 +19498,15 @@ function afficherRetour() {
         throw new Error("La conversation n'a pas pu être ouverte.");
       }
 
-      conversationActuelle = {
+      /* Ces états sont partagés avec les fonctions globales de messagerie.
+         Les exposer sur window évite le ReferenceError dans cette IIFE stricte. */
+      window.conversationActuelle = {
         id: conversationId,
         listing_id: null,
         buyer_id: window.utilisateurConnecte.id,
         seller_id: sellerId
       };
-      annonceConversationActuelle = null;
+      window.annonceConversationActuelle = null;
 
       var profilModal = document.getElementById("mgProfilVendeurModal");
       if (profilModal) profilModal.style.display = "none";
