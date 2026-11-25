@@ -18977,12 +18977,10 @@ function afficherRetour() {
 
     if (!annonce) return;
 
-    /* Rendre la carte vendeur cliquable sans remplacer
-       le système de favoris ou les boutons existants. */
+    /* La carte est rendue accessible ; le clic est géré une seule
+       fois par délégation plus bas, sans conserver une annonce périmée. */
     var carteVendeur = zone.querySelector(".mg-seller-card");
-
-    if (carteVendeur && !carteVendeur.dataset.mgProfilActif) {
-      carteVendeur.dataset.mgProfilActif = "oui";
+    if (carteVendeur) {
       carteVendeur.style.cursor = "pointer";
       carteVendeur.setAttribute("role", "button");
       carteVendeur.setAttribute("tabindex", "0");
@@ -18990,23 +18988,6 @@ function afficherRetour() {
         "aria-label",
         "Voir le profil et les annonces du vendeur"
       );
-
-      carteVendeur.addEventListener("click", function () {
-        window.mgOuvrirProfilVendeur(
-          annonce.seller_id,
-          annonce.id
-        );
-      });
-
-      carteVendeur.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          window.mgOuvrirProfilVendeur(
-            annonce.seller_id,
-            annonce.id
-          );
-        }
-      });
     }
 
     /* Les boutons restent les mêmes : on les déplace seulement
@@ -19028,6 +19009,50 @@ function afficherRetour() {
       zone.appendChild(pied);
     }
   }
+
+  /* Gestion robuste du profil vendeur par délégation :
+     fonctionne même si le détail et sa carte sont recréés après coup. */
+  function ouvrirProfilDepuisCarte(event) {
+    var cible = event.target;
+    if (!cible || typeof cible.closest !== "function") return;
+
+    var carte = cible.closest("#detailContent .mg-seller-card");
+    if (!carte) return;
+
+    var contenu = document.getElementById("detailContent");
+    var page = contenu && contenu.querySelector(".mg-detail-page");
+    if (!page) return;
+
+    var idAnnonce = obtenirIdAnnonceCourante(page);
+    var annonce = obtenirAnnonces().find(function (a) {
+      return String(a.id) === String(idAnnonce);
+    });
+
+    if (!annonce || !annonce.seller_id) {
+      console.error("[Marché Guinée] Impossible d'identifier le vendeur du détail ouvert.");
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (typeof window.mgOuvrirProfilVendeur !== "function") {
+      console.error("[Marché Guinée] Fonction de profil vendeur indisponible.");
+      alert("Le profil du vendeur n'est pas disponible. Recharge l'application.");
+      return;
+    }
+
+    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
+  }
+
+  document.addEventListener("click", ouvrirProfilDepuisCarte, true);
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    var cible = event.target;
+    if (!cible || typeof cible.closest !== "function") return;
+    if (!cible.closest("#detailContent .mg-seller-card")) return;
+    ouvrirProfilDepuisCarte(event);
+  }, true);
 
   /* Observer les changements de contenu du détail.
      Cela fonctionne aussi lorsque l'annonce se recharge. */
