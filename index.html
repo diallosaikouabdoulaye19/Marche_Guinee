@@ -26855,7 +26855,11 @@ async function loadMessagesOptimized() {
         "font-weight:800;" +
         "white-space:nowrap;" +
         "cursor:pointer;" +
-        "flex:0 0 auto;";
+        "flex:0 0 auto;" +
+        "position:relative;" +
+        "z-index:120;" +
+        "pointer-events:auto;" +
+        "touch-action:manipulation;";
     }
 
     var panel = document.getElementById(ID_PANEL);
@@ -26893,18 +26897,36 @@ async function loadMessagesOptimized() {
      * Le bouton étant recréé/déplacé dynamiquement,
      * on garantit qu'il possède toujours son propre clic.
      */
-    if (!bouton.dataset.mgPriceClickBound) {
-      bouton.dataset.mgPriceClickBound = "1";
-      bouton.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
+    /*
+     * Action tactile explicite sur le bouton lui-même.
+     * Le texte change immédiatement : cela permet de confirmer
+     * que l'appui iPhone atteint bien ce bouton.
+     */
+    bouton.onclick = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
 
-        basculerPanneau(bouton).catch(function (error) {
-          console.error("Erreur ouverture négociation :", error);
-          alert("Impossible d'ouvrir la négociation. Réessaie.");
-        });
+      bouton.textContent = "⏳ Ouverture...";
+      bouton.style.setProperty("filter", "brightness(.92)");
+
+      basculerPanneau(bouton).then(function () {
+        bouton.style.removeProperty("filter");
+        var panneau = document.getElementById(ID_PANEL);
+
+        if (!panneau) {
+          bouton.textContent = "💰 Proposer un prix";
+          alert("Le bouton reçoit bien ton appui, mais le panneau de négociation n'a pas été créé. Vérifions la conversation et l'annonce.");
+          return;
+        }
+
+        bouton.textContent = obtenirTexteBouton(panneau);
+      }).catch(function (error) {
+        bouton.style.removeProperty("filter");
+        bouton.textContent = "💰 Proposer un prix";
+        console.error("Erreur ouverture négociation :", error);
+        alert("Erreur d'ouverture : " + String(error && error.message ? error.message : error));
       });
-    }
+    };
   }
 
   async function basculerPanneau(bouton) {
