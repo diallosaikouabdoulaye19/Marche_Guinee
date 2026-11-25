@@ -18598,7 +18598,12 @@ function afficherRetour() {
 
           <div class="mg-detail-scroll">
 
-            <div class="mg-seller-card">
+            <div class="mg-seller-card"
+                 role="button"
+                 tabindex="0"
+                 style="cursor:pointer"
+                 onclick="window.mgOuvrirProfilVendeur('${echapper(annonce.seller_id)}', '${echapper(annonce.id)}')"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.mgOuvrirProfilVendeur('${echapper(annonce.seller_id)}','${echapper(annonce.id)}')}">
               ${avatarHTML}
               <div class="mg-seller-info">
                 <div class="mg-seller-name">
@@ -19733,60 +19738,6 @@ function afficherRetour() {
   
 };
 
-  /* Gestionnaire global : installé immédiatement, après la définition
-     de mgOuvrirProfilVendeur et en dehors de sa fonction async. */
-  function ouvrirProfilDepuisCarte(event) {
-    var cible = event.target;
-    if (!cible || typeof cible.closest !== "function") return;
-    var carte = cible.closest("#detailContent .mg-seller-card");
-    if (!carte) return;
-
-    var page = document.querySelector("#detailContent .mg-detail-page");
-    if (!page) return;
-
-    var boutonAcheter = page.querySelector(
-      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
-    );
-    var onclick = boutonAcheter ? boutonAcheter.getAttribute("onclick") || "" : "";
-    var match = onclick.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
-    var idAnnonce = match ? match[1] : "";
-
-    var annonces = typeof toutesLesAnnonces !== "undefined" ? toutesLesAnnonces : [];
-    var annonce = annonces.find(function (a) {
-      return String(a.id) === String(idAnnonce);
-    });
-
-    if (!annonce || !annonce.seller_id) {
-      console.error("[Marché Guinée] Vendeur introuvable pour l'annonce :", {
-        idAnnonce: idAnnonce,
-        boutonAcheterTrouve: !!boutonAcheter,
-        annoncesDisponibles: annonces.length
-      });
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (typeof window.mgOuvrirProfilVendeur !== "function") {
-      console.error("[Marché Guinée] Fonction de profil vendeur non chargée.");
-      return;
-    }
-
-    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
-  }
-
-  if (!window.mgProfilVendeurClicInstalle) {
-    window.mgProfilVendeurClicInstalle = true;
-    document.addEventListener("click", ouvrirProfilDepuisCarte, true);
-    document.addEventListener("keydown", function (event) {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      var cible = event.target;
-      if (!cible || typeof cible.closest !== "function") return;
-      if (!cible.closest("#detailContent .mg-seller-card")) return;
-      ouvrirProfilDepuisCarte(event);
-    }, true);
-  }
 
 })();
 </script>
