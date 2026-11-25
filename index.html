@@ -13577,11 +13577,70 @@ async function recupererPrixNegocie(listingId){
 
 async function chargerPropositionsPrix(){
 
-  if(
+  /*
+   * Synchroniser les états de la messagerie.
+   * Certains parcours les exposent sur window, d'autres les
+   * utilisent comme variables globales du script principal.
+   */
+  if (
+    (typeof utilisateurConnecte === "undefined" || !utilisateurConnecte) &&
+    window.utilisateurConnecte
+  ) {
+    utilisateurConnecte = window.utilisateurConnecte;
+  }
+
+  if (
+    (typeof conversationActuelle === "undefined" || !conversationActuelle) &&
+    window.conversationActuelle
+  ) {
+    conversationActuelle = window.conversationActuelle;
+  }
+
+  if (
+    (typeof annonceConversationActuelle === "undefined" || !annonceConversationActuelle) &&
+    window.annonceConversationActuelle
+  ) {
+    annonceConversationActuelle = window.annonceConversationActuelle;
+  }
+
+  const afficherBlocageNegociation = function (message) {
+    let panneauDiagnostic = document.getElementById("priceOfferPanel");
+
+    if (!panneauDiagnostic) {
+      panneauDiagnostic = document.createElement("div");
+      panneauDiagnostic.id = "priceOfferPanel";
+      panneauDiagnostic.className = "price-offer-panel";
+    }
+
+    panneauDiagnostic.innerHTML =
+      '<div class="price-offer-title">⚠️ Négociation indisponible</div>' +
+      '<div class="price-offer-text">' + message + '</div>' +
+      '<button type="button" class="price-offer-btn" ' +
+      'onclick="document.getElementById(\'priceOfferPanel\').remove()">' +
+      'Fermer</button>';
+
+    panneauDiagnostic.style.cssText =
+      "position:fixed!important;left:50%!important;top:50%!important;" +
+      "transform:translate(-50%,-50%)!important;width:min(88vw,420px)!important;" +
+      "max-width:88vw!important;max-height:70vh!important;overflow:auto!important;" +
+      "box-sizing:border-box!important;padding:16px!important;margin:0!important;" +
+      "border:1px solid #e4ebe6!important;border-radius:18px!important;" +
+      "background:#fff!important;box-shadow:0 18px 50px rgba(0,0,0,.22)!important;" +
+      "z-index:100001!important;display:block!important;";
+
+    document.body.appendChild(panneauDiagnostic);
+  };
+
+  if (
     !utilisateurConnecte ||
-    !utilisateurConnecte.id ||
-    !conversationActuelle
-  ){
+    !utilisateurConnecte.id
+  ) {
+    afficherBlocageNegociation("La session de ton compte n'est pas détectée dans cette conversation. Ferme puis rouvre la messagerie.");
+    return;
+  }
+
+  if (!conversationActuelle) {
+    afficherBlocageNegociation("La conversation active n'est pas détectée. Reviens à la liste des messages puis rouvre cette conversation depuis l'annonce.");
     return;
   }
 
@@ -13589,7 +13648,8 @@ async function chargerPropositionsPrix(){
     conversationActuelle.listing_id ||
     (annonceConversationActuelle && annonceConversationActuelle.id);
 
-  if(!listingId){
+  if (!listingId) {
+    afficherBlocageNegociation("L'identifiant de l'annonce est absent de cette conversation. La négociation doit être ouverte depuis une annonce.");
     return;
   }
 
@@ -13607,7 +13667,10 @@ async function chargerPropositionsPrix(){
       "chatContainer"
     );
 
-  if(!chatContainer) return;
+  if(!chatContainer) {
+    afficherBlocageNegociation("La zone de discussion est introuvable dans la page. Recharge la messagerie puis réessaie.");
+    return;
+  }
 
   const estVendeur =
     String(conversationActuelle.seller_id || "") ===
