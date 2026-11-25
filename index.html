@@ -3373,6 +3373,39 @@ async function supabaseFetch(url,options={}){
 
 }
 
+/*
+ * Récupère toutes les lignes d'une requête PostgREST par lots.
+ * La pagination évite la limite de lignes renvoyées par défaut par Supabase.
+ * Lecture seule : cette fonction n'effectue aucune écriture en base.
+ */
+async function supabaseFetchAllPages(url, pageSize = 1000) {
+  const toutesLesLignes = [];
+  let offset = 0;
+
+  while (true) {
+    const page = await supabaseFetch(url, {
+      headers: {
+        "Range-Unit": "items",
+        "Range": offset + "-" + (offset + pageSize - 1)
+      }
+    });
+
+    if (!Array.isArray(page)) {
+      throw new Error("Supabase n'a pas retourné une liste valide.");
+    }
+
+    toutesLesLignes.push(...page);
+
+    if (page.length < pageSize) {
+      break;
+    }
+
+    offset += pageSize;
+  }
+
+  return toutesLesLignes;
+}
+
 
 /* =========================
    OUTILS GÉNÉRAUX
@@ -4660,14 +4693,14 @@ async function chargerImages(listingId){
   try{
 
     /* Statistiques des ventes terminées uniquement. */
-    const commandes = await supabaseFetch(
+    const commandes = await supabaseFetchAllPages(
       SUPABASE_URL +
       "/rest/v1/orders" +
       "?seller_id=eq." +
       encodeURIComponent(utilisateurConnecte.id) +
       "&status=eq.completed" +
       "&delivery_status=eq.delivered" +
-      "&select=id,price_gnf,commission_gnf"
+      "&select=id,price_gnf,commission_gnf&order=id.asc"
     );
 
     if(!Array.isArray(commandes)){
@@ -12155,9 +12188,9 @@ async function ouvrirDemandeRetraitAdmin() {
   try {
 
     // 1. Charger les commissions des ventes terminées
-    const reponseCommandes = await supabaseFetch(
+    const reponseCommandes = await supabaseFetchAllPages(
       SUPABASE_URL +
-      "/rest/v1/orders?select=id,status,delivery_status,commission_gnf&status=eq.completed&delivery_status=eq.delivered"
+      "/rest/v1/orders?select=id,status,delivery_status,commission_gnf&status=eq.completed&delivery_status=eq.delivered&order=id.asc"
     );
 
     if (!Array.isArray(reponseCommandes)) {
@@ -12173,9 +12206,9 @@ async function ouvrirDemandeRetraitAdmin() {
     );
 
     // 2. Charger les retraits administrateur
-    const listeRetraits = await supabaseFetch(
+    const listeRetraits = await supabaseFetchAllPages(
       SUPABASE_URL +
-      "/rest/v1/admin_withdrawals?select=amount_gnf,status"
+      "/rest/v1/admin_withdrawals?select=id,amount_gnf,status&order=id.asc"
     );
 
     if (!Array.isArray(listeRetraits)) {
