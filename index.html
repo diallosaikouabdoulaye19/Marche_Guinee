@@ -13580,9 +13580,16 @@ async function chargerPropositionsPrix(){
   if(
     !utilisateurConnecte ||
     !utilisateurConnecte.id ||
-    !conversationActuelle ||
-    !annonceConversationActuelle
+    !conversationActuelle
   ){
+    return;
+  }
+
+  const listingId =
+    conversationActuelle.listing_id ||
+    (annonceConversationActuelle && annonceConversationActuelle.id);
+
+  if(!listingId){
     return;
   }
 
@@ -13601,12 +13608,6 @@ async function chargerPropositionsPrix(){
     );
 
   if(!chatContainer) return;
-
-  const listingId =
-    conversationActuelle.listing_id ||
-    annonceConversationActuelle.id;
-
-  if(!listingId) return;
 
   const estVendeur =
     conversationActuelle.seller_id ===
@@ -26788,13 +26789,38 @@ async function loadMessagesOptimized() {
   }
 
   function preparerBoutonPrix() {
+    var conversationCourante =
+      typeof conversationActuelle !== "undefined"
+        ? conversationActuelle
+        : window.conversationActuelle;
+
+    var annonceCourante =
+      typeof annonceConversationActuelle !== "undefined"
+        ? annonceConversationActuelle
+        : window.annonceConversationActuelle;
+
+    var listingId =
+      (conversationCourante && conversationCourante.listing_id) ||
+      (annonceCourante && annonceCourante.id);
+
+    var boutonExistant = document.getElementById(ID_BOUTON);
+
+    /*
+     * La négociation est réservée aux conversations ouvertes
+     * depuis une annonce. Aucun parcours sans annonce.
+     */
+    if (!listingId) {
+      if (boutonExistant) boutonExistant.remove();
+      return;
+    }
+
     var actions = document.getElementById(ID_ACTIONS);
     if (!actions) return;
 
     var zone = actions.querySelector(".mg-chat-actions-right");
     if (!zone) return;
 
-    var bouton = document.getElementById(ID_BOUTON);
+    var bouton = boutonExistant;
 
     if (!bouton) {
       bouton = document.createElement("button");
