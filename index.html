@@ -26887,6 +26887,24 @@ async function loadMessagesOptimized() {
     if (bouton.parentElement !== zone) {
       zone.appendChild(bouton);
     }
+
+    /*
+     * Écouteur directement attaché au bouton.
+     * Le bouton étant recréé/déplacé dynamiquement,
+     * on garantit qu'il possède toujours son propre clic.
+     */
+    if (!bouton.dataset.mgPriceClickBound) {
+      bouton.dataset.mgPriceClickBound = "1";
+      bouton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        basculerPanneau(bouton).catch(function (error) {
+          console.error("Erreur ouverture négociation :", error);
+          alert("Impossible d'ouvrir la négociation. Réessaie.");
+        });
+      });
+    }
   }
 
   async function basculerPanneau(bouton) {
@@ -26952,32 +26970,6 @@ async function loadMessagesOptimized() {
 
     panel.style.setProperty("display", "block", "important");
     bouton.setAttribute("aria-expanded", "true");
-  }
-
-  /*
-   * Gestionnaire délégué : il fonctionne même si le bouton
-   * est déplacé ou recréé par la mise en page de la messagerie.
-   */
-  if (!document.documentElement.dataset.mgPriceDelegatedClick) {
-    document.documentElement.dataset.mgPriceDelegatedClick = "1";
-
-    document.addEventListener("click", function (event) {
-      var cible = event.target;
-
-      if (!cible || typeof cible.closest !== "function") return;
-
-      var bouton = cible.closest("#" + ID_BOUTON);
-      if (!bouton) return;
-
-      event.preventDefault();
-
-      basculerPanneau(bouton).catch(function (error) {
-        console.error(
-          "Erreur lors de l'ouverture de la négociation :",
-          error
-        );
-      });
-    });
   }
 
   function programmerVerification() {
