@@ -18679,6 +18679,42 @@ function afficherRetour() {
         </div>
       `;
 
+      /* Attacher le clic directement après la création réelle de la carte.
+         Cette liaison ne dépend ni d'un observer ni d'un attribut HTML inline. */
+      var carteProfilVendeur = content.querySelector(".mg-seller-card");
+      if (carteProfilVendeur) {
+        carteProfilVendeur.setAttribute("role", "button");
+        carteProfilVendeur.setAttribute("tabindex", "0");
+        carteProfilVendeur.style.cursor = "pointer";
+
+        var ouvrirProfilCarte = function (event) {
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          if (typeof window.mgOuvrirProfilVendeur !== "function") {
+            console.error("[Marché Guinée] mgOuvrirProfilVendeur n'est pas disponible au clic.");
+            alert("Le profil vendeur ne peut pas encore être ouvert. Réessaie après avoir rechargé l'application.");
+            return;
+          }
+
+          window.mgOuvrirProfilVendeur(
+            annonce.seller_id,
+            annonce.id
+          );
+        };
+
+        carteProfilVendeur.addEventListener("click", ouvrirProfilCarte);
+        carteProfilVendeur.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            ouvrirProfilCarte(event);
+          }
+        });
+      } else {
+        console.error("[Marché Guinée] La carte vendeur n'a pas été créée dans le détail.");
+      }
+
       actualiserBoutonFavori(annonce.id);
 
       if (typeof enregistrerVue === "function") {
