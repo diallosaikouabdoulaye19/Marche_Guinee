@@ -13645,13 +13645,14 @@ async function chargerPropositionsPrix(){
         }
       );
       const liste = Array.isArray(offres) ? offres : [];
-      const attente = liste.find(o => o.status === "pending");
+      const attente = liste.find(o => o.status === "pending" && o.proposed_by !== utilisateurConnecte.id);
+      const attentePropre = liste.find(o => o.status === "pending" && o.proposed_by === utilisateurConnecte.id);
 
       if(attente){
         panel.innerHTML = `
           <div class="price-offer-title">💰 Proposition de l'acheteur</div>
           <div class="price-offer-price">${formatPrix(attente.proposed_price_gnf)} GNF</div>
-          ${attente.details ? '<div class="price-offer-text">' + String(attente.details) + '</div>' : ''}
+          ${attente.details ? '<div class="price-offer-text">' + String(attente.details).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') + '</div>' : ''}
           <div class="price-offer-actions">
             <button type="button" class="price-offer-accept">✅ Accepter</button>
             <button type="button" class="price-offer-reject">❌ Refuser</button>
@@ -13659,6 +13660,12 @@ async function chargerPropositionsPrix(){
         `;
         panel.querySelector(".price-offer-accept").onclick = () => repondrePropositionPrix(attente.id,"accepted");
         panel.querySelector(".price-offer-reject").onclick = () => repondrePropositionPrix(attente.id,"rejected");
+      } else if(attentePropre) {
+        panel.innerHTML = `
+          <div class="price-offer-title">⏳ Proposition envoyée</div>
+          <div class="price-offer-price">${formatPrix(attentePropre.proposed_price_gnf)} GNF</div>
+          <div class="price-offer-text">En attente de la réponse de l'autre personne.</div>
+        `;
       } else {
         panel.innerHTML = `
           <div class="price-offer-title">💰 Proposer un prix</div>
@@ -13701,7 +13708,10 @@ async function chargerPropositionsPrix(){
       const liste = Array.isArray(offres) ? offres : [];
 
       const offreEnAttente = liste.find(
-        offre => offre.status === "pending"
+        offre => offre.status === "pending" && offre.proposed_by !== utilisateurConnecte.id
+      );
+      const offrePropreEnAttente = liste.find(
+        offre => offre.status === "pending" && offre.proposed_by === utilisateurConnecte.id
       );
 
       const offreAcceptee = liste.find(
@@ -13875,11 +13885,19 @@ panel.dataset.mgCompactReady = "1";
         return;
       }
 
-      panel.innerHTML = `
-        <div class="price-offer-title">💰 Proposer un prix</div>
-        <div class="price-offer-text">Propose le prix que tu souhaites. Tu peux préciser les articles compris.</div>
-        <button type="button" class="price-offer-btn" onclick="proposerPrixPrive()">💰 Proposer un prix</button>
-      `;
+      if (offrePropreEnAttente) {
+        panel.innerHTML = `
+          <div class="price-offer-title">⏳ Proposition envoyée</div>
+          <div class="price-offer-price">${formatPrix(offrePropreEnAttente.proposed_price_gnf)} GNF</div>
+          <div class="price-offer-text">En attente de la réponse de l'autre personne.</div>
+        `;
+      } else {
+        panel.innerHTML = `
+          <div class="price-offer-title">💰 Proposer un prix</div>
+          <div class="price-offer-text">Propose le prix que tu souhaites. Tu peux préciser les articles compris.</div>
+          <button type="button" class="price-offer-btn" onclick="proposerPrixPrive()">💰 Proposer un prix</button>
+        `;
+      }
       afficherPanneauCentre();
       return;
 
