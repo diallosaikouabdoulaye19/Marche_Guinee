@@ -4910,7 +4910,12 @@ async function ouvrirDemandeRetrait(soldeDisponible){
         body:JSON.stringify({
           seller_id:utilisateurConnecte.id,
           amount_gnf:montantRetrait,
-          provider:compte.provider,
+          /* Le formulaire historique stocke MTN sous mobile_money,
+             tandis que payouts exige la valeur canonique mtn_momo. */
+          provider:
+            compte.provider === "mobile_money"
+              ? "mtn_momo"
+              : compte.provider,
           payout_phone:compte.phone,
           status:"pending"
         })
@@ -4924,7 +4929,7 @@ async function ouvrirDemandeRetrait(soldeDisponible){
       "Montant : " +
       montantRetrait.toLocaleString("fr-FR") +
       " GNF\n\n" +
-      "Statut : En attente de traitement."
+      "Statut : En attente sécurisée. Aucun paiement ne sera déclaré avant confirmation réelle du prestataire."
     );
 
        }catch(error){
