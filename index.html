@@ -13628,47 +13628,51 @@ async function chargerPropositionsPrix(){
 
 
   /* =======================================================
-     VENDEUR
+     VENDEUR — PROPOSITION OU RÉPONSE
   ======================================================= */
 
   if(estVendeur){
-
-    const buyerId =
-      conversationActuelle.buyer_id;
-
-    panel.innerHTML = `
-
-      <div class="price-offer-title">
-        💰 Proposer un prix
-      </div>
-
-      <div class="price-offer-text">
-        Tu peux proposer un prix privé à cet acheteur.
-        Le prix public de l'annonce restera inchangé.
-      </div>
-
-      <button
-        type="button"
-        class="price-offer-btn"
-        onclick="proposerPrixPrive()"
-      >
-        💰 Proposer un prix à cet acheteur
-      </button>
-
-    `;
-
-    const chatBox =
-      document.getElementById(
-        "chatBox"
+    try {
+      const offres = await supabaseFetch(
+        SUPABASE_URL + "/rest/v1/rpc/get_seller_price_offers",
+        {
+          method: "POST",
+          headers: headers({"Content-Type":"application/json"}),
+          body: JSON.stringify({
+            p_listing_id: listingId,
+            p_buyer_id: conversationActuelle.buyer_id
+          })
+        }
       );
+      const liste = Array.isArray(offres) ? offres : [];
+      const attente = liste.find(o => o.status === "pending");
 
-    if(chatBox){
-      chatContainer.insertBefore(
-        panel,
-        chatBox
-      );
+      if(attente){
+        panel.innerHTML = `
+          <div class="price-offer-title">💰 Proposition de l'acheteur</div>
+          <div class="price-offer-price">${formatPrix(attente.proposed_price_gnf)} GNF</div>
+          ${attente.details ? '<div class="price-offer-text">' + String(attente.details) + '</div>' : ''}
+          <div class="price-offer-actions">
+            <button type="button" class="price-offer-accept">✅ Accepter</button>
+            <button type="button" class="price-offer-reject">❌ Refuser</button>
+          </div>
+        `;
+        panel.querySelector(".price-offer-accept").onclick = () => repondrePropositionPrix(attente.id,"accepted");
+        panel.querySelector(".price-offer-reject").onclick = () => repondrePropositionPrix(attente.id,"rejected");
+      } else {
+        panel.innerHTML = `
+          <div class="price-offer-title">💰 Proposer un prix</div>
+          <div class="price-offer-text">Tu peux proposer un prix plus élevé ou plus bas, avec un détail facultatif.</div>
+          <button type="button" class="price-offer-btn" onclick="proposerPrixPrive()">💰 Proposer un prix</button>
+        `;
+      }
+    } catch(error) {
+      console.log("Erreur propositions vendeur :", error);
+      panel.innerHTML = '<div class="price-offer-text">Impossible de charger la proposition pour le moment.</div>';
     }
 
+    const chatBox = document.getElementById("chatBox");
+    if(chatBox) chatContainer.insertBefore(panel, chatBox);
     return;
   }
 
@@ -13871,6 +13875,14 @@ panel.dataset.mgCompactReady = "1";
         return;
       }
 
+      panel.innerHTML = `
+        <div class="price-offer-title">💰 Proposer un prix</div>
+        <div class="price-offer-text">Propose le prix que tu souhaites. Tu peux préciser les articles compris.</div>
+        <button type="button" class="price-offer-btn" onclick="proposerPrixPrive()">💰 Proposer un prix</button>
+      `;
+      afficherPanneauCentre();
+      return;
+
     } catch (error) {
 
       console.log(
@@ -13889,193 +13901,70 @@ panel.dataset.mgCompactReady = "1";
 
 async function proposerPrixPrive(){
 
-  if(
-    !utilisateurConnecte ||
-    !conversationActuelle
-  ){
-    alert(
-      "Connecte-toi pour continuer."
-    );
-
+  if(!utilisateurConnecte || !conversationActuelle){
+    alert("Connecte-toi pour continuer.");
     return;
   }
 
-  if(
-    conversationActuelle.seller_id !==
-    utilisateurConnecte.id
-  ){
-    alert(
-      "Seul le vendeur peut proposer un prix."
-    );
-
+  const annonce = annonceConversationActuelle;
+  const listingId = conversationActuelle.listing_id || (annonce && annonce.id);
+  if(!listingId){
+    alert("Annonce introuvable.");
     return;
   }
 
+  const saisie = prompt(
+    "💰 Quel prix proposes-tu ?\n\nTu peux proposer un prix plus élevé ou plus bas que le prix affiché."
+  );
+  if(saisie === null) return;
 
-  const annonce =
-    annonceConversationActuelle;
-
-  if(!annonce){
-
-    alert(
-      "Annonce introuvable."
-    );
-
+  const prix = Number(String(saisie).split(" ").join("").split(",").join("").split(".").join(""));
+  if(!Number.isFinite(prix) || prix <= 0 || !Number.isInteger(prix)){
+    alert("❌ Prix invalide.");
     return;
   }
 
-
-  const prixPublic =
-    Number(
-      annonce.price_gnf || 0
-    );
-
-
-  const saisie =
-    prompt(
-      "💰 Prix privé à proposer à cet acheteur :\n\n" +
-      "Prix public : " +
-      formatPrix(prixPublic) +
-      " GNF"
-    );
-
-
-  if(saisie === null){
-    return;
-  }
-
-
-  const prix =
-    Number(
-      String(saisie)
-        .replace(/\s/g,"")
-        .replace(/,/g,"")
-        .replace(/\./g,"")
-    );
-
-
-  if(
-    !Number.isFinite(prix) ||
-    prix <= 0
-  ){
-
-    alert(
-      "❌ Prix invalide."
-    );
-
-    return;
-  }
-
-
-  if(prixPublic <= 0){
-
-    alert(
-      "Le prix public de l'annonce est invalide."
-    );
-
-    return;
-  }
-
+  const details = prompt("Détail de la proposition (facultatif) :\nExemple : pantalon + t-shirt");
+  if(details === null) return;
 
   try{
-
-    const resultat =
-      await supabaseFetch(
-
-        SUPABASE_URL +
-        "/rest/v1/rpc/create_price_offer",
-
-        {
-          method:"POST",
-
-          headers:headers({
-            "Content-Type":
-              "application/json"
-          }),
-
-          body:JSON.stringify({
-
-            p_listing_id:
-              annonce.id,
-
-            p_buyer_id:
-              conversationActuelle.buyer_id,
-
-            p_proposed_price_gnf:
-              Math.round(prix)
-
-          })
-
-        }
-
-      );
-
-
-    if(!resultat){
-
-      throw new Error(
-        "La proposition n'a pas été créée."
-      );
-
-    }
-
-
-    /* Notification de l'acheteur */
-
-    try{
-
-      await creerNotification(
-
-        conversationActuelle.buyer_id,
-
-        "💰 Nouvelle proposition de prix",
-
-        "Le vendeur vous propose " +
-        formatPrix(prix) +
-        " GNF pour « " +
-        annonce.title +
-        " ». Ouvrez la conversation pour accepter ou refuser.",
-
-        "price_offer"
-
-      );
-
-    }catch(notificationError){
-
-      console.log(
-        "Notification proposition non envoyée :",
-        notificationError
-      );
-
-    }
-
-
-    alert(
-      "✅ Proposition de " +
-      formatPrix(prix) +
-      " GNF envoyée à cet acheteur."
+    const resultat = await supabaseFetch(
+      SUPABASE_URL + "/rest/v1/rpc/create_chat_price_offer",
+      {
+        method:"POST",
+        headers:headers({"Content-Type":"application/json"}),
+        body:JSON.stringify({
+          p_listing_id: listingId,
+          p_proposed_price_gnf: Math.round(prix),
+          p_details: details.trim() || null
+        })
+      }
     );
 
+    if(!resultat) throw new Error("La proposition n'a pas été créée.");
 
+    const destinataire = conversationActuelle.seller_id === utilisateurConnecte.id
+      ? conversationActuelle.buyer_id
+      : conversationActuelle.seller_id;
+
+    try{
+      await creerNotification(
+        destinataire,
+        "💰 Nouvelle proposition de prix",
+        "Une nouvelle proposition de " + formatPrix(prix) + " GNF vous attend dans votre conversation.",
+        "price_offer"
+      );
+    }catch(notificationError){
+      console.log("Notification proposition non envoyée :", notificationError);
+    }
+
+    alert("✅ Proposition de " + formatPrix(prix) + " GNF envoyée.");
     await chargerPropositionsPrix();
 
   }catch(error){
-
-    console.error(
-      "Erreur proposition prix :",
-      error
-    );
-
-    alert(
-      "Impossible d'envoyer la proposition.\n\n" +
-      (
-        error.message ||
-        "Erreur Supabase inconnue."
-      )
-    );
-
+    console.error("Erreur proposition prix :", error);
+    alert("Impossible d'envoyer la proposition.\n\n" + (error.message || "Erreur Supabase inconnue."));
   }
-
 }
 
 
