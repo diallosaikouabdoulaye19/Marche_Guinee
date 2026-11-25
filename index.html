@@ -19258,6 +19258,64 @@ function afficherRetour() {
         font-size: 14px;
       }
 
+      #mgProfilVendeurModal .mg-profil-statistiques {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+        margin: 20px 0 14px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat {
+        min-width: 0;
+        padding: 12px 5px;
+        border-radius: 13px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat strong {
+        font-size: 21px;
+        line-height: 1.2;
+        font-weight: 900;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat span {
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat-annonces {
+        background: #e2f8e9;
+        color: #087f3f;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat-ventes {
+        background: #fde8e8;
+        color: #bd2525;
+      }
+
+      #mgProfilVendeurModal .mg-profil-stat-attente {
+        background: #fff4cf;
+        color: #8a6500;
+      }
+
+      #mgProfilVendeurModal .mg-profil-contacter {
+        width: 100%;
+        max-width: 360px;
+        min-height: 46px;
+        margin-top: 8px;
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 12px;
+        background: #087f3f;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
       #mgProfilVendeurModal .mg-profil-annonces-titre {
         padding: 0 16px;
         margin-top: 22px;
@@ -19381,6 +19439,68 @@ function afficherRetour() {
     document.head.appendChild(style);
   }
 
+  window.mgContacterVendeurDepuisProfil = async function (sellerId) {
+    if (!sellerId) {
+      alert("Le vendeur est introuvable.");
+      return;
+    }
+
+    if (!window.utilisateurConnecte || !window.utilisateurConnecte.id) {
+      alert("Connecte-toi pour écrire au vendeur.");
+      if (typeof window.ouvrirCompte === "function") window.ouvrirCompte();
+      return;
+    }
+
+    if (String(window.utilisateurConnecte.id) === String(sellerId)) {
+      alert("Tu ne peux pas t'envoyer un message à toi-même.");
+      return;
+    }
+
+    try {
+      var base = obtenirAdresseSupabase().replace(/\\/+$/, "");
+      var requete = obtenirFetch();
+      var resultat = await requete(
+        base + "/rest/v1/rpc/get_or_create_direct_conversation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ p_seller_id: sellerId })
+        }
+      );
+
+      var conversationId = Array.isArray(resultat) ? resultat[0] : resultat;
+      if (conversationId && typeof conversationId === "object") {
+        conversationId = conversationId.get_or_create_direct_conversation || conversationId.id;
+      }
+      if (!conversationId) {
+        throw new Error("La conversation n'a pas pu être ouverte.");
+      }
+
+      window.conversationActuelle = {
+        id: conversationId,
+        listing_id: null,
+        buyer_id: window.utilisateurConnecte.id,
+        seller_id: sellerId
+      };
+      window.annonceConversationActuelle = null;
+
+      var profilModal = document.getElementById("mgProfilVendeurModal");
+      if (profilModal) profilModal.style.display = "none";
+
+      var messagesModal = document.getElementById("messagesModal");
+      if (!messagesModal) throw new Error("La messagerie est introuvable.");
+
+      messagesModal.style.display = "block";
+      if (typeof window.mgActualiserVerrouillageDefilement === "function") {
+        window.mgActualiserVerrouillageDefilement();
+      }
+      await window.afficherChat();
+    } catch (erreur) {
+      console.error("[Marché Guinée] Ouverture conversation privée :", erreur);
+      alert("Impossible d'ouvrir la conversation : " + (erreur.message || "Erreur inconnue."));
+    }
+  };
+
   window.mgOuvrirProfilVendeur = async function (
     sellerId,
     annonceCouranteId
@@ -19441,7 +19561,31 @@ function afficherRetour() {
         <div class="mg-profil-sous-titre">
           Vendeur sur Marché Guinée 🇬🇳
         </div>
+        <div class="mg-profil-statistiques">
+          <div class="mg-profil-stat mg-profil-stat-annonces">
+            <strong>${Number(vendeur.listings_count || 0).toLocaleString("fr-FR")}</strong>
+            <span>Annonces</span>
+          </div>
+          <div class="mg-profil-stat mg-profil-stat-ventes">
+            <strong>${Number(vendeur.sales_count || 0).toLocaleString("fr-FR")}</strong>
+            <span>Ventes</span>
+          </div>
+          <div class="mg-profil-stat mg-profil-stat-attente">
+            <strong>${Number(vendeur.pending_count || 0).toLocaleString("fr-FR")}</strong>
+            <span>En attente</span>
+          </div>
+        </div>
+        <button type="button" class="mg-profil-contacter" id="mgProfilContacterVendeur">
+          💬 Écrire au vendeur
+        </button>
       `;
+
+      var boutonContacter = identite.querySelector("#mgProfilContacterVendeur");
+      if (boutonContacter) {
+        boutonContacter.onclick = function () {
+          window.mgContacterVendeurDepuisProfil(sellerId);
+        };
+      }
 
       /*
        * Charger les annonces de CE vendeur.
@@ -19476,10 +19620,9 @@ function afficherRetour() {
       if (annonces.length === 0) {
         liste.innerHTML = `
           <div class="mg-profil-message">
-            Aucune annonce n'a été trouvée pour ce vendeur.
+            Ce vendeur n'a pas encore publié d'annonce.
             <br><br>
-            Si ce vendeur a déjà publié des annonces, il faudra vérifier
-            les données et les autorisations de lecture dans Supabase.
+            Tu peux quand même lui écrire directement depuis son profil.
           </div>
         `;
         return;
