@@ -19769,9 +19769,48 @@ function afficherRetour() {
     window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
   }
 
+  };
+
+  /* Installation au chargement du script, hors de la fonction async.
+     La carte est recréée à chaque ouverture : la délégation reste active. */
+  function ouvrirProfilDepuisCarte(event) {
+    var cible = event.target;
+    if (!cible || typeof cible.closest !== "function") return;
+    var carte = cible.closest("#detailContent .mg-seller-card");
+    if (!carte) return;
+
+    var page = document.querySelector("#detailContent .mg-detail-page");
+    var boutonAcheter = page && page.querySelector(
+      '.mg-detail-actions button[onclick*="ouvrirPaiement"]'
+    );
+    var onclick = boutonAcheter ? boutonAcheter.getAttribute("onclick") || "" : "";
+    var match = onclick.match(/ouvrirPaiement\(['"]([^'"]+)['"]\)/);
+    var idAnnonce = match ? match[1] : "";
+    var annonces = typeof toutesLesAnnonces !== "undefined" ? toutesLesAnnonces : [];
+    var annonce = annonces.find(function (a) {
+      return String(a.id) === String(idAnnonce);
+    });
+
+    if (!annonce || !annonce.seller_id) {
+      console.error("[Marché Guinée] Impossible d'identifier le vendeur.", {
+        idAnnonce: idAnnonce,
+        boutonAcheterTrouve: !!boutonAcheter,
+        nombreAnnonces: annonces.length
+      });
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof window.mgOuvrirProfilVendeur !== "function") {
+      console.error("[Marché Guinée] La fonction de profil n'est pas chargée.");
+      return;
+    }
+    window.mgOuvrirProfilVendeur(annonce.seller_id, annonce.id);
+  }
+
   if (!window.mgProfilVendeurClicInstalle) {
     window.mgProfilVendeurClicInstalle = true;
-
     document.addEventListener("click", ouvrirProfilDepuisCarte, true);
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
@@ -19782,8 +19821,6 @@ function afficherRetour() {
     }, true);
   }
 
-  
-};
 })();
 </script>
 
