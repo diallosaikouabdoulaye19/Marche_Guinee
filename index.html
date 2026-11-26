@@ -7058,7 +7058,23 @@ async function afficherAnnonces() {
       '<div class="empty">Aucune annonce trouvée dans cette catégorie.</div>';
     return;
   }
+  if (container._mgImageObserver) {
+    container._mgImageObserver.disconnect();
+  }
   container.innerHTML = "";
+  container._mgImageObserver =
+    "IntersectionObserver" in window
+      ? new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            if (typeof entry.target._mgLoadImage === "function") {
+              entry.target._mgLoadImage();
+            }
+          });
+        }, { rootMargin: "300px 0px" })
+      : null;
+
   for (const annonce of annonces) {
     const card = document.createElement("div");
     card.className = "card";
@@ -7113,12 +7129,12 @@ async function afficherAnnonces() {
       }
     });
     container.appendChild(card);
-    if (typeof chargerImages === "function") {
-      chargerImages(annonce.id)
-        .then((image) => {
-          if (!image || !card.isConnected) return;
-          const imageContainer = card.querySelector(".card-img");
-          if (!imageContainer) return;
+    const imageContainer = card.querySelector(".card-img");
+    if (imageContainer && typeof chargerImages === "function") {
+      const chargerImageCarte = async () => {
+        try {
+          const image = await chargerImages(annonce.id);
+          if (!image || !card.isConnected || !imageContainer.isConnected) return;
           const img = document.createElement("img");
           img.src = image;
           img.alt = annonce.title || "Annonce";
@@ -7131,10 +7147,17 @@ async function afficherAnnonces() {
             img.remove();
           };
           imageContainer.replaceWith(img);
-        })
-        .catch((erreur) => {
+        } catch (erreur) {
           console.error("Erreur de chargement de l'image :", erreur);
-        });
+        }
+      };
+
+      if (container._mgImageObserver) {
+        imageContainer._mgLoadImage = chargerImageCarte;
+        container._mgImageObserver.observe(imageContainer);
+      } else {
+        chargerImageCarte();
+      }
     }
   }
 }
