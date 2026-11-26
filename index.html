@@ -7072,7 +7072,7 @@ async function afficherAnnonces() {
               entry.target._mgLoadImage();
             }
           });
-        }, { rootMargin: "300px 0px" })
+        }, { root: null, rootMargin: "0px", threshold: 0.01 })
       : null;
 
   for (const annonce of annonces) {
