@@ -26474,16 +26474,8 @@ if (typeof ancienneFermeture === "function") {
 
   /* Aucun champ de recherche : aucun écouteur de recherche à installer. */
 
-  var observer = new MutationObserver(function () {
-    if (typeof mettreAJourCompteurConversations === "function") {
-      mettreAJourCompteurConversations();
-    }
-  });
-
-  observer.observe(liste, {
-    childList: true,
-    subtree: true
-  });
+  /* Le compteur historique n'a plus de fonction de mise à jour.
+     On évite donc un observateur permanent sur chaque changement de message. */
 }
 
 
@@ -26561,20 +26553,23 @@ if (typeof ancienneFermeture === "function") {
    * Réinstaller uniquement la barre de recherche si la fenêtre
    * de messagerie est reconstruite dynamiquement.
    */
-  var observerFenetre = new MutationObserver(function () {
-    if (
-      document.getElementById("messagesModal") &&
-      document.getElementById("messagesList") &&
-      !document.getElementById("mgChatToolbar")
-    ) {
-      creerBarreRecherche();
-    }
-  });
+  /* Surveillance limitée à la fenêtre de messagerie, jamais à toute la page. */
+  var modalMessagerie = document.getElementById("messagesModal");
+  if (modalMessagerie) {
+    var observerFenetre = new MutationObserver(function () {
+      if (
+        document.getElementById("messagesList") &&
+        !document.getElementById("mgChatToolbar")
+      ) {
+        creerBarreRecherche();
+      }
+    });
 
-  observerFenetre.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+    observerFenetre.observe(modalMessagerie, {
+      childList: true,
+      subtree: true
+    });
+  }
 
 })();
 </script>
@@ -28204,12 +28199,28 @@ async function loadMessagesOptimized() {
     }
   }
 
+  /* L'observateur est suspendu pendant nos propres changements DOM.
+     Cela évite qu'une mise en page déclenche sa propre actualisation. */
+  var layoutObserver = null;
+  var layoutObserverModal = null;
+
   function refreshLayout() {
+    if (layoutObserver) layoutObserver.disconnect();
+
     try {
       prepareConversationLayout();
       filterConversations();
     } catch (error) {
       console.warn("Mise en page de la messagerie :", error);
+    } finally {
+      if (layoutObserver && layoutObserverModal) {
+        layoutObserver.observe(layoutObserverModal, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
     }
   }
 
@@ -28217,24 +28228,19 @@ async function loadMessagesOptimized() {
     createPhotoViewer();
     makeSearchToolbar();
     installMessageLoader();
-    refreshLayout();
 
     var modal = document.getElementById("messagesModal");
 
-    if (modal && !modal.dataset.mg2026Observer) {
-      modal.dataset.mg2026Observer = "1";
+    if (modal && layoutObserverModal !== modal) {
+      if (layoutObserver) layoutObserver.disconnect();
 
-      var observer = new MutationObserver(function () {
+      layoutObserverModal = modal;
+      layoutObserver = new MutationObserver(function () {
         refreshLayout();
       });
-
-      observer.observe(modal, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["style", "class"]
-      });
     }
+
+    refreshLayout();
 
     var box = document.getElementById("chatBox");
 
