@@ -6982,116 +6982,87 @@ async function chargerMesVentes(){
 ========================= */
 
 async function chargerAnnonces(){
+  const container = document.getElementById("annonces");
+  if(!container) return;
 
-  const container =
-    document.getElementById(
-      "annonces"
+  window._mgAnnoncesOffset = 0;
+  window._mgAnnoncesPageSize = 5;
+  window._mgAnnoncesHasMore = true;
+  window._mgAnnoncesLoading = false;
+  window._mgAnnoncesAllLoaded = false;
+  toutesLesAnnonces = [];
+  container.innerHTML = '<div class="empty">Chargement des annonces...</div>';
+
+  await chargerPageAnnonces(false);
+}
+
+async function chargerPageAnnonces(ajouter = true){
+  const container = document.getElementById("annonces");
+  if(!container || window._mgAnnoncesLoading || !window._mgAnnoncesHasMore) return;
+
+  window._mgAnnoncesLoading = true;
+  try{
+    const taille = window._mgAnnoncesPageSize || 5;
+    const offset = window._mgAnnoncesOffset || 0;
+    const response = await fetch(
+      SUPABASE_URL +
+      "/rest/v1/listings?select=*&order=created_at.desc&limit=" + taille +
+      "&offset=" + offset,
+      {
+        method:"GET",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":"Bearer " + SUPABASE_KEY,
+          "Content-Type":"application/json"
+        },
+        signal:AbortSignal.timeout(15000)
+      }
     );
 
-
-  container.innerHTML =
-    '<div class="empty">Chargement des annonces...</div>';
-
-
-  try{
-   
-    console.log("CHARGEMENT ANNONCES : début");
-   
-    const response =
-      await fetch(
-
-        SUPABASE_URL +
-        "/rest/v1/listings?select=*&order=created_at.desc",
-
-        {
-          method:"GET",
-
-          headers:{
-            "apikey":SUPABASE_KEY,
-            "Authorization":
-              "Bearer " + SUPABASE_KEY,
-            "Content-Type":
-              "application/json"
-          },
-            signal:AbortSignal.timeout(10000)
-        }
-
-      );
-
-
-    const text =
-      await response.text();
-
-
+    const text = await response.text();
     let data = null;
-
-
-    try{
-
-      data =
-        text
-          ? JSON.parse(text)
-          : null;
-
-    }catch(e){
-
-      data = null;
-
-    }
-
-
+    try{ data = text ? JSON.parse(text) : null; }catch(e){ data = null; }
     if(!response.ok){
-
-      throw new Error(
-        data?.message ||
-        data?.hint ||
-        data?.details ||
-        "Erreur lors du chargement des annonces."
-      );
-
+      throw new Error(data?.message || data?.hint || data?.details || "Erreur lors du chargement des annonces.");
     }
 
+    const page = Array.isArray(data) ? data : [];
+    if(ajouter){
+      const dejaVues = new Set((Array.isArray(toutesLesAnnonces) ? toutesLesAnnonces : []).map(a => String(a.id)));
+      toutesLesAnnonces = [...(Array.isArray(toutesLesAnnonces) ? toutesLesAnnonces : []), ...page.filter(a => !dejaVues.has(String(a.id)))];
+    }else{
+      toutesLesAnnonces = page;
+    }
 
-    toutesLesAnnonces =
-      Array.isArray(data)
-        ? data
-        : [];
-
+    window._mgAnnoncesOffset = offset + page.length;
+    window._mgAnnoncesHasMore = page.length === taille;
+    if(!page.length || page.length < taille) window._mgAnnoncesAllLoaded = true;
 
     if(!toutesLesAnnonces.length){
-
-      container.innerHTML =
-        '<div class="empty">Aucune annonce pour le moment.</div>';
-
-      document.getElementById(
-        "nombreAnnonces"
-      ).textContent = "";
-
+      container.innerHTML = '<div class="empty">Aucune annonce pour le moment.</div>';
+      const compteur = document.getElementById("nombreAnnonces");
+      if(compteur) compteur.textContent = "";
       return;
-
     }
-
-
     await afficherAnnonces();
-
-}catch(error){
-
-  alert("ERREUR : " + error.message);
-
-  container.innerHTML =
-    '<div class="error">' +
-    'Impossible de charger les annonces.' +
-    '<br>' +
-    '<small>' +
-    escapeHTML(
-      error.message
-    ) +
-    '</small>' +
-    '</div>';
-  
-
+  }catch(error){
+    console.error("Erreur de chargement des annonces :",error);
+    if(!Array.isArray(toutesLesAnnonces) || !toutesLesAnnonces.length){
+      container.innerHTML = '<div class="error">Impossible de charger les annonces.<br><small>' + escapeHTML(error.message || "Erreur inconnue") + '</small></div>';
+    }else{
+      const sentinel = document.getElementById("mg-charger-plus-annonces");
+      if(sentinel) sentinel.textContent = "Impossible de charger la suite. Fais défiler pour réessayer.";
+    }
+  }finally{
+    window._mgAnnoncesLoading = false;
   }
+}
 
+async function chargerToutesLesAnnoncesPourFiltre(){
+  if(window._mgAnnoncesAllLoaded) return;
+  while(window._mgAnnoncesHasMore && !window._mgAnnoncesLoading){
+    await chargerPageAnnonces(true);
+  }
 }
 
 async function afficherAnnonces() {
@@ -7264,17 +7235,47 @@ async function afficherAnnonces() {
       }
     }
   }
+
+  const ancienSentinel = document.getElementById("mg-charger-plus-annonces");
+  if(ancienSentinel) ancienSentinel.remove();
+  if(window._mgAnnoncesHasMore && !window._mgAnnoncesAllLoaded){
+    const sentinel = document.createElement("div");
+    sentinel.id = "mg-charger-plus-annonces";
+    sentinel.textContent = "Fais défiler pour voir 5 autres annonces";
+    sentinel.style.cssText = "padding:18px;text-align:center;color:#68736d;font-size:13px;";
+    container.appendChild(sentinel);
+    if("IntersectionObserver" in window){
+      window._mgAnnoncesPageObserver?.disconnect();
+      window._mgAnnoncesPageObserver = new IntersectionObserver(entries => {
+        if(entries.some(entry => entry.isIntersecting)){
+          window._mgAnnoncesPageObserver.disconnect();
+          chargerPageAnnonces(true);
+        }
+      },{root:null,rootMargin:"0px",threshold:0.01});
+      window._mgAnnoncesPageObserver.observe(sentinel);
+    }else{
+      sentinel.textContent = "Fais défiler puis appuie ici pour charger 5 autres annonces";
+      sentinel.style.cursor = "pointer";
+      sentinel.onclick = () => chargerPageAnnonces(true);
+    }
+  }
 }
-function filtrerAnnonces() {
+async function filtrerAnnonces() {
+  if((document.getElementById("searchInput")?.value || "").trim()){
+    await chargerToutesLesAnnoncesPourFiltre();
+  }
   afficherAnnonces();
 }
-function choisirCategorie(categorie, button) {
+async function choisirCategorie(categorie, button) {
   categorieActuelle = categorie;
   document
     .querySelectorAll(".mg-categories .mg-category")
     .forEach((bouton) => bouton.classList.remove("active"));
   if (button) {
     button.classList.add("active");
+  }
+  if(String(categorie || "").toLocaleLowerCase("fr") !== "toutes"){
+    await chargerToutesLesAnnoncesPourFiltre();
   }
   afficherAnnonces();
 }
